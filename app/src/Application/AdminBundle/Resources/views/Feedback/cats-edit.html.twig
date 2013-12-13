@@ -1,0 +1,152 @@
+{% set this_page = 'feedback_cats' %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.FeedbackCategoryEditPage' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/FeedbackCategoryEditPage.js') }}"></script>
+	{% if leaf_ids %}
+	<script type="text/javascript">
+		var leaf_ids = {{ leaf_ids|json_encode|raw }};
+	</script>
+	{% endif %}
+{% endblock %}
+{% block pagetitle %}
+	<h1>{% if category.id %}{{ phrase('admin.general.edit_category') }}{% else %}{{ phrase('admin.general.new_category') }}{% endif %}</h1>
+	<nav>
+		<a class="clean-white" href="{{ path('admin_feedback_cats') }}">{{ phrase('admin.feedback.back_to_categories') }}</a>
+	</nav>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_feedback_cats_edit', {'category_id': category.id|default(0)}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.title') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.title) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.usergroups') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="checkbox-rows" style="width: 400px;">
+				<ul style="max-height: 200px;">
+					{% for id,name in usergroups %}
+						<label>
+							<input type="checkbox" name="usergroups[]" value="{{ id }}" {% if not category.id or id in enabled_groups %}checked="checked"{% endif %} />
+							{{ name }}
+						</label>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	{#
+	{% if form.parent %}
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('admin.general.parent_category') }}</label>
+			</div>
+			<div class="dp-form-input">
+				{{ form_widget(form.parent) }}
+				<div id="move_note" style="display: none">
+					{{ phrase('admin.feedback.notice_parent_selected') }}
+				</div>
+			</div>
+		</div>
+	{% endif %}
+	#}
+	<input type="hidden" name="feedback_cat[parent]" value="" />
+
+	{% if category.id %}
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('admin.feedback.feedback_using_this_category') }}</label>
+			</div>
+			<div class="dp-form-input">
+                {{ phrase('admin.feedback.count_feedback', {'count':count_existing}) }}
+			</div>
+		</div>
+	{% endif %}
+</div>
+
+<button class="btn primary save-trigger">{{ phrase('agent.general.save') }}</button>
+</form>
+
+{% if category.id %}
+	<div class="delete-link-wrap">
+		<a href="#" id="delete_btn">{{ phrase('admin.feedback.delete_category') }}</a>
+	</div>
+
+	{% if not other_cats|length %}
+		<div id="delete_cat_overlay" class="no-delete" style="width: 400px; height: 165px; display: none;">
+				<div class="overlay-title">
+					<span class="close-overlay close-trigger"></span>
+					<h4>{{ phrase('admin.feedback.delete_category') }}</h4>
+				</div>
+				<div class="overlay-content">
+					<p>{{ phrase('admin.feedback.cannot_delete_last_category') }}</p>
+				</div>
+		</div>
+	{% elseif category.children|length %}
+		<div id="delete_cat_overlay" class="no-delete" style="width: 400px; height: 165px; display: none;">
+				<div class="overlay-title">
+					<span class="close-overlay close-trigger"></span>
+					<h4>{{ phrase('admin.feedback.delete_category') }}</h4>
+				</div>
+				<div class="overlay-content">
+					<p>{{ phrase('admin.feedback.notice_has_children') }}</p>
+				</div>
+		</div>
+	{% else %}
+		<div id="delete_cat_overlay" style="width: 400px; height: 165px; display: none;">
+			<form action="{{ path('admin_feedback_cats_del', {'category_id': category.id}) }}" method="post">
+				<div class="overlay-title">
+					<span class="close-overlay close-trigger"></span>
+					<h4>{{ phrase('admin.feedback.delete_category') }}</h4>
+				</div>
+				<div class="overlay-content">
+					{% if count_existing %}
+						<div class="dp-form">
+							<div class="dp-form-row">
+								<div class="dp-form-label">
+									<label>Move {{ count_existing }} feedback using this category to...</label>
+								</div>
+								<div class="dp-form-input">
+									{% macro move_cat_opt(cats, depth) %}
+										{% for cat in cats %}
+											{% if cat.children|length %}
+												<optgroup label="{{ "--"|repeat(depth) }} {{ cat.title }}"></optgroup>
+												{{ _self.move_cat_opt(cat.children, depth+1) }}
+											{% else %}
+												<option value="{{ cat.id }}">{{ "--"|repeat(depth) }} {{ cat.title }}</option>
+											{% endif %}
+										{% endfor %}
+									{% endmacro %}
+									<select name="move_to_cat">
+										{{ _self.move_cat_opt(other_cats, 0) }}
+									</select>
+								</div>
+							</div>
+						</div>
+					{% else %}
+						<p>{{ phrase('admin.feedback.confirm_delete_this') }}</p>
+					{% endif %}
+				</div>
+				<div class="overlay-footer">
+					<button	class="clean-white">{{ phrase('admin.feedback.delete_category') }}</button>
+				</div>
+			</form>
+		</div>
+	{% endif %}
+{% endif %}
+{% endblock %}

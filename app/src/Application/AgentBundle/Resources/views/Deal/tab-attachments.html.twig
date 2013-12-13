@@ -1,0 +1,22 @@
+<div class="inner-box-tab-content">
+
+    <ul class="attachment-list">
+        {% for deal_attach in deal_attachments %}
+            <li class="{% if deal_attach.blob.isImage() %}is-image{% else %}icon icon-attachment icon-filetype-{{deal_attach.blob.extension|default('none')}}{% endif %}">
+                <div>
+                    {% if deal_attach.blob.isImage() %}
+                            <a href="{{ deal_attach.blob.download_url }}" target="_blank"><img src="{{ path('serve_blob', {'blob_auth_id': deal_attach.blob.auth_id, 'filename': deal_attach.blob.filename, 's': 50, 'size-fit': '1'}) }}" alt="" class="preview" /></a>
+                    {% endif %}
+
+                    <a href="{{ deal_attach.blob.download_url }}" target="_blank">{{deal_attach.blob.filename}}</a>
+                    <span class="size">({{ deal_attach.blob.readable_filesize }})</span>
+                </div>
+                <div>
+                    <span>{{ phrase('agent.general.updated_by', {name: deal_attach.person.display_name}) }}</span>
+                    <time class="timeago" datetime="{{deal_attach.blob.date_created|date('c', 'UTC')}}"></time>
+                </div>
+            </li>
+        {% endfor %}
+</ul>
+
+</div>

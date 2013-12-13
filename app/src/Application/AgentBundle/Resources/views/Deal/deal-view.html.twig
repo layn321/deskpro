@@ -1,0 +1,189 @@
+{% import 'AgentBundle:Common:optionbox-macros.html.twig' as optionbox %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.Deal';
+pageMeta.title = "{{ deal.title}}";
+pageMeta.deal_id = {{deal.id}};
+pageMeta.pageIdentity = 'deal1:{{deal.id}}';
+pageMeta.labelsSaveUrl = '{{ path('agent_deal_ajax_labels_save', {'deal_id': deal.id}) }}';
+pageMeta.ajaxSaveUrl = '{{ path('agent_deal_ajaxsave', {'deal_id': deal.id}) }}';
+
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{# Page Containers #}
+<div class="profile layout-content with-scrollbar">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /Page Containers #}
+<form class="value-form" style="display:none">
+	<input type="hidden" name="agent_id" class="agent_id" value="{{deal.assigned_agent.id|default(0)}}" />
+</form>
+<header class="page-header">
+    <nav class="actions" id="{{baseId}}_action_buttons">
+        <span class="editable" data-editable-for="#{{baseId}}_editprobablility">{{deal.probability}}</span>
+        <span class="edit-name-gear" style="display: none">{{ phrase('agent.deal.edit_name') }}</span>
+                <div id="{{baseId}}_editprobablility" style="display: none">
+                        <input type="hidden" name="action" value="change_probability" />
+                        <input type="text" size="20" name="probability" value="{{ deal.probability }}" />
+                </div>
+
+         <span>{{ phrase('agent.tickets.percent_of') }}</span>
+
+         <span>{% set selectCurrency = baseId~'_currency'%}
+
+                           {% include 'AgentBundle:Deal:select-deal-options.html.twig' with {
+                                'name': selectCurrency,
+                                'id': selectCurrency,
+                                'with_blank': true,
+                                'with_blank2': true,
+                                'blank_title': 'Set Currency',
+                                'options': deal_currencys,
+                                'add_classname': 'select-currency',
+                                'selected': deal.deal_currency.id
+
+                            } %}
+         </span>
+
+
+        <span class="editable" data-editable-for="#{{baseId}}_editdeal_value">{{deal.deal_value}} </span>
+        <span class="edit-name-gear" style="display: none">{{ phrase('agent.deal.edit_name') }}</span>
+                <div id="{{baseId}}_editdeal_value" style="display: none">
+                        <input type="hidden" name="action" value="change_deal_value" />
+                        <input type="text" size="20" name="deal_value" value="{{ deal.deal_value }}" />
+                </div>
+    </nav>
+    <div class="titlewrap">
+            <h4 class="id-number">#{{deal.id}}</h4>
+
+
+            <h1>
+                <span class="editable" data-editable-for="#{{baseId}}_editname">{{ deal.title|default('Double-click to set Title') }}</span>
+                <span class="edit-name-gear">{{ phrase('agent.deal.edit_name') }}</span>
+                <div id="{{baseId}}_editname" style="display: none">
+                        <input type="hidden" name="action" value="change_title" />
+                        <input type="text" size="20" name="title" value="{{ deal.title }}" />
+                </div>
+            </h1>
+
+    </div>
+
+    <div class="clear"></div>
+
+    <div class="titlewrap">
+        <div class="isLeft">
+            <dl class="table-list">
+                <dt class="type-labels select-deal" id="{{baseId}}_deal_type" data-deal-id="{{ deal.id }}">{{ phrase('agent.general.type') }}</dt>
+                <dd>
+                    {% include 'AgentBundle:Deal:select-deal-options.html.twig' with {
+                                'name': 'actions[dealtype]',
+                                'id': baseId~'_select_deal_type',
+                                'with_blank': true,
+                                'with_blank2': true,
+                                'blank_title': '{{ phrase('agent.deal.set_deal_type') }}',
+                                'options': deal_types,
+                                'selected': deal.deal_type.id,
+                                'add_classname': 'select-deal-type'
+                    } %}
+                </dd>
+            </dl>
+        </div>
+
+        <div class="isLeft">
+            <dl class="table-list">
+                <dt class="type-labels">{{ phrase('agent.deal.stage') }}</dt>
+                <dd class="set-deal-stage">
+                    {% include 'AgentBundle:Deal:select-deal-options.html.twig' with {
+                                'name': 'actions[dealstage]',
+                                'id': baseId~'_select_deal_stage',
+                                'with_blank': true,
+                                'with_blank2': true,
+                                'blank_title': '{{ phrase('agent.deal.set_deal_stage') }}',
+                                'options': deal_stage,
+                                'selected': deal.deal_stage.id,
+                                'add_classname': 'select-deal-stage'
+                    } %}
+                </dd>
+            </dl>
+        </div>
+
+    </div>
+
+    <div class="isRight">
+
+        <div class="meta-line">
+            <div class="isLeft category the-visibility deal-visibility" id="{{baseId}}_visibility_trigger">
+                <span id="{{baseId}}_visibility_label">
+                        {% if deal.visibility == 0 %}
+                                {{ phrase('agent.general.private') }}
+                        {% elseif deal.visibility == 1 %}
+                                {{ phrase('agent.general.public') }}
+                        {% endif %}
+                </span>
+            </div>
+
+            <div class="isLeft hasMargineLeft-10px status the-status deal-status" id="{{baseId}}_status_trigger">
+                <span id="{{baseId}}_status_label">
+                        {% if deal.status == 0 %}
+                                {{ phrase('agent.general.open') }}
+                        {% elseif deal.status == 1 %}
+                                {{ phrase('agent.deal.won') }}
+                        {% elseif deal.status == 2 %}
+                                {{ phrase('agent.general.lost') }}
+                        {% endif %}
+                </span>
+            </div>
+	</div>
+
+    </div>
+
+    <div class="clear"></div>
+</header>
+
+        <table class="layout-table" cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" width="60%">
+                <section class="content-col">
+                    {% include 'AgentBundle:Deal:view-content-col.html.twig' %}
+                </section>
+                </td>
+            </tr>
+        </table>
+
+{# Page Containers #}
+</div>
+
+</div>
+</div>
+{# /Page Containers #}
+
+
+{{ optionbox.start('Status', {'id': baseId ~ '_status_ob'}) }}
+	{{ optionbox.section_start('', 'status') }}
+		<li class="top parent-option item-open" data-item-id="0" data-full-title="{{ phrase('agent.general.open') }}">
+			<input type="radio" name="status" value="o" />
+			<label>{{ phrase('agent.general.open') }}</label>
+		</li>
+		<li class="top parent-option item-won" data-item-id="1" data-full-title="{{ phrase('agent.deal.won') }}">
+			<input type="radio" name="status" value="1" />
+			<label>{{ phrase('agent.deal.won') }}</label>
+		</li>
+
+		<li class="top parent-option item-lost" data-item-id="2" data-full-title="{{ phrase('agent.general.lost') }}">
+			<input type="radio" name="status" value="2" />
+			<label>{{ phrase('agent.general.lost') }}</label>
+		</li>
+	{{ optionbox.section_end() }}
+{{ optionbox.end('Set Status') }}
+
+
+{{ optionbox.start('Visibility', {'id': baseId ~ '_visibility_ob'}) }}
+	{{ optionbox.section_start('', 'visibility') }}
+		<li class="top parent-option item-private" data-item-id="0" data-full-title="{{ phrase('agent.general.private') }}">
+			<input type="radio" name="visibility" value="o" />
+			<label>{{ phrase('agent.general.private') }}</label>
+		</li>
+		<li class="top parent-option item-public" data-item-id="1" data-full-title="{{ phrase('agent.general.public') }}">
+			<input type="radio" name="visibility" value="1" />
+			<label>{{ phrase('agent.general.public') }}</label>
+		</li>
+	{{ optionbox.section_end() }}
+{{ optionbox.end('Set Visibility') }}

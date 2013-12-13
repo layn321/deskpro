@@ -1,0 +1,28 @@
+{##
+ # The portal sidebar block that draws the download category tree.
+ ##}
+
+<section class="dp-sidebar-block">
+	<header>
+		<h3>
+			<a href="{{ path('user_downloads_home') }}">{% if title %}{{ title }}{% else %}{{ phrase('user.downloads.title') }}{% endif %}</a>
+		</h3>
+	</header>
+	<article class="dp-written">
+		<p class="dp-summary">
+			{{ phrase('user.downloads.sidebar_description', {count: counts['0_total']|default(0)}) }}
+		</p>
+		<ul class="dp-cat-list">
+			{% for cat in categories %}
+				<li>
+					<div class="dp-fadeaway-container">
+						<i class="dp-icon-folder-close"></i>
+						<a class="dp-fadetitle" href="{{ path('user_downloads', {slug: cat.url_slug}) }}">{{ cat.title }}</a>
+						<div class="dp-fadeaway"></div>
+						<a class="dp-badge dp-small" href="{{ path('user_downloads', {slug: cat.url_slug}) }}">{{ counts[cat.id ~ '_total']|default(0) }}</a>
+					</div>
+				</li>
+			{% endfor %}
+		</ul>
+	</article>
+</section>

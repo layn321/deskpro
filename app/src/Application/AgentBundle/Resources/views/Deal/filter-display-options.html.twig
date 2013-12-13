@@ -1,0 +1,9 @@
+{% extends 'AgentBundle:Common:display-options-layout.html.twig' %}
+
+{% block display_elements_list %}
+
+    {% set types = ['date_created','probability','linked_data','ticket_type','time_open','assigned_agent','visibility','labels', 'status'] %}
+    {% for t in types %}
+            <li data-field="{{ t }}"><label><input type="checkbox" name="{{ t }}" {% if t in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.deal.type_' ~ t) }}</label></li>
+    {% endfor %}
+{% endblock %}

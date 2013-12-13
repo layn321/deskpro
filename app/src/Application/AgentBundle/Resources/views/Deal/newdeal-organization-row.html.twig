@@ -1,0 +1,9 @@
+<div class="col">
+	<h4>{{ phrase('agent.general.name') }}</h4>
+	{% if organization.id %}
+		{{ organization.name }}
+	{% else %}
+		<input type="text" name="newdeal[organizations][name]" class="name" value="{{ organization.name }}" />
+	{% endif %}
+</div>
+<br class="clear" />

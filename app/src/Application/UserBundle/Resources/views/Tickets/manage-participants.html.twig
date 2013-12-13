@@ -1,0 +1,43 @@
+{##
+ # The page that allows a user to manage the participants on one of their tickets
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+<script type="text/javascript" src="{{ path('data_interface_data', {'types': ['tickets']}) }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/User/Page/NewTicket.js') }}"></script>
+<script type="text/javascript">
+	DeskPRO_Window.setPageHandler(new DeskPRO.User.Page.NewTicket({ autoRun: true }));
+</script>
+{% endblock %}
+{% block content %}
+
+<h1 style="border-bottom: 2px solid #ddd; margin-bottom: 10px; padding-bottom: 3px;">{{ phrase('user.tickets.manage_participants') }}</h1>
+
+{% if ticket.user_participants|length %}
+	<ul>
+		{% for part in ticket.user_participants %}
+		<li>
+			<small>(<a href="{{ path('user_tickets_participants_remove', {'ticket_ref': ticket.ref, 'person_id': part.person.id}) }}">{{ phrase('user.tickets.remove_participant') }}</a>)</small> &nbsp;
+			{% if part.person.display_name_user != part.person.primary_email_address %}
+				{{ part.person.display_name_user }} ({{ part.person.primary_email_address }})
+			{% else %}
+				{{ part.person.primary_email_address }}
+			{% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+{% endif %}
+
+<form action="{{ path('user_tickets_participants_add', {'ticket_ref':ticket.ref}) }}" method="post">
+	{{ form_token() }}
+	{{ phrase('user.tickets.cc_form_add_title') }}:<br />
+	{{ phrase('user.general.first_name') }}: {{ form_widget(newpart_form.first_name) }} &nbsp;&nbsp;
+	{{ phrase('user.general.last_name') }}: {{ form_widget(newpart_form.last_name) }}
+	<br />
+	{{ phrase('user.general.email_address') }}: {{ form_widget(newpart_form.email) }}
+	<input type="submit" value="{{ phrase('user.general.add') }}" />
+	{{ form_rest(newpart_form) }}
+</form>
+
+{% endblock %}

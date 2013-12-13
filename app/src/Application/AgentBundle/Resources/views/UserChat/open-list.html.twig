@@ -1,0 +1,78 @@
+{% extends 'AgentBundle:Common:common-listing.html.twig' %}
+{% block pagemeta %}
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.OpenChats';
+pageMeta.agent_id = {{ agent.id|default(0)}};
+
+{% if filter_type == 'new' %}
+	pageMeta.url_fragment = '{{ url_fragment('agent_userchat_list_new', {'department_id': department_id}) }}';
+{% elseif filter_type == 'active' %}
+	pageMeta.url_fragment = '{{ url_fragment('agent_userchat_list_active', {'agent_id': agent_id}) }}';
+{% endif %}
+
+{% endblock pagemeta %}
+{% block pane_header %}
+	<h1><i class="icon-dp-chat"></i> {{ phrase('agent.userchat.list_title', {count: total}) }}</h1></h1>
+{% endblock %}
+{% block listing %}
+{% if convos|length %}
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for convo in convos %}
+		<article
+			class="row-item convo-{{ convo.id }} without-selection"
+			data-convo-id="{{ convo.id }}"
+			data-route="page:{{ path('agent_userchat_view', {'conversation_id': convo.id}) }}" data-route-title="@selector(a.subject)" data-route-openclass="open">
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="row-title click-through">
+							{{ convo.subjectLine }}
+						</a>
+					</h3>
+				</div>
+				<div class="top-row-right">
+					<div class="bound-fade"></div>
+					{% if convo.agent %}<span class="tipped agent-inline-icon" title="{{ convo.agent.display_name }}" style="background: url('{{ convo.agent.getPictureUrl(16) }}') no-repeat 0 50%; height: 16px; width: 16px;"></span>{% endif %}
+				</div>
+			</div>
+			<div class="userinfo general">
+				{% if convo.person %}
+				{%- set phrase_part -%}<a
+					class="click-through name"
+					data-route="person:{{ path('agent_people_view', {'person_id': convo.person.id}) }}"
+					><span class="with-icon" data-person-id="{{ convo.person.id|default(0) }}" style="background-image: url('{{ convo.person.getPictureUrl(16) }}');">{{ convo.person.display_name }}</span></a> &lt;{{ convo.person.primary_email_address }}&gt;
+				{%- endset -%}
+				{% else %}
+					{% if convo.person_name or convo.person_email %}
+						{% set phrase_part %}{{ convo.person_name }} {% if convo.person_email %} &lt;{{ convo.person_email }}&gt;{% endif %}{% endset %}
+					{% else %}
+						{% set phrase_part %}{{ phrase('agent.general.anonymous') }}{% endset %}
+					{% endif %}
+				{% endif %}
+
+				<span style="display: inline-block">{{ phrase('agent.general.by_name', {'name':phrase_part|trim}, true) }}</span> |
+				<time class="timeago" datetime="{{ convo.date_created|date('c', 'UTC') }}">{{ convo.date_created|date('day_short') }}</time>
+			</div>
+		</article>
+	{% endfor %}
+	<footer class="results-nav">
+		<div class="cursor">
+			{% set total = convos|length %}
+			{% set phrase_part1 %}
+			<span class="results-showing-count" id="{{baseId}}_showing_count">{{ total }}</span>
+			{% endset %}
+			{% set phrase_part2 %}
+			<span class="results-total-count" id="{{baseId}}_total_count">{{ total }}</span>
+			{% endset %}
+			{{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+		</div>
+		<div class="loading">
+
+		</div>
+	</footer>
+</section>
+{% else %}
+<section class="list-listing no-results">
+	<p>{{ phrase('agent.general.there_are_no_results') }}</p>
+</section>
+{% endif %}
+{% endblock listing %}

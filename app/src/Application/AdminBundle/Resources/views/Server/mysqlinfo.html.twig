@@ -1,0 +1,44 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('admin.general.mysql_info') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left" width="40%">&nbsp; {{ phrase('admin.general.variable_name') }}</th>
+				<th style="text-align:left">&nbsp; {{ phrase('agent.general.value') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Download Schema</td>
+				<td>
+					<a href="{{ path('admin_server_downloadschema') }}">Download database-schema.sql</a>
+				</td>
+			</tr>
+			<tr>
+				<td>Schema Status</td>
+				<td>
+					{% if not schemadiff %}
+						OKAY
+					{% else %}
+						<textarea rows="8" cols="100" style="width: 98%; height: 150px; font-family: Monaco, Consolas, 'Courier New', monospace; font-size: 10px;">{{ schemadiff }}</textarea>
+					{% endif %}
+				</td>
+			</tr>
+			{% for name,value in mysqlinfo %}
+				<tr>
+					<td>{{ name }}</td>
+					<td>
+						<input type="text" value="{{ value }}" style="border: none; background: transparent; box-shadow: none; width: 98%; font-size: 11px; font-family: monospace; color: #000;" />
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

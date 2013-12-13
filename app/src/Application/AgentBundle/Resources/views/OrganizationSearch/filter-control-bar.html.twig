@@ -1,0 +1,23 @@
+<header class="list-control-bar">
+	<ul class="btn-controls">
+		<li class="display-options display-options-trigger"><a></a></li>
+		<li class="right"><span class="sep"></span></li>
+	</ul>
+	<ul>
+		<li>{{ phrase('agent.general.ordered_by') }} </li>
+		<li class="order-by-menu-trigger menu-fitted" data-menu-button=".button"><a class="button">
+			<span class="label">
+				{% if 'num_members' in cache.criteria.order_by %}
+					{{ phrase('agent.general.number_of_members') }}
+				{% else %}
+					{{ phrase('agent.general.name') }}
+				{% endif %}
+			</span><em></em></a>
+		</li>
+		<li><span class="sep"></span></li>
+	</ul>
+	<ul style="display: none" class="order-by-menu">
+		<li data-order-by="num_members">{{ phrase('agent.general.number_of_members') }}</li>
+		<li data-order-by="name-asc">{{ phrase('agent.general.name') }}</li>
+	</ul>
+</header>

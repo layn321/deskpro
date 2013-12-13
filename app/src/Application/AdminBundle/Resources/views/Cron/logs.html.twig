@@ -1,0 +1,51 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<nav>
+          <ul>
+               <li><a href="{{ path('admin_server_cron_logs_clear', {x: security_token('clear_cron_logs') }) }}">{{ phrase('admin.general.clear_logs') }}</a></li>
+          </ul>
+     </nav>
+	<ul>
+		<li><a href="{{ path('admin_server_cron') }}">{{ phrase('admin.general.scheduled_tasks') }}</a></li>
+		<li>{{ phrase('admin.general.logs') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_server_cron_logs') }}" method="GET">
+	<select name="job_id">
+		<option value="">All Logs</option>
+		{% for job in jobs %}
+			<option value="{{ job.id }}" {% if job_id == job.id %}selected="selected"{% endif %}>{{ job.title }} &nbsp;&nbsp;&nbsp; ({{ job.id }})</option>
+		{% endfor %}
+	</select>
+	<select name="priority">
+		<option value="">All Priorities</option>
+		<option value="3" {% if priority == 3 %}selected="selected"{% endif %}>Errors</option>
+		<option value="6" {% if priority == 6 %}selected="selected"{% endif %}>Info</option>
+	</select>
+	<button class="btn">Go</button>
+</form>
+<br />
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:center" width="80">{{ phrase('admin.logs.log') }}</th>
+				<th style="text-align:center"Message</th>
+				<th style="text-align:center" width="185">{{ phrase('agent.general.date') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for log in logs %}
+				<tr>
+					<td style="text-align:center">{{ log.log_name }}</td>
+					<td {% if log.priority <= 4 %}style="background-color:#FFE2E2"{% endif %}>{{ log.message }}</td>
+					<td style="text-align:center">{{ log.date_created|date('fulltime') }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

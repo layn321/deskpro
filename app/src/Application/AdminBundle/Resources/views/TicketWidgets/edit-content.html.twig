@@ -1,0 +1,43 @@
+{% extends 'AdminBundle::layout_popout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/WidgetEdit.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" charset="utf-8">
+function _page_exec() {
+	window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.WidgetEdit({{widget.id|default(0)}});
+
+	{% if row_html %}
+		DeskPRO_Page.tellParentUpdated();
+		DeskPRO_Page.updateParentListRow({{ row_html|json_encode|raw }});
+	{% endif %}
+}
+</script>
+{% endblock %}
+{% block page_id "ticket_widgets" %}
+{% block header %}
+	<h1>{% if widget.id %}Edit Widget{% else %}New Widget{% endif %}</h1>
+{% endblock %}
+{% block content %}
+
+<form action="{{ path('admin_ticketwidgets_edit', {'widget_id': widget.id|default(0)}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+
+<div class="form-panel">
+	<div class="row">
+		<label>{{ phrase('admin.tickets.admin_namenote') }}</label>
+		{{ form_widget(form.note) }}
+	</div>
+	<div class="row">
+		<label>{{ phrase('admin.tickets.html_content') }}</label>
+		{{ form_widget(form.data.content, {'cols': 80, 'rows': 10}) }}
+	</div>
+</div>
+
+{{ form_rest(form) }}
+</form>
+{% endblock %}
+{% block footer %}
+	<button class="dp-button small save-trigger">{{ phrase('agent.general.save') }}</button>
+
+{% endblock %}

@@ -1,0 +1,417 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	{% if agent.id %}
+	<nav>
+		<ul>
+			<li><a href="{{ path('admin_agents_edit_prefs', {person_id: agent.id}) }}">Profile Settings</a></li>
+			{% if agent.id != app.user.id %}<li class="tools" id="tools_menu_trigger"><a></a><em></em></li>{% endif %}
+		</ul>
+	</nav>
+	<ul id="tools_menu" style="display: none">
+		<li><a href="{{ path('admin_agents_remove', {agent_id: agent.id}) }}">{{ phrase('admin.agents.delete_agent') }}</a></li>
+		<li><a href="{{ path('admin_agents_loginas', {agent_id: agent.id}) }}">Login as this agent</a></li>
+	</ul>
+	{% endif %}
+
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		{% if agent.id %}
+			<li>{{ phrase('admin.agents.edit_agent') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.agents.new_agent') }}</li>
+		{% endif %}
+	</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/AgentEditPage.js') }}"></script>
+<style type="text/css">
+#more_emails_empty {
+	font-size: 11px;
+	padding: 6px;
+}
+
+#more_emails {
+	font-size: 11px;
+	padding: 6px;
+}
+
+#more_emails .add-row {
+	font-size: 11px;
+}
+
+#more_emails .add-row input {
+	padding: 0;
+	margin: 0;
+	border: none;
+	border-bottom: 1px solid #888;
+	width: 130px;
+	box-shadow: none;
+	font-size:11px;
+}
+
+#more_emails .add-row #more_emails_trigger {
+	color: #888;
+	border: 1px solid #888;
+	border-radius: 4px;
+	padding: 1px 4px;
+}
+
+#more_emails .remove-trigger {
+	color: #999;
+	cursor: pointer;
+}
+
+#more_emails .remove-trigger:hover {
+	color: #A60003;
+}
+</style>
+{% endblock %}
+{% block page %}
+
+{% if app.getSession().getFlash('saved_agent') %}
+	<div class="alert-message block-message success">
+		Agent was saved successfully.
+	</div>
+{% endif %}
+
+{% if agent.is_vacation_mode %}
+	<div class="alert-message block-message info">
+		<h1>{{ phrase('admin.agents.name_in_vacation', {'name':agent.display_name}) }}</h1>
+		<form action="{{ path('admin_agents_setvacation', {person_id: agent.id, set_to: '0'}) }}" method="post">
+			{{ form_token() }}
+			<p>
+				{{ phrase('admin.agents.notice_effect_of_vacation') }}
+                {{ phrase('admin.agents.if_name_is_back', {'name':agent.display_name}) }} <button class="clean-white small">{{ phrase('admin.agents.turn_off_vacation_mode') }}</button>
+			</p>
+		</form>
+	</div>
+{% endif %}
+
+{% block agent_page_top %}{% endblock %}
+
+<form
+	action="{{ path('admin_agents_edit_save', {'person_id': agent.id|default('0')}) }}"
+	method="POST"
+	data-element-handler="DeskPRO.Admin.ElementHandler.AgentEditPage"
+	data-validate-url="{{ path('admin_agents_edit_formvalidate', {person_id: agent.id|default('0')}) }}"
+>
+
+{% if agent_base %}
+	<div class="alert-message block-message info">
+		You are creating a new agent based off of <strong>{{ agent_base.display_name }}</strong>. Permissions and notification settings
+		will be copied.
+		<input type="hidden" name="base_agent_id" value="{{ agent_base.id }}" />
+	</div>
+{% endif %}
+
+<div id="errors_container" style="display: none;">
+	<h3>Please correct the following errors:</h3>
+	<ul></ul>
+	<div id="dupe_confirm" style="display: none">
+		&bull; The email address you entered is already in use.
+		Do you want to merge the existing account into this agent?<br />
+		<label>
+			<input type="checkbox" name="confirm_email_dupe" value="1" {% if confirm_email_dupe %}checked="checked"{% endif %} />
+			Yes, merge this agent account into the existing account
+		</label>
+	</div>
+</div>
+
+<div class="dp-form">
+	<div class="dp-form-section">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('agent.general.name') }}</label>
+			</div>
+			<div class="dp-form-input">
+				<input style="width:422px;" type="text" name="agent[name]" value="{{ agent.name }}" />
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Override Name</label>
+			</div>
+			<div class="dp-form-input">
+				<input style="width:422px;" type="text" name="agent[override_display_name]" value="{{ agent.override_display_name }}" />
+				<div>If entered, this will be displayed to users instead of the agent's real name.</div>
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('agent.general.email') }}</label>
+			</div>
+			<div class="dp-form-input">
+				<input style="width:422px;" type="text" name="agent[email]" value="{{ agent.primary_email_address }}" />
+
+				<div id="more_emails_empty" {% if agent.emails|length != 1 %}style="display: none;"{% endif %}>
+					<a href="#">Add additional emails &rarr;</a>
+				</div>
+				<div id="more_emails" {% if agent.emails|length == 1 %}style="display: none;"{% endif %}>
+					<strong>Additional Emails:</strong>
+					<ul>
+						{% for email in agent.emails if email.id != agent.primary_email.id %}
+							<li data-email-id="{{ email.id }}">&bull; <span>{{ email.email }}</span>&nbsp;&nbsp;&nbsp;<i class="icon-trash remove-trigger" title="Remove email"></i></li>
+						{% endfor %}
+						<li class="add-row">Add another email: <input type="text" id="more_emails_txt" /> <a id="more_emails_trigger" href="#">Add</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		{% if not agent.id %}
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('admin.agents.initial_password') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<input style="width:422px;" type="text" name="agent[password]" value="{{ random_password }}" />
+				</div>
+			</div>
+		{% else %}
+			{% if agent.getPasswordHash() %}
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>Reset Password</label>
+					</div>
+					<div class="dp-form-input">
+						<input style="width:422px;" type="text" name="agent[password]" value="" placeholder="Leave blank to not reset password" />
+					</div>
+				</div>
+			{% endif %}
+			{% if user_usersources|length %}
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>Usersources</label>
+					</div>
+					<div class="dp-form-input">
+						This agent exists through the following <a href="{{ path('admin_userreg_options') }}">usersources</a>:
+						<ul>
+							{% for us in user_usersources %}
+								<li>&bull; {{ us.usersource.title }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			{% endif %}
+		{% endif %}
+
+		{% if all_teams %}
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('agent.general.teams') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<div class="checkbox-rows"  style="width:417px;">
+						<ul style="max-height: 200px;">
+							{% for team in all_teams %}
+							<li>
+								<label>
+									<input type="checkbox" name="agent[teams][]" value="{{ team.id }}" {% if team.id in agent_teams %}checked="checked"{% endif %} />
+									{{ team.name }}
+								</label>
+							</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	<div class="dp-form-section">
+		<table cellspacing="0" cellpadding="0" width="100%"><tr>
+			<td width="35%" style="padding-right: 10px">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('admin.agents.zone_access') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="hidden" name="agent[can_agent]" value="1" />
+
+						<label style="line-height: 24px">
+							<input type="checkbox" name="agent[can_admin]" value="1" {% if agent.can_admin %}checked="checked"{% endif %} />
+							<span class="with-icon zone-admin">{{ phrase('admin.agents.can_access_admin') }}</span>
+						</label><br />
+
+						<label style="line-height: 24px">
+							<input type="checkbox" name="agent[can_reports]" value="1" {% if agent.can_reports %}checked="checked"{% endif %} />
+							<span class="with-icon zone-reports">{{ phrase('admin.agents.can_access_reports') }}</span>
+						</label><br />
+
+						<label style="line-height: 24px">
+							<input type="checkbox" name="agent[can_billing]" value="1" {% if agent.can_billing %}checked="checked"{% endif %} />
+							<span class="with-icon zone-billing">{{ phrase('admin.agents.can_access_billing') }}</span>
+						</label><br />
+					</div>
+				</div>
+			</td>
+			<td width="65%" style="padding-left: 10px">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('admin.agents.department_access_permissions') }}</label>
+					</div>
+					<div class="dp-form-input" id="dep_perms">
+
+						<nav class="check-grid-tabs" style="height: 24px;">
+							<ul data-element-handler="DeskPRO.ElementHandler.SimpleTabs" data-trigger-elements="> li">
+								<li class="on" data-tab-for="#depperm_tickets"><span>{{ phrase('agent.general.tickets') }}</span></li>
+								{% if app.getSetting('core.apps_chat') %}<li data-tab-for="#depperm_chat"><span>{{ phrase('agent.general.chat') }}</span></li>{% endif %}
+							</ul>
+						</nav>
+
+						<div class="check-grid" style="max-height: 200px; overflow: auto;" id="depperm_tickets">
+							<table width="100%">
+								<thead>
+									<tr>
+										<th style="text-align: left;">{{ phrase('agent.general.department') }}</th>
+										<th width="80">
+											<a href="#" id="ticketdep_toggle_all_full" class="tipped" title="Provides the agent full access to the department's tickets. Click to toggle all.">Full Access</a>
+										</th>
+										<th width="80">
+											<a href="#" id="ticketdep_toggle_all_assign" class="tipped" title="If full access is not provided, this controls whether agents can create or assign tickets to this department. Click to toggle all.">Assignment</a>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+										<tr>
+											{% if dep.children|length %}
+												<td class="title title-group">{{ dep.title }}</td>
+												<td class="prop">&nbsp;</td>
+												<td class="prop">&nbsp;</td>
+											{% else %}
+												<td class="title">{{ dep.title }}</td>
+												<td class="prop ticket-choice">
+													<input class="onoff-slider departments" type="checkbox" {% if agent_deps[dep.id].tickets or not agent.id %}checked="checked"{% endif %} name="agent[departments][{{ dep.id }}][tickets]" value="1" />
+												</td>
+												<td class="prop ticket-assign-choice">
+													<input class="onoff-slider departments_assign" type="checkbox" {% if agent_deps[dep.id].tickets or agent_deps_assign[dep.id].tickets or not agent.id %}checked="checked"{% endif %} name="agent[departments_assign][{{ dep.id }}][tickets]" value="1" />
+												</td>
+											{% endif %}
+										</tr>
+										{% if dep.children %}
+											{% for subdep in dep.children %}
+												<tr>
+													<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; {{ subdep.title }}</td>
+													<td class="prop ticket-choice">
+														<input class="onoff-slider departments" type="checkbox" {% if agent_deps[subdep.id].tickets or not agent.id %}checked="checked"{% endif %} name="agent[departments][{{ subdep.id }}][tickets]" value="1" />
+													</td>
+													<td class="prop ticket-assign-choice">
+														<input class="onoff-slide departments_assignr" type="checkbox" {% if agent_deps[subdep.id].tickets or agent_deps_assign[subdep.id].tickets or not agent.id %}checked="checked"{% endif %} name="agent[departments_assign][{{ subdep.id }}][tickets]" value="1" />
+													</td>
+												</tr>
+											{% endfor %}
+										{% endif %}
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+
+						{% if app.getSetting('core.apps_chat') %}
+							<div class="check-grid" style="max-height: 200px; overflow: auto; display: none;" id="depperm_chat">
+								<table width="100%">
+									<thead>
+										<tr>
+											<th style="text-align: left;">{{ phrase('agent.general.department') }}</th>
+											<th width="60">
+												<a href="#" id="chatdep_toggle_all" style="font-size:9px">Toggle All</a>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for dep in app.departments.getRootNodes() if dep.is_chat_enabled %}
+											<tr>
+												{% if dep.children|length %}
+													<td class="title title-group">{{ dep.title }}</td>
+													<td class="prop">&nbsp;</td>
+												{% else %}
+													<td class="title">{{ dep.title }}</td>
+													<td class="prop chat-choice">
+														<input class="onoff-slider" type="checkbox" {% if agent_deps[dep.id].chat or not agent.id %}checked="checked"{% endif %} name="agent[departments][{{ dep.id }}][chat]" value="1" />
+													</td>
+												{% endif %}
+											</tr>
+											{% if dep.children %}
+												{% for subdep in dep.children %}
+													<tr>
+														<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; {{ subdep.title }}</td>
+														<td class="prop chat-choice">
+															<input class="onoff-slider" type="checkbox" {% if agent_deps[subdep.id].chat or not agent.id %}checked="checked"{% endif %} name="agent[departments][{{ subdep.id }}][chat]" value="1" />
+														</td>
+													</tr>
+												{% endfor %}
+											{% endif %}
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						{% endif %}
+
+					</div>
+				</div>
+			</td>
+		</tr></table>
+	</div>
+
+	{##############################
+	 # Permisssions
+	 ##############################}
+	<div class="dp-form-section">
+		<table cellspacing="0" cellpadding="0" width="100%"><tr>
+			<td width="35%" style="padding-right: 10px">
+				{% if all_usergroups %}
+					<div class="dp-form-row">
+						<div class="dp-form-label">
+							<label>{{ phrase('admin.agents.permission_groups') }}</label>
+						</div>
+						<div class="dp-form-input">
+							<div class="checkbox-rows" id="usergroup_checks">
+								<ul style="max-height: 200px;">
+									{% for usergroup in all_usergroups %}
+									<li>
+										<label>
+											<input type="checkbox" name="agent[usergroups][]" value="{{ usergroup.id }}" {% if (not agent.id and usergroup.id == 2) or (usergroup.id in agent_usergroups) %}checked="checked"{% endif %} />
+											{{ usergroup.title }}
+											<a href="{{ path('admin_agents_groups_edit', {usergroup_id: usergroup.id}) }}" class="tools-menu-icon" style="position: relative; top: 2px;"></a>
+										</label>
+									</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+			</td>
+			<td width="65%" style="padding-left: 10px">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.permissions') }}</label>
+					</div>
+					<div class="dp-form-input" id="permgroup_table">
+						{% include 'AdminBundle:Agents:edit-agent-permtable.html.twig' %}
+					</div>
+				</div>
+			</td>
+		</table>
+	</div>
+</div>
+
+{% block agent_form_bottom %}{% endblock %}
+
+<footer class="controls" id="save_control">
+	<div class="is-not-loading">
+		<button class="clean-white">{{ phrase('admin.agents.save_agent') }}</button>
+	</div>
+	<div class="is-loading">
+		<div class="loading-icon-flat">&nbsp;</div>
+	</div>
+</footer>
+
+<br class="clear" />
+</form>
+
+{% include 'AdminBundle:Agents:edit-agent-overlays.html.twig' %}
+{% endblock %}

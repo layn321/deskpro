@@ -1,0 +1,178 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.UserModePage' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/UserModePage.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+     <ul>
+         <li>{{ phrase('admin.user_registration.registration_settings') }}</li>
+     </ul>
+{% endblock %}
+{% block sidebar_right %}
+	<div class="dp-page-box" style="margin-top: 15px;">
+		<div class="resource-item-list">
+			<header>
+				<div class="controls">
+					<a class="clean-white small" href="{{ path('admin_userreg_usersource_choose') }}">{{ phrase('admin.user_registration.add_user_source') }}</a>
+				</div>
+				<h4>{{ phrase('admin.user_registration.user_sources') }}</h4>
+			</header>
+			<article>
+				<article class="box-hint">{{ phrase('admin.user_registration.explain_user_source') }}</article>
+				<ul>
+					<li>
+						<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_userreg_deskpro_source_toggle') }}';" {% if app.getSetting('core.deskpro_source_enabled') %}checked="checked"{% endif %} />
+						{{ phrase('agent.general.deskpro') }}
+					</li>
+					{% if get_instance_ability('can_use_facebook_auth') %}
+						<li>
+							<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_userreg_facebook_toggle') }}';" {% if app.getSetting('core.facebook_source_enabled') %}checked="checked"{% endif %} />
+							{{ phrase('agent.general.facebook') }} <a href="{{ path('admin_userreg_facebook_edit') }}" class="btn-edit-gear2" style="position: relative; top: 2px;"></a>
+						</li>
+					{% else %}
+						<li class="tipped" data-tipped-target=".jquery-checkbox img" data-tipped-options="maxWidth: 250, skin:'dperror'" title="{{ phrase('admin.general.error_ssl_feature_tip') }}">
+							<input class="onoff-slider" type="checkbox" />
+							{{ phrase('agent.general.facebook') }}
+						</li>
+					{% endif %}
+					{% if get_instance_ability('can_use_twitter_auth') %}
+						<li>
+							<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_userreg_twitter_toggle') }}';" {% if app.getSetting('core.twitter_source_enabled') %}checked="checked"{% endif %} />
+							{{ phrase('agent.general.twitter') }} <a href="{{ path('admin_userreg_twitter_edit') }}" class="btn-edit-gear2" style="position: relative; top: 2px;"></a>
+						</li>
+					{% else %}
+						<li class="tipped" data-tipped-target=".jquery-checkbox img" data-tipped-options="maxWidth: 250, skin:'dperror'" title="{{ phrase('admin.general.error_ssl_feature_tip') }}">
+							<input class="onoff-slider" type="checkbox" />
+							{{ phrase('agent.general.twitter') }}
+						</li>
+					{% endif %}
+					{% if get_instance_ability('can_use_google_auth') %}
+						<li>
+							<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_userreg_google_toggle') }}';" {% if app.getSetting('core.google_source_enabled') %}checked="checked"{% endif %} />
+							{{ phrase('admin.user_registration.google') }}
+						</li>
+					{% else %}
+						<li class="tipped" data-tipped-target=".jquery-checkbox img" data-tipped-options="maxWidth: 250, skin:'dperror'" title="{{ phrase('admin.general.error_ssl_feature_tip') }}">
+							<input class="onoff-slider" type="checkbox" />
+							{{ phrase('admin.user_registration.google') }}
+						</li>
+					{% endif %}
+					{% for usersource in usersources %}{% if usersource.source_type != 'facebook' and usersource.source_type != 'google' and usersource.source_type != 'twitter' %}
+						<li>
+							<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_userreg_usersource_toggle', {id: usersource.id}) }}';" {% if usersource.is_enabled %}checked="checked"{% endif %} />
+							{{ usersource.title }}
+							<a href="{{ path('admin_userreg_usersource_edit', {id: usersource.id}) }}" class="btn-edit-gear2" style="position: relative; top: 2px;"></a>
+						</li>
+					{% endif %}{% endfor %}
+				</ul>
+			</article>
+		</div>
+	</div>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_userreg_options_save') }}" method="POST" id="mode_form">
+
+{% macro options_table(reg_triggers, everyone_ug) %}
+	<section class="sunken">
+			<div class="sunken-row">
+				<input type="checkbox" name="email_validation" value="1" {% if app.getSetting('core.email_validation') %}checked="checked"{% endif %} />
+				Enable email validation for new registrations from the web portal
+			</div>
+		{% if reg_triggers %}
+			<div class="sunken-row">
+				Enable email validation for new tickets submitted via
+					{% if reg_triggers['email_validation.web'] %}<input class="trigger-toggle" type="checkbox" value="{{ reg_triggers['email_validation.web'].id }}" name="email_validation.web" {% if reg_triggers['email_validation.web'].is_enabled %}checked="checked"{% endif %} /> Web {% endif %}
+					{% if reg_triggers['email_validation.email'] %} <input class="trigger-toggle" type="checkbox" value="{{ reg_triggers['email_validation.email'].id }}" name="email_validation.web" {% if reg_triggers['email_validation.email'].is_enabled %}checked="checked"{% endif %} /> Email{% endif %}
+					{% if reg_triggers['email_validation.widget'] %}<input class="trigger-toggle" type="checkbox" value="{{ reg_triggers['email_validation.widget'].id }}" name="email_validation.web" {% if reg_triggers['email_validation.widget'].is_enabled %}checked="checked"{% endif %} /> Website Widget{% endif %}
+			</div>
+			<div class="sunken-row">
+				<input type="checkbox" name="existing_account_login" value="1" {% if app.getSetting('core.existing_account_login') %}checked="checked"{% endif %} />
+				If a user uses an email address that already exists, force them to log in before their form is accepted
+			</div>
+		{% endif %}
+		{% if everyone_ug %}
+			<div class="sunken-row">
+				Guests are still able to perform a number of actions defined by permissions granted by the <a href="{{ path('admin_usergroups_edit', {'id': everyone_ug.id}) }}">Everyone usergroup</a>.
+				Turning the Everyone usergroup off will require all users to log in to view anything on the helpdesk.
+				<div style="padding-top: 4px;">
+					The Everyone usergroup is currently
+					<input class="onoff-slider" type="checkbox" {% if everyone_ug.is_enabled %}checked="checked"{% endif %} onclick="window.location='{{ path('admin_usergroups_toggle', {id: everyone_ug.id, userreg: 1}) }}';" />
+				</div>
+			</div>
+		{% endif %}
+	</section>
+{% endmacro %}
+
+<div class="dp-form">
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.registration_mode') }}</label>
+		</div>
+		<div class="dp-form-input" style="width: 95%;">
+			<div class="dp-input-group">
+				<label>
+					<input class="option-trigger" type="radio" name="mode" value="open" {% if not app.getSetting('core.user_mode') or app.getSetting('core.user_mode') == 'open' %}checked="checked"{% endif %}>
+					{{ phrase('admin.user_registration.open_helpdesk') }}
+				</label>
+				<div class="dp-group-options" style="display: none">
+					<p>{{ phrase('admin.user_registration.explain_open_helpdesk') }}</p>
+					{{ _self.options_table(reg_triggers) }}
+				</div>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input class="option-trigger" type="radio" name="mode" value="require_reg" {% if app.getSetting('core.user_mode') == 'require_reg' %}checked="checked"{% endif %}>
+					{{ phrase('admin.user_registration.require_registration') }}
+				</label>
+				<div class="dp-group-options" style="display: none">
+					<p>{{ phrase('admin.user_registration.explain_must_login_mode') }}</p>
+					{{ _self.options_table(reg_triggers, everyone_ug) }}
+				</div>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input class="option-trigger" type="radio" name="mode" value="require_reg_agent_validation" {% if app.getSetting('core.user_mode') == 'require_reg_agent_validation' %}checked="checked"{% endif %}>
+					{{ phrase('admin.user_registration.require_registration_agent_validation') }}
+				</label>
+				<div class="dp-group-options" style="display: none">
+					<p>{{ phrase('admin.user_registration.notice_like_request_registration') }}</p>
+					{{ _self.options_table(reg_triggers, everyone_ug) }}
+				</div>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input class="option-trigger" type="radio" name="mode" value="closed" {% if app.getSetting('core.user_mode') == 'closed' %}checked="checked"{% endif %}>
+					No Registration
+				</label>
+				<div class="dp-group-options" style="display: none">
+					<p>{{ phrase('admin.user_registration.notice_closed_helpdesk') }}</p>
+					<section class="sunken">
+						{{ _self.options_table(false, everyone_ug) }}
+					</section>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+	<footer class="controls">
+		<div class="is-not-loading">
+			<button class="clean-white">{{ phrase('admin.user_registration.save_registration_settings') }}</button>
+		</div>
+		<div class="is-loading">
+			<div class="loading-icon-flat">&nbsp;</div>
+		</div>
+	</footer>
+
+	<br class="clear" />
+</div>
+</div>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.AgentTeamEditPage' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		<li>License Limit</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left">License Limit</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td style="padding: 15px;">
+					You have already created the maximum number of agents that your license allows.
+				</td>
+			</tr>
+			<tr>
+				<td style="padding: 15px;">
+					{% if app.user.can_billing %}
+						To enable more agents, you must upgrade your license from the billing area.
+						<br />
+						<br />
+						<a href="{{ app.request.getBaseUrl() }}/billing/" class="btn">Go to billing area &rarr;</a>
+					{% else %}
+						To enable more agents, contact an administrator to upgrade the helpdesk license:
+						<ul>
+							{% for admin in billing_admins %}
+								<li style="margin: 6px 0 0 0; background: url('{{ admin.getPictureUrl(20) }}') no-repeat 0 50%; padding-left: 25px; line-height: 22px; ">
+									{{ admin.display_name }} &lt;<a href="mailto: {{ admin.email_address }}">{{ admin.email_address }}</a>&gt;
+								</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+
+{% endblock %}

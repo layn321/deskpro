@@ -1,0 +1,9 @@
+<dp:subject>{{ phrase('user.email_subjects.tickets_re') }}</dp:subject>
+{{ message|raw }}
+
+<br /><br />
+
+{{ phrase('user.emails.ticket_access_ticket_online') }}
+<a href="{{ url_full('user_tickets_view', {'ticket_ref': ticket.access_code}) }}">
+	{{ url_full('user_tickets_view', {'ticket_ref': ticket.access_code}) }}
+</a>

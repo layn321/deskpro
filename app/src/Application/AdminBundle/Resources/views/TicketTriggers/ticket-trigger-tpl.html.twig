@@ -1,0 +1,156 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.TicketTriggerEditPage' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TicketTriggersNewChoosePage.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" charset="utf-8">
+DeskPRO.Admin.ElementHandler.TicketTriggerEditPage = new Orb.Class({
+	Extends: DeskPRO.ElementHandler,
+
+	init: function() {
+		var self = this;
+
+		// Criteria builder
+		this.criteriaEditor1 = new DeskPRO.Form.RuleBuilder($('.criteria-tpl'));
+		this.criteriaEditor2 = new DeskPRO.Form.RuleBuilder($('.criteria-tpl'));
+		this.actionsEditor = new DeskPRO.Form.RuleBuilder($('.actions-tpl'));
+
+		$('#criteria_all .add-term-row').on('click', function() {
+			var basename = 'terms['+Orb.uuid()+']';
+			self.criteriaEditor1.addNewRow($('#criteria_all .terms-input'), basename);
+		});
+
+		$('#criteria_any .add-term-row').on('click', function() {
+			var basename = 'terms_any['+Orb.uuid()+']';
+			self.criteriaEditor1.addNewRow($('#criteria_any .terms-input'), basename);
+		});
+
+		$('#actions .add-term-row').on('click', function() {
+			var basename = 'actions['+Orb.uuid()+']';
+			self.actionsEditor.addNewRow($('#actions .terms-input'), basename);
+		});
+
+		$('#event_row').find('select').each(function() {
+			DP.select($(this));
+		});
+
+		TicketTriggerEditPage_initTerms(this);
+
+		if (TicketTriggerEditPage_init) {
+			TicketTriggerEditPage_init.call(this);
+		}
+	}
+});
+
+function TicketTriggerEditPage_initTerms(handler) {
+	var basename;
+
+	{% for action in trigger.terms %}
+		basename = 'terms['+Orb.uuid()+']';
+		handler.criteriaEditor1.addNewRow($('#criteria_all .terms-input'), basename, { type: '{{action.type}}', op: '{{action.op}}', options: {{action.options|json_encode|raw}} });
+	{% endfor %}
+
+	{% for action in trigger.terms_any %}
+		basename = 'terms_any['+Orb.uuid()+']';
+		handler.criteriaEditor2.addNewRow($('#criteria_any .terms-input'), basename, { type: '{{action.type}}', op: '{{action.op}}', options: {{action.options|json_encode|raw}} });
+	{% endfor %}
+
+	var count = 0;
+	{% for action in trigger.actions %}
+		basename = 'actions['+Orb.uuid()+']';
+		handler.actionsEditor.addNewRow($('#actions .terms-input'), basename, { type: '{{action.type}}', options: {{action.options|json_encode|raw}} });
+	{% endfor %}
+}
+</script>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_tickettriggers_save', {'id': trigger.id|default(0)}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form row-colored">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Title</label>
+			<em class="required">Enter a title or brief description that will appear on the trigger listings page.</em>
+		</div>
+		<div class="dp-form-input">
+			<input name="trigger[title]"  type="text" value="{{ trigger.title|default('') }}" />
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Criteria</label>
+			<em class="required">Choose the criteria that must pass for the trigger to run</em>
+		</div>
+		<div class="dp-form-input">
+			<div style="vertical-align: middle; padding: 6px;" id="event_row">
+				{% block event_row %}{% endblock %}
+			</div>
+
+			<div class="dp-sub-section">
+				<h3 class="sub-head">And <em>All</em> of the following conditions are met:</h3>
+				<div id="criteria_all" class="terms-wrap">
+					<div class="terms-input"></div>
+					<div class="term-row add-term-row"><span class="add-term">{{ phrase('agent.general.widget_add') }}</span> Add Criteria</div>
+				</div>
+			</div>
+			<div class="dp-sub-section">
+				<h3 class="sub-head">And <em>Any</em> of the following conditions are met:</h3>
+				<div id="criteria_any" class="terms-wrap">
+					<div class="terms-input"></div>
+					<div class="term-row add-term-row"><span class="add-term">{{ phrase('agent.general.widget_add') }}</span> Add Criteria</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Actions</label>
+			<em class="required">Define what happens when the trigger runs</em>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-sub-section" style="border-top: none;">
+				<div id="actions" class="terms-wrap">
+					<div class="terms-input"></div>
+					<div class="term-row add-term-row"><span class="add-term">{{ phrase('agent.general.widget_add') }}</span> Add Action</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% block footer_row %}{% endblock %}
+
+<footer class="controls" id="save_control">
+	<div class="is-not-loading">
+		<button class="clean-white">Save</button>
+	</div>
+	<div class="is-loading">
+		<div class="loading-icon-flat">&nbsp;</div>
+	</div>
+</footer>
+
+</form>
+
+{% include 'AdminBundle:TicketTriggers:criteria.html.twig' with {
+	'classname': 'criteria-tpl',
+	'term_options': term_options,
+	'event_trigger': trigger.event_trigger,
+	'event_trigger_master': trigger.getMasterEvent(),
+	'event_trigger_sub': trigger.getSubEvent(),
+} %}
+
+{% include 'AdminBundle:TicketTriggers:actions.html.twig' with {
+	'classname': 'actions-tpl',
+	'term_options': term_options,
+	'trigger': trigger,
+	'event_trigger': trigger.event_trigger,
+	'event_trigger_master': trigger.getMasterEvent(),
+	'event_trigger_sub': trigger.getSubEvent(),
+} %}
+
+{% endblock %}

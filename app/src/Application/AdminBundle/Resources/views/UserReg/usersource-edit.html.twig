@@ -1,0 +1,57 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_userreg_options') }}">{{ phrase('admin.user_registration.registration_options') }}</a></li>
+	{% if not usersource.id %}
+		<li><a href="{{ path('admin_userreg_usersource_choose') }}">{{ phrase('admin.user_registration.new_usersource') }}</a></li>
+	{% else %}
+		<li>{{ usersource.title }}</li>
+	{% endif %}
+</ul>
+{% if usersource.id %}
+	<nav>
+		<ul>
+			{% if usersource.isCapable('form_login') %}
+				<li class="test" style="margin-right: 5px;"><a href="{{ path('admin_userreg_usersource_test', {id: usersource.id}) }}">Test</a></li>
+			{% endif %}
+			<li class="delete"><a href="{{ path('admin_userreg_usersource_delete', {id: usersource.id, security_token: security_token('delete_usersource') }) }}" onclick="return confirm('{{ phrase('admin.user_registration.confirm_delete_user_source') }}');">{{ phrase('agent.general.delete') }}</a></li>
+		</ul>
+	</nav>
+{% endif %}
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_userreg_usersource_edit', {id: usersource.id|default(0)}) }}" method="post" class="dp-form">
+	<input type="hidden" name="process" value="1" />
+	<input type="hidden" name="usersource[source_type]" value="{{ usersource.source_type }}" />
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.title') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.title) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.lost_password_url') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.lost_password_url) }}
+		</div>
+		<small>
+			{{ phrase('admin.user_registration.explain_lost_password') }}
+		</small>
+	</div>
+
+	{% set form_template = usersource.getFormTemplate() %}
+	{% if form_template %}
+		{% include form_template %}
+	{% endif %}
+
+	<button class="btn primary save-trigger">{{ phrase('agent.general.save') }}</button>
+</form>
+
+{% endblock %}

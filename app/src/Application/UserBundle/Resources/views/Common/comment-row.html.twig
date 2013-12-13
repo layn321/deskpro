@@ -1,0 +1,21 @@
+{##
+ # A comment in the comments box on content pages.
+ ##}
+
+<li class="{% if comment.person.is_agent == 2 %}agent{% endif %} {% if comment.status != 'visible' %}dp-comment-validating{% endif %}">
+	<header>
+		<div class="avatar" style="width: 40px; height: 40px; background-image: url('{% if comment.person %}{{ comment.person.getPictureUrl(40) }}{% else %}{{ path('serve_default_picture', {'s': 40}) }}{% endif %}');"></div>
+		<div class="byline" style="margin-{% if is_rtl() %}right{% else %}left{% endif %}: 48px;">
+			<h4>{{ comment.getUserName() }}</h4>
+			<ul class="dp-post-info">
+				<li class="dp-date"><i class="dp-icon-calendar"></i> {{ comment.date_created|date('full') }}</li>
+			</ul>
+		</div>
+	</header>
+	<article>
+		{{ comment.content_html|raw }}
+		{% if comment.status != 'visible' %}
+			<p class="dp-validating-note"><i class="dp-icon-eye-close"></i> {{ phrase('user.general.your_comment_agent_validation') }}</p>
+		{% endif %}
+	</article>
+</li>

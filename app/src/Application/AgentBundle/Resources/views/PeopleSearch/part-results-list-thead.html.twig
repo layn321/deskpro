@@ -1,0 +1,17 @@
+<thead class="display-options-trigger dbl-click-trigger nosel">
+	<tr>
+		<th></th>
+		{% for field in display_fields %}
+			{% if field == 'email_address' %}<th data-field="email_address">{{ phrase('agent.general.email') }}</th>
+			{% elseif field == 'organization' %}<th data-field="organization">{{ phrase('agent.general.organization') }}</th>
+			{% elseif field == 'language' %}<th data-field="Language">{{ phrase('agent.general.language') }}</th>
+			{% else %}
+				{% for f in person_field_defs %}
+					{% if field == 'person_fields['~f.id~']' %}
+					<th data-field="person_fields[{{f.id}}]">{{f.title}}</th>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	</tr>
+</thead>

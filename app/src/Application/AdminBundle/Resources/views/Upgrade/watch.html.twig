@@ -1,0 +1,262 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/UpgradeWatch.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<ul>
+		<li>Upgrade Status</li>
+	</ul>
+{% endblock %}
+{% block page %}
+<div
+	data-start-time="{{ app.getSetting('core.upgrade_time') }}"
+	data-element-handler="DeskPRO.Admin.ElementHandler.UpgradeWatch"
+	data-check-started-url="{{ path('admin_upgrade_watch_checkstarted') }}"
+	data-clear-cache-url="{{ app.request.getBaseUrl() }}?_sys=apcclear&_={{ static_security_token_secret(config_hash ~ 'apcclear', 86400) }}&nocache={{ el_uid() }}"
+>
+	<div id="waiting">
+		Upgrade is waiting to start
+	</div>
+	<div id="upgrade_started">
+		<ul>
+			<li class="step-preload done on"><span>Waiting for process to begin</span></li>
+			<li class="step-start"><span>Started</span></li>
+			<li class="step-checks"><span>Basic Checks</span></li>
+			<li class="step-download"><span>Download latest version</span></li>
+			{% if app.getSetting('core.upgrade_backup_files') %}
+				<li class="step-backup-files"><span>Backing up files (<em class="step-backup-files-copy">Copying</em>, <em class="step-backup-files-zip">Zipping</em>, <em class="step-backup-files-cleanup">Cleanup</em>)<i id="backup_path" style="display: none">&nbsp;&nbsp; Backed up to: <em></em></i></span></li>
+			{% endif %}
+			<li class="step-disable-hd"><span>Disabling helpdesk</span></li>
+			{% if app.getSetting('core.upgrade_backup_db') %}
+				<li class="step-backup-db"><span>Backing up database<i id="backup_path2" style="display: none">&nbsp;&nbsp; Backed up to: <em></em></i></span></li>
+			{% endif %}
+			<li class="step-install-files"><span>Installing files</span></li>
+			<li class="step-install-db"><span>Installing database updates</span></li>
+			<li class="step-enable-hd"><span>Re-enabling helpdesk</span></li>
+			<li class="step-done"><span>Done</span></li>
+		</ul>
+		<div id="error" style="display: none">
+			<div style="display:none" class="error_write_perm">
+				<h3>Write permissions failed</h3>
+				<p>
+					The upgrade utility requires write permission to the root DeskPRO directory, and all sub-directories and files.
+					This means the user running the scheduled task needs permission to write and delete DeskPRO files. Typically
+					this is done by making sure your scheduled task user is the same user who owns the files.
+				</p>
+				<p>
+					In this case, the upgrade utility detected that the status file at /auto-update-status.php could not be written.
+				</p>
+			</div>
+			<div style="display:none" class="error_basic_checks_fail">
+				<div style="display:none" class="error_php_path">
+					<h3>Could not find the path to 'php'</h3>
+					<p>
+						The upgrade utility requires the path to the PHP executable but we could not detect it automatically.
+						You will need to locate the executable and then supply its path in config.php.
+					</p>
+				</div>
+				<div style="display:none" class="error_php_binary_failcheck">
+					<h3>Could not verify the path to 'php'</h3>
+					<p>
+						The upgrade utility requires the path to the PHP executable but the one defined is invalid
+						or does not meet server requirements (<span class="place-message"></span>). You must edit
+						your config.php to specify the path to a correct PHP binary.
+					</p>
+				</div>
+				<div style="display:none" class="error_mysqldump_path">
+					<h3>Could not find the path to 'mysqldump'</h3>
+					<p>
+						The upgrade utility requires the path to the MySQL Dump executable but we could not detect it automatically.
+						You will need to locate the executable and then supply its path in config.php.
+					</p>
+					<p>
+						Note: If you want to manage backups manually, deselect the "Backup my database" option when scheduling the upgrade.
+						The database backup step will be skipped and this requirement will no longer be necessary.
+					</p>
+				</div>
+				<div style="display:none" class="error_backup_dir">
+					<h3>Could not write to the tmp directory</h3>
+					<p>
+						The /data/tmp directory needs to be writable.
+					</p>
+				</div>
+				<div style="display:none" class="error_backup_dir">
+					<h3>Could not write to the backup directory</h3>
+					<p>
+						The /data/backup directory needs to be writable.
+					</p>
+				</div>
+				<div style="display:none" class="error_log_dir">
+					<h3>Could not write to the logs directory</h3>
+					<p>
+						The /data/logs directory needs to be writable.
+					</p>
+				</div>
+				<div style="display:none" class="error_permissions">
+					<h3>Files are not writable</h3>
+					<p>
+						The upgrade utility is run by the same user who executes scheduled tasks, and this user must
+						be able to write and delete DeskPRO files. We detected that some files were not writable
+						which means you need to update file permissions.
+					</p>
+					<p>
+						<span class="place-message"></span>
+					</p>
+				</div>
+				<div style="display:none" class="error_disabled_functions">
+					<h3>You have disabled functions in php.ini</h3>
+					<p>
+						Your php.ini has a <a href="http://php.net/manual/en/ini.core.php#ini.disable-functions">disabled_functions</a> directive that is disabling one or more functions required by the automatic upgrader.
+					</p>
+					<p>
+						<span class="place-message"></span>
+					</p>
+					<p>
+						To use the automatic upgrader, you will need to edit your php.ini and remove the disabled_functions directive.
+					</p>
+					<p>
+						You can still upgrade DeskPRO manually if you cannot change php.ini. Refer to our online manual:<br/>
+						<a href="http://support.deskpro.com/kb/articles/135-manually-installing-updates" target="_blank">http://support.deskpro.com/kb/articles/135-manually-installing-updates</a>
+					</p>
+				</div>
+				<div style="display: none" class="error_zip_ext">
+					<p>
+						The upgrade utility requires the <a href="http://php.net/manual/en/book.zlib.php">zlib</a>
+						or <a href="http://php.net/manual/en/book.zip.php">Zip</a> extension installed. You will
+						need to install or activate one of these extensions before trying agian.
+					</p>
+					<p>
+						You will have to install the extension into php.ini located at: <span class="place-message"></span>
+					</p>
+					<p>
+						Note: If you want to manage backups manually, deselect the "Backup the current DeskPRO source files" option when scheduling the upgrade.
+						The file backup step will be skipped and this requirement will no longer be necessary.
+					</p>
+				</div>
+			</div>
+			<div style="display: none" class="error_backup_files">
+				<h3>Backup error</h3>
+				<p>
+					There was a problem while trying to make backups of your helpdesk files. The upgrade was aborted.
+				</p>
+				<p class="place-message"></p>
+			</div>
+			<div style="display: none" class="error_backup_db">
+				<h3>Backup error</h3>
+				<p>
+					There was a problem while trying to make database backups of your helpdesk. The upgrade was aborted.
+				</p>
+				<p>
+					This probably means the path to "mysqldump" is incorrect. You should check the value you have in config.php
+					is correct.
+				</p>
+				<p class="place-message"></p>
+				<p>
+					Note: If you want to manage backups manually, deselect the "Backup my database" option when scheduling the upgrade.
+					The database backup step will be skipped and the upgrade will continue past this step.
+				</p>
+			</div>
+			<div style="display: none" class="error_downloading_update">
+				<h3>Error communicating with DeskPRO servers</h3>
+				<p>
+					There was a problem communicating with the DeskPRO servers. This could
+					be due to a firewall or other network problem. The upgrade was aborted.
+				</p>
+				<p class="place-message"></p>
+			</div>
+			<div style="display: none" class="error_downloading_update">
+				<h3>Download error</h3>
+				<p>
+					The upgrade utility could not download the latest version of DeskPRO.
+					This may be due to a firewall or other network problem. The upgrade was aborted.
+				</p>
+				<p class="place-message"></p>
+			</div>
+			<div style="display: none" class="error_installing_files">
+				<h3>Error copying new files</h3>
+				<p>
+					The upgrade utility encountered an error while trying to install the updated
+					files from the newest version of DeskPRO.
+				</p>
+				<p class="place-message"></p>
+				<p>
+					<strong>This means you have a half-updated helpdesk!</strong>
+					To get your helpdesk back online you need to manually apply the update. Refer to our helpdesk article:
+					<a href="https://support.deskpro.com/kb/articles/135">Manually installing updates</a>.
+				</p>
+				<p>
+					If you require assistance please send the data/logs/upgrade.log file to <a href="mailto:support@deskpro.com">support@deskpro.com</a>
+					for assistance.
+				</p>
+			</div>
+			<div style="display: none" class="error_updating_db">
+				<h3>Error while applying database updates</h3>
+				<p>
+					The upgrade utility encountered an error while trying to run database updates.
+					You should refer to data/logs/upgrade.log for more information.
+				</p>
+				<p class="place-message"></p>
+				<p>
+					<strong>This means you have a half-updated helpdesk!</strong>
+					To get your helpdesk back online you need to manually apply the update. Refer to our helpdesk article:
+					<a href="https://support.deskpro.com/kb/articles/135">Manually installing updates</a>.
+				</p>
+				<p>
+					If you require assistance please send the data/logs/upgrade.log file to <a href="mailto:support@deskpro.com">support@deskpro.com</a>
+					for assistance.
+				</p>
+			</div>
+			<div style="display: none" class="error_command">
+				<h3>Upgrade failed</h3>
+				<p>
+					The upgrade did not complete successfully. If the problem persists, email <a href="mailto:support@deskpro.com">support@deskpro.com</a>
+					and one of our agents will help you as soon as possible.
+				</p>
+				<p class="place-message"></p>
+			</div>
+			<div style="display: none" class="error_remoterequester">
+				<h3>PHP cannot communicate with DeskPRO servers</h3>
+				<p>
+					The upgrade utility needs to communicate with the DeskPRO servers to get latest version information, and to download files.
+					You need to either enable the <a href="http://php.net/manual/en/book.curl.php">cURL extension</a>
+					or enable the <a href="http://www.php.net/manual/en/filesystem.configuration.php#ini.allow-url-fopen">allow_url_fopen</a>
+					configuration option in your php.ini file.
+				</p>
+				<p class="place-message"></p>
+			</div>
+			<p>
+				<br />
+				<a class="btn primary" href="{{ path('admin_upgrade') }}">Problem Fixed, Try Again</a>
+			</p>
+		</div>
+		<div id="done" style="display: none">
+			<strong>Done!</strong><br />
+			Your helpdesk has been upgraded successfully.
+
+			{% if is_wincache %}
+				<div style="padding-top: 10px; background-color: #FFD7B5; border: 2px solid #C2A389;">
+					<strong>Important:</strong>
+					Your server has WinCache installed. Due to a limitation of WinCache, updates to files are not always immediately recognised.
+					You must restart IIS (or your computer) to ensure the updates were fully installed.
+					<br/><br/>
+					If you do not restart, DeskPRO may behave strangely or you may see errors.
+				</div>
+			{% endif %}
+
+			{% if app.getSetting('core.upgrade_backup_files') or app.getSetting('core.upgrade_backup_db') %}
+				<div style="padding-top: 10px;">
+					You should download and verify the integrity of your backups:<br />
+					{% if app.getSetting('core.upgrade_backup_files') %}
+						&bull; Your file backup was made to: <span id="file_backup_loc"></span>
+					{% endif %}
+					{% if app.getSetting('core.upgrade_backup_db') %}
+						&bull; Your database backup was made to: <span id="db_backup_loc"></span>
+					{% endif %}
+				</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock %}

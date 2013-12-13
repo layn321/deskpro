@@ -1,0 +1,2 @@
+<?php
+$OUTPUT['counts'] = $counts;

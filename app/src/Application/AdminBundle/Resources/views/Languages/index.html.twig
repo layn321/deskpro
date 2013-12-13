@@ -1,0 +1,103 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/LangEditSettings.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+     <ul>
+          <li>{{ phrase('admin.general.languages') }}</li>
+     </ul>
+{% endblock %}
+{% block sidebar_right %}
+<div
+	class="dp-page-box"
+	data-element-handler="DeskPRO.Admin.ElementHandler.LangEditSettings"
+	data-set-default-lang-url="{{ path('admin_settings_set', {'setting_name':'core.default_language_id', 'security_token': security_token('set_setting')}) }}"
+>
+	<div class="resource-item-list">
+		<header>
+			<div class="controls">
+				<button class="clean-white small save-trigger" style="display: none" id="save_lang_settings">{{ phrase('admin.general.save_changes') }}</button>
+			</div>
+			<h4>{{ phrase('admin.languages.default_language') }}</h4>
+		</header>
+		<article>
+			{{ phrase('admin.languages.notice_default_language') }}:<br />
+			<select id="default_lang_setting">
+				{% for lang in installed_packs %}
+					<option value="{{lang.id}}" {% if app.getSetting('core.default_language_id') == lang.id %}selected="selected"{% endif %}>
+						{{ packs_local[lang.sys_name] }} {% if lang.title != packs[lang.sys_name] %}/ {{ packs[lang.sys_name] }}{% endif %}
+					</option>
+				{% endfor %}
+			</select>
+		</article>
+	</div>
+</div>
+
+<div class="dp-page-box">
+	<div class="resource-item-list">
+		<header>
+			<h4>
+				Auto Install
+				<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_langs_toggle_auto') }}';" {% if app.getSetting('core.lang_auto_install') %}checked="checked"{% endif %} />
+			</h4>
+		</header>
+		<article>
+			When this option is enabled, all languages will be installed automatically as they become available.
+		</article>
+	</div>
+</div>
+
+<div style="padding: 10px; font-size: 11px;">
+	<strong>Tools</strong><br/>
+	&bull; <a href="{{ path('admin_langs_mass_update_tickets') }}">Mass-update language on tickets</a><br/>
+	&bull; <a href="{{ path('admin_langs_mass_update_people') }}">Mass-update language on people</a>
+</div>
+{% endblock %}
+{% block page %}
+<div class="page-content agent-listing" style="padding-top: 0;">
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th class="single-title">Language</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for id,title in packs %}
+					<tr>
+						<td>
+							<div style="float:right">
+								{% if installed_packs[id] %}
+									<span class="field-id" style="position:relative;top: 4px;margin-right: 10px;">ID: {{ installed_packs[id].id }}</span>
+									<a class="clean-white" href="{{ path('admin_langs_editlang', {language_id: installed_packs[id].id}) }}">Edit</a>
+								{% else %}
+									<a class="clean-white" href="{{ path('admin_langs_install_pack', {id: id}) }}">Install Language</a>
+								{% endif %}
+							</div>
+							<h4>
+								{% if installed_packs[id] %}
+									{% if installed_packs[id].flag_image %}
+										<span style="background: url({{ asset('images/flags/' ~ installed_packs[id].flag_image) }}); display: inline-block; width: 16px; height: 11px; margin-right: 8px;"></span>
+									{% endif %}
+									<a href="{{ path('admin_langs_editlang', {language_id: installed_packs[id].id}) }}">
+										{{ packs_local[id] }} {% if title != packs_local[id] %}/ {{ title }}{% endif %}
+									</a>
+								{% else %}
+									{% if packs_flags[id] %}
+										<span style="background: url({{ asset('images/flags/' ~ packs_flags[id]) }}); display: inline-block; width: 16px; height: 11px; margin-right: 8px;"></span>
+									{% endif %}
+									{{ packs_local[id] }} {% if title != packs_local[id] %}/ {{ title }}{% endif %}
+								{% endif %}
+							</h4>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<br />
+	<br />
+	Are we missing your language? Please contact <a href="mailto:hello@deskpro.com?subject=Language Request">DeskPRO Staff</a> for help.
+</div>
+{% endblock %}

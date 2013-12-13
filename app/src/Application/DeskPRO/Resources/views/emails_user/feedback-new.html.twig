@@ -1,0 +1,21 @@
+<dp:subject>
+	{% if validating == 'existing' or validating == 'new' %}
+		{{ phrase('user.email_subjects.feedback_new-confirm') }}
+	{% else %}
+		{{ phrase('user.email_subjects.feedback_new') }}
+	{% endif %}
+</dp:subject>
+{{ phrase('user.emails.feedback_thank-you', {'title':feedback.title}) }}
+
+<br /><br />
+
+{% if feedback.status_code == 'hidden.validating' %}
+	{{ phrase('user.emails.feedback_agent-validation') }}
+
+	<br /><br />
+{% endif %}
+
+{% if validating %}
+	{{ phrase('user.emails.feedback_validate-email') }}
+	{{ url_full('user_validate_email', {'id': email_validating.id, 'auth': email_validating.auth }) }}
+{% endif %}

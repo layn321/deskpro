@@ -1,0 +1,125 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	{% if message_template.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_ticket_msgtpl_delete', {id: message_template.id, security_token: security_token('delete_ticket_message_template') }) }}" onclick="return confirm('{{ phrase('agent.general.ask_delete_selected') }}');">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+     <ul>
+		<li><a href="{{ path('admin_features') }}">Ticket Features and Settings</a></li>
+		{% if message_template.id %}
+			<li>Edit Message Template</li>
+		{% else %}
+			<li>New Message Template</li>
+		{% endif %}
+     </ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		DP.select($('#variables'));
+
+		$('#insert_variable').on('click', function(ev) {
+			ev.preventDefault();
+			var varname = $('#variables').val();
+
+			$('#ticket_message_template_message').insertAtCaret('{{ '{{' }} ' + varname + ' {{ '}}' }}');
+		});
+	});
+</script>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_ticket_msgtpl_edit', {'id': message_template.id|default(0)}) }}" method="post">
+
+<div class="dp-form">
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Apply to department</label>
+		</div>
+		<div class="dp-form-input">
+			<select name="ticket_message_template[department_id]">
+				<option value="">All departments</option>
+				{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+					{% set children = app.departments.getChildren(dep) %}
+					{% if children|length %}
+						<optgroup label="{{ dep.title }}">
+							{% for subdep in children %}
+								<option value="{{ subdep.id }}" {% if message_template.department_id == subdep.id %}selected="selected"{% endif %}>{{ subdep.title }}</option>
+							{% endfor %}
+						</optgroup>
+					{% else %}
+						<option value="{{ dep.id }}" {% if message_template.department_id == dep.id %}selected="selected"{% endif %}>{{ dep.title }}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.title') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.title) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Subject</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.subject, {attr: {placeholder: 'Optionally enter the ticket subject'}}) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Message Template</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.message, {attr: {style: 'width: 100%; height: 140px;', placeholder: 'Enter the ticket message'}}) }}
+
+			<div style="float: right; padding-top: 3px; vertical-align: top">
+				<select id="variables">
+					<optgroup label="Ticket">
+						<option value="ticket.subject">Subject</option>
+						<option value="ticket.department">Department</option>
+						<option value="ticket.product">Product</option>
+						<option value="ticket.category">Category</option>
+						<option value="ticket.workflow">Workflow</option>
+						<option value="ticket.priority">Priority</option>
+						<option value="ticket.agent">Agent Name</option>
+						<option value="ticket.agent_email">Agent Email Address</option>
+						<option value="ticket.agent">Agent Team</option>
+						<option value="ticket.date_created">Date Created</option>
+						<option value="ticket.time_created">Time Created</option>
+						{% for field in app.getCustomFieldManager('tickets').getFields() %}
+							<option value="ticket.field{{ field.id }}">{{ field.title }}</option>
+						{% endfor %}
+					</optgroup>
+					<optgroup label="User">
+						<option value="user.name">Name</option>
+						<option value="user.email">Email Address</option>
+						<option value="user.organization_position">Position in Organisation</option>
+						{% for field in app.getCustomFieldManager('people').getFields() %}
+							<option value="user.field{{ field.id }}">{{ field.title }}</option>
+						{% endfor %}
+					</optgroup>
+					<optgroup label="Organisation">
+						<option value="org.name">Name</option>
+					</optgroup>
+				</select> <button id="insert_variable" class="clean-white" style="vertical-align: top; position:relative; top: 3px;">Insert Variable</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<button class="btn primary save-trigger">{{ phrase('agent.general.save') }}</button>
+
+</form>
+{% endblock %}

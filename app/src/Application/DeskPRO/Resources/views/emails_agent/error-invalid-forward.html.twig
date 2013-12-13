@@ -1,0 +1,24 @@
+<dp:subject>{{ phrase('agent.emails.subject_error_forwarded_email') }}</dp:subject>
+{{ phrase('agent.emails.detected_as_forward') }}
+
+{% if error == 'invalid_fwd_email' %}
+	{{ phrase('agent.emails.invalid_fwd_email_address') }}
+{% else %}
+	{{ phrase('agent.emails.invalid_fwd_email_parse') }}
+{% endif %}
+
+<br /><br />
+
+{{ phrase('agent.emails.fwd_not_processed', {url: app.getSetting('core.deskpro_url') ~ 'agent/'}) }}
+
+<br /><br />
+
+{{ phrase('agent.emails.fwd_resend_without_fwd') }}
+
+<br /><br />
+
+{{ phrase('agent.emails.invalid_fwd_try_attach') }}
+
+<br /><br />
+
+{{ phrase('agent.emails.fwd_error_more_info') }}

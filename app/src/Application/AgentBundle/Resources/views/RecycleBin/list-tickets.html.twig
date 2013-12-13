@@ -1,0 +1,19 @@
+<tbody data-page="{{page}}">
+	{% for ticket in tickets %}
+		<tr class="{% if loop.index % 2 == 0 %}white{% endif %} ticket-{{ticket.id}} line-1">
+			<td>
+				<a class="with-route" data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': ticket.id}) }}">{{ticket.subject}}</a>
+			</td>
+		</tr>
+		<tr class="{% if loop.index % 2 == 0 %}white{% endif %} ticket-{{ticket.id}} line-2">
+			<td>
+				<time class="timeago" style="float:right" title="{{ deleted_tickets[ticket.id].date_created|date('c', 'UTC') }}">{{ deleted_tickets[ticket.id].date_created|date('day') }}</time>
+				{{ phrase('agent.tickets.deleted_by_name', {'name':deleted_tickets[ticket.id].by_person.display_name}) }}
+				{% if deleted_tickets[ticket.id].reason %}
+					<br />
+					{{ phrase('agent.general.reason') }}: {{ deleted_tickets[ticket.id].reason }}
+				{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+</tbody>

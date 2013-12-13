@@ -1,0 +1,73 @@
+{% import 'UserBundle::macros.html.twig' as dp %}
+
+{##
+ # The table of ticket properties that is at the top of the view ticket page.
+ ##}
+
+<table class="dp-table dp-table-striped dp-table-bordered">
+	<tbody>
+		{% if ticket.person.id != app.user.id %}
+			<tr>
+				<th>{{ phrase('user.tickets.ticket_starter') }}</th>
+				<td>{{ ticket.person.display_name_user }} &lt;{{ ticket.person.email_address }}&gt;</td>
+			</tr>
+		{% endif %}
+
+		{% if user_participants|length %}
+			<tr>
+				<th>{{ phrase('user.tickets.label_cced') }}</th>
+				<td>
+					<ul>
+						{% for part in user_participants %}
+							<li>
+								{{ part.person.display_name_user }} &lt;{{ part.person.email_address }}&gt;
+							</li>
+						{% endfor %}
+					</ul>
+				</td>
+			</tr>
+		{% endif %}
+
+		<tr>
+			<th>{{ phrase('user.tickets.assigned-agent') }}</th>
+			<td>{% if ticket.agent %}{{ ticket.agent.display_name_user }}{% else %}{{ phrase('user.tickets.unassigned') }}{% endif %}</td>
+		</tr>
+
+		{% for item in page_display %}
+			{% if item.field_type == 'ticket_department' %}
+				<tr>
+					<th width="150">{{ phrase('user.tickets.fields_department') }}</th>
+					<td>{{ dp.full_title(ticket.department) }}</td>
+				</tr>
+			{% elseif item.field_type == 'ticket_category' and ticket.category %}
+				<tr>
+					<th>{{ phrase('user.tickets.fields_category') }}</th>
+					<td>{{ ticket.category.full_title }}</td>
+				</tr>
+			{% elseif item.field_type == 'ticket_product' and ticket.product %}
+				<tr>
+					<th>{{ phrase('user.tickets.fields_product') }}</th>
+					<td>{{ ticket.product.full_title }}</td>
+				</tr>
+			{% elseif item.field_type == 'ticket_priority' and ticket.priority %}
+				<tr>
+					<th>{{ phrase('user.tickets.fields_priority') }}</th>
+					<td>{{ ticket.priority.title }}</td>
+				</tr>
+			{% else %}
+				{% for f in custom_fields %}
+					{% if item.field_type == 'ticket_field' and item.field_id == f.id and not (f.field_def.isFormField() and not ticket.hasCustomField(f.id)) %}
+						{% if ticket.hasCustomField(f.field_def.id) %}
+							<tr>
+								<th>{{f.title}}</th>
+								<td>
+									{{ render_custom_field(f) }}
+								</td>
+							</tr>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	</tbody>
+</table>

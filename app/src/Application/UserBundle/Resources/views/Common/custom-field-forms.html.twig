@@ -1,0 +1,9 @@
+{% extends 'TwigBundle::form.html.twig' %}
+{% block date_field %}
+	{% if field.isfield %}
+		{% set attr = attr|merge({'class': attr.class~' date-field', 'style': 'width: 200px'}) %}
+        {{ block('text_field') }}
+    {% else %}
+        {{ field.pattern|replace({ '{{ year }}': form_field(field.year), '{{ month }}': form_field(field.month), '{{ day }}': form_field(field.day) })|raw }}
+    {% endif %}
+{% endblock %}

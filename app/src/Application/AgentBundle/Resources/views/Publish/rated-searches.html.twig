@@ -1,0 +1,51 @@
+{% if rated_searches.helpful or rated_searches.unhelpful %}
+<div style="padding: 0 15px 15px 15px;">
+
+{% if rated_searches.helpful %}
+<div class="data-table-wrap">
+	<table class="data-table" cellspacing="0" width="100%">
+		<thead>
+			<tr>
+				<td>{{ phrase('agent.publish.searches_helpful') }}</td>
+				<td width="80" style="text-align: center">{{ phrase('agent.general.frequency') }}</td>
+			</tr>
+		</thead>
+		<tbody>
+		{% for term,count in rated_searches.helpful %}
+			<tr>
+				<td>{{ term }}</td>
+				<td style="text-align: center;">{{ count }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+
+<br /><br />
+{% endif %}
+
+{% if rated_searches.unhelpful %}
+<div class="data-table-wrap">
+	<table class="data-table" cellspacing="0" width="100%">
+		<thead>
+			<tr>
+				<td>{{ phrase('agent.publish.searches_unhelpful') }}</td>
+				<td width="80" style="text-align: center">{{ phrase('agent.general.frequency') }}</td>
+			</tr>
+		</thead>
+		<tbody>
+		{% for term,count in rated_searches.unhelpful %}
+			<tr>
+				<td>{{ term }}</td>
+				<td style="text-align: center;">{{ count }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+
+
+</div>
+{% endif %}

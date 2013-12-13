@@ -1,0 +1,9 @@
+{% if org_tag_cloud|length %}
+	<ul>
+		{% for label,css_class in org_tag_cloud %}
+			<li id="org_label_cloud_{{label|slugify}}" class="{{css_class}} is-nav-item"><span data-route="listpane:{{ path('agent_orgsearch_customfilter') }}?terms[0][type]=org_label&amp;terms[0][op]=is&amp;terms[0][label]={{label}}">{{label}}</span></li>
+		{% endfor %}
+	</ul>
+{% else %}
+    <aside class="source-info-explain">{{ phrase('agent.general.no_org_labels') }}</aside>
+{% endif %}

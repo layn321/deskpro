@@ -1,0 +1,18 @@
+<li
+	class="task task-row-{{ task.id }} inside"
+	data-class-id="task-row-{{ task.id }}"
+	data-type="tasks"
+	{% if task.assigned_agent %}
+		data-route="listpane:{{ path('agent_task_list',{'search_type': 'own', 'search_categoty': 'total'}) }}"
+	{% elseif task.assigned_agent_team %}
+		data-route="listpane:{{ path('agent_task_list',{'search_type': 'team', 'search_categoty': 'total'}) }}"
+	{% endif %}
+	data-route-notabreload="1"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time></time>
+	<big>{{ task.title }}</big>
+	<small>
+		{{ phrase('agent.tasks.task_due_today') }}
+	</small>
+</li>

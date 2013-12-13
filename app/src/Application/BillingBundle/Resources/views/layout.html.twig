@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>{% if app.isCloud() %}Billing{% else %}Licensing{% endif %}</title>
+	<meta charset="utf-8" />
+	<meta name="robots" content="noindex,nofollow" />
+	<meta http-equiv="X-UA-Compatible" content="IE=100" />
+	{% if app.getSetting('core.favicon_blob_id') %}
+		<link rel="shortcut icon" id="favicon" href="{{ path('favicon', {}, true) }}" />
+	{% else %}
+		<link rel="shortcut icon" id="favicon" href="{{ app.getRequest().getBasePath() }}/favicon.ico" />
+	{% endif %}
+
+	<script type="text/javascript">
+		{% if constant('DP_DEBUG') %}
+			DP_DEBUG = true;
+		{% else %}
+			DP_DEBUG = false;
+		{% endif %}
+	</script>
+
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+	{{ dp_asset_html('admin_interface_css') }}
+
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+	{{ dp_asset_html('agent_deskpro_ui') }}
+    {{ dp_asset_html('admin_admin_ui') }}
+    {{ dp_asset_html('admin_admin_handlers') }}
+
+    <script type="text/javascript" charset="utf-8">
+		var BASE_URL = '{{ app.request.getBaseUrl() }}/';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+
+		window.DeskPRO_Window = new DeskPRO.Admin.Window();
+
+		function _win_exec() {
+			window.DeskPRO_Window.initPage();
+
+			if (window._page_exec) {
+				_page_exec();
+			}
+
+			if (window.DeskPRO_Page) {
+				DeskPRO_Page.initPage();
+			}
+		}
+
+		{% block html_headjs_load %}{% endblock %}
+
+		$(document).ready(function() {
+			_win_exec();
+		});
+	</script>
+	{% block html_head %}{% endblock %}
+	{% block page_js_exec %}{% endblock %}
+
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+</head>
+<body class="billing-interface {{ body_class }}">
+
+{% block header %}
+
+<!-- BEGIN NAV BAR -->
+<div id="dp_admin_nav" class="billing">
+	<div id="dp_admin_nav_sections" class="deskproPane">
+		<div style="float:right">
+			{% if app.user.can_admin %}
+				<a href="{{ app.request.getBaseUrl() }}/admin/" style="color: #fff; text-decoration: underline; font-size: 135%; padding-top: 9px; display: block;">Back to Admin Interface</a>
+			{% endif %}
+		</div>
+		<h1>{% if app.isCloud() %}Billing{% else %}Licensing{% endif %}</h1>
+	</div>
+</div>
+
+{% endblock %}
+
+<!-- /BEGIN NAV BAR -->
+<div id="dp_page_wrap">
+
+{% set pagebar %}{% block pagebar %}{% endblock %}{% endset %}
+{% if pagebar|trim|length %}
+	<div id="dp_admin_pagebar" class="dp_admin_pagebar">{{ pagebar|raw }}</div>
+{% endif %}
+
+{% block pagebar_after %}{% endblock %}
+
+{% if app.session.hasFlash('success_message') %}
+	<div class="alert-message success">
+		{{ app.session.getFlash('success_message') }}
+	</div>
+{% endif %}
+{% if app.session.hasFlash('error_message') %}
+	<div class="alert-message error">
+		{{ app.session.getFlash('error_message') }}
+	</div>
+{% endif %}
+{% if app.session.hasFlash('saved') %}
+	<div class="alert-message success">
+		"{{ app.session.getFlash('saved') }}" was saved successfully
+	</div>
+{% endif %}
+{% if app.session.hasFlash('deleted') %}
+	<div class="alert-message success">
+		"{{ app.session.getFlash('deleted') }}" was deleted successfully
+	</div>
+{% endif %}
+
+{% set sidebar %}{% block sidebar %}{% endblock %}{% endset %}
+{% set sidebar_right %}{% block sidebar_right %}{% endblock %}{% endset %}
+{% block dp_full_page %}
+<div id="dp_admin_page" class="dp_admin_page {% if sidebar|trim|length %}with-sidebar{% endif %} {% if sidebar_right|trim|length %}with-sidebar-right{% endif %} {{ admin_page_class }} with_top_border">
+	{% block prepage %}{% endblock %}
+	<div id="dp_admin_page_inner" class="dp_admin_page_inner">
+		{% if sidebar|trim|length %}
+			<div id="dp_admin_page_sidebar" class="dp_admin_page_sidebar dp-sidebar">{{ sidebar|raw }}</div>
+		{% endif %}
+		{% if sidebar_right|trim|length %}
+			<div id="dp_admin_page_sidebar_right" class="dp_admin_page_sidebar_right dp-sidebar">{{ sidebar_right|raw }}</div>
+		{% endif %}
+		{% block content %}
+			<div class="dp-page-box">
+				<div class="page-content">
+					{% block page %}{% endblock %}
+				</div>
+			</div>
+		{% endblock %}
+	</div>
+</div>
+{% endblock %}
+
+</div>
+
+{% set page_nav %}{% block page_nav %}{% endblock %}{% endset %}
+{% set page_nav_inner %}{% block page_nav_inner %}{% endblock %}{% endset %}
+{% if page_nav|trim|length or page_nav_inner|trim|length %}
+	<div id="dp_page_nav" {% if page_nav_fixed %}class="fixed"{% endif %}>
+		{% if page_nav_inner|trim|length %}
+			{{ page_nav_inner|raw }}
+		{% else %}
+			<div class="page-nav-block">
+				<div class="inner-shadow"></div>
+				{{ page_nav|raw }}
+			</div>
+		{% endif %}
+	</div>
+{% endif %}
+
+</body>
+</html>

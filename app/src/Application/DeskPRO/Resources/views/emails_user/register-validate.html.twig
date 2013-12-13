@@ -1,0 +1,6 @@
+<dp:subject>{{ phrase('user.email_subjects.validate-email') }}</dp:subject>
+{{ phrase('user.emails.register-confirm') }}:
+
+<br /><br />
+
+<a href="{{ url_full('user_validate_email', {'id': vemail.id, 'auth': vemail.auth}) }}">{{ url_full('user_validate_email', {'id': vemail.id, 'auth': vemail.auth}) }}</a>

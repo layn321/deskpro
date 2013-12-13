@@ -1,0 +1,157 @@
+{##
+ # Used when browsing feedback that lists feedback results and controls like status and category switchers, and includes
+ # the new feedback form.
+ #
+ # This template serves for all feedback browse views including the main feedback landing page.
+ ##}
+
+{% set this_section = 'feedback' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+	<script src="{{ asset('javascripts/DeskPRO/User/ElementHandler/FeedbackInlineNew.js') }}"></script>
+{% endblock %}
+{% macro cat_row(cat, status, selected_cat) %}
+	<li {% if cat.id == selected_cat.id %}class="on"{% endif %}>
+		<a href="{{ path('user_feedback', {'status': status, 'slug': cat.url_slug}) }}">{{ phrase_object(cat) }}</a>
+		{% if cat.children|length %}
+			<ul>
+				{% for subcat in cat.children %}
+					{{ _self.cat_row(subcat, status) }}
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</li>
+{% endmacro %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_feedback') }}">{{ phrase('user.feedback.feedback') }}</a></li>
+	{% if not (status == 'open' and search_options.order_by == 'popular' and not category) %}
+		<li>
+			<span class="dp-divider">{{ language_arrow('right') }}</span>
+			<a href="{{ path('user_feedback', {order_by:search_options.order_by}) }}">
+				{% if search_options.order_by == 'popular' %}{{ phrase('user.feedback.status_popular') }}
+				{% elseif search_options.order_by == 'newest' %}{{ phrase('user.feedback.sort_newest') }}
+				{% elseif search_options.order_by == 'most-voted' %}{{ phrase('user.feedback.sort_most-votes') }}
+				{% elseif search_options.order_by == 'i-voted' %}{{ phrase('user.feedback.sort_i-voted') }}
+				{% endif %}
+			</a>
+		</li>
+		{% if category %}
+			{% for cat in category.getTreeParents() %}
+				<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_feedback', {'status': status, 'slug': cat.url_slug}) }}">{{ phrase_object(cat) }}</a></li>
+			{% endfor %}
+			<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_feedback', {'status': status, 'slug': category.url_slug}) }}">{{ phrase_object(category) }}</a></li>
+		{% endif %}
+		{% if parent_status and parent_status != 'open' %}
+			<li>
+				<span class="dp-divider">{{ language_arrow('right') }}</span>
+				<a href="{{ path('user_feedback', {'status': parent_status, 'slug': category.url_slug}) }}">
+					{% if parent_status == 'any-status' %}{{ phrase('user.feedback.status_new') }}
+					{% elseif parent_status == 'gathering-feedback' %}{{ phrase('user.feedback.status_any') }}
+					{% elseif parent_status == 'active' %}{{ phrase('user.feedback.status_active') }}
+					{% elseif parent_status == 'closed' %}{{ phrase('user.feedback.status_closed') }}
+					{% endif %}
+				</a>
+			</li>
+			{% if parent_status != status %}
+				<li>
+					<span class="dp-divider">{{ language_arrow('right') }}</span>
+					<a href="{{ path('user_feedback', {'status': status, 'slug': category.url_slug}) }}">
+						{% if parent_status == 'active' %}
+							{{ phrase_object(active_status_cats[sub_status_id]) }}
+						{% else %}
+							{{ phrase_object(closed_status_cats[sub_status_id]) }}
+						{% endif %}
+					</a>
+				</li>
+			{% endif %}
+		{% endif %}
+	{% endif %}
+{% endblock %}
+{% block page_title %}
+	{{ phrase('user.feedback.feedback') }}
+	{% if not (status == 'open' and search_options.order_by == 'popular' and not category) %}
+		-
+		{% if search_options.order_by == 'popular' %}{{ phrase('user.feedback.status_popular') }}
+		{% elseif search_options.order_by == 'newest' %}{{ phrase('user.feedback.sort_newest') }}
+		{% elseif search_options.order_by == 'most-voted' %}{{ phrase('user.feedback.sort_most-votes') }}
+		{% elseif search_options.order_by == 'i-voted' %}{{ phrase('user.feedback.sort_i-voted') }}
+	{% endif %}
+	{% if category %}
+		{% for cat in category.getTreeParents() %}
+			- {{ phrase_object(cat) }}
+		{% endfor %}
+		- {{ phrase_object(category) }}
+	{% endif %}
+	{% if parent_status and parent_status != 'open' %}
+		-
+		{% if parent_status == 'any-status' %}{{ phrase('user.feedback.status_any') }}
+		{% elseif parent_status == 'gathering-feedback' %}{{ phrase('user.feedback.status_new') }}
+		{% elseif parent_status == 'active' %}{{ phrase('user.feedback.status_active') }}
+		{% elseif parent_status == 'closed' %}{{ phrase('user.feedback.status_closed') }}
+		{% endif %}
+		{% if parent_status != status %}
+			-
+			{% if parent_status == 'active' %}
+				{{ phrase_object(active_status_cats[sub_status_id]) }}
+			{% else %}
+				{{ phrase_object(closed_status_cats[sub_status_id]) }}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+{% endif %}
+{% endblock %}
+{% block content %}
+
+{% if app.admin_portal_controls %}
+	{% set tpl_res %}{% include 'UserBundle:Feedback:section-header.html.twig' %}{% endset %}
+	<div id="dp_custom_header_wrap" class="dp-portal-block" {% if not tpl_res|trim %}style="display: none"{% endif %}>
+		<div id="dp_page_custom_header" class="dp-portal-block-content">
+			{{ tpl_res|raw }}
+		</div>
+	</div>
+	<div id="dp_custom_header_placeholder" class="dp-portal-placeholder dp-portal-placeholder-header" data-portal-block="feedback_header" data-portal-for="#dp_page_custom_header" {% if tpl_res|trim %}style="display: none"{% endif %}>
+		<em>{{ phrase('admin.designer.edit_header_section') }}</em>
+	</div>
+{% else %}
+	{% include 'UserBundle:Feedback:section-header.html.twig' %}
+{% endif %}
+
+{% if app.user.hasPerm('feedback.submit') %}
+	{% include 'UserBundle:Feedback:filter-new-feedback.html.twig' %}
+{% endif %}
+
+{% if not just_form %}
+	<section class="dp-portal-section dp-feedback-section">
+		<header>
+			<h1>{{ phrase('user.feedback.title-feedback', {'count': num_results}) }}</h1>
+		</header>
+		<div class="dp-content-block dp-articles-block">
+			<div class="dp-content-wrapper">
+				<div style="float:{% if is_rtl() %}right{% else %}left{% endif %}; width: 100%;">
+					{% include 'UserBundle:Feedback:filter-nav.html.twig' %}
+				</div>
+				<br style="clear:{% if is_rtl() %}right{% else %}left{% endif %};height: 1px;" />
+
+				<ul class="dp-content-list">
+					{% for result in display %}
+						{% include 'UserBundle:Feedback:filter-list-item.html.twig' %}
+					{% endfor %}
+				</ul>
+
+				{% if pageinfo.last != 1 %}
+					{% set page_url = path('user_feedback', {'status': status, 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by }) ~ '?p=' %}
+					<div class="dp-pagination">
+						<ul>
+							{% if pageinfo.prev %}<li><a href="{{ page_url ~ pageinfo.prev }}">{{ language_arrow('left') }} {{ phrase('user.general.page_prev') }}</a></li>{% endif %}
+							{% for p in pageinfo.pages %}
+								<li class="{% if pageinfo.cursor == p %}dp-active{% endif %}"><a href="{{ page_url ~ p }}">{{ p }}</a>
+							{% endfor %}
+							{% if pageinfo.next %}<li><a href="{{ page_url ~ pageinfo.next }}">{{ phrase('user.general.next') }} {{ language_arrow('right') }}</a></li>{% endif %}
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+{% endif %}
+{% endblock %}

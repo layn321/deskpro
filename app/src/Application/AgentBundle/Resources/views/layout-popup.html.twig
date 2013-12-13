@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="robots" content="NOINDEX" />
+	<meta http-equiv="X-UA-Compatible" content="IE=100" />
+	<title>{{ phrase('agent.general.deskpro') }}</title>
+
+	{% include 'AgentBundle:Main:resources.html.twig' with {'no_interface_date': true} %}
+
+	{% block css_files %}{% endblock %}
+	{% block js_files %}{% endblock %}
+
+	<script type="text/javascript">
+		var BASE_URL = '{{ path('user') }}';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		var DESKPRO_PERSON_ID = {{ app.user.id }};
+		var DESKPRO_SESSION_ID = {{ app.session.getEntityId() }};
+		var DESKPRO_PROXY_KEY = '{{ app.session.getSessionSecret('proxy_key') }}';
+		{# {% if app.user.is_admin %} #}
+		var DESKPRO_PERSON_ISADMIN = true;
+		{# {% endif %} #}
+	</script>
+
+	<style type="text/css">
+		html, body {
+			background: #fff;
+		}
+	</style>
+
+	{% block page_head %}{% endblock %}
+</head>
+<body class="popup">
+{% block content %}{% endblock %}
+</body>
+</html>

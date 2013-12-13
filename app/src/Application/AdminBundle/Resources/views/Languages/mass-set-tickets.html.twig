@@ -1,0 +1,41 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/LangEditSettings.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+     <ul>
+         <li><a href="{{ path('admin_langs') }}">{{ phrase('admin.general.languages') }}</a></li>
+		 <li>Mass update tickets</li>
+     </ul>
+{% endblock %}
+{% block page %}
+<div class="page-content" style="padding-top: 0;">
+
+	{% if done %}
+		<div class="alert-message block-message success">
+			{{ count }} tickets were successfully updated.
+		</div>
+	{% endif %}
+
+	<form action="{{ path('admin_langs_mass_update_tickets') }}" method="POST">
+		Update <select name="from_lang">
+			<option value="0">All Tickets</option>
+			{% for lang in app.getLanguages().getAll() %}
+				<option {% if lang.id == from_lang_id %}selected="selected"{% endif %} value="{{ lang.id }}">All {{ phrase_object(lang, 'title') }} Tickets</option>
+			{% endfor %}
+		</select>
+		and set the language to <select name="to_lang">
+			{% for lang in app.getLanguages().getAll() %}
+				<option {% if lang.id == to_lang_id %}selected="selected"{% endif %} value="{{ lang.id }}">{{ phrase_object(lang, 'title') }}</option>
+			{% endfor %}
+			<option value="0" {% if 0 == to_lang_id %}selected="selected"{% endif %}>None</option>
+		</select>.
+		<br/><br/>
+		<strong>Warning: This is a mass update and cannot be undone. Are you sure you want to continue?</strong>
+		<br/><label><input type="checkbox" name="process" value="1" /> Yes, I am sure</label>
+		<br/><br/>
+		<button class="dp-btn dp-btn-primary">Mass-update language on tickets</button>
+	</form>
+</div>
+{% endblock %}

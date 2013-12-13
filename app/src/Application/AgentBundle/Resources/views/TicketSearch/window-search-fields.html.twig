@@ -1,0 +1,298 @@
+<div class="pane-rows-wrap">
+	{% if app.departments.getPersonDepartments(app.user, 'tickets') %}
+		<div class="pane-row add-to-search">
+			<table class="layout-table v-middle" width="100%">
+				<tr>
+					<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.department') }}</span></td>
+					<td style="padding: 0 5px;" width="10">
+						<select name="terms_expanded[department][op]" class="with-select2">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</td>
+					<td>
+						<select name="terms_expanded[department][options][department_ids][]" multiple="multiple" class="with-select2 ensure-value">
+							{% for dep in app.departments.getPersonDepartments(app.user, 'tickets') %}
+								{% if dep.children|length %}
+									<optgroup label="{{ dep.title }}">
+										{% for subdep in dep.children %}
+											<option data-full-title="{{ dep.title }} &gt; {{ subdep.title }}" value="{{subdep.id}}">{{subdep.title}}</option>
+										{% endfor %}
+									</optgroup>
+								{% else %}
+									<option value="{{dep.id}}">{{dep.title}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+	{% endif %}
+
+	{% if app.products.getNames()|length %}
+		<div class="pane-row add-to-search">
+			<table class="layout-table v-middle" width="100%">
+				<tr>
+					<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.product') }}</span></td>
+					<td style="padding: 0 5px;" width="10">
+						<select name="terms_expanded[product][op]" class="with-select2">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</td>
+					<td>
+						<select name="terms_expanded[product][options][product_ids][]" multiple="multiple" class="with-select2 ensure-value">
+							<option value="0">{{ phrase('agent.general.none') }}</option>
+							{% for id,title in app.products.getNames() %}
+								<option value="{{ id }}">{{ title }}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+	{% endif %}
+
+	{% if app.getSetting('core.use_ticket_category') %}
+		<div class="pane-row add-to-search">
+			<table class="layout-table v-middle" width="100%">
+				<tr>
+					<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.category') }}</span></td>
+					<td style="padding: 0 5px;" width="10">
+						<select name="terms_expanded[category][op]" class="with-select2">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</td>
+					<td>
+						<select name="terms_expanded[category][options][category_ids][]" multiple="multiple" class="with-select2 ensure-value">
+							<option value="0">{{ phrase('agent.general.none') }}</option>
+							{% for cat in app.getDataService('TicketCategory').getRootNodes() %}
+								{% if cat.children|length %}
+									<optgroup label="{{ cat.title }}">
+										{% for subcat in cat.children %}
+											<option data-full-title="{{ cat.title }} &gt; {{ subcat.title }}" value="{{ subcat.id }}">{{ subcat.title }}</option>
+										{% endfor %}
+									</optgroup>
+								{% else %}
+									<option value="{{ cat.id }}">{{ cat.title }}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+	{% endif %}
+
+	{% if app.getSetting('core.use_ticket_priority') %}
+		<div class="pane-row add-to-search">
+			<table class="layout-table v-middle" width="100%">
+				<tr>
+					<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.priority') }}</span></td>
+					<td style="padding: 0 5px;" width="10">
+						<select name="terms_expanded[priority][op]" class="with-select2">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</td>
+					<td>
+						<select name="terms_expanded[priority][options][priority_ids][]" multiple="multiple" class="with-select2 ensure-value">
+							<option value="0">{{ phrase('agent.general.none') }}</option>
+							{% for id,name in app.getDataService('TicketPriority').getNames() %}
+								<option value="{{ id }}">{{ name }}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+	{% endif %}
+
+	{% if app.getSetting('core.use_ticket_workflow') %}
+		<div class="pane-row add-to-search">
+			<table class="layout-table v-middle" width="100%">
+				<tr>
+					<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.workflow') }}</span></td>
+					<td style="padding: 0 5px;" width="10">
+						<select name="terms_expanded[workflow][op]" class="with-select2">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</td>
+					<td>
+						<select name="terms_expanded[workflow][options][workflow_ids][]" multiple="multiple" class="with-select2 ensure-value">
+							<option value="0">{{ phrase('agent.general.none') }}</option>
+							{% for work in app.getDataService('TicketWorkflow').getAll() %}
+								<option value="{{ work.id }}">{{ work.title }}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+	{% endif %}
+</div>
+
+<div class="with-search-builder">
+	<div class="search-form criteria_list add-to-search">
+		<div class="search-terms"></div>
+		<div class="add-term-row"><span class="add-term"><i class="icon-plus-sign"></i></span></div>
+	</div>
+
+	<div class="search-builder-tpl criteria_tpl" style="display:none">
+		<div class="row">
+			<div class="term">
+				<div class="remove-row-btn trigger-remove-row"><i class="icon-minus-sign"></i></div>
+				<div class="sep-row">
+					<div class="line"></div>
+					<strong>{{ phrase('agent.general.and') }}</strong>
+				</div>
+				<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+					<td class="builder-controls" style="vertical-align: middle;">
+						<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+							<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+						</tr></tbody></table>
+					</td>
+				</tr></tbody></table>
+			</div>
+		</div>
+		<div class="builder-type-choice" title="{{ phrase('agent.general.choose_criteria') }}" data-rule-type=""></div>
+
+		<div class="builder-type" title="{{ phrase('agent.general.urgency') }}" data-rule-type="urgency" data-term-type="GenericInputTerm" data-term-triggers="urgency">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="gte">&gt;=</option>
+					<option value="lte">&lt;=</option>
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+					{% if with_change_terms %}
+						<optgroup label="{{ phrase('agent.general.changed') }}">
+							<option value="changed">{{ phrase('agent.general.changed') }}</option>
+							<option value="changed_to">{{ phrase('agent.general.changed_to') }}</option>
+							<option value="changed_from">{{ phrase('agent.general.changed_from') }}</option>
+							<option value="not_changed_to">{{ phrase('agent.general.not_changed_to') }}</option>
+							<option value="not_changed_from">{{ phrase('agent.general.not_changed_from') }}</option>
+						</optgroup>
+						<optgroup label="Changed (ranged)">
+							<option value="changed_to_gte">{{ phrase('agent.general.changed_to_gte') }}</option>
+							<option value="changed_to_lte">{{ phrase('agent.general.changed_to_lte') }}</option>
+							<option value="changed_from_gte">{{ phrase('agent.general.changed_from_gte') }}</option>
+							<option value="changed_from_lte">{{ phrase('agent.general.changed_from_lte') }}</option>
+							<option value="not_changed_to_gte">{{ phrase('agent.general.not_changed_to_gte') }}</option>
+							<option value="not_changed_from_lte">{{ phrase('agent.general.not_changed_from_lte') }}</option>
+						</optgroup>
+					{% endif %}
+				</select>
+			</div>
+			<div class="builder-options">
+				<input type="text" size="4" value="" name="num" />
+			</div>
+		</div>
+
+		{% if term_options.languages %}
+		<div class="builder-type" title="{{ phrase('agent.general.language') }}" data-term-type="GenericMenuTerm" data-rule-type="language" data-term-triggers="lang,language">
+			<div class="builder-op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				<select name="language">
+					<option value="0">{{ phrase('agent.general.none') }}</option>
+					{% for id,title in term_options.languages %}
+					<option value="{{id}}">{{title}}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+		{% endif %}
+
+		{% if term_options.slas %}
+			<div class="builder-type" title="{{ phrase('agent.general.sla') }}" data-rule-type="sla" data-term-type="GenericMenuTerm" data-term-triggers="sla">
+				<div class="builder-op">
+					<select name="op" class="op">
+						<option value="is">{{ phrase('agent.general.is') }}</option>
+						<option value="not">{{ phrase('agent.general.is_not') }}</option>
+					</select>
+				</div>
+				<div class="builder-options">
+					<select name="sla_id">
+						{% for id,title in term_options.slas %}
+							<option value="{{ id }}">{{ title }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+
+			<div class="builder-type" title="{{ phrase('agent.general.sla_status') }}" data-rule-type="sla_status" data-term-type="GenericMenuTerm" data-term-triggers="sla_status,slastatus">
+				<div class="builder-op">
+					<select name="op" class="op">
+						<option value="is">{{ phrase('agent.general.is') }}</option>
+						<option value="not">{{ phrase('agent.general.is_not') }}</option>
+					</select>
+				</div>
+				<div class="builder-options">
+					<select name="sla_status">
+						<option value="ok">{{ phrase('agent.general.okay') }}</option>
+						<option value="warn">{{ phrase('agent.general.warning') }}</option>
+						<option value="fail">{{ phrase('agent.general.failed') }}</option>
+					</select>
+					<select name="sla_id">
+						<option value="0">{{ phrase('agent.general.any_sla') }}</option>
+						{% for id,title in term_options.slas %}
+							<option value="{{id}}">{{title}}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		{% endif %}
+
+		{% if app.getTicketFieldManager().getFields() %}
+			{% set op_lang = {'is': phrase('agent.general.is'), 'not': phrase('agent.general.is_not'), 'contains': phrase('agent.general.contains'), 'notcontains': phrase('agent.general.does_not_contain'), 'gt': phrase('agent.general.is_greater_than'), 'lt': phrase('agent.general.is_less_than') } %}
+			{% for field in app.getTicketFieldManager().getDisplayArray() %}
+				{% if field.field_def.getFilterCapabilities(search_context) %}
+				<div class="builder-type" title="{{field.field_def.title}}" data-rule-type="ticket_field[{{field.field_def.id}}]">
+					<div class="builder-op">
+						<select name="op" class="op">
+							{% if search_context == 'filter' %}
+								{% for op in field.field_def.getFilterCapabilities(search_context) %}
+									<option value="{{op}}">{{op_lang[op]}}</option>
+								{% endfor %}
+							{% else %}
+								{% for op in field.field_def.getSearchCapabilities(search_context) %}
+									<option value="{{op}}">{{op_lang[op]}}</option>
+								{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+					<div class="builder-options">
+						{{ form_widget(field.formView) }}
+					</div>
+				</div>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+
+		<div class="builder-type" title="{{ phrase('agent.general.labels') }}" data-rule-type="label" data-rule-handler="DeskPRO.Agent.RuleBuilder.LabelsTerm" data-label-type="tickets" data-term-type="GenericInputTerm" data-term-triggers="label,labelled,labels">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+					{% if with_change_terms %}
+						<option value="changed">{{ phrase('agent.general.changed') }}</option>
+						<option value="changed_to">{{ phrase('agent.general.changed_to_include') }}</option>
+						<option value="changed_from">{{ phrase('agent.general.changed_to_remove') }}</option>
+					{% endif %}
+				</select>
+			</div>
+			<div class="builder-options">
+				{% include 'DeskPRO:Common:rulebuilder-labels-options.html.twig' %}
+			</div>
+		</div>
+	</div>
+</div>

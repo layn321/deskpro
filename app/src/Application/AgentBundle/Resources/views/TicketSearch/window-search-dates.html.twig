@@ -1,0 +1,127 @@
+<div class="with-search-builder">
+	<div class="search-form criteria_list add-to-search">
+		<div class="search-terms"></div>
+		<div class="add-term-row"><span class="add-term"><i class="icon-plus-sign"></i></span></div>
+	</div>
+
+	<div class="search-builder-tpl criteria_tpl" style="display:none">
+		<div class="row">
+			<div class="term">
+				<div class="remove-row-btn trigger-remove-row"><i class="icon-minus-sign"></i></div>
+				<div class="sep-row">
+					<div class="line"></div>
+					<strong>{{ phrase('agent.general.and') }}</strong>
+				</div>
+				<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+					<td class="builder-controls" style="vertical-align: middle;">
+						<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+							<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+						</tr></tbody></table>
+					</td>
+				</tr></tbody></table>
+			</div>
+		</div>
+		<div class="builder-type-choice" title="{{ phrase('agent.general.choose_criteria') }}" data-rule-type=""></div>
+
+		<div class="builder-type" title="User Waiting Time" data-rule-type="user_waiting">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="gte">{{ phrase('agent.general.is_greater_than') }}</option>
+					<option value="lte">{{ phrase('agent.general.is_less_than') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				<input type="text" name="waiting_time" value="" style="width:50px" />
+				<select name="waiting_time_unit">
+					{% for scale,label in {'minutes': phrase('admin.tickets.minutes'), 'hours': phrase('admin.tickets.hours'), 'days': phrase('admin.tickets.days'), 'weeks': phrase('admin.tickets.weeks'), 'months': phrase('admin.tickets.months')} %}
+						<option value="{{ scale }}">{{ label }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+
+		<div class="builder-type" title="User Total Waiting Time" data-rule-type="total_user_waiting">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="lte">{{ phrase('agent.general.is_less_than') }}</option>
+					<option value="gte">{{ phrase('agent.general.is_greater_than') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				<input type="text" name="waiting_time" value="" style="width:50px" />
+				<select name="waiting_time_unit">
+					{% for scale,label in {'minutes': phrase('admin.tickets.minutes'), 'hours': phrase('admin.tickets.hours'), 'days': phrase('admin.tickets.days'), 'weeks': phrase('admin.tickets.weeks'), 'months': phrase('admin.tickets.months')} %}
+						<option value="{{ scale }}">{{ label }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+
+		<div class="builder-type" title="{{ phrase('agent.general.date_created') }}" data-rule-type="date_created" data-rule-handler="DeskPRO.Agent.RuleBuilder.DateTerm" data-term-type="GenericDateTerm" data-term-triggers="date-created">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="lte">{{ phrase('agent.general.before') }}</option>
+					<option value="gte">{{ phrase('agent.general.after') }}</option>
+					<option value="between">{{ phrase('agent.general.between') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				{% include 'DeskPRO:Common:rulebuilder-date-options.html.twig' %}
+			</div>
+		</div>
+
+		<div class="builder-type" title="{{ phrase('agent.general.date_resolved') }}" data-rule-type="date_resolved" data-rule-handler="DeskPRO.Agent.RuleBuilder.DateTerm" data-term-triggers="date-resolved">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="lte">{{ phrase('agent.general.before') }}</option>
+					<option value="gte">{{ phrase('agent.general.after') }}</option>
+					<option value="between">{{ phrase('agent.general.between') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				{% include 'DeskPRO:Common:rulebuilder-date-options.html.twig' %}
+			</div>
+		</div>
+
+		<div class="builder-type" title="{{ phrase('agent.general.date_closed') }}" data-rule-type="date_closed" data-rule-handler="DeskPRO.Agent.RuleBuilder.DateTerm">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="lte">{{ phrase('agent.general.before') }}</option>
+					<option value="gte">{{ phrase('agent.general.after') }}</option>
+					<option value="between">{{ phrase('agent.general.between') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				{% include 'DeskPRO:Common:rulebuilder-date-options.html.twig' %}
+			</div>
+		</div>
+
+		<div class="builder-type" title="{{ phrase('agent.general.date_of_last_agent_reply') }}" data-rule-type="date_last_agent_reply" data-rule-handler="DeskPRO.Agent.RuleBuilder.DateTerm">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="lte">{{ phrase('agent.general.before') }}</option>
+					<option value="gte">{{ phrase('agent.general.after') }}</option>
+					<option value="between">{{ phrase('agent.general.between') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				{% include 'DeskPRO:Common:rulebuilder-date-options.html.twig' %}
+			</div>
+		</div>
+
+		<div class="builder-type" title="{{ phrase('agent.general.date_of_last_user_reply') }}" data-rule-type="date_last_user_reply" data-rule-handler="DeskPRO.Agent.RuleBuilder.DateTerm">
+			<div class="builder-op">
+				<select name="op" class="op">
+					<option value="lte">{{ phrase('agent.general.before') }}</option>
+					<option value="gte">{{ phrase('agent.general.after') }}</option>
+					<option value="between">{{ phrase('agent.general.between') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				{% include 'DeskPRO:Common:rulebuilder-date-options.html.twig' %}
+			</div>
+		</div>
+	</div>
+</div>

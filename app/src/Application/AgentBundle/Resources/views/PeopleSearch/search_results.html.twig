@@ -1,0 +1,20 @@
+<table class="list" cellspacing="0" width="100%">
+	<thead>
+		<tr>
+			<th>{{ phrase('agent.general.name') }}</th>
+			<th>{{ phrase('agent.general.email') }}</th>
+			<th>{{ phrase('agent.general.labels') }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for person in people_list %}
+			<tr data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}">
+				<td>{{person.display_name}}</td>
+				<td>{{person.primary_email.email|default(phrase('agent.search.no_email'))}}</td>
+				<td>{{ phrase('agent.general.labels') }}</td>
+			</tr>
+		{% else %}
+			<tr><td colspan="3">{{ phrase('agent.search.no_people_match_your_criteria') }}</td></tr>
+		{% endfor %}
+	</tbody>
+</table>

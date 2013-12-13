@@ -1,0 +1,43 @@
+<div class="alert-overlay mass-actions-overlay" style="width: 750px; height: 600px; overflow: auto;">
+	<div class="overlay-title">
+		<span class="close-trigger"></span>
+		<h4>
+			{% if view_action == 2 %}
+				{{ phrase('agent.publish.who_downloaded') }}
+			{% else %}
+				{{ phrase('agent.publish.who_viewed') }}
+			{% endif %}
+		</h4>
+	</div>
+	<div class="overlay-content">
+		<div style="border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
+			<table cellspacing="0" cellpadding="0" width="100%" class="data-display-table with-head">
+				<tbody>
+					<tr>
+						<th class="col-head">{{ phrase('agent.general.user') }}</th>
+						<th class="col-head">{{ phrase('agent.general.count') }}</th>
+						<th class="col-head" width="10">{{ phrase('agent.general.when') }}</th>
+					</tr>
+					{% for person in people %}
+						<tr>
+							<td>
+								<a class="dp-btn dp-btn-small" data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}">
+									<span class="text" style="background: transparent url({{ person.getPictureUrl(15) }}) no-repeat 0 50%; padding-left: 20px;">
+										{{ person.getNameWithTitle() }}
+										({{ person.primary_email_address }})
+									</span>
+								</a>
+							</td>
+							<td nowrap="nowrap" width="10" style="text-align: center;">
+								{{ id_to_info[person.id].count|default(1) }}
+							</td>
+							<td nowrap="nowrap" width="10">
+								{{ id_to_info[person.id].date_created|date('full') }}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

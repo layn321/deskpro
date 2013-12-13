@@ -1,0 +1,39 @@
+<li
+	class="inside ticket {% if is_new_ticket %}new-ticket{% elseif is_new_agent_reply or is_new_user_reply %}new-reply{% else %}update{% endif %} ticket-row-{{ ticket.id }} ticket-{{ ticket.id }}"
+	data-class-id="ticket-row-{{ ticket.id }}"
+	data-type="tickets"
+	data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': ticket.id}) }}"
+	data-route-notabreload="1"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time datetime="{{ 'now'|date('c', 'UTC') }}"></time>
+	<big>
+		<span class="row-id">#{{ ticket.id }}</span>
+		{{ ticket.subject }}
+	</big>
+	<small>
+		{% if is_new_ticket %}
+			{% if ticket.person.id != performer.id %}
+				{{ phrase('agent.tickets.notify_new_ticket_by_for', {name: performer.name, user: ticket.person.name ~ '(' ~ ticket.person.email_address ~ ')' }) }}
+			{% else %}
+            	{{ phrase('agent.chat.new_ticket_by', {'name':performer.name,'email':performer.primary_email_address}) }}
+			{% endif %}
+		{% elseif is_new_agent_reply %}
+			{% if is_new_agent_note %}
+				{{ phrase('agent.chat.new_agent_note_by', {'name':performer.name}) }}
+			{% else %}
+            	{{ phrase('agent.chat.new_agent_reply_by', {'name':performer.name}) }}
+			{% endif %}
+		{% elseif is_new_user_reply %}
+            {{ phrase('agent.chat.new_user_reply_by', {'name':performer.name,'email':performer.primary_email_address}) }}
+		{% else %}
+			{% if performer %}({{ performer.display_name }}){% endif %}
+			{% for log in log_items %}
+				{% set notify_html %}{% include 'AgentBundle:TicketSearch:notify-row-log.html.twig' %}{% endset %}
+				{% if notify_html %}
+					{{ notify_html|raw }}{% if not loop.last %},{% endif %}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	</small>
+</li>

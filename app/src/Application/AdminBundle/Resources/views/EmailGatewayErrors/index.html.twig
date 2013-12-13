@@ -1,0 +1,156 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<nav>
+	<ul>
+		{% if type == 'errors' %}
+			<li><a href="{{ path('admin_emailgateway_errors_clear', {security_token: security_token('clear_gateway_errors'), 'object_type': object_type }) }}">Clear Errors</a></li>
+		{% elseif type == 'rejections' %}
+			<li><a href="{{ path('admin_emailgateway_rejections_clear', {security_token: security_token('clear_gateway_errors'), 'object_type': object_type }) }}">Clear Rejections</a></li>
+		{% endif %}
+	</ul>
+</nav>
+<ul>
+	<li><a href="{{ path('admin_emailgateways') }}">Email Accounts</a></li>
+	{% if type == 'errors' %}
+		<li>Errors</li>
+	{% elseif type == 'all' %}
+		<li>Email Sources</li>
+	{% else %}
+		<li>Rejections</li>
+	{% endif %}
+</ul>
+{% endblock %}
+{% block page %}
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+		<tr>
+			<th style="text-align: center;" width="10">{{ phrase('agent.general.id') }}</th>
+			<th style="text-align: left;">{{ phrase('admin.general.email_info') }}</th>
+			{% if type == 'rejections' %}
+				<th style="text-align: right">Rejection Type</th>
+			{% endif %}
+		</tr>
+		</thead>
+		<tbody>
+		{% for source in sources %}
+			<tr>
+				<td class="title on" style="text-align: center; padding-left: 0;"><a href="{{ path('admin_emailgateway_errors_view', {id: source.id }) }}">{{ source.id }}</a></td>
+				<td>
+					<table cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td nowrap="nowrap" width="50" style="text-align: right; padding-right: 8px;">Date:</td>
+							<td>{{ source.date_created|date('fulltime') }}</td>
+						</tr>
+						<tr>
+							<td nowrap="nowrap" width="50" style="text-align: right; padding-right: 8px;">{{ phrase('admin.general.email_from') }}:</td>
+							<td>{{ source.header_from }}</td>
+						</tr>
+						<tr>
+							<td nowrap="nowrap" style="text-align: right; padding-right: 8px;">{{ phrase('agent.general.to') }}:</td>
+							<td>{{ source.header_to }}</td>
+						</tr>
+						<tr>
+							<td nowrap="nowrap" style="text-align: right; padding-right: 8px;">{{ phrase('admin.general.email_subject') }}:</td>
+							<td>
+								{{ source.header_subject }}
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>
+								<a class="clean-white tipped small" title="View information about the email source" href="{{ path('admin_emailgateway_errors_view', {id: source.id}) }}">View Details</a>
+								<a class="clean-white tipped small" title="Deletes this rejection log and the original email source." href="{{ path('admin_emailgateway_errors_delete', {id: source.id, security_token: security_token('delete_gateway_error')}) }}">{{ phrase('agent.general.delete') }}</a>
+								<a class="clean-white tipped small" title="Download the raw email source" href="{{ source.blob.getDownloadUrl() }}">Download Source ({{ source.blob.getReadableFilesize() }})</a>
+								<a class="clean-white tipped small" title="Attempts to reprocess the email." href="{{ path('admin_emailgateway_reprocess', {id: source.id, security_token: security_token('reprocess_gateway_error')}) }}">Reprocess Email</a>
+							</td>
+						</tr>
+					</table>
+				</td>
+				{% if type == 'rejections' %}
+					<td style="text-align: right; white-space: nowrap;" nowrap="nowrap">
+						{% if source.error_code == 'from_missing' %}
+							Missing "From"
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="There was no 'From' address in the email"></span>
+						{% elseif source.error_code == 'from_missing' %}
+							Invalid "From"
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The 'From' address in the email is not a valid email address"></span>
+						{% elseif source.error_code == 'from_gateway_address' %}
+							From Helpdesk
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The email appears to be from the helpdesk itself, or from an address monitored by the helpdesk. It was not processed to prevent processing loops."></span>
+						{% elseif source.error_code == 'from_banned' %}
+							Banned
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The 'From' address in the email is banned"></span>
+						{% elseif source.error_code == 'from_disabled_user' %}
+							User Disabled
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The 'From' address in the email is a disabled user"></span>
+						{% elseif source.error_code == 'message_too_big' %}
+							Email Too Big
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The size of the email is larger than is allowed"></span>
+						{% elseif source.error_code == 'duplicate_message' %}
+							Duplicate
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The message has already been processed"></span>
+						{% elseif source.error_code == 'missing_marker' %}
+							Missing Cut Line
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The 'Reply Above' cut line was missing from an agent reply"></span>
+						{% elseif source.error_code == 'invalid_fwd' %}
+							Invalid Agent Forward
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The email was detected as a forwarded message, but the format could not be parsed."></span>
+						{% elseif source.error_code == 'invalid_fwd_email' %}
+							Invalid Agent Forward (Bad user email address)
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The email was detected as a forwarded message, but the message did not contain a valid email address for the user"></span>
+						{% elseif source.error_code == 'agent_bounce' %}
+							Agent Auto-Response
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The email was an agent reply but was detected to be an auto-response such as an out-of-office reply or bounce error."></span>
+						{% elseif source.error_code == 'date_limit' %}
+							Date Limit
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="The date of the email is from before the email account was configured in DeskPRO. For example, if the POP3 account was reset then many old messages that were already read by DeskPRO may be loaded again. To prevent this, messages older than the account are rejected."></span>
+						{% else %}
+							{{ source.error_code_title }}
+						{% endif %}
+					</td>
+				{% endif %}
+			</tr>
+		{% else %}
+			<tr>
+				<td colspan="10" style="text-align: center; padding: 20px;">
+					{% if type == 'errors' %}
+						There are no logged errors.
+					{% else %}
+						There are no logged rejections.
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div><br />
+
+{% if pageinfo.pages|length > 1 %}
+<div class="page_nav">
+	<ul>
+		{% if type == 'errors' %}
+			{% set route = 'admin_emailgateway_errors' %}
+		{% elseif type == 'all' %}
+			{% set route = 'admin_emailgateway_all' %}
+		{% else %}
+			{% set route = 'admin_emailgateway_rejections' %}
+		{% endif %}
+		{% if pageinfo.curpage != pageinfo.first %}
+		<li><a href="{{ path(route, {'p': pageinfo.first}) }}">{{ phrase('admin.general.first') }}</a></li>
+		<li><a href="{{ path(route, {'p': pageinfo.prev}) }}">{{ phrase('agent.general.prev') }}</a></li>
+		{% endif %}
+
+		{% for i in pageinfo.pages %}
+		<li {% if i == pageinfo.curpage %}class="cur_page"{% endif %}><a href="{{ path(route, {'p': i}) }}">{{i}}</a></li>
+		{% endfor %}
+
+		{% if pageinfo.curpage != pageinfo.last %}
+		<li><a href="{{ path(route, {'p': pageinfo.next}) }}">{{ phrase('admin.general.next') }}</a></li>
+		<li><a href="{{ path(route, {'p': pageinfo.last}) }}">{{ phrase('admin.general.last') }}</a></li>
+		{% endif %}
+	</ul>
+</div>
+{% endif %}
+
+{% endblock %}

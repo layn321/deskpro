@@ -1,0 +1,21 @@
+{##
+ # The product select box of the new ticket form
+ ##}
+
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+<div class="dp-control-group ticket_product {% if error_fields['ticket.product_id'] %}dp-error{% endif %} ticket_product">
+	<div class="dp-control-label">
+		<label><strong>{{ phrase('user.tickets.fields_product') }}</strong></label>
+	</div>
+	<div class="dp-controls dp-fill">
+		<select name="newticket[ticket][product_id]" class="product_id">
+			<option></option>
+			{% for cat in app.products.getRootNodes() %}
+				{{ formmacro.select_options_hierarchy(cat, newticket.ticket.product_id) }}
+			{% endfor %}
+		</select>
+		<div class="dp-help-inline dp-error-explain">
+			{{ phrase('user.tickets.form_error_product') }}
+		</div>
+	</div>
+</div>

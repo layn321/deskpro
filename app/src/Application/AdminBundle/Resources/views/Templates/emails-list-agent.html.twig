@@ -1,0 +1,191 @@
+{% import 'AdminBundle:Templates:macros.html.twig' as tplmacro %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagetabs %}
+<ul>
+	<li><a href="{{ path('admin_templates_email', {list_type: 'layout'}) }}">Email Layout</a></li>
+	<li><a href="{{ path('admin_templates_email', {list_type: 'user'}) }}">User Emails</a></li>
+	<li class="on"><a href="{{ path('admin_templates_email', {list_type: 'agent'}) }}">Agent Emails</a></li>
+</ul>
+{% endblock %}
+{% block html_head %}
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/Templates/DpTplSearch.js') }}"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		new DpTplSearch('emails_agent');
+	});
+	</script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		new DpTplSearch('emails_user');
+
+		var variationOverlayEl = $('#add_variation_overlay');
+		var variationOverlay = new DeskPRO.UI.Overlay({
+			contentElement: variationOverlayEl,
+			triggerElement: $('#add_variation_trigger'),
+			onBeforeOverlayOpened: function() {
+				variationOverlayEl.find('input.template_name').val('');
+			}
+		});
+
+		variationOverlayEl.find('button.save-trigger').on('click', function(ev) {
+			var new_name = variationOverlayEl.find('input.template_name').val();
+			new_name = new_name.replace(/[^a-zA-Z0-9_\-]/g, '_');
+
+			if (!new_name) {
+				alert('Please enter a unique ID');
+				return;
+			}
+
+			var url = BASE_URL + 'admin/templates/email/edit/' + encodeURIComponent(new_name) + '?variant_of=' + encodeURIComponent('DeskPRO:emails_agent:blank.html.twig');
+
+			window.location = url;
+		});
+	});
+	</script>
+{% endblock %}
+{% block content %}
+
+	<div class="page-content">
+		<div class="content-table">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th class="single-title">Find in emails</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							Search for: <input type="text" id="tplsearch_term" name="search" value="" placeholder="Enter a string to search for" style="width: 200px; padding: 3px;" />
+							<button id="tplsearch_trigger" class="clean-white">Find</button>
+							<i id="tplsearch_loading" class="flat-spinner" style="display: none;"></i>
+							<span id="tplsearch_status" style="display: none;"></span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{% set list = [
+		'DeskPRO:emails_agent:new-ticket.html.twig',
+		'DeskPRO:emails_agent:ticket-update.html.twig',
+		'DeskPRO:emails_agent:new-reply-user.html.twig',
+		'DeskPRO:emails_agent:new-reply-agent.html.twig'
+	] %}
+
+	<div class="page-content">
+		<div class="content-table">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th class="single-title">Tickets</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for tpl in list %}
+						{{ tplmacro.render_emailist_row(tpl, variations[tpl], trigger_map) }}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{% set list = [
+		'DeskPRO:emails_agent:new-agent-chat-message.html.twig',
+		'DeskPRO:emails_agent:new-comment.html.twig',
+		'DeskPRO:emails_agent:new-feedback.html.twig',
+		'DeskPRO:emails_agent:new-registration.html.twig'
+	] %}
+	<div class="page-content">
+		<div class="content-table">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th class="single-title">General</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for tpl in list %}
+						{{ tplmacro.render_emailist_row(tpl, variations[tpl], trigger_map) }}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{% set list = [
+		'DeskPRO:emails_agent:login-alert.html.twig',
+		'DeskPRO:emails_agent:agent-welcome.html.twig',
+		'DeskPRO:emails_agent:agent-changeemail-mergeuser.html.twig',
+		'DeskPRO:emails_agent:admin-noreset-password.html.twig',
+		'DeskPRO:emails_agent:error-invalid-forward.html.twig',
+		'DeskPRO:emails_agent:error-marker-missing.html.twig',
+		'DeskPRO:emails_agent:error-unknown-from.html.twig'
+	] %}
+	<div class="page-content">
+		<div class="content-table">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th class="single-title">Alerts &amp; Errors</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for tpl in list %}
+						{{ tplmacro.render_emailist_row(tpl, variations[tpl], trigger_map) }}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div class="page-content">
+		<div class="content-table">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th class="single-title">
+							<div style="float:right;">
+								<button id="add_variation_trigger" class="clean-white" style="font-size: 10px; padding: 0 6px;">Create Custom Template</button>
+							</div>
+							Custom Templates
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for tpl in custom_templates %}
+						{{ tplmacro.render_emailist_row(tpl, variations[tpl], trigger_map) }}
+					{% else %}
+						<tr><td>
+							You have not created any custom templates yet.
+							<br />
+							<br />
+							You can use custom templates in conjunction with ticket triggers to send arbitrary emails to users.
+						</td></tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div id="add_variation_overlay" class="edit-phrase-overlay" style="width: 725px; height: 200px; display: none;">
+		<div class="overlay-title">
+			<span class="close-trigger close-overlay"></span>
+			<h4>Add Custom Template</h4>
+		</div>
+		<div class="overlay-content">
+			<section class="phrase-section custom">
+				<header>
+					<h4>Unique Template ID</h4>
+				</header>
+				<article>
+					custom_<input type="text" class="template_name" name="template_name" placeholder="Enter a unique ID that will be used to identify this template" style="width: 350px;" />
+				</article>
+			</section>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white save-trigger">Create Custom Template</button>
+		</div>
+	</div>
+{% endblock %}

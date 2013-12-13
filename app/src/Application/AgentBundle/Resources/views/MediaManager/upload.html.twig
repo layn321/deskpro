@@ -1,0 +1,42 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.MediaManagerPage.Upload';
+</script>
+<div class="manager-window-content content">
+	<div class="drop-file-zone"><h1>{{ phrase('agent.general.drop_here_to_upload') }}</h1></div>
+	<div class="upload-control">
+		{{ phrase('agent.media.choose_file_from_computer') }}
+		<br /><br />
+		<input type="file" class="file" name="file-upload" />
+	</div>
+	<div class="files">
+	</div>
+	<script class="template-upload" type="text/x-tmpl">
+		{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+		<p>{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</p>
+		{{ '{% } %}' }}
+	</script>
+	<script class="template-download" type="text/x-tmpl">
+		{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+		{{ '{% if (file.error) { %}'}}
+		<div class="error">
+			{{ '{%=file.error%}' }}
+		</div>
+		{{ '{% } else { %}'}}
+		<div>
+			<button
+				class="clean-white insert-trigger"
+				data-download-url="{{ '{%=file.download_url%}' }}"
+				data-is-image="{{ '{%=file.is_image%}' }}"
+				data-file-name="{{ '{%=file.filename%}' }}"
+				data-blob-id="{{ '{%=file.blob_id%}' }}"
+			>Insert Into Article</button>
+			<button class="clean-white cancel-trigger">Upload a different file instead</button>
+			<div style="padding-top: 10px;">
+				File URL: <input type="text" class="file-url" style="width: 95%;" value="{{ '{%=file.download_url%}' }}" />
+			</div>
+			<div style="max-width: 98%; max-height: 400px; overflow:auto; padding-top: 10px;"><img src="{{ '{%=file.download_url%}' }}" /></div>
+		</div>
+		{{ '{% } %}' }}
+		{{ '{% } %}' }}
+	</script>
+</div>

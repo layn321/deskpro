@@ -1,0 +1,48 @@
+{##
+ # This login bar is displayed at the top of the page under the search bar when the browser size is very small
+ # and the sidebar is hidden.
+ ##}
+{% if app.user.id %}
+	<section class="dp-topbar-block dp-userinfo">
+		<div class="dp-left-side">
+			<h3>{{ phrase('user.portal.sidebar_welcome-user', {name: app.user.first_name|default(app.user.display_name_user)}) }}</h3>
+		</div>
+		<div class="dp-right-side">
+			<ul>
+				<li>
+					<a href="{{ path('user_profile') }}">{{ phrase('user.profile.edit_your_profile') }}</a>
+				</li>
+				{% if ticket_count %}
+				<li>
+					<a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.view_your_x_tickets', {count: ticket_count })}}</a>
+				</li>
+				{% endif %}
+				{% if org_ticket_count %}
+				<li>
+					<a href="{{ path('user_tickets_organization') }}">{{ phrase('user.tickets.view_organization_x_tickets', {organization: app.user.organization.name, count: org_ticket_count })}}</a>
+				</li>
+				{% endif %}
+				<li>
+					<a href="{{ path('user_logout', {'auth': static_security_token('user_logout', 0) }) }}">{{ phrase('user.general.log_out') }}</a>
+				</li>
+			</ul>
+		</div>
+	</section>
+{% else %}
+	<!--DP_OFFLINE_CACHE_REMOVE_START-->
+	<section class="dp-topbar-block dp-userinfo">
+		<div class="dp-left-side">
+			<h3>{{ phrase('user.portal.welcome-back-guest') }}</h3>
+		</div>
+		<div class="dp-right-side">
+			<form action="{{ path('user_login_authenticate_local') }}" method="post">
+				{{ form_token('user_login') }}
+				<input type="text" value="" name="email" size="40" placeholder="{{ phrase('user.general.email_address') }}" />
+				<input type="password" value="" name="password" id="dp_login_password" size="20" placeholder="{{ phrase('user.profile.password') }}" />
+				<input class="dp-btn" type="submit" value="{{ phrase('user.general.log_in') }}" />
+				<label style="display: inline"><input type="checkbox" name="remember_me" value="1" style="display:inline; position: relative; top: -2px;" /> {{ phrase('user.general.remember_me') }}</label>
+			</form>
+		</div>
+	</section>
+	<!--DP_OFFLINE_CACHE_REMOVE_END-->
+{% endif %}

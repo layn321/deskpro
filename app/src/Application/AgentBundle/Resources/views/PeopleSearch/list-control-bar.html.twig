@@ -1,0 +1,38 @@
+<header class="list-control-bar">
+	<ul class="btn-controls">
+		<li class="display-options display-options-trigger"><a></a></li>
+		<li class="right"><span class="sep"></span></li>
+		<li class="detail-view detail-view-trigger"><a class="setupIcon"></a></li>
+		<li class="right"><span class="sep"></span></li>
+	</ul>
+	<ul>
+		<li>{{ phrase('agent.general.ordered_by') }} </li>
+		<li class="order-by-menu-trigger menu-fitted" data-menu-button=".button"><a class="button">
+			<span class="label">
+				{% if 'name' in cache.criteria.order_by %}
+					{{ phrase('agent.general.name') }}
+				{% elseif 'date_last_login' in cache.criteria.order_by %}
+					{{ phrase('agent.general.last_login_time') }}
+				{% elseif 'organization' in cache.criteria.order_by %}
+					{{ phrase('agent.general.organization') }}
+				{% elseif 'num_tickets' in cache.criteria.order_by %}
+					{{ phrase('agent.search.number_of_tickets') }}
+				{% else %}
+					{{ phrase('agent.general.date_created') }}
+				{% endif %}
+			</span>
+			<em></em>
+		</a></li>
+		<li><span class="sep"></span></li>
+	</ul>
+
+	<ul class="order-by-menu" style="display: none">
+		<li data-order-by="people_name">{{ phrase('agent.general.name') }}</li>
+		<li data-order-by="date_created">{{ phrase('agent.general.date_created') }}</li>
+		<li data-order-by="last_login">{{ phrase('agent.general.last_login_time') }}</li>
+		<li data-order-by="org">{{ phrase('agent.general.organization') }}</li>
+		<li data-order-by="num_tickets">{{ phrase('agent.search.number_of_tickets') }}</li>
+	</ul>
+
+	{% include 'AgentBundle:PeopleSearch:list-display-options-overlay.html.twig' %}
+</header>

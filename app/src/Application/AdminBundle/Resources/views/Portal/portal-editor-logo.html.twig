@@ -1,0 +1,39 @@
+<section class="dp-portal-simpleheader-editor">
+	<div class="overlay-title">
+		<span class="close-overlay close-trigger"></span>
+		<h4>{{ phrase('admin.portal.edit_logo') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div class="image">
+
+			<h3>{{ phrase('admin.portal.upload_a_new_logo') }}</h3>
+			<input type="file" name="file-upload" />
+			<div class="files"></div>
+
+			<script class="template-upload" type="text/text/x-tmpl">
+				<p>Upliading ...</p>
+			</script>
+			<script class="template-download" type="text/x-tmpl">
+				{{ '{% var file=o.files[0]; %}' }}
+				<div>
+					<input type="hidden" class="new_blob_auth_id" value="{{ '{%=file.blob_auth_id%}' }}" />
+					<input type="hidden" class="new_logo_url" value="{{ '{%=file.download_url%}' }}" />
+					<img src="{{ '{%=file.download_url%}' }}" class="pic-new" />
+				</div>
+			</script>
+
+			<div class="save-btn-wrap">
+				<button class="clean-white save-logo-trigger">{{ phrase('admin.portal.save_logo') }}</button>
+			</div>
+		</div>
+		<div class="text">
+			<h3>{{ phrase('admin.portal._or_just_enter_a_title_and_a') }}</h3>
+			<div class="input-title"><input type="text" class="title" name="title" value="{{ app.getSetting('user.portal_header') }}" placeholder="{{ phrase('agent.general.title') }}" /></div>
+			<div class="input-tagline"><input type="text" class="tagline" name="tagline" value="{{ app.getSetting('user.portal_tagline') }}" placeholder="{{ phrase('admin.general.tagline') }}" /></div>
+
+			<div class="save-btn-wrap">
+				<button class="clean-white save-text-trigger">{{ phrase('admin.portal.save_title_and_tagline') }}</button>
+			</div>
+		</div>
+	</div>
+</section>

@@ -1,0 +1,392 @@
+@static_path: '../..';
+@img_path: "@{static_path}/images";
+
+//----------------------------------------------------------------------------------------------------------------------
+// HEADER
+//----------------------------------------------------------------------------------------------------------------------
+
+@agent_text_color: #444;
+
+@agent_header_bg_color: #1d7ab2;
+@agent_header_btn_bg_color: #2c85c6;
+
+@agent_header_height: 49px;
+@agent_header_border_color: #273036;
+
+@agent_header_userprofile_bg_color: #1a6299;
+@agent_header_userprofile_border_color: #2d85c4;
+@agent_header_userprofile_text_color: #bcd6e8;
+
+@agent_header_userchat_bg_color: #00a98e;
+@agent_header_userchat_off_bg_color: #927A43;
+@agent_header_userchat_alloff_bg_color: #920002;
+
+@agent_header_badge_bg_color: #FB0016;
+
+@agent_link_color: #1B6CA7;
+
+@agent_menu_bg_color: #fff;
+@agent_menu_text_color: #67686A;
+@agent_menu_highlight_bg_color: #1abc9c;
+@agent_menu_highlight_text_color: #fff;
+
+@agent_bigmenu_bg_color: #fff;
+@agent_bigmenu_text_color: #535456;
+@agent_bigmenu_border_color: #c3c8cd;
+
+@agent_nav_bg_color: #2B2F33;
+@agent_nav_width: 54px;
+
+@agent_highlight_text_bg_color: #F8FF82;
+
+@agent_sidetabs_bg: #41464d;
+
+@agent_source_bg_color: #eceef0;
+@agent_source_bubble_bg_color: #1975ad;
+
+@agent_panetabs_bg_color: #d5d6da;
+@agent_panetabs_color: #2273af;
+@agent_panetabs_text_color: #5a606a;
+@agent_panetabs_active_text_color: #fff;
+
+@agent_panetabs_height: 39px;
+
+@agent_counter_font: Verdana, Arial, sans-serif;
+
+//----------------------------------------------------------------------------------------------------------------------
+// Some standard icons
+//----------------------------------------------------------------------------------------------------------------------
+
+@icn_ticket_content: "\f0e0";
+@icn_person_content: "\f007";
+@icn_organization_content: "\f0c0";
+@icn_task_content: "\f046";
+@icn_article_content: "\f0f6";
+@icn_news_content: "\f02d";
+@icn_download_content: "\f01a";
+@icn_feedback_content: "\f087";
+@icn_twitter_content: "\f099";
+@icn_chat_content: "\f075";
+
+// Shortcuts/aliases to fontawesome icons
+i.icon-dp-ticket:before       { content: @icn_ticket_content; }
+i.icon-dp-person:before       { content: @icn_person_content; }
+i.icon-dp-organization:before { content: @icn_organization_content; }
+i.icon-dp-task:before         { content: @icn_task_content; }
+i.icon-dp-article:before      { content: @icn_article_content; }
+i.icon-dp-news:before         { content: @icn_news_content; }
+i.icon-dp-download:before     { content: @icn_download_content; }
+i.icon-dp-feedback:before     { content: @icn_feedback_content; }
+i.icon-dp-twitter:before      { content: @icn_twitter_content; }
+i.icon-dp-chat:before         { content: @icn_chat_content; }
+
+.icon-flag-blue:before { content: "\f024"; }
+.icon-flag-green:before { content: "\f024"; }
+.icon-flag-orange:before { content: "\f024"; }
+.icon-flag-pink:before { content: "\f024"; }
+.icon-flag-purple:before { content: "\f024"; }
+.icon-flag-red:before { content: "\f024"; }
+.icon-flag-yellow:before { content: "\f024"; }
+
+.icon-flag-blue   { color: blue; }
+.icon-flag-green  { color: green; }
+.icon-flag-orange { color: orange; }
+.icon-flag-pink   { color: #ff00ff; }
+.icon-flag-purple { color: purple; }
+.icon-flag-red    { color: red; }
+.icon-flag-yellow { color: #E1D232; }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Flags
+//----------------------------------------------------------------------------------------------------------------------
+
+[class^="dp-flag-"],[class*=" dp-flag-"] {
+	.iconbase(16px, 11px);
+	vertical-align: middle;
+}
+.dp-flag-ad { background-image: url('@{img_path}/flags/ad.png'); }   .dp-flag-ae { background-image: url('@{img_path}/flags/ae.png'); }   .dp-flag-af { background-image: url('@{img_path}/flags/af.png'); }   .dp-flag-ag { background-image: url('@{img_path}/flags/ag.png'); }
+.dp-flag-ai { background-image: url('@{img_path}/flags/ai.png'); }   .dp-flag-al { background-image: url('@{img_path}/flags/al.png'); }   .dp-flag-am { background-image: url('@{img_path}/flags/am.png'); }   .dp-flag-an { background-image: url('@{img_path}/flags/an.png'); }
+.dp-flag-ao { background-image: url('@{img_path}/flags/ao.png'); }   .dp-flag-ar { background-image: url('@{img_path}/flags/ar.png'); }   .dp-flag-as { background-image: url('@{img_path}/flags/as.png'); }   .dp-flag-at { background-image: url('@{img_path}/flags/at.png'); }
+.dp-flag-au { background-image: url('@{img_path}/flags/au.png'); }   .dp-flag-aw { background-image: url('@{img_path}/flags/aw.png'); }   .dp-flag-ax { background-image: url('@{img_path}/flags/ax.png'); }   .dp-flag-az { background-image: url('@{img_path}/flags/az.png'); }
+.dp-flag-ba { background-image: url('@{img_path}/flags/ba.png'); }   .dp-flag-bb { background-image: url('@{img_path}/flags/bb.png'); }   .dp-flag-bd { background-image: url('@{img_path}/flags/bd.png'); }   .dp-flag-be { background-image: url('@{img_path}/flags/be.png'); }
+.dp-flag-bf { background-image: url('@{img_path}/flags/bf.png'); }   .dp-flag-bg { background-image: url('@{img_path}/flags/bg.png'); }   .dp-flag-bh { background-image: url('@{img_path}/flags/bh.png'); }   .dp-flag-bi { background-image: url('@{img_path}/flags/bi.png'); }
+.dp-flag-bj { background-image: url('@{img_path}/flags/bj.png'); }   .dp-flag-bm { background-image: url('@{img_path}/flags/bm.png'); }   .dp-flag-bn { background-image: url('@{img_path}/flags/bn.png'); }   .dp-flag-bo { background-image: url('@{img_path}/flags/bo.png'); }
+.dp-flag-br { background-image: url('@{img_path}/flags/br.png'); }   .dp-flag-bs { background-image: url('@{img_path}/flags/bs.png'); }   .dp-flag-bt { background-image: url('@{img_path}/flags/bt.png'); }   .dp-flag-bv { background-image: url('@{img_path}/flags/bv.png'); }
+.dp-flag-bw { background-image: url('@{img_path}/flags/bw.png'); }   .dp-flag-by { background-image: url('@{img_path}/flags/by.png'); }   .dp-flag-bz { background-image: url('@{img_path}/flags/bz.png'); }   .dp-flag-ca { background-image: url('@{img_path}/flags/ca.png'); }
+.dp-flag-cc { background-image: url('@{img_path}/flags/cc.png'); }   .dp-flag-cd { background-image: url('@{img_path}/flags/cd.png'); }   .dp-flag-cf { background-image: url('@{img_path}/flags/cf.png'); }   .dp-flag-cg { background-image: url('@{img_path}/flags/cg.png'); }
+.dp-flag-ch { background-image: url('@{img_path}/flags/ch.png'); }   .dp-flag-ci { background-image: url('@{img_path}/flags/ci.png'); }   .dp-flag-ck { background-image: url('@{img_path}/flags/ck.png'); }   .dp-flag-cl { background-image: url('@{img_path}/flags/cl.png'); }
+.dp-flag-cm { background-image: url('@{img_path}/flags/cm.png'); }   .dp-flag-cn { background-image: url('@{img_path}/flags/cn.png'); }   .dp-flag-co { background-image: url('@{img_path}/flags/co.png'); }   .dp-flag-cr { background-image: url('@{img_path}/flags/cr.png'); }
+.dp-flag-cs { background-image: url('@{img_path}/flags/cs.png'); }   .dp-flag-cu { background-image: url('@{img_path}/flags/cu.png'); }   .dp-flag-cv { background-image: url('@{img_path}/flags/cv.png'); }   .dp-flag-cx { background-image: url('@{img_path}/flags/cx.png'); }
+.dp-flag-cy { background-image: url('@{img_path}/flags/cy.png'); }   .dp-flag-cz { background-image: url('@{img_path}/flags/cz.png'); }   .dp-flag-de { background-image: url('@{img_path}/flags/de.png'); }   .dp-flag-dj { background-image: url('@{img_path}/flags/dj.png'); }
+.dp-flag-dk { background-image: url('@{img_path}/flags/dk.png'); }   .dp-flag-dm { background-image: url('@{img_path}/flags/dm.png'); }   .dp-flag-do { background-image: url('@{img_path}/flags/do.png'); }   .dp-flag-dz { background-image: url('@{img_path}/flags/dz.png'); }
+.dp-flag-ec { background-image: url('@{img_path}/flags/ec.png'); }   .dp-flag-ee { background-image: url('@{img_path}/flags/ee.png'); }   .dp-flag-eg { background-image: url('@{img_path}/flags/eg.png'); }   .dp-flag-eh { background-image: url('@{img_path}/flags/eh.png'); }
+.dp-flag-er { background-image: url('@{img_path}/flags/er.png'); }   .dp-flag-es { background-image: url('@{img_path}/flags/es.png'); }   .dp-flag-et { background-image: url('@{img_path}/flags/et.png'); }   .dp-flag-fi { background-image: url('@{img_path}/flags/fi.png'); }
+.dp-flag-fj { background-image: url('@{img_path}/flags/fj.png'); }   .dp-flag-fk { background-image: url('@{img_path}/flags/fk.png'); }   .dp-flag-fm { background-image: url('@{img_path}/flags/fm.png'); }   .dp-flag-fo { background-image: url('@{img_path}/flags/fo.png'); }
+.dp-flag-fr { background-image: url('@{img_path}/flags/fr.png'); }   .dp-flag-ga { background-image: url('@{img_path}/flags/ga.png'); }   .dp-flag-gb { background-image: url('@{img_path}/flags/gb.png'); }   .dp-flag-gd { background-image: url('@{img_path}/flags/gd.png'); }
+.dp-flag-ge { background-image: url('@{img_path}/flags/ge.png'); }   .dp-flag-gf { background-image: url('@{img_path}/flags/gf.png'); }   .dp-flag-gh { background-image: url('@{img_path}/flags/gh.png'); }   .dp-flag-gi { background-image: url('@{img_path}/flags/gi.png'); }
+.dp-flag-gl { background-image: url('@{img_path}/flags/gl.png'); }   .dp-flag-gm { background-image: url('@{img_path}/flags/gm.png'); }   .dp-flag-gn { background-image: url('@{img_path}/flags/gn.png'); }   .dp-flag-gp { background-image: url('@{img_path}/flags/gp.png'); }
+.dp-flag-gq { background-image: url('@{img_path}/flags/gq.png'); }   .dp-flag-gr { background-image: url('@{img_path}/flags/gr.png'); }   .dp-flag-gs { background-image: url('@{img_path}/flags/gs.png'); }   .dp-flag-gt { background-image: url('@{img_path}/flags/gt.png'); }
+.dp-flag-gu { background-image: url('@{img_path}/flags/gu.png'); }   .dp-flag-gw { background-image: url('@{img_path}/flags/gw.png'); }   .dp-flag-gy { background-image: url('@{img_path}/flags/gy.png'); }   .dp-flag-hk { background-image: url('@{img_path}/flags/hk.png'); }
+.dp-flag-hm { background-image: url('@{img_path}/flags/hm.png'); }   .dp-flag-hn { background-image: url('@{img_path}/flags/hn.png'); }   .dp-flag-hr { background-image: url('@{img_path}/flags/hr.png'); }   .dp-flag-ht { background-image: url('@{img_path}/flags/ht.png'); }
+.dp-flag-hu { background-image: url('@{img_path}/flags/hu.png'); }   .dp-flag-id { background-image: url('@{img_path}/flags/id.png'); }   .dp-flag-ie { background-image: url('@{img_path}/flags/ie.png'); }   .dp-flag-il { background-image: url('@{img_path}/flags/il.png'); }
+.dp-flag-in { background-image: url('@{img_path}/flags/in.png'); }   .dp-flag-io { background-image: url('@{img_path}/flags/io.png'); }   .dp-flag-iq { background-image: url('@{img_path}/flags/iq.png'); }   .dp-flag-ir { background-image: url('@{img_path}/flags/ir.png'); }
+.dp-flag-is { background-image: url('@{img_path}/flags/is.png'); }   .dp-flag-it { background-image: url('@{img_path}/flags/it.png'); }   .dp-flag-jm { background-image: url('@{img_path}/flags/jm.png'); }   .dp-flag-jo { background-image: url('@{img_path}/flags/jo.png'); }
+.dp-flag-jp { background-image: url('@{img_path}/flags/jp.png'); }   .dp-flag-ke { background-image: url('@{img_path}/flags/ke.png'); }   .dp-flag-kg { background-image: url('@{img_path}/flags/kg.png'); }   .dp-flag-kh { background-image: url('@{img_path}/flags/kh.png'); }
+.dp-flag-ki { background-image: url('@{img_path}/flags/ki.png'); }   .dp-flag-km { background-image: url('@{img_path}/flags/km.png'); }   .dp-flag-kn { background-image: url('@{img_path}/flags/kn.png'); }   .dp-flag-kp { background-image: url('@{img_path}/flags/kp.png'); }
+.dp-flag-kr { background-image: url('@{img_path}/flags/kr.png'); }   .dp-flag-kw { background-image: url('@{img_path}/flags/kw.png'); }   .dp-flag-ky { background-image: url('@{img_path}/flags/ky.png'); }   .dp-flag-kz { background-image: url('@{img_path}/flags/kz.png'); }
+.dp-flag-la { background-image: url('@{img_path}/flags/la.png'); }   .dp-flag-lb { background-image: url('@{img_path}/flags/lb.png'); }   .dp-flag-lc { background-image: url('@{img_path}/flags/lc.png'); }   .dp-flag-li { background-image: url('@{img_path}/flags/li.png'); }
+.dp-flag-lk { background-image: url('@{img_path}/flags/lk.png'); }   .dp-flag-lr { background-image: url('@{img_path}/flags/lr.png'); }   .dp-flag-ls { background-image: url('@{img_path}/flags/ls.png'); }   .dp-flag-lt { background-image: url('@{img_path}/flags/lt.png'); }
+.dp-flag-lu { background-image: url('@{img_path}/flags/lu.png'); }   .dp-flag-lv { background-image: url('@{img_path}/flags/lv.png'); }   .dp-flag-ly { background-image: url('@{img_path}/flags/ly.png'); }   .dp-flag-ma { background-image: url('@{img_path}/flags/ma.png'); }
+.dp-flag-mc { background-image: url('@{img_path}/flags/mc.png'); }   .dp-flag-md { background-image: url('@{img_path}/flags/md.png'); }   .dp-flag-me { background-image: url('@{img_path}/flags/me.png'); }   .dp-flag-mg { background-image: url('@{img_path}/flags/mg.png'); }
+.dp-flag-mh { background-image: url('@{img_path}/flags/mh.png'); }   .dp-flag-mk { background-image: url('@{img_path}/flags/mk.png'); }   .dp-flag-ml { background-image: url('@{img_path}/flags/ml.png'); }   .dp-flag-mm { background-image: url('@{img_path}/flags/mm.png'); }
+.dp-flag-mn { background-image: url('@{img_path}/flags/mn.png'); }   .dp-flag-mo { background-image: url('@{img_path}/flags/mo.png'); }   .dp-flag-mp { background-image: url('@{img_path}/flags/mp.png'); }   .dp-flag-mq { background-image: url('@{img_path}/flags/mq.png'); }
+.dp-flag-mr { background-image: url('@{img_path}/flags/mr.png'); }   .dp-flag-ms { background-image: url('@{img_path}/flags/ms.png'); }   .dp-flag-mt { background-image: url('@{img_path}/flags/mt.png'); }   .dp-flag-mu { background-image: url('@{img_path}/flags/mu.png'); }
+.dp-flag-mv { background-image: url('@{img_path}/flags/mv.png'); }   .dp-flag-mw { background-image: url('@{img_path}/flags/mw.png'); }   .dp-flag-mx { background-image: url('@{img_path}/flags/mx.png'); }   .dp-flag-my { background-image: url('@{img_path}/flags/my.png'); }
+.dp-flag-mz { background-image: url('@{img_path}/flags/mz.png'); }   .dp-flag-na { background-image: url('@{img_path}/flags/na.png'); }   .dp-flag-nc { background-image: url('@{img_path}/flags/nc.png'); }   .dp-flag-ne { background-image: url('@{img_path}/flags/ne.png'); }
+.dp-flag-nf { background-image: url('@{img_path}/flags/nf.png'); }   .dp-flag-ng { background-image: url('@{img_path}/flags/ng.png'); }   .dp-flag-ni { background-image: url('@{img_path}/flags/ni.png'); }   .dp-flag-nl { background-image: url('@{img_path}/flags/nl.png'); }
+.dp-flag-no { background-image: url('@{img_path}/flags/no.png'); }   .dp-flag-np { background-image: url('@{img_path}/flags/np.png'); }   .dp-flag-nr { background-image: url('@{img_path}/flags/nr.png'); }   .dp-flag-nu { background-image: url('@{img_path}/flags/nu.png'); }
+.dp-flag-nz { background-image: url('@{img_path}/flags/nz.png'); }   .dp-flag-om { background-image: url('@{img_path}/flags/om.png'); }   .dp-flag-pa { background-image: url('@{img_path}/flags/pa.png'); }   .dp-flag-pe { background-image: url('@{img_path}/flags/pe.png'); }
+.dp-flag-pf { background-image: url('@{img_path}/flags/pf.png'); }   .dp-flag-pg { background-image: url('@{img_path}/flags/pg.png'); }   .dp-flag-ph { background-image: url('@{img_path}/flags/ph.png'); }   .dp-flag-pk { background-image: url('@{img_path}/flags/pk.png'); }
+.dp-flag-pl { background-image: url('@{img_path}/flags/pl.png'); }   .dp-flag-pm { background-image: url('@{img_path}/flags/pm.png'); }   .dp-flag-pn { background-image: url('@{img_path}/flags/pn.png'); }   .dp-flag-pr { background-image: url('@{img_path}/flags/pr.png'); }
+.dp-flag-ps { background-image: url('@{img_path}/flags/ps.png'); }   .dp-flag-pt { background-image: url('@{img_path}/flags/pt.png'); }   .dp-flag-pw { background-image: url('@{img_path}/flags/pw.png'); }   .dp-flag-py { background-image: url('@{img_path}/flags/py.png'); }
+.dp-flag-qa { background-image: url('@{img_path}/flags/qa.png'); }   .dp-flag-re { background-image: url('@{img_path}/flags/re.png'); }   .dp-flag-ro { background-image: url('@{img_path}/flags/ro.png'); }   .dp-flag-rs { background-image: url('@{img_path}/flags/rs.png'); }
+.dp-flag-ru { background-image: url('@{img_path}/flags/ru.png'); }   .dp-flag-rw { background-image: url('@{img_path}/flags/rw.png'); }   .dp-flag-sa { background-image: url('@{img_path}/flags/sa.png'); }   .dp-flag-sb { background-image: url('@{img_path}/flags/sb.png'); }
+.dp-flag-sc { background-image: url('@{img_path}/flags/sc.png'); }   .dp-flag-sd { background-image: url('@{img_path}/flags/sd.png'); }   .dp-flag-se { background-image: url('@{img_path}/flags/se.png'); }   .dp-flag-sg { background-image: url('@{img_path}/flags/sg.png'); }
+.dp-flag-sh { background-image: url('@{img_path}/flags/sh.png'); }   .dp-flag-si { background-image: url('@{img_path}/flags/si.png'); }   .dp-flag-sj { background-image: url('@{img_path}/flags/sj.png'); }   .dp-flag-sk { background-image: url('@{img_path}/flags/sk.png'); }
+.dp-flag-sl { background-image: url('@{img_path}/flags/sl.png'); }   .dp-flag-sm { background-image: url('@{img_path}/flags/sm.png'); }   .dp-flag-sn { background-image: url('@{img_path}/flags/sn.png'); }   .dp-flag-so { background-image: url('@{img_path}/flags/so.png'); }
+.dp-flag-sr { background-image: url('@{img_path}/flags/sr.png'); }   .dp-flag-st { background-image: url('@{img_path}/flags/st.png'); }   .dp-flag-sv { background-image: url('@{img_path}/flags/sv.png'); }   .dp-flag-sy { background-image: url('@{img_path}/flags/sy.png'); }
+.dp-flag-sz { background-image: url('@{img_path}/flags/sz.png'); }   .dp-flag-tc { background-image: url('@{img_path}/flags/tc.png'); }   .dp-flag-td { background-image: url('@{img_path}/flags/td.png'); }   .dp-flag-tf { background-image: url('@{img_path}/flags/tf.png'); }
+.dp-flag-tg { background-image: url('@{img_path}/flags/tg.png'); }   .dp-flag-th { background-image: url('@{img_path}/flags/th.png'); }   .dp-flag-tj { background-image: url('@{img_path}/flags/tj.png'); }   .dp-flag-tk { background-image: url('@{img_path}/flags/tk.png'); }
+.dp-flag-tl { background-image: url('@{img_path}/flags/tl.png'); }   .dp-flag-tm { background-image: url('@{img_path}/flags/tm.png'); }   .dp-flag-tn { background-image: url('@{img_path}/flags/tn.png'); }   .dp-flag-to { background-image: url('@{img_path}/flags/to.png'); }
+.dp-flag-tr { background-image: url('@{img_path}/flags/tr.png'); }   .dp-flag-tt { background-image: url('@{img_path}/flags/tt.png'); }   .dp-flag-tv { background-image: url('@{img_path}/flags/tv.png'); }   .dp-flag-tw { background-image: url('@{img_path}/flags/tw.png'); }
+.dp-flag-tz { background-image: url('@{img_path}/flags/tz.png'); }   .dp-flag-ua { background-image: url('@{img_path}/flags/ua.png'); }   .dp-flag-ug { background-image: url('@{img_path}/flags/ug.png'); }   .dp-flag-um { background-image: url('@{img_path}/flags/um.png'); }
+.dp-flag-us { background-image: url('@{img_path}/flags/us.png'); }   .dp-flag-uy { background-image: url('@{img_path}/flags/uy.png'); }   .dp-flag-uz { background-image: url('@{img_path}/flags/uz.png'); }   .dp-flag-va { background-image: url('@{img_path}/flags/va.png'); }
+.dp-flag-vc { background-image: url('@{img_path}/flags/vc.png'); }   .dp-flag-ve { background-image: url('@{img_path}/flags/ve.png'); }   .dp-flag-vg { background-image: url('@{img_path}/flags/vg.png'); }   .dp-flag-vi { background-image: url('@{img_path}/flags/vi.png'); }
+.dp-flag-vn { background-image: url('@{img_path}/flags/vn.png'); }   .dp-flag-vu { background-image: url('@{img_path}/flags/vu.png'); }   .dp-flag-wf { background-image: url('@{img_path}/flags/wf.png'); }   .dp-flag-ws { background-image: url('@{img_path}/flags/ws.png'); }
+.dp-flag-ye { background-image: url('@{img_path}/flags/ye.png'); }   .dp-flag-yt { background-image: url('@{img_path}/flags/yt.png'); }   .dp-flag-za { background-image: url('@{img_path}/flags/za.png'); }   .dp-flag-zm { background-image: url('@{img_path}/flags/zm.png'); }
+.dp-flag-zw { background-image: url('@{img_path}/flags/zw.png'); }
+
+//----------------------------------------------------------------------------------------------------------------------
+// MIXINS
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Sets the width and height
+ */
+.size(@width: 5px, @height: 5px) {
+	height: @height;
+	width: @width;
+}
+
+/**
+ * Sets the absolute width and height (overflow is hidden)
+ */
+.size-absolute(@width: 5px, @height: 5px) {
+	height: @height;
+	width: @width;
+	overflow: hidden;
+}
+
+/**
+ * Sets width and height to @size
+ */
+.size-square(@size: 5px) {
+	height: @size;
+	width: @size;
+}
+
+/**
+ * Sets the absolute position
+ */
+.pos-absolute(@top, @right, @bottom, @left) {
+	position: absolute;
+	top: @top;
+	right: @right;
+	bottom: @bottom;
+	left: @left;
+}
+
+/**
+ * Adds styling that prevents cursor selection in the browser
+ */
+.noselect {
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+/**
+ * Adds basic CSS suitable for an inline icon image
+ */
+.iconbase(@w: 16px, @h: 16px) {
+    display: inline-block;
+	width: @w;
+	height: @h;
+	overflow: hidden;
+	text-indent: -100px;
+	line-height: 100%;
+	margin: 0;
+	padding: 0;
+
+	background-repeat: no-repeat;
+	background-position: 0 0;
+}
+
+/**
+ * Clearfix
+ */
+.clearfix() {
+	zoom: 1;
+	&:before { content: ''; display: block; }
+	&:after { content: ''; display: table; clear: both; }
+}
+
+/**
+ * Generates a horizontal gradient
+ */
+.gradient-h(@startColor: #555, @endColor: #333, @size: 20) {
+	@startSend: `"@{startColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@startSend_esc: `encodeURI(@{startSend})`;
+	@endSend: `"@{endColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@endSend_esc: `encodeURI(@{endSend})`;
+	background: @startColor url("../../../file.php/gradient?size=@{size}&start_color=@{startSend_esc}&end_color=@{endSend_esc}&direction=horizontal") repeat-y top right ~"/*gradient_h:@{size}:@{startSend}:@{endSend}*/";
+}
+
+/**
+ * Generates a vertical gradient
+ */
+.gradient-v(@startColor: #555, @endColor: #333, @size: 20) {
+	@startSend: `"@{startColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@startSend_esc: `encodeURI(@{startSend})`;
+	@endSend: `"@{endColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@endSend_esc: `encodeURI(@{endSend})`;
+	background: @startColor url("../../../file.php/gradient?size=@{size}&start_color=@{startSend_esc}&end_color=@{endSend_esc}") repeat-x bottom left ~"/*gradient_v:@{size}:@{startSend}:@{endSend}*/";
+}
+
+/**
+ * Gradient for a 'fade away' element
+ */
+.fade-away(@rgba_start, @rgba_end, @width: 45px, @fallback: transparent) {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: @width;
+
+	background: @fallback; /* old browsers just dont have fading */
+	background: -moz-linear-gradient(left top, @rgba_start 0%, @rgba_end 100%); /* FF 3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,@rgba_start), color-stop(100%,@rgba_end)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left, @rgba_start 0%,@rgba_end 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left, @rgba_start 0%,@rgba_end 100%); /* Opera11.10+ */
+	background: linear-gradient(left, @rgba_start 0%,@rgba_end 100%); /* W3C */
+}
+
+/**
+ * Changes opacity
+ */
+.opacity(@opacity: 100) {
+	-khtml-opacity: (@opacity / 100);
+	-moz-opacity: (@opacity / 100);
+	opacity: (@opacity / 100);
+	-ms-filter: e(%('"progid:DXImageTransform.Microsoft.Alpha(Opacity=%d)"', @opacity));
+    filter: e(%("progid:DXImageTransform.Microsoft.Alpha(Opacity=%d)", @opacity));
+}
+
+/**
+ * Adds rounded corners
+ */
+.rounded(@radius: 2px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+/**
+* Set a radius on each corner
+*/
+.border-radius(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-top-left-radius: @topleft;
+	-webkit-border-top-right-radius: @topright;
+	-webkit-border-bottom-right-radius: @bottomright;
+	-webkit-border-bottom-left-radius: @bottomleft;
+	-moz-border-radius-topleft: @topleft;
+	-moz-border-radius-topright: @topright;
+	-moz-border-radius-bottomright: @bottomright;
+	-moz-border-radius-bottomleft: @bottomleft;
+	border-top-left-radius: @topleft;
+	border-top-right-radius: @topright;
+	border-bottom-right-radius: @bottomright;
+	border-bottom-left-radius: @bottomleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+/**
+ * Sets border radius on top-left corner
+ */
+.border-radius-tl(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-top-left-radius: @topleft;
+	-moz-border-radius-topleft: @topleft;
+	border-top-left-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+/**
+ * Sets border radius on top-right corner
+ */
+.border-radius-tr(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-top-right-radius: @topleft;
+	-moz-border-radius-topright: @topleft;
+	border-top-right-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+/**
+ * Sets border radius on bottom-right corner
+ */
+.border-radius-br(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-bottom-right-radius: @topleft;
+	-moz-border-radius-bottomright: @topleft;
+	border-bottom-right-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+/**
+ * Sets border radius on bottom -left corner
+ */
+.border-radius-bl(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-bottom-left-radius: @topleft;
+	-moz-border-radius-bottomleft: @topleft;
+	border-bottom-left-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+/**
+ * Standard zindex levels
+ */
+@zindex_lvl_chrome: 10000000;
+.zindex-chrome0 { z-index: (@zindex_lvl_chrome - 1) }
+.zindex-chrome { z-index: (@zindex_lvl_chrome) }
+.zindex-chrome2 { z-index: (@zindex_lvl_chrome + 1) }
+.zindex-chrome3 { z-index: (@zindex_lvl_chrome + 2) }
+.zindex-chrome4 { z-index: (@zindex_lvl_chrome + 3) }
+.zindex-chrome5 { z-index: (@zindex_lvl_chrome + 4) }
+.zindex-chrome6 { z-index: (@zindex_lvl_chrome + 5) }
+.zindex-chrome7 { z-index: (@zindex_lvl_chrome + 6) }
+.zindex-chrome8 { z-index: (@zindex_lvl_chrome + 7) }
+.zindex-chrome9 { z-index: (@zindex_lvl_chrome + 8) }
+.zindex-chrome10 { z-index: (@zindex_lvl_chrome + 9) }

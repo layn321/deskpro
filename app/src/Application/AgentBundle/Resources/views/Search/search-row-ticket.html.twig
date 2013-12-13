@@ -1,0 +1,34 @@
+<article class="row-item ticket-{{ ticket.id }}" data-ticket-id="{{ ticket.id }}" data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': ticket.id}) }}" data-route-title="@selector(a.subject)" data-route-openclass="open">
+	<div class="loading-arrow">{{ phrase('agent.search.loading') }}</div>
+	<input type="checkbox" class="item-select" value="{{ ticket.id }}" style="visibility: hidden" />
+	<div class="top-row">
+		<div class="top-row-left">
+			<h3>
+				<a class="subject click-through">
+					{{ ticket.subject }}
+				</a>
+			</h3>
+		</div>
+		<div class="top-row-right">
+			<div class="bound-fade"></div>
+			<div class="urgency"><a>{{ ticket.urgency }}</a></div>
+			<div class="status {{ ticket.status_code }}">{{ phrase('agent.tickets.status_' ~ ticket.status_code|replace({'.': '_'})) }}</div>
+			{% if ticket.is_hold %}<div class="on-hold">{{ phrase('agent.tickets.on_hold') }}</div>{% endif %}
+			<br class="clear" />
+		</div>
+	</div>
+	<div class="userinfo">
+		<a class="name click-through" data-route="person:{{ path('agent_people_view', {'person_id': ticket.person.id|default('0')}) }}" data-route-title="@selector(.person-tip)">
+			<span data-person-id="{{ ticket.person.id|default(0) }}">{{ ticket.person.display_name }}</span>
+		</a>
+		{% if ticket.person.organization %}
+			<span class="org">
+				({% if ticket.person.organization_position %}{{ ticket.person.organization_position }}, {% endif %}{{ ticket.person.organization.name }})
+			</span>
+		{% endif %}
+		{% if ticket.person.primary_email %}
+			<span class="email"><b class="person-{{ticket.person.id}}-pemail">{{ ticket.person.primary_email_address }}</b></span>
+		{% endif %}
+		<div class="bound-fade"></div>
+	</div>
+</article>

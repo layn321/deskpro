@@ -1,0 +1,26 @@
+{{ set_tplvar('agent_notification_footer', 'ticket-notify') }}
+{{ set_tplvar('agent_reply_above_line', true) }}
+<dp:subject>
+	{{ phrase('agent.emails.new_user_reply_ticket_subject') }}
+</dp:subject>
+
+<dp:user-reply />
+
+<br /><br />
+
+<h1>{{ phrase('agent.general.ticket') }}</h1>
+{{ phrase('agent.emails.person_replied', {name: new_message.person.getDisplayContact(), 'subject':ticket.subject}) }}
+
+<br /><br />
+
+<dp:ticket-properties-table />
+
+<br /><br />
+
+<h1>{{ phrase('agent.tickets.ticket_changes') }}</h1>
+<dp:ticket-logs />
+
+<br /><br />
+
+<h1>{{ phrase('agent.general.message_history') }}</h1>
+<dp:agent-ticket-history />

@@ -1,0 +1,58 @@
+<section class="list-top-area">
+	<form class="feedback-filter-form">
+		<div style="float:right">
+			<select name="order_by">
+				<optgroup label="{{ phrase('agent.general.order_by')}}">
+					<option {% if filter_form.order_by == 'date.desc' %}selected="selected"{% endif %} value="date.desc">{{ phrase('agent.feedback.newest_on_top') }}</option>
+					<option {% if filter_form.order_by == 'date.asc' %}selected="selected"{% endif %} value="date.asc">{{ phrase('agent.feedback.oldest_on_top') }}</option>
+					<option {% if filter_form.order_by == 'votes.desc' %}selected="selected"{% endif %} value="votes.desc">{{ phrase('agent.feedback.top_voted_on_top') }}</option>
+					<option {% if filter_form.order_by == 'votes.asc' %}selected="selected"{% endif %} value="votes.asc">{{ phrase('agent.feedback.least_voted_on_top') }}</option>
+				</optgroup>
+			</select>
+		</div>
+
+		<input type="hidden" name="terms[status][type]" value="status" />
+		<input type="hidden" name="terms[status][op]" value="is" />
+		<select name="terms[status][status]">
+			<option value="visible">{{ phrase('agent.feedback.any_status') }}</option>
+			<option {% if filter_form.status.status == 'new' %}selected="selected"{% endif %} value="new">{{ phrase('agent.feedback.status_new') }}</option>
+			<option {% if filter_form.status.status == 'active' %}selected="selected"{% endif %} value="active">{{ phrase('agent.feedback.status_active') }}</option>
+			{% for cat in active_status_cats %}
+				<option {% if filter_form.status.status == cat.id %}selected="selected"{% endif %} value="{{cat.id}}">-- {{cat.title}}</option>
+			{% endfor %}
+			<option {% if filter_form.status.status == 'closed' %}selected="selected"{% endif %} value="closed">{{ phrase('agent.feedback.status_closed') }}</option>
+			{% for cat in closed_status_cats %}
+				<option {% if filter_form.status.status == cat.id %}selected="selected"{% endif %} value="{{cat.id}}">-- {{cat.title}}</option>
+			{% endfor %}
+			<option value="visible"></option>
+			<optgroup label="Other Statuses">
+				<option {% if filter_form.status.status == 'hidden' %}selected="selected"{% endif %} value="hidden">{{ phrase('agent.feedback.status_hidden') }}</option>
+				<option {% if filter_form.status.status == 'hidden.deleted' %}selected="selected"{% endif %} value="hidden.deleted">-- {{ phrase('agent.feedback.status_deleted') }}</option>
+				<option {% if filter_form.status.status == 'hidden.spam' %}selected="selected"{% endif %} value="hidden.spam">-- {{ phrase('agent.feedback.status_spam') }}</option>
+				<option {% if filter_form.status.status == 'hidden.validating' %}selected="selected"{% endif %} value="hidden.validating">{{ phrase('agent.feedback.status_validating') }}</option>
+			</optgroup>
+		</select>
+
+		<input type="hidden" name="terms[category][type]" value="category" />
+		<input type="hidden" name="terms[category][op]" value="is" />
+		<select name="terms[category][category]">
+			<option value="DP_DISCARD_TERM">{{ phrase('agent.feedback.any_category') }}</option>
+			{% for cat in feedback_cats %}
+				<option {% if filter_form.category.category == cat.id %}selected="selected"{% endif %} value="{{cat.id}}">{% if cat.depth %}{% for x in 1..cat.depth%}--{% endfor %} {% endif %}{{ cat.title }}</option>
+			{% endfor %}
+		</select>
+
+		<div style="font-size: 10px;">
+			<input type="hidden" name="terms[popular][type]" value="popular" />
+			<input type="hidden" name="terms[popular][op]" value="is" />
+			<label>
+				<input type="checkbox" name="terms[popular][popular]" value="1" {% if filter_form.popular.popular %}checked="checked"{% endif %} style="width: 10px" />
+				{{ phrase('agent.general.popular_feedback_only') }}
+			</label>
+		</div>
+
+		<div class="submit-row" style="display:none">
+			<button class="submit-trigger dp-button x-small">{{ phrase('agent.feedback.update_filter') }}</button>
+		</div>
+	</form>
+</section>

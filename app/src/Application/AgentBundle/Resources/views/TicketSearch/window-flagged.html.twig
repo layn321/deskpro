@@ -1,0 +1,18 @@
+<ul class="nav-list nav-list-small" id="tickets_outline_flags_list">
+	{% for color in flags %}
+		<li class="flag flag-{{color}} nav-flag-{{color}} is-nav-item" data-flag="{{color}}" data-route="listpane:{{ path('agent_ticketsearch_runcustomfilter') }}?terms[0][type]=flagged&amp;terms[0][op]=is&amp;terms[0][flag]={{color}}&amp;view_name=flagged">
+			<div class="item with-title">
+				<h3>
+					<i class="icon-flag-{{ color }}"></i>
+					<span class="title-text flag-label">{{ flagnamer.flag_name(color, person) }}</span>
+					<input type="text" class="inline-edit-field flag-label-input" value="{{ flagnamer.flag_name(color, person) }}" style="display: none;" />
+				</h3>
+				<em id="ticket_flag_{{color}}_count" class="counter list-counter">{{ flag_counts[color]|default(0) }}</em>
+			</div>
+		</li>
+	{% endfor %}
+</ul>
+
+<aside class="source-info-explain">
+	{{ phrase('agent.tickets.explain_flags') }}
+</aside>

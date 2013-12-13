@@ -1,0 +1,18 @@
+<tr>
+	<td style="width: 60%">
+		<div class="fade-container">
+			<div class="line">
+				<a data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': charge.ticket.id}) }}" data-route-notabreload="1" data-route-title="@text">{{charge.ticket.subject}}</a>
+			</div>
+			<div class="bound-fade"></div>
+		</div>
+	</td>
+	<td title="Agent: {{ charge.agent.name }}, {{charge.date_created|date('fulltime')}}" style="font-size: 11px">
+		{% if charge.charge_time %}
+			{{ charge.charge_time|time_length }}
+		{% endif %}
+		{% if charge.amount %}
+			{{ charge.amount|number_format(2) }} {{ app.getSetting('core_tickets.billing_currency') }}
+		{% endif %}
+	</td>
+</tr>

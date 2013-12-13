@@ -1,0 +1,44 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_webhooks') }}">Web Hooks</a></li>
+	<li>Test Web Hook</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+	<div class="check-grid item-list">
+		<table width="100%">
+		<tbody>
+		{% if exception %}
+			<tr>
+				<td>Result</td>
+				<td><strong style="color: #f00;">FAILED</strong></td>
+			</tr>
+			<tr>
+				<td>Exception</td>
+				<td>{{ exception.getMessage() }}</td>
+			</tr>
+		{% else %}
+			<tr>
+				<td>Result</td>
+				<td>
+					{% if success %}
+						<strong style="color: #139300;">SUCCESS</strong>
+					{% else %}
+						<strong style="color: #f00;">FAILED</strong>
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>Raw Data</td>
+				<td>
+					<textarea style="width: 98%; height: 120px; font-family: Monaco, Consolas, 'Courier New', monospace; font-size: 11px;">{{ response.getBody() }}</textarea>
+				</td>
+			</tr>
+		{% endif %}
+		</tbody>
+		</table>
+	</div>
+
+{% endblock %}

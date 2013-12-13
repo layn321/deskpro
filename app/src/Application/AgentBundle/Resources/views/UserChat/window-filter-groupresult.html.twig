@@ -1,0 +1,28 @@
+{% for group in groups %}
+	<li data-grouping-option="{{ group.id }}"
+		data-route="listpane:{{ path('agent_userchat_filterlist', {'filter_id': filter_id, 'group_var': group_by, 'group_val': group.id }) }}"
+		class="is-nav-item grouping-{{ group.id }}"
+	>
+		<span class="title">
+			<span class="list-counter" id="chat_filter_count_{{ filter_id }}_{{ group_by }}_{{ group.id }}">
+				{{ group.count }}
+			</span>
+			{{ group.title }}
+		</span>
+		{% if group.children %}
+			{% for subcat in group.children %}
+				<li data-grouping-option="{{ subcat.id }}"
+					data-route="listpane:{{ path('agent_userchat_filterlist',
+						{'filter_id': filter_id, 'group_var': group_by, 'group_val': group.id }) }}"
+					class="sub-item with-elbow is-nav-item grouping-{{ subcat.id }}"
+					>
+					<span class="elbow">|</span>
+					<span class="title">
+						<span class="list-counter" id="chat_filter_count_{{ filter_id }}_{{ group_by }}_{{ subcat.id }}">{{ subcat.count }}</span>
+						{{ subcat.title }}
+					</span>
+				</li>
+			{% endfor %}
+		{% endif %}
+	</li>
+{% endfor %}

@@ -1,0 +1,42 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.PublishDraftsList';
+
+		{% if all %}
+			pageMeta.url_fragment = '{{ url_fragment('agent_public_drafts', {'type': 'all'}) }}';
+		{% else %}
+			pageMeta.url_fragment = '{{ url_fragment('agent_public_drafts', {'type': 'mine'}) }}';
+		{% endif %}
+	</script>
+
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-article"></i> {{ phrase('agent.publish.drafts_list_title', {count: drafts|length|default(0)}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	{% include 'AgentBundle:Publish:drafts-massactions-bar.html.twig' %}
+
+	<section class="comments-list list-listing">
+		{% include 'AgentBundle:Publish:drafts-page.html.twig' %}
+	</section>
+
+{% endblock pane_content %}

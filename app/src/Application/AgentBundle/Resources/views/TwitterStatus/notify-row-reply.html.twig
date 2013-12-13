@@ -1,0 +1,15 @@
+<li
+	class="twitter inside"
+	data-type="twitter"
+	data-related="tweet:{{ account_status.id }}"
+	data-route="poppage:{{ path('agent_twitter_status_tweet_overlay', {'account_status_id': account_status.id}) }}"
+	data-route-notabreload="1"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time></time>
+	<big>{{ phrase('agent.twitter.tweet') }}</big>
+	<small>
+		{{ phrase('agent.twitter.user_replied_to_tweet', {name: '@' ~ account_status.status.user.screen_name}) }}
+		<div>{{ account_status.status.text|raw }}</div>
+	</small>
+</li>

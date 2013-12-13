@@ -1,0 +1,84 @@
+{% extends base_edit_tpl %}
+{% block form_extra %}
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>
+			Checkbox label
+			<span class="small-light-icon tipped" title="This is the label text displayed to the right of the checkbox. This is clickable text that will toggle the checkbox. For example, it may be a short description or simply 'Yes' or 'On' or 'I agree' etc."></span>
+		</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.label_text) }}
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>
+			{{ phrase('admin.general.default_value') }}
+			<span class="small-light-icon tipped" title="This value will be disaplyed by default when the user has not input anything."></span>
+		</label>
+	</div>
+	<div class="dp-form-input">
+		<label>
+			<input type="checkbox" name="fielddef[default_value]" vaue="1" {% if editfield.default_value %}checked="checked"{% endif %}>
+			Checked by default
+		</label>
+	</div>
+</div>
+
+{% if not no_validation_options %}
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				{{ phrase('admin.custom_fields.user_validation') }}
+				<span class="small-light-icon tipped" title="Validation rules applied when agents create tickets or update tickets through the agent interface."></span>
+			</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[validation_type]" value="" {% if not editfield.validation_type %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.no_validation') }}
+				</label>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[validation_type]" value="required" {% if editfield.validation_type == 'required' %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.choice_require_user_input') }}
+				</label>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				{{ phrase('admin.custom_fields.agent_validation') }}
+				<span class="small-light-icon tipped" title="Validation rules applied when agents create tickets or update tickets through the agent interface."></span>
+			</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[agent_validation_type]" value="" {% if not editfield.agent_validation_type %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.no_validation') }}
+				</label>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[agent_validation_type]" value="required" {% if editfield.agent_validation_type == 'required' %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.choice_require_user_input') }}
+				</label>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

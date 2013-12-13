@@ -1,0 +1,39 @@
+#!/bin/bash
+# This is a simple command-runner.
+
+VM_LOCAL="/vm_local"
+
+case "$1" in
+    clear-caches)
+        fromdos $VM_LOCAL/clear-caches
+        /bin/bash $VM_LOCAL/clear-caches
+        exit $?
+        ;;
+    start-selenium)
+        fromdos $VM_LOCAL/start-selenium
+        /bin/bash $VM_LOCAL/start-selenium
+        exit $?
+        ;;
+    stop-selenium)
+        fromdos $VM_LOCAL/stop-selenium
+        /bin/bash $VM_LOCAL/stop-selenium
+        exit $?
+        ;;
+    start-logio)
+        fromdos $VM_LOCAL/start-logio
+        /bin/bash $VM_LOCAL/start-logio
+        exit $?
+        ;;
+    stop-logio)
+        fromdos $VM_LOCAL/stop-logio
+        /bin/bash $VM_LOCAL/stop-logio
+        exit $?
+        ;;
+    *)
+		echo "Usage: dpcmd <cmd>"
+        echo "Where <cmd> is one of:"
+        echo "    clear-caches       Clears DeskPRO caches (in /deskpro-caches)"
+        echo "    start-selenium     Starts selenium server ready for behat tests"
+        echo "    stop-selenium      Stops selenium server"
+        exit 1
+esac

@@ -1,0 +1,1419 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--  $Id: settings.xml 7065 2011-05-24 00:15:52Z chroder $i -->
+<settingscats>
+	<settingscat parent="set_advanced" name="users_expire" displayorder="1">
+		<description>These settings control user expirations</description>
+		<display_name>User Expiration Settings</display_name>
+		<setting name="expire_date_ticket_view" field_type="radio" displayorder="1">
+			<display_name>Date Expiration : Allow Ticket View</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When a user is expired because of the date, should the user be able to view their tickets?</description>
+		</setting>
+		<setting name="expire_date_ticket_modify" field_type="radio" displayorder="2">
+			<display_name>Date Expiration : Allow Ticket Modification</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When a user is expired because of the date, should the user be able to modify their tickets, including making follow up replies?</description>
+		</setting>
+		<setting name="expire_date_other" field_type="radio" displayorder="3">
+			<display_name>Date Expiration : Allow User Actions</display_name>
+			<value>1</value>
+			<options></options>
+			<description><![CDATA[When a user is expired because of the date, should the user be able to perform other user based actions, including viewing the knowledgebase & troubleshooter, creating knowledgebase articles, subscribing to knowledgebase articles & modifying their profile.]]></description>
+		</setting>
+		<setting name="expire_tickets_ticket_view" field_type="radio" displayorder="4">
+			<display_name>Ticket Expiration : Allow Ticket View for Closed Tickets</display_name>
+			<value>1</value>
+			<options></options>
+			<description>When a user is expired because of the amount of tickets submitted, should the user be able to access resolved tickets? Unresolved tickets will be accessible to the user.</description>
+		</setting>
+		<setting name="expire_tickets_other" field_type="radio" displayorder="5">
+			<display_name>Ticket Expiration : Allow User Actions</display_name>
+			<value>1</value>
+			<options></options>
+			<description><![CDATA[When a user is expired because of the amount of tickets submitted, should the user be able to perform other user based actions, including viewing the knowledgebase & troubleshooter, creating knowledgebase articles, subscribing to knowledgebase articles & modifying their profile.]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_advanced" name="attachments" displayorder="2">
+		<description>Settings controlling the use of attachments</description>
+		<display_name>Attachments</display_name>
+
+		<setting name="attachments_user" field_type="radio" displayorder="1">
+			<display_name>Allow Users to Upload Attachments</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Do you wish to allow attachments to be uploaded by users of {$DP_NAME}.</description>
+		</setting>
+		<setting name="attachments_user_size" field_type="text" displayorder="2">
+			<display_name>Maximum Attachment Size for Users</display_name>
+			<value>1</value>
+			<options></options>
+			<description>This value specifies the maximum size (in megabytes) an attachment can be when uploaded by a user.</description>
+			<php_verify><![CDATA[
+				$maxsize_b = return_bytes(@ini_get('upload_max_filesize'));
+				if ($maxsize_b AND $maxsize_b > 0) {
+					$maxsize_m = floor($maxsize_b / 1024 / 1024);
+
+					if ($value > $maxsize_m) {
+						$error = "Maximum filesize allowed by your server is $maxsize_m MB";
+					}
+				}
+			]]></php_verify>
+		</setting>
+		<setting name="user_extensions_allowed" field_type="text" displayorder="3">
+			<display_name>User Enabled Attachment Types</display_name>
+			<value></value>
+			<options></options>
+			<description>This specifies a list of extensions that {$DP_NAME} will permit for attachments uploaded by users. Specify this in a comma-separated list. If left blank, all attachments will be accepted, if any attachments are entered then nothing apart from those attachments will be accepted.</description>
+		</setting>
+		<setting name="user_extensions_disabled" field_type="text" displayorder="4">
+			<display_name>User Disabled Attachment Types</display_name>
+			<value></value>
+			<options></options>
+			<description>This specifies a list of extensions that {$DP_NAME} will refuse for attachments uploaded by users. Specify this in a comma-separated list. Leave blank to disable.</description>
+		</setting>
+		<setting name="attachment_max_user_email" field_type="text" displayorder="5">
+			<display_name>Max Attachment Size for Tech Notifications</display_name>
+			<value>1</value>
+			<options></options>
+			<description>This setting sets the max size for attachments that will be emailed to users as part of notifications. If the user is not sent the attachment, they will be supplied a link to directly download the attachment from the helpdesk.</description>
+		</setting>
+		<setting name="attachments_tech_size" field_type="text" displayorder="6">
+			<display_name>Max Attachment Size for Technicians</display_name>
+			<value>1</value>
+			<options></options>
+			<description>This value specifies the maximum size (in megabytes) an attachment can be when uploaded by a technician.</description>
+			<php_verify><![CDATA[
+				$maxsize_b = return_bytes(@ini_get('upload_max_filesize'));
+				if ($maxsize_b AND $maxsize_b > 0) {
+					$maxsize_m = floor($maxsize_b / 1024 / 1024);
+
+					if ($value > $maxsize_m) {
+						$error = "Maximum filesize allowed by your server is $maxsize_m MB";
+					}
+				}
+			]]></php_verify>
+		</setting>
+		<setting name="tech_extensions_allowed" field_type="text" displayorder="7">
+			<display_name>Tech Enabled Attachment Types</display_name>
+			<value></value>
+			<options></options>
+			<description>This specifies a list of extensions that {$DP_NAME} will permit for attachments uploaded by technicians. Specify this in a comma-separated list. If left blank, all attachments will be accepted, if any attachments are entered then nothing apart from those attachments will be accepted.</description>
+		</setting>
+		<setting name="tech_extensions_disabled" field_type="text" displayorder="8">
+			<display_name>Tech Disabled Attachment Types</display_name>
+			<value></value>
+			<options></options>
+			<description>This specifies a list of extensions that {$DP_NAME} will refuse for attachments uploaded by technicians. Specify this in a comma-separated list. Leave blank to disable.</description>
+		</setting>
+		<setting name="attachment_max_tech_email" field_type="text" displayorder="9">
+			<display_name>Max Attachment Size for Tech Notifications</display_name>
+			<value>0.2</value>
+			<options></options>
+			<description>This setting sets the max size for attachments that will be emailed to techs as part of notifications. If you have a number of techs who receive notifications and you set this high; you can add quite a lot of load to your system; if for example the system has to send 50MB of emails every time a user uploads a 1MB attachment. If the tech is not sent the attachment, they will be supplied a link to directly download the attachment from the helpdesk.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_advanced" name="cleanup" displayorder="3">
+		<description>Auto Management</description>
+		<display_name>Cleanup</display_name>
+		<setting name="cleanup_cronlog" field_type="text" displayorder="1">
+			<display_name>Purge Cron Log</display_name>
+			<value>7</value>
+			<options></options>
+			<description>Cron log entries older than this setting (in days) will be deleted. Set to 0 to prevent deletion.</description>
+		</setting>
+		<setting name="cleanup_sources" field_type="text" displayorder="2">
+			<display_name>Purge Gateway Sources</display_name>
+			<value>21</value>
+			<options></options>
+			<description>Gateway source emails older than this setting (in days) will be deleted. Set to 0 to prevent deletion. You may wish to disable source email deletion if you want to have a reference to the source email in the future, however keeping source emails will increase the size of your database rapidly.</description>
+		</setting>
+		<setting name="cleanup_gateway_errors" field_type="text" displayorder="3">
+			<display_name>Purge Gateway Rejections</display_name>
+			<value>21</value>
+			<options></options>
+			<description>Email gateway rejections older than this setting (in days) will be deleted along with their email source. Set to 0 to prevent deletion.</description>
+		</setting>
+		<setting name="cleanup_loginlog" field_type="text" displayorder="5">
+			<display_name>Prune Login Logs</display_name>
+			<value>30</value>
+			<options></options>
+			<description>Login log entries older than this setting (in days) will be deleted. Set to 0 to prevent deletion.</description>
+		</setting>
+		<setting name="cleanup_tracking" field_type="text" displayorder="5">
+			<display_name>Prune Tracking Logs</display_name>
+			<value>150</value>
+			<options></options>
+			<description>Tracking (user cookie tracking, logs pages viewed etc) with no activity in over this many days will be deleted. Set to 0 to prevent deletion.</description>
+		</setting>
+		<setting name="cleanup_tracking_log" field_type="text" displayorder="5">
+			<display_name>Prune Tracking Tracks</display_name>
+			<value>30</value>
+			<options></options>
+			<description>Individual tracking "tracks" (specific pages etc) that were created this many days ago be deleted. Set to 0 to prevent deletion.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_advanced" name="search" displayorder="3">
+		<description>Search Settings</description>
+		<display_name>Search</display_name>
+		<setting name="disable_natural_ticket_search" field_type="radio" displayorder="10">
+			<display_name>Disable natural search in Ticket</display_name>
+			<value>0</value>
+			<options></options>
+			<description>On very large databases, natural search (that is, searching within messages for phrases or words) can be very resource intensive. You may want to disable this type of search, forcing your techs to find tickets on other criteria like dates or categories etc. Before disabling natural search, you might want to try the below setting first.</description>
+		</setting>
+		<setting name="natural_search_maxage_days" field_type="text" displayorder="20">
+			<display_name>Max age (in days) of tickets returned with a natural search</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When using natural search, define the maximum age of a ticket to be returned. The shorter the age, the faster the search will take and the less resources will be used. If your database is large and you are experiencing slow natural searches, try setting this value (start at 90 days and play around until you find an appropriate value).</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_advanced" name="payment" displayorder="4">
+		<description>These settings control the time tracking and billing features of {$DP_NAME}.</description>
+		<display_name>Payment Settings</display_name>
+		<setting name="payments" field_type="radio" displayorder="1">
+			<display_name>Enable Payments</display_name>
+			<value>0</value>
+			<options></options>
+			<description>If enabled, {$DP_NAME} will display payment tracking functions in the Technician and Administration interfaces. Disabling this feature after enabling it will not delete existing billing information.</description>
+		</setting>
+		<setting name="payments_auto" field_type="radio" displayorder="2">
+			<display_name>Automatically Log Billing</display_name>
+			<value>0</value>
+			<options></options>
+			<description>This will automatically start the timer when a tech views a ticket; it will also preselect the option to charge the user for the time spent when the tech replies.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_advanced" name="server" displayorder="6">
+		<description>Server Options</description>
+		<display_name>Server Options</display_name>
+		<setting name="cron_auto_cron" field_type="radio" displayorder="1">
+			<display_name>Auto Run Scheduled Tasks</display_name>
+			<value>0</value>
+			<options></options>
+			<description>If you enable this setting {$DP_NAME} will create an image in the footer of the tech and user interface which is used to run the {$DP_NAME} scheduled tasks. This is only recommended if you are unable to setup a cron task (on linux) or a scheduled task (on windows).</description>
+		</setting>
+		<setting name="use_gzip" field_type="radio" displayorder="2">
+			<display_name>Enable Gzip</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Do you wish to enable gzip. This will compress and thus reduce the size of your html pages.</description>
+			<php_verify><![CDATA[
+				if ($value AND !function_exists('gzcompress')) {
+					$error = 'Your server does not support gzip compression.';
+				}
+			]]></php_verify>
+		</setting>
+		<setting name="graphing" field_type="radio" displayorder="4">
+			<display_name>Enable Graphing</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Do you wish {$DP_NAME} to generate graphs? This feature has a number of server requirements. If your server does not meet these, you can disable graphing to prevent the generation of error messages.</description>
+		</setting>
+		<setting name="safe_mode_upload" field_type="radio" displayorder="5">
+			<display_name>Safe Mode Upload Enabled</display_name>
+			<value>0</value>
+			<options></options>
+			<description>If your server runs PHP with SAFE MODE Restrictions, set this to yes. You should only set this to yes if you are having problems with attachment uploads.</description>
+		</setting>
+		<setting name="safe_mode_dir" field_type="text" displayorder="6">
+			<display_name>Safe Mode Temporary Directory</display_name>
+			<value></value>
+			<options></options>
+			<description><![CDATA[If your server is running in PHP Safe Mode, you'll need to specify a directory that is CHMOD to 777 that will act as a temporary directory for uploads. All files are removed from this directory after database insertion.Note: Do NOT include the trailing slash ('/') after the directory name]]></description>
+		</setting>
+		<setting name="post_ref_whitelist" field_type="text" displayorder="7">
+			<display_name>POST Referer Whitelist</display_name>
+			<value></value>
+			<options></options>
+			<description><![CDATA[For security reasons, {$DP_NAME} denies some requests if the page referer is not the same domain as the helpdesk. If you need to allow other domains (for example, your main site has a search box for your helpdesk) then enter them here. Enter only the domain, separate multiple domains by a comma. Do not insert paths (/index.php for example) or 'http://'. Valid examples are: example.com, subdomain.example.com]]></description>
+		</setting>
+
+	</settingscat>
+	<settingscat parent="set_advanced" name="sessions" displayorder="7">
+		<description>Session Settings</description>
+		<display_name>Sessions</display_name>
+		<setting name="user_session_length" field_type="text" displayorder="1">
+			<display_name>User Session Length</display_name>
+			<value>3600</value>
+			<options></options>
+			<description>This setting determines the length, in seconds, a user session can be idle before it is expired.</description>
+		</setting>
+		<setting name="tech_session_length" field_type="text" displayorder="2">
+			<display_name>Tech Session Length</display_name>
+			<value>3600</value>
+			<options></options>
+			<description>This setting determines the length, in seconds, a tech session can be idle before it is expired.</description>
+		</setting>
+		<setting name="admin_session_length" field_type="text" displayorder="3">
+			<display_name>Admin Session Length</display_name>
+			<value>3600</value>
+			<options></options>
+			<description>This setting determines the length, in seconds, an admin session can be idle before it is expired.</description>
+		</setting>
+		<setting name="cookie_path" field_type="text" displayorder="4">
+			<display_name>Cookie Path</display_name>
+			<value></value>
+			<options></options>
+			<description>You only need to set this if you have two installations of {$DP_NAME} running on the same domain. You can then set a path to restrict the cookie to, for example helpdesk1 and helpdesk2. Be very careful when setting this value, if you set it wrong you will lock yourself out of both the admin and tech interface and will need to edit this value directly in mySQL to regain access.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_email" name="email" displayorder="1">
+		<description>These settings control the email functions of DeskPRO</description>
+		<display_name>Email</display_name>
+		<setting name="email_from" field_type="text" displayorder="1">
+			<display_name>From Email Address</display_name>
+			<value></value>
+			<options></options>
+			<description>This is the email address that notifications for which no reply is expected will be sent by {$DP_NAME}. The type of mailings sent will be notification email including registration emails, notifications such as knowledgebase articles or error emails from the email gateway. You will probably want to auto delete any emails that get sent to this address. It is essential that this is a valid email address or some servers will not send the email. It is also important that you do *not* collect this email using the email gateway.</description>
+			<php_verify><![CDATA[
+				if (!is_email($value)) {
+					$error = 'You entered an incorrect email address.';
+				}
+			]]></php_verify>
+		</setting>
+		<setting name="email_from_name" field_type="text" displayorder="2">
+			<display_name>From Email Name</display_name>
+			<value>Help Desk</value>
+			<options></options>
+			<description>The name that notifications will be sent from.</description>
+		</setting>
+		<setting name="email_offemail" field_type="text" displayorder="3">
+			<display_name>Off Helpdesk Emergency Email Address</display_name>
+			<value>important@domain.com</value>
+			<options></options>
+			<description>This is your emergency off helpdesk email. This will be shown to users in the case of a serious problem which prevents {$DP_NAME} from working. This email should be monitored regularly.</description>
+			<php_verify><![CDATA[
+				if (!is_email($value)) {
+					$error = 'You entered an incorrect email address.';
+				}
+			]]></php_verify>
+		</setting>
+		<setting name="email_linereturns" field_type="select" displayorder="5">
+			<display_name>Email Line Returns</display_name>
+			<value>Unix</value>
+			<options><![CDATA[a:3:{s:4:"Unix";s:9:"Unix (\n)";s:7:"Windows";s:14:"Windows (\r\n)";s:3:"Mac";s:8:"Mac (\r)";}]]></options>
+			<description>Your mail server might require you to change the line returns that emails are sent with. You can set them here</description>
+		</setting>
+		<setting name="email_footer_tech" field_type="radio" displayorder="6">
+			<display_name>Add footer to tech emails</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Add the technician footer email template to all outgoing emails to technicians.</description>
+		</setting>
+		<setting name="email_ticketfields_tech" field_type="radio" displayorder="6">
+			<display_name>Include custom ticket fields in tech notifications</display_name>
+			<value>1</value>
+			<options></options>
+			<description>When enabled, relevant custom ticket field values will be added to the email notifications sent to techs for new tickets, new replies and assignments.</description>
+		</setting>
+		<setting name="email_footer_user" field_type="radio" displayorder="7">
+			<display_name>Add footer to user emails</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Add the user footer email template to all outgoing emails to users.</description>
+		</setting>
+		<setting name="email_failed_retry" field_type="text" displayorder="7">
+			<display_name>Number of times to retry sending failed emails</display_name>
+			<value>2</value>
+			<options></options>
+			<description>If an email fails to send, {$DP_NAME} will log the email and try and send it again later. How many tries should {$DP_NAME} attempt to make before the email is deleted? (0 to disable)</description>
+			<php_verify><![CDATA[
+				$value = (int)$value;
+				if ($value < 0) $value = 0;
+			]]></php_verify>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_email" name="smtp" displayorder="2">
+		<description>Use the internal SMTP mail sending system</description>
+		<display_name>SMTP</display_name>
+		<setting name="use_smtp" field_type="radio" displayorder="1">
+			<display_name>Use SMTP?</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Send emails using the included SMTP server. If disabled mail will be sent through the standard php mail() function. If you have problems using the php mail() function, you should check the settings are correct inside your php.ini file.</description>
+		</setting>
+		<setting name="smtp_host" field_type="text" displayorder="2">
+			<display_name>SMTP Host</display_name>
+			<value>localhost</value>
+			<options></options>
+			<description>If SMTP mailing is enabled, this value specifies the server to use for SMTP mailing. The default (for SMTP server on your web server) is localhost.</description>
+		</setting>
+		<setting name="smtp_port" field_type="text" displayorder="3">
+			<display_name>SMTP Port</display_name>
+			<value>25</value>
+			<options></options>
+			<description>If SMTP mailing is enabled, this value specifies the port number to connect to on the SMTP server for mailing. The default value, 25, is almost universally standard; you should change this only if you know your SMTP server is running on a non-standard port.</description>
+		</setting>
+		<setting name="smtp_ssl" field_type="radio" displayorder="3">
+			<display_name>SMTP Secure?</display_name>
+			<value>0</value>
+			<options></options>
+			<description>If your SMTP server requires secure communications (SSL), enable this option. If this is enabled, your port (the above setting) will probably be 465 unless it is non-standard.</description>
+			<php_verify><![CDATA[
+				// Only works in PHP5
+				if ($value AND !check_ssl_available()) {
+					$error = 'To use SMTP with SSL, PHP needs to be compiled with OpenSSL. For more information, including installation instructions,
+						refer to <a href="http://php.net/manual/en/ref.openssl.php">this PHP manual page</a>.';
+
+					$value = 0;
+				}
+			]]></php_verify>
+		</setting>
+		<setting name="smtp_helo" field_type="text" displayorder="4">
+			<display_name>SMTP HELO String</display_name>
+			<value></value>
+			<options></options>
+			<description>If SMTP mailing is enabled, this value specifies what identification string {$DP_NAME} will send to the SMTP server as part of its introductory message. Your domain name is often a good choice.</description>
+		</setting>
+		<setting name="smtp_auth" field_type="radio" displayorder="5">
+			<display_name>SMTP Authorization?</display_name>
+			<value></value>
+			<options></options>
+			<description>If SMTP mailing is enabled, this value specifies whether SMTP auth should be used.</description>
+		</setting>
+		<setting name="smtp_user" field_type="text" displayorder="6">
+			<display_name>SMTP Username</display_name>
+			<value></value>
+			<options></options>
+			<description>If SMTP authentication is enabled, this value specifies the username that will be used during SMTP authentication.</description>
+		</setting>
+		<setting name="smtp_pass" field_type="text" displayorder="7">
+			<display_name>SMTP Password</display_name>
+			<value></value>
+			<options></options>
+			<description>If SMTP authentication is enabled, this value specifies the password that will be used during SMTP authentication.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_gateway" name="gateway_gen" displayorder="1">
+		<description>General Gateway Settings</description>
+		<display_name>General Settings</display_name>
+		<setting name="max_message_size" field_type="text" displayorder="1">
+			<display_name>Maximum Message Size</display_name>
+			<value>1</value>
+			<options></options>
+			<description>This value specifies the largest size (in MB) message that will be accepted by {$DP_NAME} when it retrieves mail. Messages larger than this size will be deleted and the user notified. If you have low amounts of RAM available per PHP process it is important this setting is not set too high (1 MB is recommended)</description>
+		</setting>
+		<setting name="gateway_reply_cut" field_type="radio" displayorder="2">
+			<display_name>Gateway Reply Quote Handling</display_name>
+			<value>1</value>
+			<options></options>
+			<description>When this is enabled the helpdesk will attempt to ignore any text entered below the reply line (wordref gateway_reply_cut). This is useful to prevent lots of quoting of messages.</description>
+		</setting>
+		<setting name="gateway_no_del_msg" field_type="radio" displayorder="3">
+			<display_name>Leave Messages on Server</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Leave POP3 email messages on the server instead of deleting them?</description>
+		</setting>
+		<setting name="gateway_allow_empty_body" field_type="radio" displayorder="6">
+			<display_name>Allow Empty Email Bodies</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Allow new tickets to be created with empty bodies? For example, if you use some system where the email address and subject are the only important thing. Note this only affects empty bodies and new tickets; an empty bodied reply on a ticket will still be discarded.</description>
+		</setting>
+		<setting name="gateway_num_newticket_autosearch" field_type="text" displayorder="6">
+			<display_name>How many articles to suggest</display_name>
+			<value>5</value>
+			<options></options>
+			<description>When the KB suggestion features are enabeld (see mail rules), what is the maximum number of articles to return?</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_gateway" name="gateway_autoresponder" displayorder="4">
+		<description>Controls the autoresponder settings</description>
+		<display_name>Autoresponder Settings</display_name>
+		<setting name="max_new" field_type="text" displayorder="1">
+			<display_name>Max New Tickets</display_name>
+			<value>8</value>
+			<options></options>
+			<description>This setting is the maximum amount of tickets that a user can create in an hour. It should be larger than the Max New Tickets Warning setting. Any new ticket emails sent breaching this limit will not be processed.</description>
+		</setting>
+		<setting name="max_reply_warning" field_type="text" displayorder="3">
+			<display_name>Max Replies Warning</display_name>
+			<value>4</value>
+			<options></options>
+			<description>It is important to have a limit on the number of emails a user can send in an hour to prevent a possible autoresponder loop. Once this limit is reached the user will be marked as an autoresponder and automatic ticket notifications will not be sent to them. A tech response to the ticket will reset the number. Set to 0 to disable. Identical emails will always be ignored.</description>
+		</setting>
+		<setting name="max_subject_warning" field_type="text" displayorder="3">
+			<display_name>Max Subject Warning</display_name>
+			<value>3</value>
+			<options></options>
+			<description>A warning will be sent and the user marked as an autoresponder if this number of emails is received with identical subjects.</description>
+		</setting>
+		<setting name="max_new_warning" field_type="text" displayorder="2">
+			<display_name>Max New Tickets Warning</display_name>
+			<value>4</value>
+			<options></options>
+			<description>It is important to have a limit on the number of emails a user can send in an hour to prevent a possible autoresponder loop. This setting is the warning amount, when the amount is reached a separate email is sent to the user asking them to not send new emails so quickly and to explain that they will not receive anymore automatic notifications from {$DP_NAME}.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_general" name="config" displayorder="1">
+		<description>These settings control your {$DP_NAME} configuration</description>
+		<display_name>Configuration</display_name>
+		<setting name="site_url" field_type="text" displayorder="1">
+			<display_name>Your Site URL</display_name>
+			<value>http://domain.com/2</value>
+			<options></options>
+			<description><![CDATA[This setting specifies the URL to your company's main web site. This is not {$DP_NAME} URL, but just a link of convenience to make available to your users. They can click this link to exit your support pages and return here. This can be any link you desire; it does not affect {$DP_NAME}'s behaviour.]]></description>
+		</setting>
+		<setting name="helpdesk_url" field_type="text" displayorder="2">
+			<display_name>The URL to {$DP_NAME}</display_name>
+			<value>http://localhost/helpdesk/</value>
+			<options></options>
+			<description><![CDATA[This setting specifies the base URL your users will use to access your {$DP_NAME} installation. This is used to generate links within {$DP_NAME}'s interface. In most cases, the installation and upgrade scripts' auto detected value are correct. The url must end with a trailing slash.]]></description>
+		</setting>
+		<setting name="site_name" field_type="text" displayorder="3">
+			<display_name>Your Site Name</display_name>
+			<value>domain.com</value>
+			<options></options>
+			<description>This setting specifies the human-readable name {$DP_NAME} to your users.</description>
+		</setting>
+		<setting name="helpdesk_enabled" field_type="radio" displayorder="4">
+			<display_name>Helpdesk Enabled</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Set yes to turn the helpdesk on. If the helpdesk is not turned on, users will not be allowed to enter the help desk; instead they will be shown the Help desk disabled message. The administrator and tech interfaces will still be active. If you have POP3 mail collection setup, mail will not be processed. Mail sent by PIPE will be logged to the database awaiting the turning on of the helpdesk.</description>
+		</setting>
+		<setting name="enable_wysiwyg" field_type="radio" displayorder="4">
+			<display_name>WYSIWYG Editors Enabled</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Set yes to enable WYSIWYG editors in the tech interface. These editors show up when managaing articles, troubleshooters, private messages etc.</description>
+		</setting>
+		<setting name="force_ssl" field_type="radio" displayorder="5">
+			<display_name>Force SSL</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[Enable this option for force SSL encryption on all communications. If you enable this, {$DP_NAME} will redirect all non-HTTPS requests to HTTPS. If you enable this option, the above helpdesk URL should also start with 'https://'. <em style="color:#724848;">Warning: If your server isn't equip to properly serve https, then your users will be unable to use the helpdesk because the https URL will not load. After enabling this option you should check to make sure your helpdesk front-page loads properly.</em>]]></description>
+		</setting>
+		<setting name="autocorrect_domain" field_type="radio" displayorder="5">
+			<display_name>Auto-Redirect To Correct Domain</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[When this setting is enabled, {$DP_NAME} will try and force users on to a single domain name. For example, you might have a subdomain "helpdesk.example.org"
+			that maps to "example.org/helpdesk/". If "helpdesk.example.org" is the domain you entered above as your helpdesk URL, then {$DP_NAME} will redirect
+			users who come from "example.org/helpdesk/". <em style="color:#724848;">Warning: After enabling this option you should check that your helpdesk front-page loads properly in case the above domain is incorrect and users are automatically redirected to a non-functioning URL.</em>]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_general" name="users" displayorder="2">
+		<description>These settings control the user functions of {$DP_NAME}</description>
+		<display_name>Users</display_name>
+		<setting name="min_username_length" field_type="text" displayorder="1">
+			<display_name>Minimum username length</display_name>
+			<value>3</value>
+			<options></options>
+			<description><![CDATA[The minimum length of username a user can choose when registering.]]></description>
+			<php_verify><![CDATA[
+				if (!ctype_digit($value)) {
+					$error = 'Please input numbers only';
+				} elseif ($value < 1) {
+					$error = 'Please input a number >= 1';
+				}
+			]]></php_verify>
+		</setting>
+		<setting name="user_captcha_register" field_type="radio" displayorder="6">
+			<display_name>Enable Image Verification</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[Enable image verification to ensure users are human and not automated bots. Please be sure your server supports the required technologies before enabling this option. You can check by running the <a href="test_captcha.php">CAPTCHA test</a>.]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_general" name="techs" displayorder="3">
+		<description>These settings control the tech functions of {$DP_NAME}</description>
+		<display_name>Techs</display_name>
+		<setting name="tech_header_title" field_type="text" displayorder="4">
+			<display_name>Tech interface title</display_name>
+			<value>Helpdesk</value>
+			<options></options>
+			<description>This is the title displayed in the top left of the tech interface.</description>
+		</setting>
+		<setting name="tech_immediate_redirects" field_type="radio" displayorder="4">
+			<display_name>Disable redirection screens</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When enabled, the redirection screens will be disabled. These are the screens that confirm a particular action was successfull and end with "You will be redirected automatically..."</description>
+		</setting>
+		<setting name="tech_display_name" field_type="radio" displayorder="4">
+			<display_name>Show Tech Display Name in Tech Interface</display_name>
+			<value>1</value>
+			<options></options>
+			<description>When enabled, the tech interface will always show the techs display name instead of the username. If the tech has not entered a display name for themselves, then the username will be displayed.</description>
+		</setting>
+		<setting name="email_on_admin_login" field_type="radio" displayorder="4">
+			<display_name>Send email notifications for admin logins</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When enabled, an email will be sent to the email address of the admin that is logging in.</description>
+		</setting>
+		<setting name="email_on_admin_login_all" field_type="text" displayorder="4">
+			<display_name>Send email notifications for every admin login</display_name>
+			<value></value>
+			<options></options>
+			<description>Enter an email address (or multiple email addresses, separated by a comma) to send login notifcations to for ALL admin logins.</description>
+			<php_verify><![CDATA[
+				$emails = array_remove_empty(explode(',', $value));
+				$value = array();
+
+				if ($emails) {
+					foreach ($emails as $email) {
+						$email = trim($email);
+						$value[] = $email;
+
+						if (!$email) {
+							continue;
+						}
+
+						if (!is_email($email)) {
+							$error = 'The email(s) you entered are invalid.';
+							break;
+						}
+					}
+				}
+
+				$value = implode(',', $value);
+			]]></php_verify>
+		</setting>
+				<setting name="email_on_admin_login_failed" field_type="radio" displayorder="4">
+			<display_name>Send email notifications for failed admin logins</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When enabled, an email will be sent to the email address of the admin that failed logging in.</description>
+		</setting>
+		<setting name="email_on_admin_login_failed_all" field_type="text" displayorder="4">
+			<display_name>Send email notifications for every failed admin login</display_name>
+			<value></value>
+			<options></options>
+			<description>Enter an email address (or multiple email addresses, separated by a comma) to send login notifcations to for ALL failed admin logins.</description>
+			<php_verify><![CDATA[
+				$emails = array_remove_empty(explode(',', $value));
+				$value = array();
+
+				if ($emails) {
+					foreach ($emails as $email) {
+						$email = trim($email);
+						$value[] = $email;
+
+						if (!$email) {
+							continue;
+						}
+
+						if (!is_email($email)) {
+							$error = 'The email(s) you entered are invalid.';
+							break;
+						}
+					}
+				}
+
+				$value = implode(',', $value);
+			]]></php_verify>
+		</setting>
+		<setting name="tech_invalid_pass_lockout" field_type="text" displayorder="5">
+			<display_name>Login Attemps Lockout</display_name>
+			<value>3</value>
+			<options></options>
+			<description>How many logins can be attempted before the system locks the account for 1 hour? (0 disables)</description>
+			<php_verify><![CDATA[
+				$value = (int)$value;
+				if ($value < 0) $value = 0;
+			]]></php_verify>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_general" name="date" displayorder="4">
+		<description>These settings control the display of Dates within {$DP_NAME}</description>
+		<display_name>Dates</display_name>
+		<setting name="timezone" field_type="select" displayorder="1">
+			<display_name>Default Timezone</display_name>
+			<value>0</value>
+			<options><![CDATA[a:27:{i:-11;s:40:"(GMT - 11:00 hours) Midway Island, Samoa";i:-12;s:40:"(GMT - 12:00 hours) Enitwetok, Kwajalien";i:-10;s:26:"(GMT - 10:00 hours) Hawaii";i:-9;s:25:"(GMT - 9:00 hours) Alaska";i:-8;s:45:"(GMT - 8:00 hours) Pacific Time (US & Canada)";i:-7;s:46:"(GMT - 7:00 hours) Mountain Time (US & Canada)";i:-6;s:45:"(GMT - 6:00 hours) Central Time (US & Canada)";i:-5;s:66:"(GMT - 5:00 hours) Eastern Time (US & Canada), Bogota, Lima, Quito";i:-4;s:58:"(GMT - 4:00 hours) Atlantic Time (Canada), Caracas, La Paz";s:4:"-3.5";s:37:"(GMT - 3:30 hours) Newfoundland (NST)";i:-3;s:65:"(GMT - 3:00 hours) Brazil, Buenos Aires, Georgetown, Falkland Is.";i:-2;s:57:"(GMT - 2:00 hours) Mid-Atlantic, Ascention Is., St Helena";i:-1;s:45:"(GMT - 1:00 hours) Azores, Cape Verde Islands";i:0;s:61:"(GMT) Casablanca, Dublin, Edinburgh, London, Lisbon, Monrovia";i:1;s:68:"(GMT + 1:00 hours) Berlin, Brussels, Copenhagen, Madrid, Paris, Rome";i:2;s:52:"(GMT + 2:00 hours) Kaliningrad, South Africa, Warsaw";i:3;s:51:"(GMT + 3:00 hours) Baghdad, Riyadh, Moscow, Nairobi";i:4;s:51:"(GMT + 4:00 hours) Adu Dhabi, Baku, Muscat, Tbilisi";i:5;s:61:"(GMT + 5:00 hours) Ekaterinburg, Islamabad, Karachi, Tashkent";i:6;s:41:"(GMT + 6:00 hours) Almaty, Colomba, Dhaka";i:7;s:42:"(GMT + 7:00 hours) Bangkok, Hanoi, Jakarta";i:8;s:63:"(GMT + 8:00 hours) Beijing, Hong Kong, Perth, Singapore, Taipei";i:9;s:56:"(GMT + 9:00 hours) Osaka, Sapporo, Seoul, Tokyo, Yakutsk";s:3:"9.5";s:26:"(GMT +9:30 hours) Adelaide";i:10;s:68:"(GMT + 10:00 hours) Melbourne, Papua New Guinea, Sydney, Vladivostok";i:11;s:59:"(GMT + 11:00 hours) Magadan, New Caledonia, Solomon Islands";i:12;s:63:"(GMT + 12:00 hours) Auckland, Wellington, Fiji, Marshall Island";}]]></options>
+			<description>This is the default timezone for your users. If you are based in New York you should set New York as your default timezone. All technicians and users who do not set their own timezone will have dates displayed in this timezone.</description>
+		</setting>
+		<setting name="dst" field_type="radio" displayorder="2">
+			<display_name>Enable DST</display_name>
+			<value>0</value>
+			<options></options>
+			<description>If Daylight Savings Time is currently in effect in your timezone, enable this setting.</description>
+		</setting>
+		<setting name="date_full" field_type="text" displayorder="3">
+			<display_name>Date Display Format</display_name>
+			<value>D, jS M Y g:i a</value>
+			<options></options>
+			<description><![CDATA[{$DP_NAME} uses this value to format "full" date displays (used when both the date and time are to be displayed). This is based on the specification shown <a href="http://www.php.net/manual/en/function.date.php">here</a>.]]></description>
+		</setting>
+		<setting name="date_day" field_type="text" displayorder="4">
+			<display_name>Short Date Display Format</display_name>
+			<value>D, jS M Y</value>
+			<options></options>
+			<description><![CDATA[{$DP_NAME} uses this value to format "short" date displays (used when just the date is to be displayed). This is based on the specification shown <a href="http://www.php.net/manual/en/function.date.php">here</a>.]]></description>
+		</setting>
+		<setting name="date_time" field_type="text" displayorder="5">
+			<display_name>Time Display Format</display_name>
+			<value>g:i a</value>
+			<options></options>
+			<description><![CDATA[{$DP_NAME} uses this value to format "time" date displays (used when just the time is to be displayed). This is based on the specification shown <a href="http://www.php.net/manual/en/function.date.php">here</a>.]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_general" name="language" displayorder="5">
+		<description>These settings control {$DP_NAME}'s language usage</description>
+		<display_name>Language</display_name>
+		<setting name="language_on" field_type="radio" displayorder="1">
+			<display_name>Enable User Language Choice</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[If set to "yes", your users will be able to change the deskpro interface to the languages you have enabled in the <a href="languages.php">language section</a>.]]></description>
+		</setting>
+		<setting name="language_translate_on" field_type="radio" displayorder="1">
+			<display_name>Enable Translation Interface</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[If set to "yes", the language interface will allow you to create and submit to {$DP_NAME} custom new languages for translation and complete updates of {$DP_NAME} provided languages.]]></description>
+		</setting>
+		<setting name="staff_interface_charset" field_type="text" displayorder="8">
+			<display_name>Admin/Tech Interface Charset</display_name>
+			<value>ISO-8859-1</value>
+			<options></options>
+			<description><![CDATA[This is the charset that will be used when you use the admin or tech interface. For example, if the primary language of the helpdesk is not English you may need to change this charset.]]></description>
+		</setting>
+		<setting name="gateway_lang_detect" field_type="radio" displayorder="6">
+			<display_name>Gateway Language Detection</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[When this is enabled, the helpdesk will atempt to automatically detect the language of an incoming email message based on the installed languages. For the most effective detection, you must have the <a href="http://php.net/iconv" target="_blank">iconv</a> PHP module available. Please note that if you install similar languages (for example Norwegian and Danish) then you may experience false-positives.]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_general" name="templates" displayorder="5">
+		<description>These settings control {$DP_NAME}'s template usage</description>
+		<display_name>Templates</display_name>
+		<setting name="template_allow_include" field_type="radio" displayorder="1">
+			<display_name>Enable Include Tag</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[If set to "yes", you will be able to include files directly into your templates with the &lt;%include%&gt;/path/file.php&lt;%endinclude%&gt; tag.]]></description>
+		</setting>
+		<setting name="enable_link_parser" field_type="radio" displayorder="1">
+			<display_name>Enable Automatic Link Parser</display_name>
+			<value>1</value>
+			<options></options>
+			<description><![CDATA[If set to "yes," some plain-text content in the helpdesk including things like ticket messages or KB comments will be put through a parser to detect URL's and automatically make them clickable links. The parser is not perfect and may create links out of text that aren't meant to be links.]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_knowledgebase" name="kb_general" displayorder="1">
+		<description>These settings control some aspects of the knowledgebase</description>
+		<display_name>General Knowledgebase</display_name>
+		<setting name="faq_days" field_type="text" displayorder="3">
+			<display_name>Length of time new/updated</display_name>
+			<value>14</value>
+			<options></options>
+			<description>Set in days, this setting controls how long an article is new or updated.</description>
+		</setting>
+		<setting name="user_captcha_kb_comment" field_type="radio" displayorder="3">
+			<display_name>Comment CAPTCHA</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Enable a CAPTCHA for unregistered users wanting to submit comments to articles?</description>
+		</setting>
+		<setting name="addthis_username" field_type="text" displayorder="4">
+			<display_name>Display AddThis widget on articles</display_name>
+			<value></value>
+			<options></options>
+			<description><![CDATA[Display an <a href="http://www.addthis.com/">AddThis</a> widget in the sidebar of your articles by inputting your username for this setting.]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_knowledgebase" name="kb_home" displayorder="2">
+		<description>Control Knowledgebase Home</description>
+		<display_name>Knowledgebase Home</display_name>
+		<setting name="faq_front_show_popular" field_type="text" displayorder="1">
+			<display_name>Front Page Display : Number of Popular Articles</display_name>
+			<value>10</value>
+			<options></options>
+			<description>This specifies the number of popular  Knowledgebase articles to display on the user Knowledgebase home page. Set to 0 to disable this feature.</description>
+		</setting>
+		<setting name="faq_front_show_featured" field_type="text" displayorder="2">
+			<display_name>Front Page Display : Number of Top Featured Articles</display_name>
+			<value>10</value>
+			<options></options>
+			<description>This specifies the number of top rated knowledgebase articles to display on the user Knowledgebase home page. Set to 0 to disable this feature.</description>
+		</setting>
+		<setting name="faq_front_show_new" field_type="text" displayorder="3">
+			<display_name><![CDATA[Front Page Display : Number of New & Updated Articles]]></display_name>
+			<value>10</value>
+			<options></options>
+			<description>This specifies the number of new/updated knowledgebase articles to display on the user Knowledgebase home page. Set to 0 to disable this feature.</description>
+		</setting>
+		<setting name="faq_front_noduplicates" field_type="radio" displayorder="4">
+			<display_name>Front Page Display : Prevent Duplicates</display_name>
+			<value>1</value>
+			<options></options>
+			<description>For the various listings of articles on the Front page, prevent duplicates from appearing.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_knowledgebase" name="kb_category" displayorder="3">
+		<description>Control Knowledgebase Category Pages</description>
+		<display_name>Knowledgebase Category</display_name>
+		<setting name="faq_category_show_cats" field_type="text" displayorder="1">
+			<display_name>Category Display : Show Subcategories</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When categories are display on the front page and category page; would you like to show subcategories. Set a number for the maximum number of subcategories you would like to show or 0 to disable.</description>
+		</setting>
+		<setting name="faq_category_show_articles" field_type="text" displayorder="2">
+			<display_name>Category Display : Show Articles</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When categories are display on the front page and category page; would you like to show article titles from that category. Set a number for the maximum number of articles you would like to show or 0 to disable.</description>
+		</setting>
+		<setting name="faq_category_show_description" field_type="radio" displayorder="3">
+			<display_name>Category Display : Show Description</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When categories are displayed on the front page and category page would you like to show the category descriptions?</description>
+		</setting>
+		<setting name="faq_category_show_template" field_type="select" displayorder="4">
+			<display_name>Category Display : Template Choice</display_name>
+			<value>table</value>
+			<options><![CDATA[a:2:{s:5:"table";s:13:"List in Table";s:5:"qanda";s:21:"Questions and Answers";}]]></options>
+			<description>Would you like the default category template to be the template that lists articles in a tabular list, or the template that lists articles in a Question - Answer format?</description>
+		</setting>
+		<setting name="faq_columns" field_type="text" displayorder="9">
+			<display_name>Category Columns</display_name>
+			<value>3</value>
+			<options></options>
+			<description>The number of columns used to display knowledgebase categories.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_ticket" name="tickets" displayorder="1">
+		<description>These settings control ticket properties and display</description>
+		<display_name>Tickets</display_name>
+		<setting name="user_feedback" field_type="radio" displayorder="1">
+			<display_name>Enable Ticket Feedback</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Allow users to rate the quality of responses to a ticket</description>
+		</setting>
+		<setting name="disable_newticket_autosearch" field_type="radio" displayorder="1">
+			<display_name>Disable New Ticket Auto-Search</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Disable the auto-searching of your knowledgebase when the user submits a ticket from the web interface.</description>
+		</setting>
+		<setting name="num_newticket_autosearch" field_type="text" displayorder="1">
+			<display_name>Number of Auto-Search Results</display_name>
+			<value>5</value>
+			<options></options>
+			<description>The maximum number of results to return with the knowledgebase auto-search when a user submits a new ticket.</description>
+		</setting>
+		<setting name="lock_time" field_type="text" displayorder="2">
+			<display_name>Lock Time</display_name>
+			<value>20</value>
+			<options></options>
+			<description>How long should a ticket be locked for (in minutes) when a technician locks a ticket preventing other techs from replying</description>
+		</setting>
+		<setting name="ticket_tech_owner_view" field_type="radio" displayorder="3">
+			<display_name>Show Tech Ticket Owner</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Enable to show to users the name of the technician a ticket is assigned to.</description>
+		</setting>
+		<setting name="message_tech_owner_view" field_type="radio" displayorder="4">
+			<display_name>Show Tech Message Writer</display_name>
+			<value>1</value>
+			<options></options>
+			<description><![CDATA[Do you wish to allow users to view the technician that wrote a message. Enabling this "personalises" a response, disabling it depersonalises your responses.]]></description>
+		</setting>
+		<setting name="max_size" field_type="text" displayorder="5">
+			<display_name>Maximum Message Size</display_name>
+			<value>50000</value>
+			<options></options>
+			<description>This value specifies the largest message (number of characters) {$DP_NAME} will accept for a ticket message or reply. Messages larger than this value will be rejected.</description>
+		</setting>
+		<setting name="ticket_token" field_type="radio" displayorder="8">
+			<display_name>Ticket Tokens</display_name>
+			<value>0</value>
+			<options></options>
+			<description>You enable an added security measure to prevent automated bots submitting tickets by requiring a special token to be generated when the user wishes to create a new ticket. However, this will prevent you from being able to create your own forms and posting them to {$DP_NAME}.</description>
+		</setting>
+		<setting name="ticket_logged_out_create" field_type="radio" displayorder="9">
+			<display_name>Enable ticket creation from a logged out user</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[If a logged out user that exists in the {$DP_NAME} database tries to create a ticket with an email that matches, by default {$DP_NAME} will create a temporary ticket and ask the user to login before finalising the ticket. This is to prevent a 3rd party creating a ticket for someone else. If you wish to allow tickets to be created without logging in, set this setting to Yes. The user will then be able to create the ticket but will not be able to view the ticket in the web interface until they log in.]]></description>
+		</setting>
+		<setting name="ticket_autouser" field_type="radio" displayorder="9">
+			<display_name>Enable automatic user creation via posted forms</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[When enabled, {$DP_NAME} will allow you to post forms to newticket.php which can be automatically turned into a new ticket and automatically have a user account created. For more information on how to do this properly, please refer to <a href="http://helpdesk.deskpro.com/kb_article.php?ref=5785-OJKV-9587">this Knowledgebase article</a>.]]></description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_ticket" name="category" displayorder="2">
+		<description>Category Settings</description>
+		<display_name>Category</display_name>
+		<setting name="category_user_viewable" field_type="radio" displayorder="2">
+			<display_name>Show Users the Ticket Category</display_name>
+			<value>1</value>
+			<options></options>
+			<description>If enabled users will be able to see ticket categories. If disabled, all references to ticket categories will be removed. If disabled, this setting will override all other category settings.</description>
+		</setting>
+		<setting name="category_user_start" field_type="radio" displayorder="3">
+			<display_name>Allow New Ticket Category Selection</display_name>
+			<value>1</value>
+			<options></options>
+			<description><![CDATA[Allows users to select the category for a new ticket created through the web interface. If disabled, this will override the <i>require category</i> setting.]]></description>
+		</setting>
+		<setting name="category_require_selection" field_type="radio" displayorder="4">
+			<display_name>Require Category</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Require your users to select a category when creating a new ticket through the web interface. If you allow the user to modify the ticket category, enabling this setting will prevent them from not choosing a category.</description>
+		</setting>
+		<setting name="category_user_editable" field_type="radio" displayorder="5">
+			<display_name>Categories User Editable</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Allows users to modify the category by editing the ticket through the web interface.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_ticket" name="priority" displayorder="3">
+		<description>Priority Settings</description>
+		<display_name>Priority</display_name>
+		<setting name="priority_user_viewable" field_type="radio" displayorder="2">
+			<display_name>Show Users the Ticket Priority</display_name>
+			<value>1</value>
+			<options></options>
+			<description>If enabled users will be able to see ticket priorities. If disabled, all references to ticket priorities will be removed. If disabled, this setting will override all other priority settings.</description>
+		</setting>
+		<setting name="priority_user_start" field_type="radio" displayorder="3">
+			<display_name>Allow New Ticket Priority Selection</display_name>
+			<value>1</value>
+			<options></options>
+			<description><![CDATA[Allows users to select the priority for a new ticket created through the web interface. If disabled, this will override the <i>require priority</i> setting.]]></description>
+		</setting>
+		<setting name="priority_require_selection" field_type="radio" displayorder="4">
+			<display_name>Require Priority</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Require your users to select a priority when creating a new ticket through the web interface. If you allow the user to modify the ticket category, enabling this setting will prevent them from not choosing a category.</description>
+		</setting>
+		<setting name="priority_user_editable" field_type="radio" displayorder="5">
+			<display_name>Priorities User Editable</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Allows users to modify the category by editing the ticket through the web interface.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_ticket" name="autoclose" displayorder="4">
+		<description>The settings control the automatic closure of tickets</description>
+		<display_name>Auto Close</display_name>
+		<setting name="autoclose_tickets" field_type="text" displayorder="1">
+			<display_name>Autoclose Tickets</display_name>
+			<value>0</value>
+			<options></options>
+			<description>By setting this option, tickets that have been awaiting a user reply after the specified number of days will be automatically closed. Enter a number in days to enable this setting. To disable auto ticket closure enter 0.</description>
+		</setting>
+		<setting name="autoclose_email" field_type="radio" displayorder="2">
+			<display_name>Send email on ticket closure</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Select yes to send an email to the user when their ticket is closed.</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_ticket" name="ticketcheckbox" displayorder="5">
+		<description>These settings control the default checkboxes for ticket creation and reply</description>
+		<display_name>Ticket Checkbox Defaults</display_name>
+		<setting name="ticket_default_new_email" field_type="radio" displayorder="1">
+			<display_name>Newticket: Email User</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Set the default for the 'e-mail user upon ticket creation' checkbox</description>
+		</setting>
+		<setting name="ticket_default_reply_ownership" field_type="radio" displayorder="3">
+			<display_name>Reply: Claim Ownership</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Set the default for the 'claim ownership' checkbox on ticket reply</description>
+		</setting>
+		<setting name="ticket_default_reply_email" field_type="radio" displayorder="2">
+			<display_name>Reply: Email User</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Set the default for the 'e-email this reply to the user' checkbox</description>
+		</setting>
+		<setting name="ticket_default_reply_status" field_type="radio" displayorder="4">
+			<display_name>Reply: Change Status</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Set the default for the change status checkbox that will set the ticket status to awaiting user</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_hidden" name="gateway_hidden" displayorder="2">
+		<description>These settings control the tech to user email gateway</description>
+		<display_name>Hidden Gateway Settings</display_name>
+		<setting name="gateway_webmail_on" field_type="radio" displayorder="1">
+			<display_name>Enable webmail</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Enable webmail</description>
+		</setting>
+		<setting name="gateway_webmail_email" field_type="text" displayorder="2">
+			<display_name>Webmail Email</display_name>
+			<value></value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_bounce_on" field_type="radio" displayorder="3">
+			<display_name>Enable Bounce Gateway</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_tech_on" field_type="radio" displayorder="4">
+			<display_name>Enable Tech</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_bounce_email" field_type="text" displayorder="5">
+			<display_name>Bounce Email</display_name>
+			<value></value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_pop_lastrun" field_type="text" displayorder="6">
+			<display_name>POP Gateway Last Run Time</display_name>
+			<value></value>
+			<options></options>
+			<description>Last Run Time</description>
+		</setting>
+		<setting name="gateway_pop_active" field_type="text" displayorder="6">
+			<display_name>POP Gateway Active</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_tickets_lastrun" field_type="text" displayorder="6">
+			<display_name>Last Run Time of the gateway tickets script</display_name>
+			<value></value>
+			<options></options>
+			<description>Last Run Time</description>
+		</setting>
+		<setting name="gateway_tickets_active" field_type="text" displayorder="6">
+			<display_name>If the gateway tickets script is active</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_decode_lastrun" field_type="text" displayorder="6">
+			<display_name>Last Run Time of the gateway decode script</display_name>
+			<value></value>
+			<options></options>
+			<description>Last Run Time</description>
+		</setting>
+		<setting name="gateway_decode_active" field_type="text" displayorder="6">
+			<display_name>If the gateway decode script is active</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_user_on" field_type="radio" displayorder="7">
+			<display_name>Enable User</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="gateway_tech_email" field_type="text" displayorder="8">
+			<display_name>Tech Email</display_name>
+			<value></value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="cron_auto_pop" field_type="radio" displayorder="1">
+			<display_name>Auto Run POP3 Script</display_name>
+			<value>0</value>
+			<options></options>
+			<description>If you enable this setting {$DP_NAME} will create an image in the footer of the tech and user interface which is used to run POP3 mail processing. This is only recommended if you are unable to setup a cron task (on linux) or a scheduled task (on windows).</description>
+		</setting>
+	</settingscat>
+	<settingscat parent="set_hidden" name="hidden" displayorder="3">
+		<description>Settings used internally by {$DP_NAME}</description>
+		<display_name>Hidden Settings</display_name>
+		<setting name="register_welcome" field_type="radio" displayorder="5">
+			<display_name>Send Welcome Email (Web Registrations)</display_name>
+			<value>1</value>
+			<options></options>
+			<description>If enabled a welcome email will be sent to users who register, either by completing the registration form or if registration happened when creating a ticket. Disabling this feature will have no effect if you require either user or tech validation of accounts. Only applies to web interface.</description>
+		</setting>
+		<setting name="register_gateway_welcome" field_type="radio" displayorder="3">
+			<display_name>Send Welcome Email (Gateway Registrations)</display_name>
+			<value>0</value>
+			<options></options>
+			<description>If enabled a welcome email will be sent to users when they first send an email letting them know an account has been created for them. This is useful to let the user know their username and password and introduce the idea that they are using a helpdesk. Note that if you have the new ticket autoresponders turned on, the user will receive two emails.</description>
+		</setting>
+		<setting name="deskpro_year" field_type="text" displayorder="1">
+			<display_name></display_name>
+			<value>2001 - 2007</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="deskpro_version" field_type="text" displayorder="3">
+			<display_name>{$DP_NAME} Version</display_name>
+			<value>3.5.5.1</value>
+			<options></options>
+			<description>The current {$DP_NAME} version (not user adjustable)</description>
+		</setting>
+		<setting name="deskpro_version_internal" field_type="text" displayorder="3">
+			<display_name>Internal {$DP_NAME} Version</display_name>
+			<value>3050502</value>
+			<options></options>
+			<description>The internal deskpro version (not user adjustable)</description>
+		</setting>
+		<setting name="next_cron" field_type="text" displayorder="6">
+			<display_name>Cron runtime</display_name>
+			<value>1095430920</value>
+			<options></options>
+			<description>The time that a cron script next needs running</description>
+		</setting>
+		<setting name="cron_active" field_type="text" displayorder="6">
+			<display_name>Cron Active State</display_name>
+			<value>0</value>
+			<options></options>
+			<description>The time the cron job was started, or 0 if it has finished.</description>
+		</setting>
+		<setting name="graph_count" field_type="input" displayorder="7">
+			<display_name>Graph Count</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Count we are up to for generated graphs</description>
+		</setting>
+		<setting name="ticket_temp_reminder1" field_type="input" displayorder="9">
+			<display_name>First Incomplete Ticket Reminder</display_name>
+			<value>24</value>
+			<options></options>
+			<description>How many hours after the user has submitted an incomplete ticket should the first reminder email be sent</description>
+		</setting>
+		<setting name="ticket_temp_reminder2" field_type="input" displayorder="10">
+			<display_name>Second Incomplete Ticket Reminder</display_name>
+			<value>48</value>
+			<options></options>
+			<description>How many hours after the first reminder should the second and final reminder be sent</description>
+		</setting>
+		<setting name="ticket_temp_clean" field_type="input" displayorder="11">
+			<display_name>Prune Incomplete Tickets</display_name>
+			<value>168</value>
+			<options></options>
+			<description>How many hours after the reminders were sent to finally clean up and remove incomplete tickets from the system.</description>
+		</setting>
+		<setting name="license" field_type="textarea" displayorder="8">
+			<display_name>License Code</display_name>
+			<value>LICENSE_CODE</value>
+			<options></options>
+			<description>The license key required for {$DP_NAME} to function</description>
+		</setting>
+		<setting name="gzip_level" field_type="text" displayorder="3">
+			<display_name>Gzip Level</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Set the GZIP level to encode pages.</description>
+		</setting>
+		<setting name="serialize_secure_string" field_type="text" displayorder="9">
+			<display_name>Serialize Secure String</display_name>
+			<value>SECURE_STRING</value>
+			<options></options>
+			<description>A random string used to generate a secure MD5 checksum of serialized content to catch data tampering and to prevent exploitation.</description>
+		</setting>
+		<setting name="install_timestamp" field_type="text" displayorder="9">
+			<display_name>Timestamp {$DP_NAME} was Installed</display_name>
+			<value></value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="register_url" field_type="text" displayorder="9">
+			<display_name>User Registration URL</display_name>
+			<value></value>
+			<options></options>
+			<description>An alternate script to redirect the user to when they go the the reigster page</description>
+		</setting>
+		<setting name="allow_registration" field_type="radio" displayorder="1">
+			<display_name>Allow Registrations</display_name>
+			<value>1</value>
+			<options></options>
+			<description>You can disable new user registrations if you want to temporarily prevent new users being created or if you only want to create users manually through the technician interface. Enabling this will also prevent users from being created by the email gateway independent of any email gateway registration options chosen.</description>
+		</setting>
+		<setting name="gateway_guest_deny" field_type="radio" displayorder="1">
+			<display_name>Deny guest messages sent to gateway?</display_name>
+			<value>0</value>
+			<options></options>
+			<description>This lets you simply sent a rejection note to the user with a link to register isntead of using the new tempticket system to let them register later.</description>
+		</setting>
+		<setting name="register_validate_user" field_type="radio" displayorder="3">
+			<display_name>Validate Email Upon Registration</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Enabling this will require a user to validate their email address upon registering. Only applies to the web interface.</description>
+		</setting>
+		<setting name="register_validate_tech" field_type="radio" displayorder="4">
+			<display_name>Technicians Must Validate New Registrations</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Enabling this will require technicians to validate each user that registers, this includes any user created by sending an email through the gateway interface.</description>
+		</setting>
+		<setting name="register_newticket_auto" field_type="radio" displayorder="4">
+			<display_name>Register Users Automatically After New Ticket</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Instead of redirecting users to a registration form after submitting a ticket, the user is registered automatically.</description>
+		</setting>
+		<setting name="default_category_id" field_type="radio" displayorder="4">
+			<display_name>Default category</display_name>
+			<value>0</value>
+			<options></options>
+			<description>The default category ID (instead of None) used when users are creating tickets</description>
+		</setting>
+		<setting name="default_priority_id" field_type="radio" displayorder="4">
+			<display_name>Default priority</display_name>
+			<value>0</value>
+			<options></options>
+			<description>The default priority ID (instead of None) used when users are creating tickets</description>
+		</setting>
+		<setting name="spam_filter" field_type="text" displayorder="3">
+			<display_name>Type of spam filter to use (only 'deskpro' supported right now)</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="dp_spam_threshold" field_type="text" displayorder="3">
+			<display_name>Threshold for marking messages as spam</display_name>
+			<value>1.0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="dp_spam_threshold_del" field_type="text" displayorder="3">
+			<display_name>Threshold for deleting spam messages outright</display_name>
+			<value>8.0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="dplive_is_trial" field_type="radio" displayorder="9">
+			<display_name>In trial move</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="dplive_is_suspended" field_type="radio" displayorder="9">
+			<display_name>In suspended mode</display_name>
+			<value>0</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="plugin_manual_seo_url" field_type="radio" displayorder="4">
+			<display_name>Enable SEO'ed URLs in the manual?</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Enable SEO URLs</description>
+		</setting>
+		<setting name="plugin_manual_comment_captcha" field_type="radio" displayorder="4">
+			<display_name>Enable captcha for manual comments</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Captcha for manual comments</description>
+		</setting>
+		<setting name="plugin_manual_print_page" field_type="radio" displayorder="4">
+			<display_name>Enable printable manual pages</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Enable printable manual pages</description>
+		</setting>
+		<setting name="plugin_manual_single_page" field_type="radio" displayorder="4">
+			<display_name>Enable single page download</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Enable single page manual download</description>
+		</setting>
+		<setting name="plugin_manual_zip" field_type="radio" displayorder="4">
+			<display_name>Enable ZIP download</display_name>
+			<value>0</value>
+			<options></options>
+			<description>Enable ZIP manual download</description>
+		</setting>
+		<setting name="plugin_chat_autoassign" field_type="text" displayorder="4">
+			<display_name>Enable Auto-Assignment</display_name>
+			<value>least</value>
+			<options></options>
+			<description>Method of auto-assigning new chats.</description>
+		</setting>
+		<setting name="plugin_chat_autoassign_techdep" field_type="radio" displayorder="4">
+			<display_name>Tech Deparments for Auto-Assignments</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Use techs selected for departments for auto-assignments</description>
+		</setting>
+		<setting name="plugin_chat_autoassign_always" field_type="radio" displayorder="4">
+			<display_name>Always Auto-Assignments</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Always auto-assign. Use all online techs if department techs are not available.</description>
+		</setting>
+		<setting name="plugin_chat_autocreate_user" field_type="radio" displayorder="4">
+			<display_name>Auto-create user</display_name>
+			<value>1</value>
+			<options></options>
+			<description>Automatically create a new user if they enter an email address and the email is not associated with an account</description>
+		</setting>
+		<setting name="plugin_chat_user_wait_time" field_type="text" displayorder="4">
+			<display_name>Auto-create user</display_name>
+			<value>3</value>
+			<options></options>
+			<description>How many minutes of no tech should pass before showing the "try submitting a ticket" message</description>
+		</setting>
+		<setting name="plugin_chat_proactive_to_chat" field_type="radio" displayorder="4">
+			<display_name>Go straight to chat after accepting proactive chat</display_name>
+			<value>1</value>
+			<options></options>
+			<description>When a user accepts a proactive chat, take them directly to the chat window instead of the intermediate window asking about the department etc</description>
+		</setting>
+		<setting name="plugin_chat_proactive_auto_time" field_type="radio" displayorder="4">
+			<display_name>Time before auto-chat is sent</display_name>
+			<value>0</value>
+			<options></options>
+			<description>How long until an auto-chat init is sent to a user</description>
+		</setting>
+		<setting name="plugin_chat_proactive_auto_pages" field_type="radio" displayorder="4">
+			<display_name>Pageviews before auto-chat is sent</display_name>
+			<value>0</value>
+			<options></options>
+			<description>How many page views until an auto-chat init is sent to a user</description>
+		</setting>
+		<setting name="plugin_chat_proactive_auto_delay" field_type="radio" displayorder="4">
+			<display_name>Auto-Invitation Display Delay</display_name>
+			<value>5</value>
+			<options></options>
+			<description>How long after a page load until an auto-chat invitiation is displayed (seconds, 0 to disable)</description>
+		</setting>
+		<setting name="billing_credits_value" field_type="text">
+			<display_name>Price per credit</display_name>
+			<value>1</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_credits_word_noun" field_type="text">
+			<display_name>Word used when describing the credits currency</display_name>
+			<value>Dollars</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_credits_word_html" field_type="text">
+			<display_name>Phrase used when displaying credit values (HTML)</display_name>
+			<value>${AMOUNT}</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_credits_word_text" field_type="text">
+			<display_name>Phrase used when displaying credit values (Text)</display_name>
+			<value>${AMOUNT}</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_currency_word_noun" field_type="text">
+			<display_name>Word used when describing the real-money currency</display_name>
+			<value>Dollars</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_currency_word_html" field_type="text">
+			<display_name>Phrase used when displaying real money values (HTML)</display_name>
+			<value>${AMOUNT}</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_currency_word_text" field_type="text">
+			<display_name>Phrase used when displaying real money values (Text)</display_name>
+			<value>${AMOUNT}</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_currency" field_type="text">
+			<display_name>Currency used when charging users</display_name>
+			<value>USD</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_time_interval" field_type="text">
+			<display_name>How the time fees are applied. Example: every half hour, hourly, daily.</display_name>
+			<value>3600</value>
+			<options></options>
+			<description></description>
+		</setting>
+		<setting name="billing_time_round" field_type="text">
+			<display_name>Always round up/down to this fraction of time.</display_name>
+			<value>0.25</value>
+			<options></options>
+			<description>For example, if charged hourly and you worked 1:55 hours, a value of 1/4 would round this up to 2 hours.</description>
+		</setting>
+		<setting name="billing_time_min" field_type="text">
+			<display_name>Minimum time to charge</display_name>
+			<value>900</value>
+			<options></options>
+			<description>If rounding made the value 0, the user will be charged for this minimum time.</description>
+		</setting>
+		<setting name="billing_add_funds_min_credits" field_type="text">
+			<display_name>Minimum "add funds" amount in credits</display_name>
+			<value>5.00</value>
+			<options></options>
+			<description>The minimum amount a user is allowed to add when adding funds to their account balance.</description>
+		</setting>
+		<setting name="billing_contact_email" field_type="text">
+			<display_name>Billing contact email</display_name>
+			<value></value>
+			<options></options>
+			<description>An email address that people can use when they need to ask about billing. If this email address is monitored by DeskPRO, you should ensure (via billing rules) that the cost for a ticket is nothing.</description>
+		</setting>
+		<setting name="attachment_filesystem_enable" field_type="text">
+			<display_name>Enable filesystem attachment storage?</display_name>
+			<value>0</value>
+			<options></options>
+			<description>When enabled, attachments will be stored in the filesystem instead of the database.</description>
+		</setting>
+		<setting name="attachment_filesystem_basepath" field_type="text">
+			<display_name>Base path to store files in the filesystem</display_name>
+			<value></value>
+			<options></options>
+			<description>The base path in the filesystem to store files.</description>
+		</setting>
+		<setting name="tech_newticket_sendtoself" field_type="radio">
+			<display_name>Send new ticket notifications to tech ticket starter</display_name>
+			<value></value>
+			<options></options>
+			<description>When enabled, a tech-created ticket generates a notifications for the tech starter. (Usually the tech starter is excluded, since it's assumed they don't need a notification).</description>
+		</setting>
+		<setting name="ideas_enable" field_type="radio" displayorder="1">
+			<display_name>Enable Ideas</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[This is a global on/off switch for the Ideas features.]]></description>
+		</setting>
+		<setting name="ideas_enable_comments" field_type="radio" displayorder="1">
+			<display_name>Enable comments</display_name>
+			<value>1</value>
+			<options></options>
+			<description><![CDATA[Enable or disable comments globally. If you turn this off, existing comments will remain in the database but they won't be displayed.]]></description>
+		</setting>
+		<setting name="ideas_num_votes_per_user" field_type="text" displayorder="1">
+			<display_name>Number of votes per user</display_name>
+			<value>10</value>
+			<options></options>
+			<description><![CDATA[The number of votes each user gets. Votes are returned to users when ideas are accepted or declined.]]></description>
+		</setting>
+		<setting name="ideas_num_votes_per_idea" field_type="text" displayorder="1">
+			<display_name>Maximum number of votes per idea</display_name>
+			<value>3</value>
+			<options></options>
+			<description><![CDATA[The maximum number of votes a user can allocate to a single idea.]]></description>
+		</setting>
+		<setting name="ideas_enable_ajaxsubmit" field_type="radio" displayorder="1">
+			<display_name>Enable AJAX Widget</display_name>
+			<value>0</value>
+			<options></options>
+			<description><![CDATA[When enabled, new ideas can be submitted via AJAX. Users don't need to be logged in (even if Guest perms disable new ideas).]]></description>
+		</setting>
+	</settingscat>
+</settingscats>

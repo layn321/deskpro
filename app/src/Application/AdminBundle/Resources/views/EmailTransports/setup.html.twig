@@ -1,0 +1,12 @@
+{% set is_setup = true %}
+{% extends 'AdminBundle:EmailTransports:edit-account.html.twig' %}
+{% block email_transports_form_top %}
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.gateway.default_from_email') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="default_from_email" id="default_from_email" value="{{ app.getSetting('core.default_from_email') }}" /><br />
+		</div>
+	</div>
+{% endblock %}

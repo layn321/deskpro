@@ -1,0 +1,78 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+     <nav>
+          <ul>
+               <li class="add"><a href="{{ path('admin_usergroups_new') }}">{{ phrase('admin.user_groups.add_usergroup') }}</a></li>
+          </ul>
+     </nav>
+     <ul>
+          <li>{{ phrase('agent.general.usergroups') }}</li>
+     </ul>
+{% endblock %}
+
+{% block page %}
+
+<div class="page-content agent-listing" style="padding:0;">
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th class="single-title">{{ phrase('agent.general.usergroup') }}</th>
+					<th class="single-title" width="80" style="text-align: center">Members</th>
+					<th class="r-col" width="80" style="text-align: center">Edit<br />Permissions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="title">
+						<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_usergroups_toggle', {id: sys_usergroups.everyone.id}) }}';" {% if sys_usergroups.everyone.is_enabled %}checked="checked"{% endif %} />
+						<h4 style="display: inline;"><a href="{{ path('admin_usergroups_edit', {'id': sys_usergroups.everyone.id}) }}">{{ sys_usergroups.everyone.title }}</a></h4>
+						{% if sys_usergroups.everyone.note %}<div style="font-size:11px;">{{ sys_usergroups.everyone.note }}</div>{% endif %}
+					</td>
+					<td class="prop r-col">
+						&nbsp;
+					</td>
+					<td class="prop r-col" valign="middle" style="text-align: center">
+						<a href="{{ path('admin_usergroups_edit', {'id': sys_usergroups.everyone.id}) }}"><span class="btn-edit-gear"></span></a>
+					</td>
+				</tr>
+				<tr>
+					<td class="title">
+						<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_usergroups_toggle', {id: sys_usergroups.registered.id}) }}';" {% if sys_usergroups.registered.is_enabled %}checked="checked"{% endif %} />
+						<h4 style="display: inline;"><a href="{{ path('admin_usergroups_edit', {'id': sys_usergroups.registered.id}) }}">{{ sys_usergroups.registered.title }}</a></h4>
+						{% if sys_usergroups.registered.note %}<div style="font-size:11px;">{{ sys_usergroups.registered.note }}</div>{% endif %}
+					</td>
+					<td class="prop r-col" valign="middle" style="text-align: center">
+						<a href="{{ app.getRequest().getBaseUrl() }}/agent/#app.people">{{ member_counts[0]|default('0') }}</a>
+					</td>
+					<td class="prop r-col" valign="middle" style="text-align: center">
+						<a href="{{ path('admin_usergroups_edit', {'id': sys_usergroups.registered.id}) }}"><span class="btn-edit-gear"></span></a>
+					</td>
+				</tr>
+				{% for usergroup in usergroups %}
+				<tr>
+					<td class="title">
+						<input class="onoff-slider" type="checkbox" value="1" onclick="window.location='{{ path('admin_usergroups_toggle', {id: usergroup.id}) }}';" {% if usergroup.is_enabled %}checked="checked"{% endif %} />
+						<h4 style="display: inline;"><a href="{{ path('admin_usergroups_edit', {'id': usergroup.id}) }}">{{ usergroup.title }}</a></h4>
+						{% if usergroup.note %}
+						<div style="font-size: 11px; margin-left: 15px;">{{ usergroup.note }}</div>
+						{% endif %}
+					</td>
+					<td class="prop r-col" valign="middle" style="text-align: center">
+						{% if member_counts[usergroup.id]|default('0') %}
+						<a href="{{ app.getRequest().getBaseUrl() }}/agent/#app.people,usergroup:{{ usergroup.id }}">{{ member_counts[usergroup.id]|default('0') }}</a>
+						{% else %}
+						0
+						{% endif %}
+					</td>
+					<td class="prop r-col" valign="middle" style="text-align: center">
+						<a href="{{ path('admin_usergroups_edit', {'id': usergroup.id}) }}"><span class="btn-edit-gear"></span></a>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}

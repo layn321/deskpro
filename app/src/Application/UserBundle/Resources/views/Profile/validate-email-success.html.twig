@@ -1,0 +1,12 @@
+{% extends 'UserBundle::layout.html.twig' %}
+{% block content %}
+
+<section class="dp-portal-section">
+	<div class="dp-content-block dp-profile-block">
+		<p>
+			{{ phrase('user.profile.you_have_validated') }}
+			{% if ticket_ids|length %}{{ phrase('user.prifle.ticket_validated-message') }}{% endif %}
+		</p>
+	</div>
+</section>
+{% endblock %}

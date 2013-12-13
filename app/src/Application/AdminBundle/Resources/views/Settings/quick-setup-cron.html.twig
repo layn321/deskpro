@@ -1,0 +1,94 @@
+{% if app.getSetting('core.deskpro3importer') %}
+	<div class="alert-message block-message success">
+		It is safe to enable the scheduled task with your imported database. Enabling the scheduled task will not have any affect on
+		your imported data. The email gateways were imported but are disabled by default, and existing tickets
+		will not be modified by any triggers or escalations.
+	</div>
+{% endif %}
+
+{{ phrase('admin.settings.cron_explain') }}
+
+<br />
+<br />
+
+{% if not get_instance_ability('is_windows') %}
+<div class="content-table template-dir">
+	<table width="100%">
+		<thead>
+		<tr>
+			<th class="single-title" colspan="10">
+				<h1 class="noexpand">{{ phrase('admin.settings.cron_setup_linux') }}</h1>
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>
+				{{ phrase('admin.settings.cron_setup_linux_edit_file') }}
+				<code class="code-box nowrap">* * * * * exampleuser {{ php_path|default('/path/to/php') }} -q {{ constant('DP_WEB_ROOT') }}/cron.php</code>
+				<div class="small-note-box">
+					{{ phrase('admin.settings.cron_setup_linux_edit_file_user') }}
+					{% if not php_path %}
+						<br />
+						<strong>{{ phrase('agent.general.note_attn') }}:</strong>
+						{{ phrase('admin.settings.could_not_find_php_use_real') }}
+					{% elseif not php_path_set %}
+						<br />
+						<strong>{{ phrase('agent.general.note_attn') }}:</strong>
+						The above path to PHP was auto-detected but may be incorrect. If you have configured the task but this step does not get marked as completed,
+						it means the PHP path is incorrect and you will need to change it. If you are having trouble, you should attempt to run the command manually
+						from the command-line so you can see any possible errors. If you require assistance, email <a href="mailto:support@deskpro.com">support@deskpro.com</a>.
+					{% endif %}
+				</div>
+				<br />
+				<p>
+					<a href="{{ get_service_url('dp.kb.install.cron') }}">{{ phrase('admin.settings.cron_detailed_instructions') }}</a>
+				</p>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<br />
+{% endif %}
+
+{% if get_instance_ability('is_windows') %}
+<div class="content-table template-dir">
+	<table width="100%">
+		<thead>
+		<tr>
+			<th class="single-title" colspan="10">
+				<h1 class="noexpand">{{ phrase('admin.settings.cron_setup_windows') }}</h1>
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>
+				<h2>Option 1:</h2>
+				<ol class="number-list">
+				    <li>Open the folder where you have installed DeskPRO: {{ constant('DP_WEB_ROOT') }}</li>
+				    <li>Run the file called schedule.bat</li>
+				</ol>
+
+				<h2>Option 2:</h2>
+				<ol class="number-list">
+				    <li>Manually open Windows Scheduled Tasks</li>
+					<li>Create a scheduled task for php-win.exe to run {{ constant('DP_WEB_ROOT') }}/cron.php every minute.</li>
+				</ol>
+				<p>
+					<a href="{{ get_service_url('dp.kb.install.cron') }}">{{ phrase('admin.settings.cron_detailed_instructions') }}</a>
+				</p>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<br />
+{% endif %}
+
+<br />
+
+After you have configured the schedueld task, you can move on to the next section. This section will automatically complete once the cron task has been run for the first time.
+
+<div id="cron_errors" style="display: none"></div>

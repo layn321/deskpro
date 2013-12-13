@@ -1,0 +1,20 @@
+{##
+ # The priority select box of the new ticket form
+ ##}
+
+<div class="dp-control-group {% if error_fields['ticket.priority_id'] %}dp-error{% endif %} ticket_priority">
+	<div class="dp-control-label">
+		<label><strong>{{ phrase('user.tickets.fields_priority') }}</strong></label>
+	</div>
+	<div class="dp-controls dp-fill">
+		<select name="newticket[ticket][priority_id]" class="priority_id">
+			<option></option>
+			{% for id,pri in app.getDataService('TicketPriority').getNames() %}
+				<option value="{{ id }}" {% if newticket.ticket.priority_id == id %}selected="selected"{% endif %}>{{ pri }}</option>
+			{% endfor %}
+		</select>
+		<div class="dp-help-inline dp-error-explain">
+			{{ phrase('user.tickets.form_error_priority') }}
+		</div>
+	</div>
+</div>

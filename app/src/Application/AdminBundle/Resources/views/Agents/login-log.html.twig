@@ -1,0 +1,69 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li>Login Logs</li>
+	</ul>
+{% endblock %}
+{% block page %}
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th>Account</th>
+				<th>Area</th>
+				<th>Successful?</th>
+				<th>IP</th>
+				<th>Hostname</th>
+				<th>User Agent</th>
+				<th>Date</th>
+			</tr>
+		</thead>
+		<tbody id="sendmail_list">
+			{% for log in logs %}
+				<tr>
+					<td nowrap="nowrap">
+						<a href="{{ path('admin_agents_edit', {person_id: log.person_id}) }}">
+							{{ app.getAgents().get(log.person_id).display_name }}
+						</a>
+					</td>
+					<td nowrap="nowrap">{{ log.area }}</td>
+					<td nowrap="nowrap" {% if not log.is_success %}style="background-color: #FFB2AF;"{% endif %}>{% if log.is_success %}Yes {% if log.via_cookie %}(via cookie){% endif %}{% else %}NO{% endif %}</td>
+					<td nowrap="nowrap">{{ log.ip_address }}</td>
+					<td nowrap="nowrap">{{ log.hostname }}</td>
+					<td>{{ log.user_agent }}</td>
+					<td nowrap="nowrap">{{ log.date_created|date('fulltime') }}</td>
+				</tr>
+				{% if log.note %}
+					<tr>
+						<td colspan="7">|- {{ log.note }}</td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+		</tbody>
+
+	</table>
+</div>
+
+{% if pageinfo.pages|length > 1 %}
+<div class="page_nav">
+	<ul>
+		{% set route = 'admin_login_logs' %}
+		{% if pageinfo.curpage != pageinfo.first %}
+		<li><a href="{{ path(route, {'p': pageinfo.first}) }}">{{ phrase('admin.general.first') }}</a></li>
+		<li><a href="{{ path(route, {'p': pageinfo.prev}) }}">{{ phrase('agent.general.prev') }}</a></li>
+		{% endif %}
+
+		{% for i in pageinfo.pages %}
+		<li {% if i == pageinfo.curpage %}class="cur_page"{% endif %}><a href="{{ path(route, {'p': i}) }}">{{i}}</a></li>
+		{% endfor %}
+
+		{% if pageinfo.curpage != pageinfo.last %}
+		<li><a href="{{ path(route, {'p': pageinfo.next}) }}">{{ phrase('admin.general.next') }}</a></li>
+		<li><a href="{{ path(route, {'p': pageinfo.last}) }}">{{ phrase('admin.general.last') }}</a></li>
+		{% endif %}
+	</ul>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>
+	{% if account_status.status_type == 'direct' %}
+		{{ phrase('agent.emails.account_rec_dm_by', {account: '@'~account_status.account.user.screen_name, user: '@'~account_status.status.user.screen_name}) }}
+	{% elseif account_status.status_type == 'retweet' %}
+		{{ phrase('agent.emails.account_rec_retweet_by', {account: '@'~account_status.account.user.screen_name, user: '@'~account_status.status.user.screen_name}) }}
+	{% else %}
+		{{ phrase('agent.emails.account_rec_tweet_by', {account: '@'~account_status.account.user.screen_name, user: '@'~account_status.status.user.screen_name}) }}
+	{% endif %}
+</dp:subject>
+
+{% if account_status.status_type == 'direct' %}
+	{{ phrase('agent.emails.account_rec_dm_by', {account: '@'~account_status.account.user.screen_name, user: '@'~account_status.status.user.screen_name}) }}
+{% elseif account_status.status_type == 'retweet' %}
+	{{ phrase('agent.emails.account_rec_retweet_by', {account: '@'~account_status.account.user.screen_name, user: '@'~account_status.status.user.screen_name}) }}
+{% else %}
+	{{ phrase('agent.emails.account_rec_tweet_by', {account: '@'~account_status.account.user.screen_name, user: '@'~account_status.status.user.screen_name}) }}
+{% endif %}
+
+<blockquote>{{ account_status.status.parsed_text|raw }}</blockquote>
+
+<a href="{{ url_full('agent') }}#app.twitter,tw-all:{{ account_status.account.id }}::">{{ phrase('agent.emails.view_account_tweets', {account: '@' ~ account_status.account.user.screen_name}) }}</a>

@@ -1,0 +1,161 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a href="{{ path('admin_tickets_filters_new') }}">{{ phrase('admin.tickets.add_new_filter') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.tickets.ticket_filters') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{% macro filterrow(filter, access_tester, agents) %}
+	{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+	{{ design.dpgrid_content() }}
+		{{ design.dpgrid_col({ class: 'l r', style: "width: 935px;"}) }}
+
+			<div style="float:right;">
+				{% if filter.is_global or filter.agent_team %}
+					{% set is_use_by = false %}
+					{% set use_by_list %}
+						<h4>{{ phrase('admin.tickets.used_by') }}:</h4>
+						<ul>
+							{% for agent in agents %}
+								{% if not access_tester.isIgnored(agent, filter) and access_tester.canUse(agent, filter) %}
+									{% set is_use_by = true %}
+									<li><img src="{{ agent.getPictureUrl(20) }}" title="{{ agent.display_name }}" class="tipped" /></li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					{% endset %}
+					{% set is_ignored_by = false %}
+					{% set ignored_by_list %}
+						<h4>{{ phrase('admin.tickets.disabled_by') }}:</h4>
+						<ul>
+							{% for agent in agents %}
+								{% if access_tester.isIgnored(agent, filter) and access_tester.canUse(agent, filter) %}
+									{% set is_ignored_by = true %}
+									<li><img src="{{ agent.getPictureUrl(20) }}" title="{{ agent.display_name }}" class="tipped" /></li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					{% endset %}
+
+					{% if is_use_by %}
+						<div class="namelistbox">
+							{{use_by_list}}
+						</div>
+					{% endif %}
+					{% if is_ignored_by %}
+						<div class="namelistbox">
+							{{ignored_by_list}}
+						</div>
+					{% endif %}
+					{% if not is_use_by and not is_ignored_by %}
+						<div class="namelistbox">
+                            {{ phrase('admin.tickets.title_has_no_members', {'title':filter.agent_team.name}) }}
+						</div>
+					{% endif %}
+				{% endif %}
+			</div>
+
+			<h2><a href="{{ path('admin_tickets_filters_edit', {'filter_id': filter.id}) }}">{{ filter.title|default('untitled') }}</a></h2>
+			<ul class="search-summary">
+				{% for term in filter.getSummaryParts() %}
+					<li>{{ term }}</li>
+				{% else %}
+					<li>{{ phrase('admin.tickets.all_tickets_match') }}</li>
+				{% endfor %}
+			</ul>
+			<br class="clear" />
+		{{ design.dpgrid_col_end() }}
+	{{ design.dpgrid_content_end() }}
+{% endmacro %}
+
+{############################
+# No filters
+#############################}
+
+{% if not global_filters and not team_filters and not agent_filters %}
+	<div class="note-box new-arrow">
+		{{ phrase('admin.general.you_have_not_created_filters') }}
+	</div>
+{% endif %}
+
+{############################
+# {{ phrase('admin.tickets.global_filters') }}
+#############################}
+
+{% if global_filters %}
+	{{ design.dpgrid() }}
+		{{ design.dpgrid_headerrow() }}
+			{{ design.dpgrid_headercol({ class: 'l r tl tr', style: "width: 935px;"}) }}
+				<h1>{{ phrase('admin.tickets.global_filters') }}</h1>
+			{{ design.dpgrid_headercol_end() }}
+		{{ design.dpgrid_headerrow_end() }}
+
+		{% for filter in global_filters %}
+			{{ _self.filterrow(filter, access_tester, agents) }}
+		{% endfor %}
+	{{ design.dpgrid_end() }}
+
+	<br />
+{% endif %}
+
+{############################
+# {{ phrase('admin.tickets.team_filters') }}
+#############################}
+
+{% if team_filters %}
+	{{ design.dpgrid() }}
+		{{ design.dpgrid_headerrow() }}
+			{{ design.dpgrid_headercol({ class: 'l r tl tr', style: "width: 935px;"}) }}
+				<h1>{{ phrase('admin.tickets.team_filters') }}</h1>
+			{{ design.dpgrid_headercol_end() }}
+		{{ design.dpgrid_headerrow_end() }}
+
+		{% for group in team_filters %}
+			{{ design.dpgrid_section({style: "width: 935px;"}) }}
+				<h1>{{ group.team.name }}</h1>
+			{{ design.dpgrid_section_end() }}
+			{% for filter in group.filters %}
+				{{ _self.filterrow(filter, access_tester, agents) }}
+			{% endfor %}
+		{% endfor %}
+	{{ design.dpgrid_end() }}
+
+	<br />
+{% endif %}
+
+{############################
+# {{ phrase('admin.tickets.agent_filters') }}
+#############################}
+
+{% if agent_filters %}
+	{{ design.dpgrid() }}
+		{{ design.dpgrid_headerrow() }}
+			{{ design.dpgrid_headercol({ class: 'l r tl tr', style: "width: 935px;"}) }}
+				<h1>{{ phrase('admin.tickets.agent_filters') }}</h1>
+			{{ design.dpgrid_headercol_end() }}
+		{{ design.dpgrid_headerrow_end() }}
+
+		{% for group in agent_filters %}
+			{{ design.dpgrid_section({style: "width: 935px;"}) }}
+				<h1>{{ group.person.display_name }}</h1>
+			{{ design.dpgrid_section_end() }}
+			{% for filter in group.filters %}
+				{% if not access_tester.isIgnored(filter.person, filter) %}
+					{{ _self.filterrow(filter, access_tester, agents) }}
+				{% endif %}
+			{% endfor %}
+		{% endfor %}
+	{{ design.dpgrid_end() }}
+
+	<br />
+{% endif %}
+
+{% endblock %}

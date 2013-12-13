@@ -1,0 +1,30 @@
+{##
+ # A news result displayed on the list of news.
+ ##}
+
+{% import 'UserBundle:Common:macros-social.html.twig' as social %}
+<li>
+	<section class="dp-news-post dp-content-post">
+		<div class="dp-cal-date" title="{{ phrase('user.news.posted_date', {'date':news.date_created|date('fulltime')}) }}">
+			<div class="dp-month">{{ news.date_created|date('M')|upper }}</div>
+			<div class="dp-day">{{ news.date_created|date('d') }}</div>
+		</div>
+		<header>
+			<h3 style="margin-bottom: 0"><a href="{{ path('user_news_view', {'slug': news.url_slug}) }}">{{ news.title }}</a></h3>
+			<ul class="dp-post-info">
+				<li class="dp-author"><i class="dp-icon-user"></i> {{ news.person.display_name_user }}</li>
+				<li class="dp-category"><i class="dp-icon-folder-close"></i> <a href="{{ path('user_news', {'slug': news.category.url_slug })}}">{{ news.category.title }}</a></li>
+				{% if app.getSetting('user.publish_comments') %}<li class="dp-comments"><i class="dp-icon-comment"></i> <a href="{{ path('user_news_view', {'slug': news.url_slug}) }}#comments">{{ phrase('user.general.count_comments', {'count': comment_counts[news.id]|default(0)}) }}</a></li>{% endif %}
+			</ul>
+		</header>
+		<article>
+			{{ news.content|raw }}
+		</article>
+
+		{% if app.getSetting('core.show_share_widget') %}
+			<footer>
+				{{ social.social_block(url('user_news_view', {'slug': news.url_slug}), news.title) }}
+			</footer>
+		{% endif %}
+	</section>
+</li>

@@ -1,0 +1,59 @@
+{% if status.isRetweet() %}
+	{% set retweet = status %}
+	{% set status = status.retweet %}
+{% else %}
+	{% set retweet = null %}
+{% endif %}
+
+<article
+	class="twitter-status-inline {% if retweet %}retweet{% endif %} {%if status.in_reply_to_status %}reply{% endif %} {% if status.recipient %}dm{% endif %}"
+	data-status-id="{{ status.id }}"
+	data-twitter-status-id="{{ status.id }}"
+	data-user-id="{{ status.user.id }}"
+>
+	<div class="status-body">
+		<div class="photo" data-route="page:{{ path('agent_twitter_user', {'user_id': status.user.id}) }}">
+			<img src="{{ status.user.profile_image_url }}" width="48" height="48" border="0" />
+		</div>
+		<div class="main-status-body">
+			<h4>
+				<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': status.user.id}) }}">
+					<span class="name">{{ status.user.name }}</span>
+					<span class="screen-name">@{{ status.user.screen_name }}</span>
+				</span>
+				{% if status.isMessage() %}
+					<span class="dm-notice">{{ phrase('agent.twitter.dm') }}</span>
+				{% endif %}
+				{% if status.long %}
+					<span class="long-notice">{% if status.long.is_public %}{{ phrase('agent.twitter.long') }}{% else %}{{ phrase('agent.twitter.long_private') }}{% endif %}</span>
+				{% endif %}
+			</h4>
+
+			<div class="status-text">{{ status.long ? status.long.parsed_text|raw : status.parsed_text|raw }}</div>
+
+			<a data-route="poppage:{{ path('agent_twitter_status_tweet_overlay', {'account_status_id': 'status:' ~ status.id}) }}" class="timeago status-time" title="{{retweet ? retweet.date_created|date('c', 'UTC') : status.date_created|date('c', 'UTC')}}" data-relative-cutoff="86400">{{retweet ? retweet.date_created|date('day') : status.date_created|date('day')}}</a>
+
+			{% if status.in_reply_to_status or retweet or (status.long and status.long.date_read) %}
+				<div class="extra-container">
+					{% if status.in_reply_to_status %}
+						{% set reply = status.in_reply_to_status %}
+						<div class="extra-row in-reply-to">
+							<a data-route="poppage:{{ path('agent_twitter_status_tweet_overlay', {'account_status_id': 'status:' ~reply.id}) }}" style="color: inherit">{{ phrase('agent.twitter.in_reply_to') }} @{{ reply.user.screen_name }} "{{ reply.getClippedText(70) }}"</a>
+						</div>
+					{% endif %}
+					{% if retweet %}
+						<div class="extra-row retweet">
+							{% set name_part %}<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': retweet.user.id}) }}"><strong>@{{ retweet.user.screen_name }}</strong></span>{% endset %}
+							{{ phrase('agent.twitter.retweeted_by', {name: name_part}, true) }}
+						</div>
+					{% endif %}
+					{% if status.long and status.long.date_read %}
+						<div class="extra-row long-read">
+							{{ phrase('agent.twitter.long_tweet_read') }} (<time class="timeago" title="{{status.long.date_read|date('c', 'UTC')}}">{{status.long.date_read|date('day')}}</time>)
+						</div>
+					{% endif %}
+				</div>
+			{% endif %}
+		</div>
+	</div>
+</article>

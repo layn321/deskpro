@@ -1,0 +1,58 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TwitterStatus';
+
+		pageMeta.accountId = '{{ account.id|escape }}';
+		pageMeta.url_fragment = '{{ url_fragment(twitter_list_route, {'account_id': account.id, 'group': group, 'group_value': group_value}) }}';
+		pageMeta.currentPage = {{ page }};
+		pageMeta.perPage = {{ per_page }};
+		pageMeta.totalCount = {{ total_count }};
+
+		pageMeta.statusListUrl = '{{ path(twitter_list_route, {'account_id': account.id, 'group': group, 'group_value': group_value}) }}?partial=1';
+		pageMeta.listRoute = '{{ twitter_list_route }}';
+		pageMeta.group = {{ group|json_encode|raw }};
+		pageMeta.groupValue = {{ group_value|json_encode|raw }};
+		{% include 'AgentBundle:Twitter:list-urls.js.twig' %}
+
+		pageMeta.baseId = '{{ tplvars.baseId }}';
+	</script>
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-twitter"></i> {{ phrase('agent.twitter.list_title', {count: total_count}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	<div class="layout-content twitter">
+		{% if twitter_list_route != 'agent_twitter_sent_list' %}
+			{% include 'AgentBundle:TwitterStatus:list-control-bar.html.twig' with { 'twitter_list_route': twitter_list_route } %}
+			{% include 'AgentBundle:TwitterStatus:list-massactions-bar.html.twig' %}
+		{% endif %}
+
+		<div class="new-tweet-list-indicator"></div>
+
+		<div class="content">
+			{% include 'AgentBundle:TwitterStatus:part-status.html.twig' %}
+		</div>
+
+		{% include 'AgentBundle:TwitterStatus:list-footer.html.twig' %}
+	</div>
+
+{% endblock pane_content %}

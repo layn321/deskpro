@@ -1,0 +1,5 @@
+{% macro flag_name(flag, person) %}
+	{% if not person %}{% set person = app.user %}{% endif %}
+	{% set pref_names = person.getHelper('AgentPrefs').getNamedPrefs('agent.ui.flag.blue', 'agent.ui.flag.green','agent.ui.flag.orange','agent.ui.flag.pink','agent.ui.flag.purple','agent.ui.flag.red','agent.ui.flag.yellow') %}
+	{% if pref_names['agent.ui.flag.' ~ flag] %}{{pref_names['agent.ui.flag.' ~ flag]}}{% else %}{{ phrase('agent.general.flag_' ~ flag) }}{% endif %}
+{% endmacro %}

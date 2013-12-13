@@ -1,0 +1,35 @@
+{#% extends 'AgentBundle:Common:display-options-layout.html.twig' %#}
+{% if deal_type_id is null%}
+    {% set deal_type_id = 0 %}
+{% endif %}
+
+{#% block other_options %#}
+<header class="list-control-bar">
+	<ul>
+		<li>{{ phrase('agent.general.ordered_by') }} </li>
+		<li class="order-by-menu-trigger"><a class="button"><span class="label">{{ order_by|default(phrase('agent.general.date_created')) }}</span><em></em></a></li>
+		<li><span class="sep"></span></li>
+		<li>{{ phrase('agent.general.and_grouped_by') }} </li>
+		<li class="group-by-menu-trigger"><a class="button"><span class="label">{{ group_by|default(phrase('agent.general.none')) }}</span><em></em></a></li>
+		<li class="display-options display-options-trigger"><a>{{ phrase('agent.general.display_options') }}</a></li>
+	</ul>
+
+	<ul style="display: none" class="order-by-menu">
+		<li data-order-by="date_created" data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id, 'order_by': 'date_created' }) }}">{{ phrase('agent.general.date_created') }}</li>
+		<li data-order-by="title" data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id, 'order_by': 'title' }) }}">{{ phrase('agent.general.title') }}</li>
+		<li data-order-by="deal_size" data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id, 'order_by': 'deal_size' }) }}">{{ phrase('agent.deal.deal_size') }}</li>
+                <li data-order-by="deal_type" data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id, 'order_by': 'deal_type' }) }}">{{ phrase('agent.deal.deal_type') }}</li>
+	</ul>
+	<ul style="display: none" class="group-by-menu">
+		<li data-group-by="">{{ phrase('agent.general.none') }}</li>
+		<li class="sep">-</li>
+		<li data-group-by="deal_stage" data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id, 'group_by': 'deal_stage' }) }}">{{ phrase('agent.general.deal_stage') }}</li>
+		{% if deal_type_id <= 0%}
+                    <li data-group-by="deal_type" data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id, 'group_by': 'deal_type' }) }}">{{ phrase('agent.deal.deal_type') }}</li>
+                {% endif %}
+		{% if owner_type == 'other'%}
+                    <li data-group-by="assigned_agent" data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id, 'group_by': 'assigned_agent' }) }}">{{ phrase('agent.general.assigned_agent') }}</li>
+                {% endif%}
+	</ul>
+</header>
+{#% endblock %#}

@@ -1,0 +1,75 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.KbPendingArticles';
+		pageMeta.url_fragment = '{{ url_fragment('agent_kb_pending') }}';
+		pageMeta.baseId = '{{ tplvars.baseId }}';
+	</script>
+
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-article"></i> {{ phrase('agent.publish.kb_list_title', {count: pending_articles|length|default(0)}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	<header class="list-control-bar">
+		<button class="clean-white small add-new-trigger" style="margin:  3px 0 0 3px;">
+			<span>{{ phrase('agent.general.add') }}</span>
+		</button>
+	</header>
+
+	<div id="{{tplvars.baseId}}_add_new_overlay" style="display:none;">
+		<div class="prompt-overlay add_new_overlay">
+			<div class="overlay-title">
+				<h4>{{ phrase('agent.publish.add_pending') }}</h4>
+			</div>
+			<div class="overlay-content">
+				<textarea class="add-new-comment"></textarea>
+			</div>
+			<div class="overlay-footer">
+				<button class="save-new-trigger clean-white">{{ phrase('agent.general.add') }}</button>
+			</div>
+		</div>
+	</div>
+
+
+	{% include 'AgentBundle:Kb:pending-articles-massactions-bar.html.twig' %}
+
+	<section class="pending-articles-list list-listing">
+		{% include 'AgentBundle:Kb:pending-articles-page.html.twig' %}
+	</section>
+
+	{% if not pending_articles|length %}
+		<section class="list-listing no-results">
+			<p>{{ phrase('agent.general.there_are_no_results') }}</p>
+		</section>
+	{% endif %}
+
+	{% if pending_articles|length %}
+		<footer class="results-nav">
+			<div class="pagecontrols results-nav">
+				<div class="cursor">
+					{{ phrase('agent.publish.kb_list_title', {count: pending_articles|length|default(0)}) }}
+				</div>
+			</div>
+		</footer>
+	{% endif %}
+
+{% endblock pane_content %}

@@ -1,0 +1,100 @@
+{% set this_page = 'report_builder' %}
+{% extends 'ReportBundle::layout.html.twig' %}
+{% block html_head %}
+{{ dp_asset_html('report_builder') }}
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+    window._dpRbGroupParams = {{ reportGroupParams|json_encode|raw }};
+
+    function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Report.PageHandler.ReportBuilder();
+		window.DeskPRO_Page.updateFavorites({{ favoritesJs|json_encode|raw }});
+	}
+</script>
+{% endblock %}
+{% block nav_block %}
+{% endblock %}
+{% block pagebar %}
+{% endblock %}
+{% macro report_list_item(report, titleType, params) %}
+	<li>
+		<a href="{{ path('report_builder_favorite', {
+			'report_builder_id': report.id,
+			'token': security_token('report_builder_favorite'),
+			'params': params
+			}) }}"
+		   class="report-favorite-toggle report-favorite"
+		   data-report-id="{{ report.id }}"
+		   data-report-params="{{ params }}"
+		   title="Toggle favorite status"
+		>Toggle favorite status</a>
+		<a rel="report-page-body" class="report-list-title" href="{{ path('report_builder_report', {'report_builder_id': report.id, 'params': params}) }}" title="{{ report.getTitle('placeholder', params) }}">{{ report.getTitle(titleType, params) }}</a>
+	</li>
+{% endmacro %}
+{% block all_page %}
+<div id="report-container">
+	<div id="report-list" data-element-handler="DeskPRO.Report.ElementHandler.Builder.ReportList"
+		data-cookie="dp_report_list_width"
+		data-min="120"
+		data-max="900"
+	>
+		<div id="report-container-inner">
+		<div class="top-btn">
+			<a rel="report-page-body" href="{{ path('report_builder_new') }}" class="btn">Create Custom Report</a>
+		</div>
+
+		<div id="report-favorites" {{ favoriteReports ? '' : 'style="display: none"'}}>
+			<h3>Favorite</h3>
+			<ul class="report-list-ungroupable">
+			{% for fav in favoriteReports %}
+				{{ _self.report_list_item(fav.report_builder, 'printable', fav.params) }}
+			{% endfor %}
+			</ul>
+		</div>
+
+		{% if customReports %}
+		<h3>Custom</h3>
+		<ul class="report-list-groupable">
+		{% for report in customReports %}
+			{{ _self.report_list_item(report, 'raw') }}
+		{% endfor %}
+		</ul>
+		{% endif %}
+
+		{% if builtInReports %}
+		<h3>Built-In</h3>
+		<ul>
+			{% for categoryName, reports in builtInReports %}
+				<li><h4 data-element-handler="DeskPRO.Report.ElementHandler.Builder.ListCollapse"
+					data-cookie="dp_report_collapsed"
+					><span></span>{{ categoryName }}</h4>
+					<ul data-collapse-id="{{categoryName}}" class="report-list-groupable">
+					{% for report in reports %}
+						{{ _self.report_list_item(report, 'raw') }}
+					{% endfor %}
+					</ul>
+				</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+		</div>
+	</div>
+
+	<div id="report-page-body">
+		<!--dp:report-page-body-->
+		<div id="report-page-body-inner">
+		{% block inner_page %}{% endblock %}
+		</div>
+		<!--/dp:report-page-body-->
+	</div>
+	<div id="report-failed-block">
+		<div class="query-error">
+			The report failed to load. Please try again.
+		</div>
+	</div>
+</div>
+<div id="report-loading-block">
+	Loading... <img src="{{ asset('images/spinners/loading-small.gif') }}" alt="" />
+</div>
+{% endblock %}

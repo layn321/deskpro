@@ -1,0 +1,20 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block page_nav %}
+	<section>
+		<header>
+			<h4>{{ phrase('admin.general.banning') }}</h4>
+		</header>
+		<article>
+			<ul>
+				<li class="{% if this_page == 'ban_emails' %}on{% endif %}">
+					<span class="count" id="ban_count_emails">{{ counts.emails|default(0) }}</span>
+					<a href="{{ path('admin_banning_emails') }}">{{ phrase('admin.general.email_addresses') }}</a>
+				</li>
+				<li class="{% if this_page == 'ban_ips' %}on{% endif %}">
+					<span class="count" id="ban_count_ips">{{ counts.ips|default(0) }}</span>
+					<a href="{{ path('admin_banning_ips') }}">{{ phrase('admin.banning.ip_addresses') }}</a>
+				</li>
+			</ul>
+		</article>
+	</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+<thead>
+	<tr>
+		{% if not disable_actions %}
+			<th width="20" class="check-all check" width="5" valign="middle" style="vertical-align: middle; text-align: left;"><input type="checkbox" class="check-all-box selection-control" style="margin: 0; margin-left: 3px; padding: 0;"/></th>
+		{% endif %}
+		{% set perc = (100 / display_fields|length) %}
+		{% for field in display_fields %}
+			{% if field == 'subject' %}<th>{{ phrase('agent.general.subject') }}</th>
+			{% elseif field == 'ref' %}<th>{{ phrase('agent.general.ref') }}</th>
+			{% elseif field == 'id' %}<th>{{ phrase('agent.general.id') }}</th>
+			{% elseif field == 'status' %}<th>{{ phrase('agent.general.status') }}</th>
+			{% elseif field == 'user' %}<th>{{ phrase('agent.general.user') }}</th>
+			{% elseif field == 'deleted_reason' %}<th data-field="deleted_reason">{{ phrase('agent.general.deleted_reason') }}</th>
+			{% elseif field == 'person_email' %}<th data-field="person">{{ phrase('agent.tickets.user_email') }}</th>
+			{% elseif field == 'person_organization' %}<th data-field="person_organization">{{ phrase('agent.general.organization') }}</th>
+			{% elseif field == 'department' %}<th data-field="department">{{ phrase('agent.general.department') }}</th>
+			{% elseif field == 'category' %}<th data-field="category">{{ phrase('agent.general.category') }}</th>
+			{% elseif field == 'product' %}<th data-field="product">{{ phrase('agent.general.product') }}</th>
+			{% elseif field == 'priority' %}<th data-field="priority">{{ phrase('agent.general.priority') }}</th>
+			{% elseif field == 'organization' %}<th data-field="organization">{{ phrase('agent.general.organization') }}</th>
+			{% elseif field == 'agent' %}<th data-field="agent">{{ phrase('agent.general.agent') }}</th>
+			{% elseif field == 'agent_team' %}<th data-field="agent_team">{{ phrase('agent.general.team') }}</th>
+			{% elseif field == 'labels' %}<th data-field="agent_team">{{ phrase('agent.tickets.lables') }}</th>
+			{% elseif field == 'date_user_waiting' %}<th data-field="agent_team">{{ phrase('agent.general.user_waiting') }}</th>
+			{% elseif field == 'date_created' %}<th data-field="date_created">{{ phrase('agent.general.date_opened') }}</th>
+			{% elseif field == 'date_resolved' %}<th data-field="date_resolved">{{ phrase('agent.general.date_resolved') }}</th>
+			{% elseif field == 'date_last_agent_reply' %}<th data-field="date_last_agent_reply">{{ phrase('agent.general.date_of_last_agent_reply') }}</th>
+			{% elseif field == 'date_last_user_reply' %}<th data-field="date_last_user_reply">{{ phrase('agent.general.date_of_last_user_reply') }}</th>
+			{% elseif field == 'total_user_waiting' %}<th data-field="total_user_waiting">{{ phrase('agent.general.total_time_waiting') }}</th>
+			{% else %}
+				{% for f in ticket_field_defs %}
+					{% if field == 'ticket_fields['~f.id~']' %}
+					<th data-field="ticket_fields[{{f.id}}]">{{f.title}}</th>
+					{% endif %}
+				{% endfor %}
+				{% for f in person_field_defs %}
+					{% if field == 'person_fields['~f.id~']' %}
+					<th data-field="person_fields[{{f.id}}]">{{f.title}}</th>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	</tr>
+</thead>

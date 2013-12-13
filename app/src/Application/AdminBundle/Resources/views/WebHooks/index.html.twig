@@ -1,0 +1,47 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li class="add"><a href="{{ path('admin_webhooks_new') }}">Add Web Hook</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>Web Hooks</li>
+</ul>
+{% endblock %}
+{% block prepage %}
+<div style="padding: 10px 10px 0 10px;">
+	{{ design.helpbox() }}
+	<p>Web hooks allow any URL to be notified when particular events occur within DeskPRO. This is one of several ways of integrating DeskPRO with external systems without modifying the source code. Web hooks are currently only attached to triggers.</p>
+	{{ design.helpbox_end() }}
+</div>
+{% endblock %}
+{% block page %}
+{% if hooks %}
+<form action="" method="post" class="check-grid item-list">
+	<table width="100%">
+	<thead>
+		<tr>
+			<th style="text-align: left">Title</th>
+			<th style="text-align: left">URL</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for hook in hooks %}
+		<tr>
+			<td><a href="{{ path('admin_webhooks_edit', {'webhook_id': hook.id} )}}">{{hook.title}}</a></td>
+			<td>{{hook.url}}</td>
+			<td style="text-align: right; padding-right: 5px;"><a href="{{ path('admin_webhooks_delete', {'webhook_id': hook.id, 'security_token': security_token('webhook_delete')} )}}" class="delete-icon" onclick="return confirm('Are you sure you want to delete this web hook?')">Delete</a></td>
+		</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+
+	{{ form_token() }}
+</form>
+{% else %}
+	<div class="note-box new-arrow">You have not created any web hooks yet. Click the "Add Web Hook" button to create one now.</div>
+{% endif %}
+{% endblock %}

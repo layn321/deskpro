@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+	<meta charset="utf-8" />
+	<meta name="robots" content="noindex,nofollow" />
+	<meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0" id="dp_meta_viewport" />
+	<script type="text/javascript">
+		(function() {
+			var h = 'height';
+			var w = 'device-width';
+			var d = false;
+
+			if (window.innerWidth < 1200) {
+				w = '1200';
+				d = true;
+			}
+			if (window.innerHeight < 800) {
+				h = 800;
+				d = true;
+			}
+
+			if (d) {
+				var vp = document.getElementById('dp_meta_viewport');
+				if (vp) {
+					vp.setAttribute('content','height='+h+', width='+w+', user-scalable=yes, initial-scale=1.0');
+				}
+			}
+		})();
+	</script>
+
+	<style type="text/css">
+		body,html {
+			-ms-touch-action: none;
+		}
+	</style>
+
+	<script type="text/javascript">var DP_IS_DOMDUMP_VIEW = false;</script>
+	<script type="text/javascript">
+		{% if app.isDebug() %}
+			DP_DEBUG = true;
+		{% else %}
+			DP_DEBUG = false;
+		{% endif %}
+
+		{% if app.isCloud() %}
+			DPC_IS_CLOUD = true;
+		{% else %}
+			DPC_IS_CLOUD = false;
+		{% endif %}
+
+		window.DP_LOADED_TIME = (new Date()).getTime() / 1000;
+
+		if (!window.console) window.console = {};
+		if (!window.console.error) window.console.error = function(){};
+		if (!window.console.log)   window.console.log   = function(){};
+		if (!window.console.warn)  window.console.warn  = function(){};
+		if (!window.console.info)  window.console.info  = function(){};
+		if (!window.console.debug) window.console.debug = function(){};
+		if (!window.console.trace) window.console.trace = function(){};
+	</script>
+
+	{% include 'AgentBundle:Main:page-vars.html.twig' %}
+
+	{% if not app.user.timezone or app.user.timezone == 'UTC' %}
+		<script type="text/javascript" src="{{ asset('vendor/detect_timezone.js') }}"></script>
+	{% endif %}
+
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/CurrentTs.js?' ~ el_uid()) }}"></script>
+	<script type="text/javascript">
+		if (window.DP_LOAD_TIME_TS) {
+			if (!DP_IS_DOMDUMP_VIEW) {
+				(function() {
+					var lastTime = (new Date()).getTime();
+
+					setInterval(function() {
+						var currentTime = (new Date()).getTime();
+						if (currentTime > (lastTime + 360000)) {
+							// Probably just woke up from sleep
+							window.location.reload(false);
+						}
+						lastTime = currentTime;
+					}, 240000);
+				})();
+
+				(function() {
+					var now_ts = window.DP_LOAD_TIME_TS;
+					var diff = Math.abs(now_ts - {{ 'now'|date('U') }});
+
+					if (diff > 1200) {
+						DESKPRO_TIME_OUT_OF_SYNC = diff;
+						console.log("Time is off by %s seconds", diff);
+
+						if (DESKPRO_TIME_OUT_OF_SYNC_IGNORE && Math.abs(diff - DESKPRO_TIME_OUT_OF_SYNC_IGNORE) < 480) {
+							DESKPRO_TIME_OUT_OF_SYNC = null;
+							console.log("Time offset is ignored");
+						}
+					}
+
+					{% if is_first_login %}
+						DESKPRO_TIME_OUT_OF_SYNC = null;
+					{% endif %}
+				})();
+			}
+		}
+	</script>
+
+	{% if app.getSetting('core.favicon_blob_id') %}
+		<link rel="shortcut icon" id="favicon" href="{{ path('favicon', {}, true) }}" />
+	{% else %}
+		<link rel="shortcut icon" id="favicon" href="{{ app.getRequest().getBasePath() }}/favicon.ico" />
+	{% endif %}
+
+	<title>{{ phrase('agent.interface.deskpro_agent_interface') }}</title>
+	<style type="text/css">
+	body {
+		overflow: hidden;
+		background: #fff !important;
+	}
+	#agent_chats_wrapper, #agent_chat_panel {
+		display: none;
+	}
+
+	#dp_loading {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1000000000;
+
+		background: #91ada1 url('{{ asset('images') }}/login/background.jpg') repeat center top fixed;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+		text-align: center;
+	}
+
+	#dp_loading .msg-outer {
+		width: 250px;
+
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -120px;
+		margin-left: -125px;
+	}
+
+	#dp_loading .msg {
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		background: #ffffff;
+
+		box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+		-moz-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+		-webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+
+		padding:  25px;
+		text-align: center;
+	}
+
+	#dp_loading h1 {
+		font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+		font-size: 15px;
+		text-align: left;
+		color: #000;
+
+		display: inline-block;
+		text-align: center;
+
+		background: url({{ asset('images/spinners/logo-loading.gif') }}) no-repeat 50% 0;
+
+		margin: 0;
+		padding: 0;
+		padding-top: 108px;
+	}
+
+	{# Agent links that are us dont appear clickable #}
+	.agent-link[data-agent-id="{{ app.user.id }}"]:hover, .agent-link[data-agent-id="0"]:hover {
+		text-decoration: none;
+		cursor: text;
+	}
+	</style>
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+</head>
+<body class="dp {% if is_demo %}is-demo{% endif %}">
+
+<script type="text/javascript">
+	(function() {
+		var ua = navigator.userAgent.toLowerCase();
+		var is_ios = /(iPhone|iPod|iPad).*AppleWebKit/i.test(navigator.userAgent);
+		var is_android = ua.indexOf("android") > -1;
+
+		if (is_ios || is_android) {
+			window.DP_NO_JS_SCROLL = true;
+			document.body.className = document.body.className + " dp_no_js_scroll";
+		}
+	})();
+</script>
+
+<div id="dp_loading"><div class="msg-outer"><div class="msg"><h1>{{ phrase('agent.general.loading_interface') }}</h1></div></div></div>
+<div id="dp_window">
+
+{% include 'AgentBundle:Main:window-header.html.twig' %}
+{% include 'AgentBundle:Main:window-nav.html.twig' %}
+{% include 'AgentBundle:Main:window-col-layout.html.twig' %}
+{% include 'AgentBundle:Main:window-chat.html.twig' %}
+
+{####################
+ # RESOURCE LOADING
+ ####################}
+
+{% include 'AgentBundle:Main:global-templates.html.twig' %}
+
+</div>{# /dp_window #}
+
+<audio preload="preload">
+	<source src="{{ asset('/sounds/new-chat.mp3') }}" />
+	<source src="{{ asset('/sounds/new-chat.ogg') }}" />
+</audio>
+<div id="volume_controls_back"></div>
+<div id="volume_controls">
+	<div class="slider"></div>
+	<span class="mute-toggle tipped" id="sound_icon_in" title="{{ phrase('agent.interface.toggle_mute') }}"></span>
+</div>
+
+<div id="reload_overlay" style="display: none;">
+	<table cellspacing="0" cellpadding="0" width="100%" height="100%"><tr><td width="100%" height="100%" valign="middle" align="center" style="vertical-align: middle; text-align: center">
+		<article>
+			<strong id="reload_overlay_updates" style="display: none; font-size: 11pt; position:relative; top: -3px;">
+				{{ phrase('agent.general.performing_updates') }}
+			</strong>
+			<h3>{{ phrase('agent.general.please_wait') }}</h3>
+		</article>
+	</table>
+</div>
+
+{% if is_first_login %}
+	{% include 'AgentBundle:Settings:welcome.html.twig' %}
+{% endif %}
+
+{% include 'AgentBundle:Main:resources.html.twig' with {'in_body': true} %}
+{% include 'AgentBundle:Settings:settings-window.html.twig' %}
+{% include 'AgentBundle:MediaManager:media-window.html.twig' %}
+{% include 'AgentBundle:Main:page-init.html.twig' %}
+
+{% include 'AgentBundle:Main:custom-page-init.html.twig' %}
+
+<!--[if IE 8]>
+<style type="text/css">
+	#dp_right_collapsed ul li span {
+		margin-left: 33px;
+		left: -34px;
+	}
+	#dp_right_collapsed ul li span {
+		-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=-1.836909530733566e-16, M12=-1, M21=1, M22=-1.836909530733566e-16, SizingMethod='auto expand')";
+	}
+</style>
+<![endif]-->
+
+</body>
+</html>

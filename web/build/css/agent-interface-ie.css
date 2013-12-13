@@ -1,0 +1,198 @@
+/** sprite: cssagent-interface-ie_flag-icons; sprite-image: url(../../build/images/cssagent-interface-ie_sprite-flag-icons.png); sprite-layout: vertical */
+/** sprite: cssagent-interface-ie_ui-v; sprite-image: url(../../build/images/cssagent-interface-ie_sprite-ui-v.png); sprite-layout: vertical */
+/** sprite: cssagent-interface-ie_ui-h; sprite-image: url(../../build/images/cssagent-interface-ie_sprite-ui-h.png); sprite-layout: horizontal */
+.less-rule {
+  color: #000;
+}
+/**
+* Set a 1px border of color on each side
+*/
+/**
+* Set a black drop shadow
+*/
+/**
+* Set rounded corners
+*/
+/**
+* Set a radius on each corner
+*/
+/**
+* Set an inner black shadow
+*/
+/**
+* Set an inner shadow with your own oclor
+*/
+/**
+* Full box shadow
+*/
+/**
+* Transition effect
+*/
+.noselect {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.boxmodel-border-box {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}
+.imgel {
+  overflow: hidden;
+  text-indent: -1000px;
+}
+.status.urgency-10,
+.marker-urgency-data.urgency-10 {
+  -khtml-opacity: 1;
+  -moz-opacity: 1;
+  opacity: 1;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  -webkit-transition: opacity 0.5s linear;
+  -moz-transition: opacity 0.5s linear;
+  -o-transition: opacity 0.5s linear;
+  -ms-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
+}
+body.timer-mark .status.urgency-10,
+body.timer-mark .marker-urgency-data.urgency-10 {
+  -khtml-opacity: 0.6;
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+  -webkit-transition: opacity 0.5s linear;
+  -moz-transition: opacity 0.5s linear;
+  -o-transition: opacity 0.5s linear;
+  -ms-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
+}
+.with-scrollbar .scrollbar:hover .thumb,
+.with-scrollbar .scrollbar.is-scrolling .thumb,
+.with-scrollbar .thumb {
+  transition: none !important;
+}
+.with-scrollbar .scrollbar .thumb {
+  background-color: #686D75;
+}
+.browser-ie .with-scrollbar .thumb,
+.browser-ie .list-listing .row-item .status,
+.browser-ie .list-listing .extra-fields ul li,
+.browser-ie section.source-switcher-tabs ul li,
+.browser-ie section.source-labels-list ul li span,
+.browser-ie #dp_omnibox_adv,
+.browser-ie .DP-createTicket #createContentTrigger a,
+.browser-ie .adminSwitcher,
+.browser-ie .profile-box-container > header,
+.browser-ie .profile-box-container > section,
+.browser-ie .flagged-wrap ul li,
+.browser-ie article.content-message .content header,
+.browser-ie article.content-message .content,
+.browser-ie .list-control-bar ul li a.button,
+.browser-ie a.performActTrigger,
+.browser-ie .list-selection-bar a.perform-action,
+.browser-ie .text-core .text-wrap .text-tags .text-tag .text-button,
+.browser-ie button.clean-white,
+.browser-ie a.clean-white,
+.browser-ie .deskpro-menu > ul,
+.browser-ie .search-form .term,
+.browser-ie #dp_searchsheet,
+.browser-ie section.mass-actions-overlay > footer,
+.browser-ie section.mass-actions-overlay > header,
+.browser-ie section.mass-actions-overlay,
+.browser-ie section.mass-actions-overlay > footer button,
+.browser-ie .optionbox > footer,
+.browser-ie .optionbox > header,
+.browser-ie .optionbox,
+.browser-ie .optionbox > footer button,
+.browser-ie table.tickets-simple td.status .status,
+.browser-ie #dp_keyboard_shortcuts > header,
+.browser-ie #dp_keyboard_shortcuts,
+.browser-ie .page-ticket .people-box .user-link.clean-white,
+.browser-ie #agent_chat_section,
+.browser-ie #dp_omnibox {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+#dp_nav_sections li .navCounterRed,
+#DP-chatOnlineCount .navCounterRed {
+  box-shadow: none !important;
+  background: #943232 !important;
+  filter: none !important;
+}
+.deskproTabList li.is-alerting:hover .bound-fade,
+.deskproTabList li.is-alerting.alert-highlight .bound-fade {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+.deskproTabList li:hover,
+.deskproTabList li.over {
+  background: #fff;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+.deskproTabList li:hover .bound-fade,
+.deskproTabList li.over .bound-fade {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+.deskproTabList li .bound-fade {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+table.tickets-simple td .bound-fade {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+.profile-box-container > header > nav ul li.on {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+table.tickets-simple td .bound-fade {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+#agent_chat_panel button.view-history {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+header.page-header .meta-line .set-hold.unhold span,
+.list-listing .row-item .top-row-right .bound-fade,
+.list-listing .row-item.open .top-row-right .bound-fade,
+.list-listing .row-item .userinfo .bound-fade,
+article.content-message.note-message .content header {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+}
+.deskproTabList li .bound-fade {
+  display: none !important;
+}
+.snippets-overlay .snippet-sections li .content .fadeaway {
+  background: transparent !important;
+  filter: none !important;
+  -ms-filter: none !important;
+  padding: 8px 0 8px 0 !important;
+}
+.deskproTabList li a {
+  width: 90px !important;
+  white-space: nowrap;
+}
+.deskproTabList li {
+  width: 115px !important;
+}

@@ -1,0 +1,109 @@
+{% macro grouping_field_select(grouping_field, options)%}
+	<span class="drop-option">
+		<i></i>
+		<select class="grouping-field" name="grouping_field">
+
+			{% if options.none %}
+				<option {% if not grouping_field %}selected="selected"{% endif %} value="">None</option>
+			{% endif %}
+
+			<optgroup label="Ticket Fields">
+			<option {% if grouping_field == 'department' %}selected="selected"{% endif %} value="department">Department</option>
+			<option {% if grouping_field == 'agent' %}selected="selected"{% endif %} value="agent">Agent</option>
+
+			{% if app.agent_teams.getTeamNames() %}
+				<option {% if grouping_field == 'agent_team' %}selected="selected"{% endif %} value="agent_team">Agent Team</option>
+			{% endif %}
+			{% if app.getDataService('TicketCategory').getNames() %}
+				<option {% if grouping_field == 'ticket_category' %}selected="selected"{% endif %} value="ticket_category">Category</option>
+			{% endif %}
+			{% if app.getDataService('TicketWorkflow').getNames() %}
+				<option {% if grouping_field == 'ticket_workflow' %}selected="selected"{% endif %} value="ticket_workflow">Workflow</option>
+			{% endif %}
+			{% if app.getDataService('TicketPriority').getNames() %}
+				<option {% if grouping_field == 'ticket_priority' %}selected="selected"{% endif %} value="ticket_priority">Priority</option>
+			{% endif %}
+
+			<option {% if grouping_field == 'ticket_urgency' %}selected="selected"{% endif %} value="ticket_urgency">Urgency</option>
+
+			{% if app.products.getNames() %}
+				<option {% if grouping_field == 'product' %}selected="selected"{% endif %} value="product">Product</option>
+			{% endif %}
+			{% if app.languages.getTitles() %}
+				<option {% if grouping_field == 'language' %}selected="selected"{% endif %} value="language">Language</option>
+			{% endif %}
+
+			{% for field_def in app.getCustomFieldManager('tickets').getFields() %}
+				<option {% if grouping_field == ('ticket_field.' ~ field_def.id) %}selected="selected"{% endif %} value="ticket_field.{{ field_def.id }}">{{ field_def.title }}</option>
+			{% endfor %}
+			</optgroup>
+			<optgroup label="User Fields">
+				<option {% if grouping_field == 'user' %}selected="selected"{% endif %} value="user">User</option>
+				<option {% if grouping_field == 'organization' %}selected="selected"{% endif %} value="organization">Organization</option>
+				<option {% if grouping_field == 'usergroup' %}selected="selected"{% endif %} value="usergroup">Usergroup</option>
+				{% for field_def in app.getCustomFieldManager('people').getFields() %}
+					<option {% if grouping_field == ('user_field.' ~ field_def.id) %}selected="selected"{% endif %} value="user_field.{{ field_def.id }}">{{ field_def.title }}</option>
+				{% endfor %}
+			</optgroup>
+		</select>
+	</span>
+{% endmacro %}
+
+{% macro stat_table(data) %}
+	<table class="stat-table" width="100%">
+	{% for id, title in data.titles %}
+		<tr>
+			<td class="title"><span>{{ title }}</span></td>
+			<td width="100%">
+				{% if not data.sub_titles %}
+					{% if data.values[id] %}
+						<table width="100%" class="stat-value"><tr>
+							{% set perc = (data.values[id] / data.max|default(1)) * 100 %}
+							{% if perc < 1.0 %}
+								<td class="value" width="1%"><div>&nbsp;</div></td>
+								<td><span style="white-space: nowrap;">{{ data.values[id]|default(0) }}</span></td>
+							{% else %}
+								<td class="value" width="{{ perc }}%"><div>&nbsp;</div></td>
+								<td><span style="white-space: nowrap;">{{ data.values[id]|default(0) }}</span></td>
+							{% endif %}
+						</tr></table>
+					{% endif %}
+				{% else %}
+					{% if data.group_total[id] %}
+						<table width="100%"><tr>
+							{% set perc = (data.group_total[id] / data.max|default(1)) * 100 %}
+							{% if perc < 1.0 %}
+								<td width="1%">
+							{% else %}
+								<td width="{{ perc }}%">
+							{% endif %}
+								<table width="100%" class="stat-value stat-value-multi">
+									<tr>
+									{% for subid, subtitle in data.sub_titles %}
+										{% if data.values[id][subid] %}
+											{% set perc = (data.values[id][subid] / data.group_total[id]) * 100 %}
+											{% if perc < 1.0 %}
+												<td title="{{ subtitle }} ({{ data.values[id][subid] }})" class="value tipped" width="1%"><div style="background-color:#{{data.group_keys[subid]}}">&nbsp;</div></td>
+											{% else %}
+												<td title="{{ subtitle }} ({{ data.values[id][subid] }})" class="value tipped" width="{{ perc }}%"><div style="background-color:#{{data.group_keys[subid]}}">&nbsp;</div></td>
+											{% endif %}
+										{% endif %}
+									{% endfor %}
+									</tr>
+								</table>
+							</td>
+							<td><span style="white-space: nowrap;">{{ data.group_total[id]|default(0) }}</span></td>
+						</tr></table>
+					{% endif %}
+				{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endmacro %}
+
+{% macro no_data() %}
+	<div class="no-data">
+		<h3>No matching data</h3>
+	</div>
+{% endmacro %}

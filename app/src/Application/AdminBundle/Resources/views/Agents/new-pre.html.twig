@@ -1,0 +1,72 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		<li>New Agent</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="alert-message block-message info form_new_type_new">
+	<h1>
+		<label>
+			<input type="radio" name="new_type" class="new_type" value="new" checked="checked" />
+			&nbsp;
+			Create a new agent
+		</label>
+	</h1>
+	<div class="inner-content" style="display: none;">
+		<form action="{{ path('admin_agents_new') }}" method="post">
+			Create a brand new agent with no pre-selected options.
+			<br/>
+			<button class="dp-btn">Continue &rarr;</button>
+		</form>
+	</div>
+</div>
+
+<div class="alert-message block-message info form_new_type_agent">
+	<h1>
+		<label>
+			<input type="radio" name="new_type" class="new_type" value="agent" />
+			&nbsp;
+			Create a new agent based off of an existing agent
+		</label>
+	</h1>
+	<div class="inner-content" style="display: none;">
+		<form action="{{ path('admin_agents_new') }}" method="post">
+			Base the new agent off of <select name="base_agent_id">
+				<option value="0"></option>
+				{% for agent in app.agents.getAgents() %}
+					<option value="{{ agent.id }}">{{ agent.display_name }}</option>
+				{% endfor %}
+			</select>
+			<br/>
+			<button class="dp-btn">Continue &rarr;</button>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+function updateDisplay() {
+	var sel = $('.new_type').filter(':checked').val();
+
+	var new_type_new   = $('.form_new_type_new').find('.inner-content');
+	var new_type_agent = $('.form_new_type_agent').find('.inner-content');
+
+	if (sel == 'new') {
+		new_type_new.show();
+		new_type_agent.hide();
+	} else {
+		new_type_new.hide();
+		new_type_agent.show();
+	}
+}
+
+updateDisplay();
+$('.new_type').on('click change', function() {
+	updateDisplay();
+});
+</script>
+
+{% endblock %}

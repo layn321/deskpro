@@ -1,0 +1,51 @@
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for pending_article in pending_articles %}
+		<article class="row-item pending-article pending-article-{{pending_article.id}}">
+			<input
+				class="item-select"
+				type="checkbox"
+				value="{{ pending_article.id }}"
+				{% if pending_article.ticket %}
+					data-ticket-route="page:{{ object_path_agent(pending_article.ticket) }}"
+				{% endif %}
+			/>
+			{% if pending_article.ticket %}
+				<div class="top-row">
+					<div class="top-row-left">
+						<h3 style="font-weight: normal">
+							{{ phrase('agent.general.ticket') }} <a class="with-route" data-route="page:{{ object_path_agent(pending_article.ticket) }}">{{ pending_article.ticket.subject }}</a>
+						</h3>
+					</div>
+					<div class="top-row-right buttons">
+						<div class="bound-faded"></div>
+						<button class="clean-white small pending-create">{{ phrase('agent.publish.create_artilce') }}</button>
+						<button class="clean-white small pending-delete">{{ phrase('agent.general.delete') }}</button>
+					</div>
+				</div>
+				<div class="comment-text">
+					<div class="rendered" style="padding-bottom: 3px; padding-top: 3px; font-size: 11px; max-height: 100px; overflow: hidden; position:relative; text-overflow: ellipsis">
+						{% if pending_article.comment %}
+							{{ pending_article.comment }}
+						{% else %}
+							{{ first_messages[pending_article.ticket.id].getMessageText() }}
+						{% endif %}
+					</div>
+				</div>
+			{% else %}
+				<div class="top-row">
+					<div class="top-row-left">
+						<h3 style="font-weight: normal">
+							{{ pending_article.comment }}
+						</h3>
+					</div>
+					<div class="top-row-right buttons">
+						<div class="bound-faded"></div>
+						<button class="clean-white small pending-create">{{ phrase('agent.publish.create_artilce') }}</button>
+						<button class="clean-white small pending-delete">{{ phrase('agent.general.delete') }}</button>
+					</div>
+				</div>
+			{% endif %}
+			<br class="clear" />
+		</article>
+	{% endfor %}
+</section>

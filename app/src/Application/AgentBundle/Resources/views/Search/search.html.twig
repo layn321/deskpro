@@ -1,0 +1,54 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.title = 'Search'
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.Search';
+</script>
+{{ agentui.scroll_containers('page-listing page-ticket-listing') }}
+
+{% if results|length %}
+	<section class="list-listing">
+		{% if results.ticket %}
+			<header class="type-header">{{ phrase('agent.general.tickets') }}</header>
+			{% for res in results.ticket %}
+				{% include 'AgentBundle:Search:search-row-ticket.html.twig' with {ticket: res.object} %}
+			{% endfor %}
+		{% endif %}
+		{% if results.chat_conversation %}
+			<header class="type-header">{{ phrase('agent.search.chat_conversations') }}</header>
+			{% for res in results.chat_conversation %}
+				{% include 'AgentBundle:Search:search-row-chat.html.twig' with {convo: res.object} %}
+			{% endfor %}
+		{% endif %}
+		{% if results.feedback %}
+			<header class="type-header">{{ phrase('agent.general.feedback') }}</header>
+			{% for res in results.feedback %}
+				{% include 'AgentBundle:Search:search-row-feedback.html.twig' with {feedback: res.object} %}
+			{% endfor %}
+		{% endif %}
+		{% if results.article %}
+			<header class="type-header">{{ phrase('agent.general.articles') }}</header>
+			{% for res in results.article %}
+				{% include 'AgentBundle:Search:search-row-article.html.twig' with {article: res.object} %}
+			{% endfor %}
+		{% endif %}
+		{% if results.news %}
+			<header class="type-header">{{ phrase('agent.general.news') }}</header>
+			{% for res in results.news %}
+				{% include 'AgentBundle:Search:search-row-news.html.twig' with {news: res.object} %}
+			{% endfor %}
+		{% endif %}
+		{% if results.download %}
+			<header class="type-header">{{ phrase('agent.general.downloads') }}</header>
+			{% for res in results.download %}
+				{% include 'AgentBundle:Search:search-row-download.html.twig' with {download: res.object} %}
+			{% endfor %}
+		{% endif %}
+	</section>
+{% else %}
+	<section class="list-listing no-results">
+		<article class="row-item no-results">
+			<p style="padding: 15px;">{{ phrase('agent.general.there_are_no_results') }}</p>
+		</article>
+	</section>
+{% endif %}
+{{ agentui.scroll_containers_end() }}

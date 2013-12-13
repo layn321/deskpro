@@ -1,0 +1,15 @@
+{##
+ # Used when displaying an article in website widget
+ ##}
+{% set content_link = article.getLink() %}
+{% extends 'UserBundle:Widget:layout-content-overlay.html.twig' %}
+{% block content %}
+<section class="dp-content-post dp-content-page">
+	<header>
+		<h3 class="title"><a href="{{ article.getLink() }}" class="full-page">{{ article.title }}</a></h3>
+	</header>
+	<article>
+		<div class="dp-post">{{ article.content_html|raw }}</div>
+	</article>
+</section>
+{% endblock %}

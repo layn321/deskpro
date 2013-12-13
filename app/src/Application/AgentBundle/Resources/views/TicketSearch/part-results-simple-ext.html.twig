@@ -1,0 +1,289 @@
+<section class="search-reuslts page-set" data-page="{{page}}">
+{% for ticket in tickets %}
+
+{% set ticket_person = ticket.person %}
+{% set ticket_agent = ticket.agent %}
+
+<article
+	class="row-item ticket-{{ ticket.id }} {% if ticket.getSlaIds() %}sla-status-{{ sla_id ? ticket.getSlaById(sla_id).sla_status : ticket.worst_sla_status }}{% endif %} {% if ticket.status == 'awaiting_agent' %}urgency-{{ ticket.urgency }}{% endif %}" data-ticket-id="{{ ticket.id }}" data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': ticket.id}) }}"
+	data-route-title="@selector(a.subject)"
+	data-route-openclass="open"
+	data-ticket-lastactivity="{{ ticket.getLastActivityDate().getTimestamp() }}"
+>
+	<div class="item-hover-over-indicator"></div>
+	<div class="loading-arrow">{{ phrase('agent.general.loading') }}</div>
+	<input type="checkbox" class="item-select" value="{{ ticket.id }}"/>
+	<div class="top-row">
+		<div class="top-row-left">
+			<h3>
+				<span class="obj-id">#{{ ticket.id }}</span>
+				<a class="subject click-through">
+					{{ ticket.subject }}
+				</a>
+			</h3>
+		</div>
+		<div class="top-row-right">
+			<div class="bound-fade"></div>
+			{% if ticket.is_hold %}<div class="on-hold">{{ phrase('agent.tickets.on_hold') }}</div>{% endif %}
+			<div class="status-pill status urgency-{{ ticket.urgency }} {{ ticket.status_code|replace({'.': '_'}) }}">
+				<label>{{ phrase('agent.tickets.status_' ~ ticket.status_code|replace({'.': '_'})) }}</label>
+				{% if ticket.status == 'awaiting_agent' %}<i class="ticket-urgency" data-urgency="{{ ticket.urgency }}">{{ ticket.urgency }}</i>{% endif %}
+			</div>
+			{% if ticket.agent %}
+				<span class="tipped agent-inline-icon" title="{{ ticket.agent.display_name }}" style="background: url('{{ ticket.agent.getPictureUrl(16) }}') no-repeat 0 50%; height: 16px; width: 16px;"></span>
+			{% endif %}
+			{% if ticket_display.getFlaggedColor(ticket) %}
+				<i class="flag {{ ticket_display.getFlaggedColor(ticket) }}"></i>
+			{% endif %}
+			<br class="clear" />
+		</div>
+	</div>
+	<div class="userinfo">
+		<a class="name click-through" data-route="person:{{ path('agent_people_view', {'person_id': ticket_person.id|default('0')}) }}" data-route-title="@selector(.person-tip)">
+			<span class="with-icon" data-person-id="{{ ticket_person.id|default(0) }}" style="background-image: url('{{ ticket_person.getPictureUrl(16) }}');">{{ ticket_person.display_name }}</span></a>
+		{% if ticket_person.organization %}
+			<span class="org">
+				({% if ticket_person.organization_position %}{{ ticket_person.organization_position }}, {% endif %}{{ ticket_person.organization.name }})
+			</span>
+		{% endif %}
+		{% if ticket_person.primary_email %}
+			<span class="email"><b class="person-{{ticket_person.id}}-pemail">{{ ticket_person.primary_email_address }}</b></span>
+		{% endif %}
+		<div class="bound-fade"></div>
+	</div>
+	{% if display_fields|length %}
+		{% set extra_list %}
+		{% for field in display_fields %}
+			{% if field == 'deleted_reason' %}
+				<li class="{{field}}">
+					{% if deleted_tickets[ticket.id] %}
+						{{ phrase('agent.general.deleted_by', {name: deleted_tickets[ticket.id].by_person.display_name}) }}
+						{% if deleted_tickets[ticket.id].reason %}
+							({{ phrase('agent.general.reason') }}: {{ deleted_tickets[ticket.id].reason }})
+						{% endif %}
+					{% endif %}
+				</li>
+			{% elseif field == 'department' and (ticket.department or changed_fields[ticket.id].department) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].department %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.department') }}:</span>
+					<span class="prop-val department_id" data-prop-value="{{ticket.department.id}}">
+					{% if ticket.department %}
+						{{ ticket_display.getDepartmentName(ticket) }}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'ref' %}
+				<li class="{{field}}">
+					<span class="prop-title">{{ phrase('agent.general.ref') }}:</span>
+					<span class="prop-val ref" data-prop-value="{{ticket.ref}}">{{ ticket.ref }}</span>
+				</li>
+			{% elseif field == 'language' and (ticket.language or changed_fields[ticket.id].language) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].language %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.language') }}:</span>
+					<span class="prop-val language_id" data-prop-value="{{ticket.language.id}}">
+					{% if ticket.language %}
+						{% if ticket.language.flag_image %}
+							<span
+								style="background: url('{{ asset('images/flags/' ~ ticket.language.flag_image) }}') no-repeat 0 50%; height: 16px; padding-left: 19px;"
+							>{{ticket.language.title}}</span>
+						{% else %}
+							{{ticket.language.title}}
+						{% endif %}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'category' and (ticket.category or changed_fields[ticket.id].category) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].category %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.category') }}:</span>
+					<span class="prop-val category_id" data-prop-value="{{ticket.category.id}}">
+					{% if ticket.category %}
+						{{ticket.category.title}}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'priority' and (ticket.priority or changed_fields[ticket.id].priority) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].priority %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.priority') }}:</span>
+					<span class="prop-val priority_id" data-prop-value="{{ticket.priority.id}}">
+					{% if ticket.priority %}
+						{{ticket.priority.title}}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'workflow' and (ticket.workflow or changed_fields[ticket.id].workflow) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].workflow %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.workflow') }}:</span>
+					<span class="prop-val workflow_id" data-prop-value="{{ticket.workflow.id}}">
+					{% if ticket.workflow %}
+						{{ticket.workflow.title}}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'agent' %}
+				<li class="{{field}} {% if changed_fields[ticket.id].agent %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.agent') }}:</span>
+					<span class="prop-val" data-prop-value="{{ticket_agent.id}}">
+					{% if ticket_agent %}
+                        {% if ticket_agent.id == app.user.id %}
+                            {{ ticket_agent.display_name }}
+                        {% else %}
+                            <a class="agent_link">{{ ticket_agent.display_name }}</a>
+                        {% endif %}
+					{% else %}
+						{{ phrase('agent.general.unassigned') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'agent_team' and (ticket.agent_team or changed_fields[ticket.id].agent_team) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].agent_team %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.agent_team') }}:</span>
+					<span class="prop-val agent_team_id" data-prop-value="{{ticket_agent_team.id}}">
+					{% if ticket.agent_team %}
+						<span class="agent-team agent-team-{{ ticket.agent_team.id }}" title="{{ ticket.agent_team.name }}">{{ ticket.agent_team.name }}</span>
+					{% else %}
+						{{ phrase('agent.general.no_team') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'product' and (ticket.product or changed_fields[ticket.id].product) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].product %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.product') }}:</span>
+					<span class="prop-val product_id" data-prop-value="{{ticket.product.id}}">
+					{% if ticket.product %}
+						{{ticket.product.title}}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'slas' and (ticket_display.hasTicketSlas(ticket) or changed_fields[ticket.id].slas) %}
+				{% for ticket_sla in ticket_display.getTicketSlas(ticket) %}
+					<li class="{{field}} {% if changed_fields[ticket.id].slas %}changed{% endif %}">
+						<span class="prop-val sla-status-{{ticket_sla.sla_status}}">
+							{{ ticket_sla.title }}
+							{% if ticket_display.getNextSlaTriggerDate(ticket_sla) %}
+								(<time class="timeago" datetime="{{ ticket_display.getNextSlaTriggerDate(ticket_sla)|date('c', 'UTC') }}"></time>)
+							{% endif %}
+						</span>
+					</li>
+				{% endfor %}
+			{% elseif field == 'labels' and (ticket_display.hasTicketLabels(ticket) or changed_fields[ticket.id].labels) %}
+				<li class="{{field}} {% if changed_fields[ticket.id].labels %}changed{% endif %}">
+					<span class="prop-title">{{ phrase('agent.general.labels') }}:</span>
+					<span class="prop-val labels">
+						{% for label in ticket_display.getTicketLabels(ticket) %}
+							<span class="listing-tag">{{ label }}</span>
+						{% endfor %}
+					</span>
+				</li>
+			{% elseif field == 'date_user_waiting' %}
+				<li class="{{field}}">
+					<span class="prop-title">{{ phrase('agent.general.user_waiting') }}:</span>
+					<span class="prop-val">
+						{% if ticket.date_user_waiting %}
+							<time class="timeago timestamp" data-timeago-no-ago="1" datetime="{{ ticket.date_user_waiting|date('c', 'UTC') }}"></time>
+						{% else %}
+							{{ phrase('agent.tickets.na') }}
+						{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'date_created' %}
+				<li class="{{field}}">
+					<span class="prop-title">{{ phrase('agent.general.date_created') }}:</span>
+					<span class="prop-val">
+						<time class="timeago timestamp" datetime="{{ ticket.date_created|date('c', 'UTC') }}"></time>
+					</span>
+				</li>
+			{% elseif field == 'date_last_agent_reply' %}
+				<li class="{{field}}">
+					<span class="prop-title">{{ phrase('agent.general.date_of_last_agent_reply') }}:</span>
+					<span class="prop-val">
+						{% if ticket.date_last_agent_reply %}
+							<time class="timeago timestamp" data-timeago-no-ago="1" datetime="{{ ticket.date_last_agent_reply|date('c', 'UTC') }}"></time>
+						{% else %}
+							{{ phrase('agent.tickets.na') }}
+						{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'date_last_user_reply' %}
+				<li class="{{field}}">
+					<span class="prop-title">{{ phrase('agent.general.date_of_last_user_reply') }}:</span>
+					<span class="prop-val">
+						{% if ticket.date_last_user_reply %}
+							<time class="timeago timestamp" data-timeago-no-ago="1" datetime="{{ ticket.date_last_user_reply|date('c', 'UTC') }}"></time>
+						{% else %}
+							{{ phrase('agent.tickets.na') }}
+						{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'total_user_waiting' %}
+				<li class="{{field}}">
+					<span class="prop-title">{{ phrase('agent.general.total_time_waiting') }}:</span>
+					<span class="prop-val">
+						{% if ticket.real_total_user_waiting %}
+							<time class="timeago" data-timeago-no-ago="1" datetime="{{ ("- " ~ ticket.real_total_user_waiting ~ " seconds")|date('c', 'UTC') }}"></time>
+						{% else %}
+							{{ phrase('agent.tickets.na') }}
+						{% endif %}
+					</span>
+				</li>
+			{% elseif field == 'organization' and ticket.organization %}
+				<li class="{{field}}">
+					<span class="prop-title">{{ phrase('agent.general.organization') }}:</span>
+					<span class="prop-val organization_id" data-prop-value="{{ticket.organization.id}}">
+					{% if ticket.organization %}
+						<a class="with-route" data-route="page:{{ path('agent_org_view', {'organization_id': ticket.organization.id}) }}" data-route-title="@text">{{ticket.organization.name}}</a>
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</li>
+			{% else %}
+				{% for f in all_custom_fields[ticket.id] %}
+					{% if field == 'ticket_fields['~f.id~']' and ticket.hasCustomField(f.id) %}
+						<li class="ticket-field">
+							<span class="prop-title">{{ f.title }}:</span>
+							<span class="prop-val ticket_fields_{{f.id}}">
+								{{ render_custom_field(f) }}
+							</span>
+						</li>
+					{% endif %}
+				{% endfor %}
+				{% for f in user_all_custom_fields[ticket_person.id] %}
+					{% if field == 'person_fields['~f.id~']' and ticket_person.hasCustomField(f.id) %}
+						<li class="person-field">
+							<span class="prop-title">{{ f.title }}:</span>
+							<span class="prop-val person_fields_{{f.id}}">
+								{{ render_custom_field(f) }}
+							</span>
+						</li>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+		{% endset %}
+		{% if extra_list|trim|length %}
+			<div class="extra-fields">
+				<ul>
+					{{ extra_list|raw }}
+				</ul>
+				<br class="clear" />
+			</div>
+		{% else %}
+			<div class="extra-fields"></div>
+		{% endif %}
+	{% endif %}
+</article>
+
+{% endfor%}
+</section>

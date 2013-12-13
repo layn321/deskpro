@@ -1,0 +1,102 @@
+Return-Path: <chris.nadeau@deskpro.com>
+Received: from [172.18.3.161] ([5.10.152.79])
+        by mx.google.com with ESMTPS id k8sm4372979wia.6.2012.06.15.04.28.33
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Fri, 15 Jun 2012 04:28:34 -0700 (PDT)
+Date: Fri, 15 Jun 2012 12:28:32 +0100
+From: Christopher Nadeau <chris.nadeau@deskpro.com>
+To: DeskPRO <dpug2@nadeau.ws>
+Message-ID: <DC72E8C2B4514B6D86D2E241A3DD438F@deskpro.com>
+In-Reply-To: <E0FD9C2AE1DD4492A82E0E10DCFE4408@gmail.com>
+References: <E0FD9C2AE1DD4492A82E0E10DCFE4408@gmail.com>
+Subject: Fw: Test Subject - 2012-06-15 12:23:55
+X-Mailer: sparrow 1.6.1 (build 1081.51)
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="4fdb1c60_6b94764_52b4"
+
+--4fdb1c60_6b94764_52b4
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Agent reply
+
+--
+Christopher Nadeau
+Senior Developer, DeskPRO Ltd.
+www.deskpro.com
+
+
+
+Forwarded message:
+
+> From: Christopher Nadeau <chroder@gmail.com>
+> To: Christopher Nadeau <chris.nadeau@deskpro.com>
+> Date: Friday, 15 June 2012 12:24:04
+> Subject: Test Subject - 2012-06-15 12:23:55
+>
+> Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nam mollis ipsum sed erat facilisis pellentesque. Curabitur nec lacus eget lorem faucibus eleifend. Aliquam laoreet bibendum purus. Vivamus elit. Pellentesque convallis lacus pellentesque erat. Aliquam eget metus tempus nibh fermentum sollicitudin. Nullam ac massa. Donec ligula leo, mattis id, congue et, sagittis quis, augue. Nulla facilisi. Vivamus non nulla. Duis ligula. Nunc ultrices elit. Donec vitae urna in massa placerat pellentesque. Cras tristique. Vestibulum tellus neque, euismod non, fermentum a, eleifend non, mauris. Morbi vel urna id eros suscipit dictum. 2012-06-15 12:23:56
+>
+> -- Christopher
+>
+
+
+--4fdb1c60_6b94764_52b4
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+
+                <div>
+                    <span style=3D=22font-size: 12px;=22>Agent reply</spa=
+n>
+                </div>
+                <div><div><br></div><div><div>--</div><div>Christopher Na=
+deau</div><div>Senior Developer, DeskPRO Ltd.</div><div>www.deskpro.com</=
+div></div></div>
+                =20
+                <p style=3D=22color: =23A0A0A8;=22>=46orwarded message:</=
+p>
+                <blockquote type=3D=22cite=22 style=3D=22border-left-styl=
+e:solid;border-width:1px;margin-left:0px;padding-left:10px;=22>
+                    <div>
+                        =20
+                        <b>=46rom:</b> Christopher Nadeau &lt;chroder=40g=
+mail.com&gt;<br>
+                        =20
+                        =20
+                        =20
+                        <b>To:</b> Christopher Nadeau &lt;chris.nadeau=40=
+deskpro.com&gt;<br>
+                        =20
+                        =20
+                        <b>Date:</b> =46riday, 15 June 2012 12:24:04<br>
+                        <b>Subject:</b> Test Subject - 2012-06-15 12:23:5=
+5<br>
+                    </div>
+                    =20
+                    <br>
+                    =20
+                    <div><div><div>
+                <div><span style=3D=22font-size: 12px;=22>Lorem ipsum dol=
+or sit amet, consectetuer adipiscing elit. Nam mollis ipsum sed erat faci=
+lisis pellentesque. Curabitur nec lacus eget lorem faucibus eleifend. Ali=
+quam laoreet bibendum purus. Vivamus elit. Pellentesque convallis lacus p=
+ellentesque erat. Aliquam eget metus tempus nibh fermentum sollicitudin. =
+Nullam ac massa. Donec ligula leo, mattis id, congue et, sagittis quis, a=
+ugue. Nulla facilisi. Vivamus non nulla. Duis ligula. Nunc ultrices elit.=
+ Donec vitae urna in massa placerat pellentesque. Cras tristique. Vestibu=
+lum tellus neque, euismod non, fermentum a, eleifend non, mauris. Morbi v=
+el urna id eros suscipit dictum. 2012-06-15 12:23:56</span>
+                </div>
+                <div><div><br></div>--&nbsp;Christopher<br><div><br></div=
+></div>
+            </div></div></div>
+                </blockquote>
+                =20
+                <div>
+                    <br>
+                </div>
+
+--4fdb1c60_6b94764_52b4--
+

@@ -1,0 +1,5 @@
+<div class="dp-hr">&nbsp;</div>
+<a href="{{ site_url }}">{{ site_name }}</a> &middot; <a href="{{ deskpro_url }}">{{ deskpro_url }}</a>
+{% if tplvars.agent_notification_footer %}
+	&middot; <a href="{{ url_full('user') }}agent/#settings.{{ tplvars.agent_notification_footer }}">Manage Your Notification Settings</a>
+{% endif %}

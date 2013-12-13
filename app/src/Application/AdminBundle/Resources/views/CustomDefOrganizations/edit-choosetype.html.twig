@@ -1,0 +1,8 @@
+{% extends 'AdminBundle:CustomDefAbstract:edit-choosetype.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+     <ul>
+		<li><a href="{{ path('admin_customdeforganizations') }}">{{ phrase('admin.general.organization_fields') }}</a></li>
+		<li>{{ phrase('admin.general.choose_field_type') }}</li>
+     </ul>
+{% endblock %}

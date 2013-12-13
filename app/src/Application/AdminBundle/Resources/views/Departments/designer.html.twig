@@ -1,0 +1,275 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block section 'setup' %}
+{% block sub_section 'departments' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/DepartmentDesigner.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" charset="utf-8">
+function _page_exec() {
+	window.DESKPRO_URL_REGISTRY['admin_departments_designer_ajaxfetchfield']  = '{{ path('admin_departments_designer_ajaxfetchfield', {'department_id': department.id, 'field_id': '000'})|replace({'000': '{field_id}'}) }}';
+	window.DESKPRO_URL_REGISTRY['admin_departments_designer_ajaxfetchwidget'] = '{{ path('admin_departments_designer_ajaxfetchwidget', {'department_id': department.id, 'widget_id': '000'})|replace({'000': '{widget_id}'}) }}';
+	window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.DepartmentDesigner();
+
+	// init pre-selections
+	{% for display_element in display_elements %}
+		var el = {};
+		el.idClass = '{{display_element.element_type}}_{{display_element.element_id}}';
+		el.initial_state = '{{display_element.initial_state}}';
+		el.is_agent_only = {% if display_element.is_agent_only %}true{% else %}false{%endif%};
+		{% if display_element.conds_all %}
+			el.conds_all = [];
+			{% for term in display_element.conds_all %}
+				el.conds_all.push(['{{term.rule_type}}', {
+					{% for k,v in term %}
+						{{k}}: '{{v}}',
+					{% endfor %}
+					'': null
+				}]);
+			{% endfor %}
+		{% endif %}
+		{% if display_element.conds_any %}
+			el.conds_any = [];
+			{% for term in display_element.conds_any %}
+				el.conds_any.push(['{{term.rule_type}}', {
+					{% for k,v in term %}
+						{{k}}: '{{v}}',
+					{% endfor %}
+					'': null
+				}]);
+			{% endfor %}
+		{% endif %}
+
+		DeskPRO_Page.addDefinedDisplayElement(el);
+	{% endfor %}
+}
+</script>
+<style type="text/css">
+.available-display-items {
+	background-color: #F5F5F5;
+	font-size: 8pt;
+}
+
+.available-display-items h4 {
+	font-size: 12pt;
+	background-color: #BACADE;
+	padding: 4px;
+	margin-top: 10px;
+}
+
+.available-display-items h4:first-child {
+	margin-top: 0;
+}
+
+.display-item {
+	background-color: #E4E7EB;
+	padding: 3px;
+	border: 1px solid #C2C6CC;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	margin: 4px 8px 4px 8px;
+	list-style-type: none;
+}
+
+.display-item:hover {
+	cursor: move;
+	background-color: #fff;
+}
+
+#display_item_list {
+	margin-top: 10px;
+}
+
+#display_item_list.drop-active {
+
+}
+#display_item_list.drop-active li {
+	background-color: #EDECC2;
+}
+
+#display_item_list.droppable-hover li {
+	background-color: #FFFB8C;
+}
+
+#display_item_list li {
+	background-color: #F0F1F5;
+	font-size: 10px;
+	cursor: move;
+}
+
+#display_item_list li .remove {
+	color: #820D0D;
+	padding-right: 9px;
+	margin-right: 6px;
+	border-right: 1px solid #D0D2D6;
+	cursor: pointer;
+}
+#display_item_list li .edit-rules {
+	cursor: pointer;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<form action="{{ path('admin_departments_designer', {'department_id': department.id}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+
+<div style="float:left; width: 200px">
+	<div class="available-display-items">
+		<h4>{{ phrase('admin.general.ticket_fields') }}</h4>
+		<ul class="field-list">
+			{% for field in custom_fields %}
+				{% include 'AdminBundle:Departments:designer-field-choicerow.html.twig' %}
+			{% endfor %}
+			<li style="text-align:center;">
+				<a class="dp-button green x-small popout-trigger" href="{{ path('admin_customdeftickets_new_choosetype') }}" data-height="400">{{ phrase('admin.departments.new_custom_field') }}</a>
+			</li>
+		</ul>
+
+		<br />
+		<h4>{{ phrase('admin.departments.widgets') }}</h4>
+		<ul class="widget-list">
+			{% for widget in widgets %}
+				{% include 'AdminBundle:Departments:designer-widget-choicerow.html.twig' %}
+			{% endfor %}
+			<li style="text-align:center;">
+				<a class="dp-button green x-small popout-trigger" href="{{ path('admin_ticketwidgets_new_choosetype') }}">{{ phrase('admin.departments.new_widget') }}</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div style="margin-left: 220px">
+	<ul class="item-list" id="display_item_list">
+		<li id="no_elements_message">{{ phrase('admin.designer.notice_no_display_elements') }}</li>
+	</ul>
+</div>
+
+<div style="margin-top: 10px; text-align: center">
+	<button class="dp-button green" type="submit">{{ phrase('agent.general.save') }}</button>
+</div>
+
+</form>
+
+<script id="display_item" type="text/x-jquery-tmpl">
+	<li id="display_item_${idClass}" data-id-class="${idClass}" data-item-id="${itemId}">
+		<div style="float:right">
+			<span class="remove">Remove this</span>
+			<span class="edit-rules"><span class="tipped" data-tipped="rule_builder_${idClass}" data-tipped-options="inline:true, closeButton: true, hideOn: false, showOn: 'click', target: 'self', hook: {target:  'leftmiddle', tooltip: 'righttop' }, maxWidth: 600, hideOnClickOutside: true, onHide: DeskPRO_Page.resetFormItems">Edit display rules</span></span>
+		</div>
+
+		<strong>${name}</strong><br />
+		<input type="hidden" name="display_items[]" value="${itemId}" />
+
+		<div class="rules-wrap" id="rule_builder_${idClass}" data-id-class="${idClass}" style="display:none; min-width: 500px; height: 230px; overflow: auto; margin-bottom: 11px;">
+            {% set phrase_part1 %}
+                <select name="initial_display[${itemId}]"><option value="hidden">{{ phrase('agent.general.hidden') }}</option><option value="visible">{{ phrase('agent.general.all') }}</option></select>
+            {% endset %}
+            {% set phrase_part2 %}
+                <span class="ruletype">{{ phrase('agent.general.all') }}</span>
+            {% endset %}
+            {{ phrase('admin.designer.initial_status', {'option':phrase_part1,'all':phrase_part2}, true) }}
+			<div class="septop">
+				<input type="checkbox" name="agent_only[${itemId}]" value="1" /> {{ phrase('admin.designer.only_show_for_agents') }}
+			</div>
+			<div class="search-form ruletype-all">
+				<div class="rule-list"></div>
+				<div class="term"><span class="add-term">+</span> {{ phrase('admin.designer.add_new_rule') }}</div>
+			</div>
+			<br /><br />
+            {{ set phrase_part }}
+                <span class="ruletype">{{ phrase('agent.general.any') }}</span>
+            {{ endset }}
+			{{ phrase('admin.designer.and_when_any_match', {'any':phrase_part}, true) }}
+			<div class="search-form ruletype-any">
+				<div class="rule-list"></div>
+				<div class="term"><span class="add-term">+</span> {{ phrase('admin.designer.add_new_rule') }}</div>
+			</div>
+		</div>
+	</li>
+</script>
+
+<div id="criteria_tpl" class="search-builder-tpl" style="display:none">
+	<div class="row">
+		<div class="term">
+			<div class="type"></div>
+			<div class="op"></div>
+			<div class="options"></div>
+			<div class="remove">-</div>
+		</div>
+	</div>
+	{% if term_options.products %}
+		<div class="type" title="{{ phrase('agent.general.product') }}" data-rule-type="product">
+			<div class="op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</div>
+			<div class="options">
+				<select name="product">
+					{% for id,label in term_options.products %}
+						<option value="{{id}}">{{label}}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+	{% if term_options.ticket_categories_full %}
+		<div class="type" title="{{ phrase('agent.general.category') }}" data-rule-type="category">
+			<div class="op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</div>
+			<div class="options">
+				<select name="category">
+					{% for id,label in term_options.ticket_categories_full %}
+						<option value="{{id}}">{{label}}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+	{% if term_options.priorities %}
+		<div class="type" title="{{ phrase('agent.general.priority') }}" data-rule-type="priority">
+			<div class="op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+					<option value="lt">{{ phrase('agent.general.is_less_than') }}</option>
+					<option value="gt">{{ phrase('agent.general.is_greater_than') }}</option>
+				</select>
+			</div>
+			<div class="options">
+				<select name="priority">
+					{% for id,label in term_options.priorities %}
+						<option value="{{id}}">{{label}}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+	{% if term_options.ticket_workflows %}
+		<div class="type" title="{{ phrase('agent.general.workflow') }}" data-rule-type="workflow">
+			<div class="op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</div>
+			<div class="options">
+				<select name="workflow">
+					{% for id,label in term_options.ticket_workflows %}
+						<option value="{{id}}">{{label}}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+</div>
+
+<br style="clear:both;" />
+
+{% endblock %}

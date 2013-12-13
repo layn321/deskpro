@@ -1,0 +1,76 @@
+{% raw %}
+<script type="text/x-jquery-tmpl" id="agent_chat_conversation">
+	<section class="agent-chat with-avatar" id="agent_chat_conversation_${local_id}">
+		<nav>
+			{{if to_agent_picture}}
+			<a class="with-picture" style="background-image: url('${to_agent_picture}');">
+			{{else}}
+			<a>
+			{{/if}}
+			${to_agent_shortname}</a>
+			<span class="close-trigger">x</span>
+		</nav>
+		<section class="window">
+			<header>
+				<span class="close"></span>
+				<span class="minimize"></span>
+				<h2>${to_agent_name}</h2>
+			</header>
+			<div class="messages-box">
+				<div class="messages-container"></div>
+			</div>
+			<div class="input-message-wrap">
+				<div class="input-message">
+					<textarea rows="1" cols="20"/></textarea>
+				</div>
+			</div>
+		</section>
+	</section>
+</script>
+
+<script type="text/x-jquery-tmpl" id="agent_groupchat_conversation">
+	<section class="agent-chat with-avatar" id="agent_chat_conversation_${local_id}">
+		<nav>
+			<a style="padding-left:0; text-overflow: ellipsis; display: block; overflow: hidden; width: 62px;" title="${title}">${title}</a>
+			<span class="close-trigger">x</span>
+		</nav>
+		<section class="window">
+			<header>
+				<span class="close"></span>
+				<span class="minimize"></span>
+				<h2>${title}</h2>
+			</header>
+			<div class="messages-box">
+				<div class="messages-container"></div>
+			</div>
+			<div class="input-message-wrap">
+				<div class="input-message">
+					<textarea rows="1" cols="20"/></textarea>
+				</div>
+			</div>
+		</section>
+	</section>
+</script>
+
+<script type="text/x-jquery-tmpl" id="agent_chat_message">
+	<div class="chatRecieve">
+		<div class="avatar"><img src="${author_picture}" class="tipped" title="${author_name}" /></div>
+		<time>${time}</time>
+		<div class="chatMsgRecieve">
+			<span class="message-text">${message}</span>
+			<span class="bubbleRight"></span>
+		</div>
+	</div>
+</script>
+
+<script type="text/x-jquery-tmpl" id="agent_chat_message_me">
+	<div class="chatSend">
+		<div class="avatar"><img src="{% endraw %}{{ app.user.getPictureUrl(25) }}{% raw %}" /></div>
+		<time>${time}</time>
+		<div class="chatMsgSend">
+			<span class="message-text">${message}</span>
+			<span class="bubbleLeft"></span>
+		</div>
+	</div>
+</script>
+{% endraw %}

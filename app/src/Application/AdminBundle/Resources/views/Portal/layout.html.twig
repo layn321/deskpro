@@ -1,0 +1,20 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block page_nav %}
+<div data-element-handler="DeskPRO.Admin.ElementHandler.PortalNav" id="portal_nav">
+	<section class="top">
+		<header>
+			<h4>{{ phrase('admin.general.portal') }}</h4>
+		</header>
+		<article>
+			<ul>
+				<li class="{% if this_page == 'portal_editor' %}on{% endif %}"><a href="{{ path('admin_portal') }}">{{ phrase('admin.portal.portal_editor') }}</a></li>
+				<li class="{% if this_page == 'portal_templates' %}on{% endif %}"><a href="{{ path('admin_templates_user') }}">{{ phrase('admin.general.templates') }}</a></li>
+				<li><a href="{{ path('admin_templates_user', {open: 'UserBundle:Css:custom.css.twig'}) }}">Edit Custom CSS</a></li>
+				<li><a href="{{ path('admin_portal_uploadfavicon') }}">Change favicon</a></li>
+			</ul>
+		</article>
+
+		{% block page_nav_portal %}{% endblock %}
+	</section>
+</div>
+{% endblock %}

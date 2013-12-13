@@ -1,0 +1,14 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>
+	{{ phrase('agent.feedback.new_feedback') }}	{{ feedback.title }} {% if feedback.getStatusCode() == 'hidden.validating' %}({{ phrase('agent.general.requires_validation') }}){% endif %}
+</dp:subject>
+{{ phrase('agent.feedback.user_submitted_new_feedback', {name: feedback.person.getDisplayContact() }) }}
+{% if feedback.getStatusCode() == 'hidden.validating' %}({{ phrase('agent.general.requires_validation') }}){% endif %}
+
+<br /><br />
+
+{{ phrase('agent.emails.view_online_at') }}: <a href="{{ url_full('agent') }}#app.feedback,i:{{ feedback.id }}">{{ url_full('agent') }}#app.feedback,fb_content,i:{{ feedback.id }}</a>
+
+<br /><br />
+
+{{ feedback.getContent()|raw }}

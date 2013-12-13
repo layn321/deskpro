@@ -1,0 +1,51 @@
+{% extends 'AdminBundle:Plugins:config.html.twig' %}
+{% block inner_form %}
+
+<div class="setting_field_row">
+	<h4>API Configuration</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label>Magento URL</label>
+			<input type="text" name="settings[url]" value="{{ app.getSetting(plugin.id ~ '.url') }}" style="width: 50%; padding: 5px" />
+			<p>This is the URL to your Magento directory, without any trailing slash.</p>
+		</div>
+
+		<div class="field_row">
+			<label>Magento API User</label>
+			<input type="text" name="settings[api_user]" value="{{ app.getSetting(plugin.id ~ '.api_user') }}" style="width: 50%; padding: 5px" />
+			<p>Enter the name of an API user that you setup in Magento via System &gt; Web Services &gt; SOAP/XML-RPC - Users.</p>
+		</div>
+
+		<div class="field_row">
+			<label>Magento API Key</label>
+			<input type="password" name="settings[api_key]" value="{{ app.getSetting(plugin.id ~ '.api_key') }}" style="width: 50%; padding: 5px" />
+		</div>
+
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Widgets</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label><input type="checkbox" name="widget_ticket" value="1" {% if showTicket %}checked="checked"{% endif %} />
+				Enable ticket widget</label>
+		</div>
+
+		<div class="field_row">
+			<label><input type="checkbox" name="widget_profile" value="1" {% if showProfile %}checked="checked"{% endif %} />
+				Enable profile widget</label>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Single Sign On</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<button class="clean-white" name="configure_usersource" value="1">Configure Magento Single Sign On</button>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

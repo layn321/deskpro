@@ -1,0 +1,213 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<style type="text/css">
+	ul.small-detail-list {
+		margin: 0 0 0 20px;
+		padding: 0;
+	}
+
+	ul.small-detail-list li {
+		font-size: 11px;
+		list-style: square;
+		pading: 0 0 0 5px;
+		margin: 0;
+	}
+
+	#email_forward_list input[type="text"] {
+		width: 50%;
+	}
+
+	.select2-container .select2-choice span {
+		text-align: left;
+	}
+
+	.select2-results .select2-result-label .dep-opt em {
+		visibility: hidden;
+		margin-left: 8px;
+		float: right;
+	}
+
+	.select2-results .select2-result-label .dep-opt.disabled {
+		opacity: 0.5;
+
+	}
+
+	.select2-results .select2-result-label .dep-opt.disabled em {
+		visibility: visible;
+		font-size: 9px;
+		text-transform: uppercase;
+		font-style: normal;
+	}
+</style>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var sels = $('select.change-linked-dep');
+	sels.data('select-width', '300');
+
+	DP.select(sels, {
+		formatResult: function(result) {
+			return '<div class="dep-opt dep-' + result.id + '">' + result.text + ' <em>In use</em></div>';
+		}
+	});
+	sels.on('open', function() {
+		updateSelected();
+		window.setTimeout(function() {
+			updateSelected();
+		}, 150);
+	});
+
+	function updateSelected() {
+		$('.dep-opt').removeClass('disabled');
+		$('select.change-linked-dep').each(function() {
+			var id = parseInt($(this).val());
+			if (!id) {
+				return;
+			}
+
+			$('.dep-' + id).addClass('disabled');
+		});
+	}
+
+	function findUsed(depid) {
+		sels.each(function() {
+			if ($(this).val() == depid) {
+				return $(this).data('gateway-id');
+			}
+		});
+
+		return null;
+	}
+
+	updateSelected();
+
+	sels.on('change', function() {
+		var gateway_id = $(this).data('gateway-id');
+		var dep_id = $(this).val();
+		var el = $(this);
+		var me = this;
+
+		if (dep_id != '0') {
+
+			var inUse = findUsed(dep_id);
+			if (inUse && inUse != gateway_id) {
+				if (confirm('This department is already in use by another gateway. Do you want to switch it to this gateway instead? The old gateway will unset.')) {
+					$('select.change-linked-dep').each(function() {
+						if (this != me && $(this).val() == dep_id) {
+							$(this).select2('val', '0');
+							DeskPRO_Window.util.showSavePuff($(this).prev());
+						}
+					});
+				}
+			}
+		}
+
+		$.ajax({
+			url: '{{ path('admin_emailgateways_setlinkeddep') }}',
+			data: {
+				gateway_id: gateway_id,
+				department_id: dep_id
+			},
+			type: 'POST',
+			success: function() {
+				DeskPRO_Window.util.showSavePuff(el.prev());
+			}
+		});
+
+		updateSelected();
+	});
+});
+</script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li style="margin-right: 8px;"><a href="{{ path('admin_emailgateway_errors') }}">View Errors ({{ error_count|default('0') }})</a></li>
+			<li style="margin-right: 8px;"><a href="{{ path('admin_emailgateway_rejections') }}">View Rejections ({{ rejection_count|default('0') }})</a></li>
+			<li style="margin-right: 8px;"><a href="{{ path('admin_emailgateway_all') }}">Browse All Sources ({{ all_count|default('0') }})</a></li>
+			<li class="add"><a href="{{ path('admin_emailgateways_new') }}">{{ phrase('admin.gateway.add_email_gateway') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li><a href="{{ path('admin_emailgateways') }}">{{ phrase('admin.general.email_gateways') }}</a></li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{{ design.helpbox() }}
+	<p>{{ phrase('admin.gateway.explain_email_gateway') }}</p>
+{{ design.helpbox_end() }}
+
+<div class="check-grid item-list" id="by_address">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left; padding-left:0;" colspan="2">{{ phrase('agent.general.email_address') }}</th>
+				<th style="text-align:left" width="50">Department</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for gateway in all_gateways %}
+				<tr>
+					<td style="vertical-align: top;" width="10">
+						<a href="{{ path('admin_emailgateways_del', {id: gateway.id, security_token: security_token('delete_gateway') }) }}" onclick="return confirm('{{ phrase('admin.gateway.ask_delete_gateway') }}');" style="position:relative;top:1px;"><span class="btn-remove"></span></a>
+					</td>
+					<td>
+						<strong>{{ gateway.getMatchPatternDisplay() }}</strong>
+						<div style="position:relative; top: -2px; display: inline">
+							<input
+								type="checkbox"
+								class="onoff-slider gateway-toggle-{{ gateway.id }}"
+								{% if gateway.is_enabled %}checked="checked"{% endif %}
+								data-element-handler="DeskPRO.ElementHandler.CheckboxCallUrl"
+								data-url="{{ path('admin_emailgateways_quicktoggle', {'id': gateway.id}) }}"
+								data-state-property="is_enabled"
+							/>
+						</div>
+						<ul class="small-detail-list">
+							<li>
+								Incoming Account:
+								<a class="editable-link" href="{{ path('admin_emailgateways_edit', { 'id': gateway.id }) }}"><span>
+									{{ gateway.title }}
+								</span></a>
+							</li>
+							<li>
+								Outgoing account:
+								<a class="editable-link" href="{{ path('admin_emailgateways_edit', { 'id': gateway.id }) }}"><span>
+									{% if gateway.linked_transport and gateway.linked_transport.transport_type != 'mail' %}
+										{{ gateway.linked_transport.title }}
+									{% else %}
+										Send through PHP mail()
+									{% endif %}
+								</span></a>
+							</li>
+						</ul>
+					</td>
+					<td>
+						<select class="change-linked-dep" data-gateway-id="{{ gateway.id }}">
+							<option value="0" {% if not gateway.department %}selected="selected"{% endif %}>None</option>
+							{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+								{% if dep.children|length %}
+									<optgroup label="{{ dep.title }}">
+										{% for subdep in dep.children %}
+											<option data-full-title="{{ dep.title }} &gt; {{ subdep.title }}" value="{{subdep.id}}" {% if gateway.department.id == subdep.id %}selected="selected"{% endif %}>{{subdep.title}}</option>
+										{% endfor %}
+									</optgroup>
+								{% else %}
+									<option value="{{dep.id}}" {% if gateway.department.id == dep.id %}selected="selected"{% endif %}>{{dep.title}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<br />
+
+{% include 'AdminBundle:EmailGateways:list-fwd-list.html.twig' %}
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li><a href="{{ path('admin_plugins_uninstall', {'plugin_id': plugin.id}) }}">Uninstall</a></li>
+	</ul>
+</nav>
+<ul>
+	<li><a href="{{ path('admin_plugins') }}">Plugins</a> &gt; {{info.title}}</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_plugins_plugin', {'plugin_id': plugin.id}) }}" method="post">
+	{% if errors %}
+	<ul id="errors_container">
+		{% for error in errors %}
+		<li>{{ error }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+	{% block inner_form %}{% endblock %}
+
+	<footer class="controls">
+		<button class="clean-white">Save Changes</button>
+	</footer>
+
+	{{ form_token() }}
+	<input type="hidden" name="process" value="1" />
+</form>
+
+{% endblock %}

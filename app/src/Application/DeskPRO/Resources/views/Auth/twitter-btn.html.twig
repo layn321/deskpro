@@ -1,0 +1,8 @@
+{% if not button_type %}{% set button_type = 'button' %}{% endif %}
+{% if button_type == 'icon' %}
+	<a href="{{ path('user_login_authenticate', {'usersource_id': usersource.id}) }}"><img src="{{ asset('images/icons/social_media_mini_icons/twitter.png') }}" /></a>
+{% elseif button_type == 'button' %}
+	<a class="small btn" href="{{ path('user_login_authenticate', {'usersource_id': usersource.id}) }}">
+		<span style="background-image: url('{{ asset('images/icons/social_media_mini_icons/twitter.png') }}')">{{ phrase('agent.general.twitter') }}</span>
+	</a>
+{% endif %}

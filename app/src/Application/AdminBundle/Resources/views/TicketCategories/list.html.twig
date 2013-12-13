@@ -1,0 +1,143 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TicketCategoryList.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a id="newcat_open">{{ phrase('admin.tickets.add_new_category') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.general.ticket_categories') }}</li>
+	</ul>
+{% endblock %}
+{% block content %}
+<div class="dp-page-box">
+<div
+	class="page-content"
+	data-element-handler="DeskPRO.Admin.ElementHandler.TicketCategoryList"
+	data-reorder-url="{{ path('admin_ticketcats_updateorders') }}"
+>
+
+	{% if all_categories|length %}
+		{{ design.dpgrid({class: 'dep-list'}) }}
+			{{ design.dpgrid_headerrow() }}
+				{{ design.dpgrid_headercol({ class: 'l r tl tr', style: "width: 890px;"}) }}
+					<h1>{{ phrase('agent.general.category') }}</h1>
+				{{ design.dpgrid_headercol_end() }}
+			{{ design.dpgrid_headerrow_end() }}
+
+			{% for category in all_categories %}
+				{% include 'AdminBundle:TicketCategories:list-row.html.twig' %}
+			{% endfor %}
+		{{ design.dpgrid_end() }}
+	{% else %}
+		<div class="note-box new-arrow">
+			{{ phrase('admin.general.you_have_not_created_categories') }}
+		</div>
+	{% endif %}
+
+	<div id="editcat_overlay" style="width: 400px; height: 180px; display: none;">
+		<div class="overlay-title">
+			<span class="close-overlay"></span>
+			<h4>{{ phrase('admin.tickets.edit_category_title') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<form class="dp-form" method="POST" action="{{ path('admin_ticketcats_savetitle') }}">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.title') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="hidden" name="category_id" id="editcat_catid" value="" />
+						<input type="text" name="title" id="editcat_title" value="" />
+					</div>
+				</div>
+				<div class="dp-form-row" id="editcat_parent_row">
+					<div class="dp-form-label">
+						<label>Parent</label>
+					</div>
+					<div class="dp-form-input">
+						<select name="parent_id" id="editcat_parent_id">
+							<option value="0">{{ phrase('admin.general.no_parent') }}</option>
+							{% for category in all_categories %}
+								<option value="{{ category.id }}">{{ category.title }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white" id="editcat_savebtn">{{ phrase('agent.general.save') }}</button>
+		</div>
+	</div>
+
+	<div id="newcat_overlay" style="width: 400px; height: 230px; display: none;">
+		<div class="overlay-title">
+			<span class="close-overlay"></span>
+			<h4>{{ phrase('admin.general.new_category') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<form class="dp-form" method="POST" action="{{ path('admin_ticketcats_savenew') }}">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.title') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="text" name="title" id="newcat_title" value="" />
+					</div>
+				</div>
+
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('admin.general.parent') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<select name="parent_id" id="newcat_parent_id">
+							<option value="0">{{ phrase('admin.general.no_parent') }}</option>
+							{% for category in all_categories %}
+								<option value="{{ category.id }}">{{ category.title }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white" id="newcat_savebtn">{{ phrase('agent.general.add') }}</button>
+		</div>
+	</div>
+
+</div>
+
+{% if all_categories %}
+	<div style="padding: 0 10px 10px 15px;">
+		<form action="{{ path('admin_ticketcats_setdefault') }}" method="POST">
+			<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="This is the value selected by default on new ticket forms."></span> Default category:
+			<select name="default_value">
+				<option></option>
+				{% for itm in all_categories %}
+					{% if itm.children|length %}
+						<optgroup label="{{ itm.title }}">
+							{% for sub_itm in itm.children_ordered %}
+								<option value="{{ sub_itm.id }}" {% if app.getSetting('core.default_ticket_cat') == sub_itm.id %}selected="selected"{% endif %}>{{ sub_itm.title }}</option>
+							{% endfor %}
+						</optgroup>
+					{% else %}
+						<option value="{{ itm.id }}" {% if app.getSetting('core.default_ticket_cat') == itm.id %}selected="selected"{% endif %}>{{ itm.title }}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+			<button class="clean-white">Update</button>
+		</form>
+	</div>
+
+	{% include 'AdminBundle:TicketFeatures:field-cat-validation-options.html.twig' with {field_id: 'ticket_cat'} %}
+{% endif %}
+
+</div>
+{% endblock %}

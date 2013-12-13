@@ -1,0 +1,63 @@
+{% extends 'AdminBundle:TicketTriggers:ticket-trigger-tpl.html.twig' %}
+{% block pagebar %}
+	{% if trigger.id and not trigger.sys_name %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_tickettriggers_delete', {id: trigger.id, auth: security_token('delete_trigger') }) }}" class="confirm-delete-trigger" data-prompt="{{ phrase('admin.tickets.confirm_delete_trigger') }}">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+	<ul>
+		<li><a href="{{ path('admin_tickettriggers') }}">{{ phrase('admin.general.triggers') }}</a></li>
+		<li>
+			{% if trigger.id %}
+				Edit Trigger
+			{% else %}
+				New Trigger
+			{% endif %}
+		</li>
+	</ul>
+{% endblock %}
+
+{% block page_js_exec %}
+<script type="text/javascript">
+function TicketTriggerEditPage_init()
+{
+	var self = this;
+	var update = function() {
+		var val = $('#event_trigger').val();
+		if (val == 'new.web.user.widget' || val == 'new.web.user.embed') {
+			self.criteriaEditor1.enableType('creation_system_option');
+			self.criteriaEditor2.enableType('creation_system_option');
+		} else {
+			self.criteriaEditor1.disableType('creation_system_option');
+			self.criteriaEditor2.disableType('creation_system_option');
+		}
+	};
+	$('#event_trigger').on('change', update);
+	update();
+}
+</script>
+{{ parent() }}
+{% endblock %}
+
+{% block event_row %}
+	{% if 'new.web.user' not in trigger.event_trigger %}
+		<input type="hidden" name="trigger[event_trigger]" value="{{ trigger.event_trigger }}" />
+	{% endif %}
+
+	{% if trigger.event_trigger == 'new' %}When a new ticket is created
+	{% elseif trigger.event_trigger == 'new.email.user' %}When a user creates a ticket via email
+	{% elseif trigger.event_trigger == 'new.email.agent' %}When an agent forwards a user email via email
+	{% elseif trigger.event_trigger == 'new.web.agent.portal' %}When an agent creates a new ticket via the agent interface
+	{% elseif trigger.event_trigger == 'new.web.api' %}When a new ticket is created via the API
+	{% elseif 'new.web.user' in trigger.event_trigger %}
+		When a user creates a new ticket via
+		<select name="trigger[event_trigger]" id="event_trigger">
+			<option {% if trigger.event_trigger == 'new.web.user' %}selected="selected"{% endif %} value="new.web.user">any web form</option>
+			<option {% if trigger.event_trigger == 'new.web.user.portal' %}selected="selected"{% endif %} value="new.web.user.portal">the helpdesk portal</option>
+			<option {% if trigger.event_trigger == 'new.web.user.widget' %}selected="selected"{% endif %} value="new.web.user.widget">the website widget</option>
+			<option {% if trigger.event_trigger == 'new.web.user.embed' %}selected="selected"{% endif %} value="new.web.user.embed">the embedded ticket form</option>
+		</select>
+	{% endif %}
+{% endblock %}

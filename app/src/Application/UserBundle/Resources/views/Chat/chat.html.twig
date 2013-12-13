@@ -1,0 +1,355 @@
+{##
+ # The chat window
+ ##}
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html class="{% if is_rtl() %}rtl{% endif %}" {{ language_html_attr() }}>
+<head>
+	<script type="text/javascript">
+		var BASE_URL = '{{ path('user') }}';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		var DESKPRO_PERSON_ID = {{ app.user.id|default(0) }};
+		var DESKPRO_SESSION_ID = '{{ app.session.getId() }}';
+		var DP_REQUEST_TOKEN = '{{ security_token('request_token', 10800) }}';
+
+		{% if constant('DP_DEBUG') %}
+			DP_DEBUG = true;
+		{% else %}
+			DP_DEBUG = false;
+		{% endif %}
+	</script>
+
+	{% if app.isDebug() %}
+		{{ dp_asset_html('user_vendors') }}
+		{{ dp_asset_html('user_common') }}
+		<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.request.getBasePath() }}/file.php/res-user/main.css?{{ app.style.css_updated|date('U') }}&amp;reload=1{% if is_rtl() %}&amp;rtl=1{% endif %}" media="screen,print" />
+	{% else %}
+		{{ dp_asset_html('user') }}
+		{% if (is_rtl() and not app.style.css_blob_rtl) or (not is_rtl() and not app.style.css_blob) or app.admin_portal_controls %}
+			<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.request.getBasePath() }}/file.php/res-user/main.css?{{ app.style.css_updated|date('U') }}&amp;reload=1{% if is_rtl() %}&amp;rtl=1{% endif %}" media="screen,print" />
+		{% else %}
+			{% if is_rtl() %}
+				<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.style.css_blob_rtl.getDownloadUrl() }}?{{ app.style.css_blob_rtl.id }}" media="screen,print" />
+			{% else %}
+				<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.style.css_blob.getDownloadUrl() }}?{{ app.style.css_blob.id }}" media="screen,print" />
+			{% endif %}
+		{% endif %}
+	{% endif %}
+
+	{% if app.isDebug() %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/user-lang-{{ app.language.id }}.js?nocache=1&v={{ security_token('lang') }}"></script>
+	{% else %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/user-lang-{{ app.language.id }}.js?v={{ app.getSetting('core.deskpro_build') }}"></script>
+	{% endif %}
+
+	<link rel="stylesheet" type="text/css" href="{{ asset('stylesheets/user/main-print.css') }}" media="print" />
+	<!--[if IE ]><link href="{{ asset('stylesheets/user/main-ie.css') }}" rel="stylesheet" type="text/css"><![endif]-->
+
+	<script src="{{ asset('javascripts/DeskPRO/TouchCaller.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('javascripts/DeskPRO/WordHighlighter.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('javascripts/DeskPRO/User/ChatWidget/ChatWin.js') }}" type="text/javascript"></script>
+
+	<script type="text/javascript">
+	{{ chat_display_js|raw }}
+	</script>
+
+	<script type="text/javascript">
+		window.DeskPRO_Window = new DeskPRO.User.Window();
+		var ChatWin = new DeskPRO.User.WebsiteWidget.ChatWin({
+			parentUrl: {{ parent_url|json_encode|raw }},
+			sessionCode: '{{ session_code }}',
+			conversationId: {{ convo.id|default(0) }},
+			assignedAgentId: {{ convo.agent.id|default(0) }},
+			assignedAgentName: '{{ convo.agent.display_name_user|default(0) }}',
+			assignedAgentAvatar: '{{ convo.agent.getPictureUrl(30)|default(0) }}',
+			assignedAgentAvatarIcon: '{{ convo.agent.getPictureUrl(16)|default(0) }}',
+			initialMessages: {{ convo_messages|json_encode|raw }},
+			uploadTo: '{{ path('user_accept_upload') }}',
+			uploadSecurityToken: '{{ security_token('attach_temp') }}',
+			autoStart: {% if auto_start %}true{% else %}false{% endif %},
+			isWindowMode: {% if is_window_mode %}true{% else %}false{% endif %}
+		});
+		$(document).ready(function() {
+
+			if ($(window).height() > $('#dp_chat_start').find('article').height()) {
+
+			}
+
+			window.DeskPRO_Window.initPage();
+			ChatWin.initPage();
+
+			$('.dp-copy a').on('click', function(ev) {
+				ev.preventDefault();
+
+				var href = $(this).attr('href');
+				window.open(href);
+			})
+		});
+	</script>
+</head>
+<body id="dp_chat" {% if is_window_mode %}class="window-mode"{% endif %}>
+<div id="dp">
+<div id="dp_chat_wrap">
+
+<div id="dp_chat_end_confirm" style="display: none">
+	<article>
+		<p>
+			{{ phrase('user.chat.window_cancel-confirm') }}
+		</p>
+		<p>
+			<button class="dp-btn" id="dp_chat_end_no">{{ phrase('user.chat.window_cancel') }}</button>
+			<button class="dp-btn" id="dp_chat_end_yes">{{ phrase('user.chat.window_end-chat') }}</button>
+		</p>
+	</article>
+</div>
+
+<section class="dp-chat-active-state" id="dp_chat_start">
+	<header>
+		<h3>{{ phrase('user.chat.form_create_title') }}</h3>
+	</header>
+	<article id="dp_chat_start_form">
+		<div class="inner-wrapper">
+			{% if app.user.id %}
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>{{ phrase('user.chat.name') }}</label>
+					</div>
+					<div class="dp-controls">
+						{% if not app.user.name %}
+							<input type="text" name="name" placeholder="{{ phrase('user.chat.name') }}" value="{{ initial_name }}" /><br />
+						{% else %}
+							<strong style="font-size: 110%;">{{ app.user.name }}</strong>
+							<input type="hidden" name="name" value="{{ app.user.name }}" /><br />
+						{% endif %}
+					</div>
+				</div>
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>{{ phrase('user.chat.email') }}</label>
+					</div>
+					<div class="dp-controls">
+						{% if not app.user.email_address %}
+							<input type="text" name="email" placeholder="{{ phrase('user.chat.email') }}" value="{{ initial_email }}" />
+						{% else %}
+							<strong style="font-size: 110%;">{{ app.user.email_address }}</strong>
+							&nbsp; (<a href="{{ path('user_logout', {auth: static_security_token('user_logout', 0), via: 'user_chat' }) }}">{{ phrase('user.general.log_out') }}</a>)
+							<input type="hidden" name="email" value="{{ app.user.email_address }}" />
+						{% endif %}
+					</div>
+				</div>
+			{% endif %}
+
+			{#--- FIELDS CONTAINER ---#}
+			<div id="fields_container">
+				{# First time outputs items in order and visible depending on the page data #}
+				{% include 'UserBundle:Chat:field-list-loop.html.twig' with {'page_data': default_page_data, 'mode': 'default', 'page_data_field_ids': page_data_field_ids }%}
+			</div>
+			{#--- FIELDS CONTAINER ---#}
+
+			<div style="vertical-align: middle">
+				<button class="dp-btn dp-btn-success" id="dp_chat_start_go">{{ phrase('user.chat.form_create_button-submit') }}</button>
+			</div>
+		</div>
+
+		<footer id="dp_chat_start_footer" class="dp-chat-footer dp-relative">
+			{{ dp_copyright() }}
+		</footer>
+	</article>
+</section>
+
+<section class="dp-chat-active-state" id="dp_chat_finding_agent" style="display: none">
+	<header>
+		<div class="dp_chatwin_close"><i class="dp-icon-remove-sign"></i> {{ phrase('user.chat.window_end-chat') }}</div>
+
+		<h3>{{ phrase('user.chat.message_finding-agent') }}</h3>
+	</header>
+	<article>
+		<p>{{ phrase('user.chat.message_wait') }}</p>
+		<div id="dp_chat_finding_agent_loading">
+			<div class="dp-progress dp-progress-striped dp-active">
+				<div class="dp-bar" style="width: 1%;"></div>
+			</div>
+		</div>
+		<div id="dp_chat_finding_agent_more" style="display: none">
+			{{ phrase('user.chat.message_long-wait') }}
+		</div>
+	</article>
+</section>
+
+<section class="dp-chat-active-state" id="dp_chat_active" style="display: none">
+	<div id="dp_chat_filedrag">{{ phrase('user.chat.window_upload-drag') }}</div>
+	<header>
+		<div class="dp_chatwin_close"><i class="dp-icon-remove-sign"></i> {{ phrase('user.chat.window_end-chat') }}</div>
+
+		<div id="dpchat_with_agent" style="display: none"></div>
+		<h3 id="dpchat_without_agent">{{ phrase('user.chat.message_finding-agent') }}</h3>
+	</header>
+	<article>
+		<div id="dp_chat_messages_pane">
+			<div id="uploading_list" class="uploading-list">
+				<ul class="files"></ul>
+			</div>
+		</div>
+		<div id="dp_chat_input_pane">
+			<table cellspacing="0" cellpadding="0" width="100%"><tr>
+				<td width="100%" style="padding: 8px"><textarea id="dp_chat_message_input"></textarea></td>
+				<td width="10">&nbsp;</td>
+				<td nowrap="nowrap" style="padding: 8px;">
+					<button id="dp_chat_message_send" class="dp-btn">{{ phrase('user.chat.form_chat_button-submit') }}</button>
+				</td>
+			</tr></table>
+			<div id="dp_chat_message_upload">
+				<a id="dp_chat_upload_link"><i class="dp-icon-file"></i><span class="dp-link">{{ phrase('user.chat.form_chat_send-file') }}</span></a>
+				<input type="file" name="attach" id="dp_chat_message_upload_file" />
+			</div>
+		</div>
+	</article>
+</section>
+
+<section class="dp-chat-active-state" id="dp_chat_done" style="display: none">
+	<header>
+		<h3>{{ phrase('user.chat.form_feedback_title') }}</h3>
+	</header>
+	<article>
+		{# Field is hidden if the user entered an email addy, its sent automatically when chat ended #}
+		<div class="dp-control-group form-row email-field">
+			<div class="dp-control-label">
+				<label>{{ phrase('user.chat.form_feedback_transcript-email') }}</label>
+			</div>
+			<div class="dp-controls">
+				<input type="text" name="email" value="" placeholder="{{ phrase('user.chat.email') }}" />
+			</div>
+		</div>
+
+		<div class="dp-control-group">
+			<div class="dp-controls">
+				<input type="hidden" id="no_feedback" name="no_feedback" value="0" />
+				<table cellspacing="0" cellpadding="0" class="dp-layout">
+					<tr>
+						<td style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 5px; padding-bottom: 4px;">{{ phrase('user.chat.form_feedback_rate-time') }}</td>
+						<td style="padding-bottom: 4px;">
+							<select name="rating_response_time">
+								<option value="1">{{ phrase('user.chat.form_feedback_rate-satisfied') }}</option>
+								<option value="-1">{{ phrase('user.chat.form_feedback_rate-unsatisfied') }}</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 5px">{{ phrase('user.chat.form_feedback_rate-satisfaction') }}</td>
+						<td>
+							<select name="rating_overall">
+								<option value="1">{{ phrase('user.chat.form_feedback_rate-satisfied') }}</option>
+								<option value="-1">{{ phrase('user.chat.form_feedback_rate-unsatisfied') }}</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+				<textarea name="comments" style="width: 95%; margin-top: 3px;" placeholder="{{ phrase('user.chat.form_feedback_comments') }}"></textarea>
+			</div>
+		</div>
+
+		<div style="padding-bottom: 20px;">
+			<div id="send_feedback_controls">
+				<button class="dp-btn dp-btn-success" id="dp_chat_end_real">{{ phrase('user.chat.form_feedback_button-submit') }}</button>
+				<span class="dp-link" id="dp_chat_end_real_alt">{{ phrase('user.chat.window_close') }}</span>
+			</div>
+			<div id="send_feedback_loading" style="display: none;">
+				<i class="spinner-flat"></i>
+			</div>
+		</div>
+	</article>
+</section>
+
+<section class="dp-chat-active-state" id="dp_chat_done_unassigned" style="display: none">
+	<header>
+		<h3>{{ phrase('user.chat.submit-ticket-title') }}</h3>
+	</header>
+	<article>
+		<p>
+			{{ phrase('user.chat.ended-no-agent') }}
+		</p>
+
+		<div style="padding-bottom: 20px;">
+			{% if app.getSetting('user.portal_enabled') %}
+				<button class="dp-btn dp-btn-success cancel-and-newticket-trigger">{{ phrase('user.chat.submit-ticket-button') }}</button>
+			{% endif %}
+			<span class="dp-link" id="dp_chat_end_real_unassigned">{{ phrase('user.chat.window_close') }}</span>
+		</div>
+	</article>
+</section>
+
+<section class="dp-chat-active-state" id="dp_chat_error" style="display: none">
+	<header>
+		<h3>{{ phrase('user.chat.error') }}</h3>
+	</header>
+	<article>
+		<p id="dp_chat_error_text">
+			{{ phrase('user.profile.account_disabled_message') }}
+		</p>
+
+		<div style="padding-bottom: 20px;">
+			<span class="dp-link" id="dp_chat_end_error">{{ phrase('user.chat.window_close_only') }}</span>
+		</div>
+	</article>
+</section>
+
+</div>
+</div>
+
+<script type="text/x-deskpro-plain" id="dp_chat_tpl_agent_header">
+	<div class="dp-chatting-with">
+		<div class="avatar"><img src="%avatar_url%" /></div>
+		<h3 class="title">{{ phrase('user.chat.message_chatting-with') }}</h3>
+		<h3 class="name">%name%</h3>
+	</div>
+</script>
+<script type="text/x-deskpro-plain" id="dp_chat_tpl_user_message">
+	<div class="row message user">
+		<div class="time"></div>
+		<div class="author">{{ phrase('user.general.you') }}</div>
+		<div class="message">%message%</div>
+	</div>
+</script>
+<script type="text/x-deskpro-plain" id="dp_chat_tpl_agent_message">
+	<div class="row message agent">
+		<div class="time"></div>
+		<div class="avatar"><img src="%avatar_url_icon%" /></div>
+		<div class="author">%name%</div>
+		<div class="message">%message%</div>
+	</div>
+</script>
+<script type="text/x-deskpro-plain" id="dp_chat_tpl_sys_message">
+	<div class="row message sys">
+		<div class="author">*</div>
+		<div class="message">%message%</div>
+	</div>
+</script>
+<script type="text/x-deskpro-plain" id="dp_chat_tpl_sys_message_prompt">
+	<div class="row message sys-prompt">
+		<div class="message">%message%</div>
+	</div>
+</script>
+
+<script class="dptpl-attach-upload" type="text/x-tmpl">
+	{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+		<li class="uploading">{{ '{%=file.name%}' }} ({{ phrase('user.chat.message_uploading') }})</li>
+	{{ '{% } %}' }}
+</script>
+<script class="dptpl-attach-download" type="text/x-tmpl">
+	{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+	{{ '{% if (file.error) { %}'}}
+	<li class="error">
+		{{ '{%=file.error%}' }}
+	</li>
+	{{ '{% } else { %}'}}
+	<li>
+		<input type="hidden" name="{{ blob_field_name|default('attach_ids[]') }}" value="{{ '{%=file.blob_auth_id%}' }}" />
+		<label><a href="{{ '{%=file.download_url%}' }}" target="_blank">{{ '{%=file.filename%}' }}</a><span>{{ '{%=file.filesize_readable%}' }}</span></label>
+	</li>
+	{{ '{% } %}' }}
+	{{ '{% } %}' }}
+</script>
+
+</body>
+</html>

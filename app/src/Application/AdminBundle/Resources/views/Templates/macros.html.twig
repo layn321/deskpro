@@ -1,0 +1,231 @@
+{% macro render_dir(bundle_name, dirname, dirinfo, options) %}
+<div class="content-table template-dir">
+	<table width="100%">
+		<thead class="{% if dirinfo.count_outdated %}dir-outdated{% endif %} {% if dirinfo.count_changed %}dir-changed{% endif %}">
+		<tr>
+			<th class="single-title" colspan="10">
+				<span class="count-outdated">{{ phrase('admin.templates.count_outdated', {'count':dirinfo.count_outdated}) }}</span>
+				<span class="count-changed">{{ phrase('admin.templates.count_custom', {'count':dirinfo.count_changed}) }}</span>
+				<span class="count">{{ phrase('admin.templates.count_template', {'count':dirinfo.templates|length}) }}</span>
+				<h1 class="toggle-section {% if options.open %}expanded{% endif %}">{% if options.title %}{{ options.title }}{% else %}{% if dirname != '!top' %}{{ dirname }}{% else %}{{ phrase('admin.templates.layout') }}{% endif %}{% endif %}</h1>
+			</th>
+		</tr>
+		</thead>
+		<tbody {% if not options.open %}style="display: none"{% endif %}>
+		{% for name,info in dirinfo.templates %}
+		{{ _self.render_tpl(name, info) }}
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+<br />
+{% endmacro %}
+
+{% macro render_tpl(name, info) %}
+<tr id="row_{{ name|lower|replace({':': '_', '.': '_'}) }}" class="template-row {% if info.is_custom %}tpl-changed{% endif %} {% if info.is_outdated %}tpl-outdated{% endif %}" data-template-name="{{ name }}">
+	<td>
+		<em class="edit edit-tpl-trigger"></em>
+		<span class="changed-tag">{{ phrase('admin.templates.custom') }}</span>
+		<span class="outdated-tag">{{ phrase('admin.templates.outdated') }}</span>
+		<h3>{{ info.shortname }}</h3>
+	</td>
+</tr>
+{% endmacro %}
+
+{% macro render_editor_overlay(id, with_subject) %}
+	<div id="{{id|default('edittpl_overlay')}}" class="deskpro-overlay-outer" style="display: none;">
+		<div class="deskpro-overlay">
+			<div class="overlay-title">
+				<span class="close-overlay"></span>
+				<h4 class="template-title"></h4>
+			</div>
+			<div class="overlay-content">
+				{% if with_subject %}
+					<div class="subject-field" style="display: none;">
+						<strong>Subject:</strong><br />
+						<textarea class="template-subject-code" spellcheck="false" style="height: 85px;"></textarea>
+						<br />
+						<strong>Email Content:</strong>
+					</div>
+				{% endif %}
+				<textarea class="template-code" spellcheck="false"></textarea>
+			</div>
+			<div class="overlay-footer">
+				<div class="is-not-loading">
+					<button class="clean-white save-trigger">{{ phrase('admin.general.save_changes') }}</button>
+					&nbsp;&nbsp; <button class="clean-white revert-trigger">{{ phrase('admin.templates.revert_to_default') }}</button>
+				</div>
+				<div class="is-loading">
+					<div class="loading-icon-flat"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro email_template_row(title, template_name, options) %}
+	<div class="content-table template-dir template-editor-row" style="margin-bottom: 6px;">
+		<table width="100%" class="simple">
+			<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<h1 class="toggle-section">{{ title }} <i class="flat-spinner" style="display: none;"></i></h1>
+					</th>
+				</tr>
+			</thead>
+			<tbody style="display: none;">
+				<tr>
+					<td>
+						<div class="template-edit-row">
+							<div class="template-editor-wrap">
+								<div class="template-toolbar">
+									<ul>
+										<li class="new-phrase"><span>Add Phrase</span></li>
+										<li class="phrase-editor"><span>Phrase Editor</span></li>
+										<li class="view-default" style="{% if not options.default_template %}display:none;{% endif %}"><span>View Default</span></li>
+										<li class="reset-default" style="{% if not options.default_template %}display:none;{% endif %}"><span>Reset To Default</span></li>
+									</ul>
+								</div>
+								<textarea class="template-editor template" data-template-name="{{ template_name }}"></textarea>
+								<textarea class="body-default-code" style="display: none;"></textarea>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+			<tfoot style="display: none" class="save-control">
+				<tr>
+					<td>
+						<div class="is-not-loading">
+							<button class="clean-white save-trigger">Save</button>
+						</div>
+						<div class="is-loading" style="text-align: center"><i class="flat-spinner"></i></div>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+
+		{{ _self.render_editor_overlay() }}
+		{{ _self.render_addphrase_overlay() }}
+		{{ _self.render_addvariation_overlay() }}
+		{{ _self.render_lang_overlay() }}
+	</div>
+{% endmacro %}
+
+{% macro render_addphrase_overlay(id) %}
+	<div id="{{ id|default('add_phrase_overlay') }}" class="edit-phrase-overlay" style="width: 725px; height: 260px; display: none;">
+		<div class="overlay-title">
+			<span class="close-trigger close-overlay"></span>
+			<h4>Add Phrase</h4>
+		</div>
+		<div class="overlay-content">
+			<section class="phrase-section custom">
+				<header>
+					<h4>Unique Phrase ID</h4>
+				</header>
+				<article>custom.<input type="text" class="phrase_id" name="phrase_id" style="width: 200px;" /></article>
+			</section>
+			<section class="phrase-section custom">
+				<header>
+					<h4>{{ phrase('admin.languages.your_phrase') }}</h4>
+				</header>
+				<article><textarea class="custom_phrase" name="custom_phrase"></textarea></article>
+			</section>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white save-trigger" data-add-url="{{ path('admin_langs_newphrase', {language_id: 1}) }}">Save Phrase</button>
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro render_emailist_row(tpl, variations, trigger_map) %}
+	{% set phrase_key = 'admin.emailtpl_desc.' ~ tpl|lower|replace({'.':'_', ':':'_'}) %}
+	<tr class="{{ tpl|lower|replace({'.':'_', ':':'_'}) }}" data-template-name="{{ tpl }}">
+		<td>
+			<strong><a class="editable-link" href="{{ path('admin_templates_editemail', {name: tpl}) }}"><span>
+				{% if has_phrase(phrase_key ~ '_title') %}
+					{{ phrase(phrase_key ~ '_title') }}
+				{% else %}
+					{{  tpl|replace({'DeskPRO:emails_user:':'', '.html.twig':''}) }}
+				{% endif %}
+			</span></a></strong>
+			{%- if trigger_map[tpl] -%}
+				<span class="small-secondary-links">
+					(Used by triggers:&nbsp;
+						{%- for tr in trigger_map[tpl] -%}
+							<a href="{{ path('admin_tickettriggers_edit', {id: tr.id}) }}">{{ tr.title|default("Trigger #" ~ tr.id) }}</a>{% if not loop.last %}, {% endif %}
+						{%- endfor -%}
+					)
+				</span>
+			{%- endif -%}
+			<div class="tpl-desc">
+				{% if has_phrase(phrase_key ~ '_desc') %}
+					{{ phrase(phrase_key ~ '_desc') }}
+				{% endif %}
+				{% if variations %}
+					<div style="margin-top: 5px; font-size: 11px;">
+						Variations:
+						<ul class="small-detail-list">
+							{% for var_tpl in variations %}
+								<li>
+									<a class="editable-link" href="{{ path('admin_templates_editemail', {name: var_tpl.name}) }}"><span>
+										{{ var_tpl.name|replace({'DeskPRO:emails_user:': '', 'DeskPRO:emails_agent:': '', '.html.twig': ''}) }}
+									</span></a>
+									{%- if trigger_map[var_tpl.name] -%}
+										<span class="small-secondary-links">
+											(Used by triggers:&nbsp;
+												{%- for tr in trigger_map[var_tpl.name] -%}
+													<a href="{{ path('admin_tickettriggers_edit', {id: tr.id}) }}">{{ tr.title|default("Trigger #" ~ tr.id) }}</a>{% if not loop.last %}, {% endif %}
+												{%- endfor -%}
+											)
+										</span>
+									{%- endif -%}
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+		</td>
+	</tr>
+{% endmacro %}
+
+{% macro render_addvariation_overlay() %}
+	<div class="add-variation-overlay edit-phrase-overlay" style="width: 725px; height: 200px; display: none;">
+		<div class="overlay-title">
+			<span class="close-trigger close-overlay"></span>
+			<h4>Add Template Variation</h4>
+		</div>
+		<div class="overlay-content">
+			<section class="phrase-section custom">
+
+				You can create mutliple variations of an email and use triggers to change the template
+				you want to send to users based on any criteria you want.
+				<br />
+				<br />
+
+				<header>
+					<h4>Unique Template ID</h4>
+				</header>
+				<article>
+					custom_<input type="text" class="template_name" name="template_name" placeholder="Enter a unique ID that will be used to identify this template" style="width: 350px;" />
+				</article>
+			</section>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white save-trigger">Create Variation</button>
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro render_lang_overlay() %}
+	<div class="lang-overlay edit-phrase-overlay" style="width: 850px; height: 685px; display: none;">
+		<div class="overlay-title">
+			<span class="close-trigger close-overlay"></span>
+			<div class="lang_overlay_nav"></div>
+		</div>
+		<div class="overlay-content">
+			<div class="lang_overlay_content"></div>
+		</div>
+	</div>
+{% endmacro %}

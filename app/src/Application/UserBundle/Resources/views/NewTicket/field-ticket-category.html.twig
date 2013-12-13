@@ -1,0 +1,21 @@
+{##
+ # The category select box of the new ticket form
+ ##}
+
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+<div class="dp-control-group {% if error_fields['ticket.category_id'] %}dp-error{% endif %} ticket_category">
+	<div class="dp-control-label">
+		<label><strong>{{ phrase('user.tickets.fields_category') }}</strong></label>
+	</div>
+	<div class="dp-controls dp-fill">
+		<select name="newticket[ticket][category_id]" class="category_id">
+			<option></option>
+			{% for cat in app.getDataService('TicketCategory').getRootNodes() %}
+				{{ formmacro.select_options_hierarchy(cat, newticket.ticket.category_id) }}
+			{% endfor %}
+		</select>
+		<div class="dp-help-inline dp-error-explain">
+			{{ phrase('user.tickets.form_error_category') }}
+		</div>
+	</div>
+</div>

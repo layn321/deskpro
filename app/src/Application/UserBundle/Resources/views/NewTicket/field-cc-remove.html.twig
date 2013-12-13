@@ -1,0 +1,10 @@
+<div class="dp-control-group ticket_remove_ccs {% if error_fields['ticket.remove_ccs'] %}dp-error{% endif %}">
+	<div class="dp-control-label">
+		<label><strong>{{ phrase('user.tickets.label_remove_ccs') }}</strong></label>
+	</div>
+	<div class="dp-controls dp-fill">
+		{% for part in user_participants %}
+			<div><label><input type="checkbox" name="newticket[ticket][remove_ccs][]" value="{{ part.person.id }}" /> {{ part.person.display_name_user }} &lt;{{ part.person.email_address }}&gt;</label></div>
+		{% endfor %}
+	</div>
+</div>

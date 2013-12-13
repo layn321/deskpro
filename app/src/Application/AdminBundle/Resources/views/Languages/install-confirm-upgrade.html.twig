@@ -1,0 +1,18 @@
+{% extends 'AdminBundle:Languages:lang-layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_langs') }}">{{ phrase('admin.general.languages') }}</a></li>
+	<li>{{ phrase('admin.languages.new_language') }}</li>
+</ul>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_langs_installupload') }}" method="POST">
+	<input type="hidden" name="pack_string" value="{{ pack }}" />
+	<p>
+		"{{ lang_title }}" is <a href="{{ path('admin_langs_editlang', {language_id: language.id}) }}">already installed</a>. Do you want to upgrade it?
+	</p>
+	<p>
+		<button name="confirm_upgrade" value="1" class="clean-white">Upgrade {{ language.title }}</button>
+	</p>
+</form>
+{% endblock %}

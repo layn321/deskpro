@@ -1,0 +1,59 @@
+{% set this_page = 'report_billing' %}
+{% extends 'ReportBundle::layout.html.twig' %}
+{% block html_head %}
+{{ dp_asset_html('report_builder') }}
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+    window._dpRbGroupParams = {{ reportGroupParams|json_encode|raw }};
+
+    function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Report.PageHandler.ReportBuilder();
+	}
+</script>
+{% endblock %}
+{% block nav_block %}
+{% endblock %}
+{% block pagebar %}
+{% endblock %}
+{% macro billing_report_list_item(report, params) %}
+	<li>
+		<a rel="report-page-body" class="report-list-title" href="{{ path('report_billing_report', {'report_id': report.id, 'params': params}) }}" title="{{ report.title_placeholder|default(report.title) }}">{{ report.title }}</a>
+	</li>
+{% endmacro %}
+{% block all_page %}
+<div id="report-container" class="report-container-billing">
+	<div id="report-list" data-element-handler="DeskPRO.Report.ElementHandler.Builder.ReportList"
+		data-cookie="dp_report_list_width"
+		data-min="120"
+		data-max="900"
+	>
+		<div id="report-container-inner">
+
+		<h3>Billing Reports</h3>
+		<ul class="report-list-groupable">
+		{% for report in billingReports %}
+			{{ _self.billing_report_list_item(report) }}
+		{% endfor %}
+		</ul>
+
+		</div>
+	</div>
+
+	<div id="report-page-body">
+		<!--dp:report-page-body-->
+		<div id="report-page-body-inner">
+		{% block inner_page %}{% endblock %}
+		</div>
+		<!--/dp:report-page-body-->
+	</div>
+	<div id="report-failed-block">
+		<div class="query-error">
+			The report failed to load. Please try again.
+		</div>
+	</div>
+</div>
+<div id="report-loading-block">
+	Loading... <img src="{{ asset('images/spinners/loading-small.gif') }}" alt="" />
+</div>
+{% endblock %}

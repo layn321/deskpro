@@ -1,0 +1,6 @@
+<li class="ticket_field_{{field.field_def.id}} field-{{field.field_def.id}} display-item original" data-item-name="{{field.title}}" data-item-id="ticket_field.{{field.field_def.id}}">
+	{{field.title}}
+	<div style="display:none" class="rendered">
+		{{ form_widget(field.formView, {}, {}, ['AgentBundle:Ticket:custom-field-forms.html.twig']) }}
+	</div>
+</li>

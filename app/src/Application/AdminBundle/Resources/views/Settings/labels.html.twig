@@ -1,0 +1,107 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('agent.general.labels') }}</li>
+	</ul>
+{% endblock %}
+{% block page_nav %}
+<div>
+	<section class="top">
+		<header>
+			<h4>{{ phrase('admin.settings.label_types') }}</h4>
+		</header>
+		<article>
+			<ul>
+				<li class="{% if label_type == 'all' %}on{% endif %}">
+					<span class="count" id="labels_count_all">{{ def_counts.TOTAL|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'all'}) }}">{{ phrase('agent.general.all') }}</a>
+				</li>
+				<li class="{% if label_type == 'articles' %}on{% endif %}">
+					<span class="count" id="labels_count_articles">{{ def_counts.articles|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'articles'}) }}">{{ phrase('agent.general.articles') }}</a>
+				</li>
+				<li class="{% if label_type == 'deals' %}on{% endif %}">
+					<span class="count" id="labels_count_deals">{{ def_counts.deals|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'deals'}) }}">{{ phrase('admin.general.deals') }}</a>
+				</li>
+				<li class="{% if label_type == 'downloads' %}on{% endif %}">
+					<span class="count" id="labels_count_downloads">{{ def_counts.downloads|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'downloads'}) }}">{{ phrase('agent.general.downloads') }}</a>
+				</li>
+				<li class="{% if label_type == 'feedback' %}on{% endif %}">
+					<span class="count" id="labels_count_feedback">{{ def_counts.feedback|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'feedback'}) }}">{{ phrase('agent.general.feedback') }}</a>
+				</li>
+				<li class="{% if label_type == 'news' %}on{% endif %}">
+					<span class="count" id="labels_count_news">{{ def_counts.news|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'news'}) }}">{{ phrase('agent.general.news') }}</a>
+				</li>
+				<li class="{% if label_type == 'organizations' %}on{% endif %}">
+					<span class="count" id="labels_count_organizations">{{ def_counts.organizations|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'organizations'}) }}">{{ phrase('agent.general.organizations') }}</a>
+				</li>
+				<li class="{% if label_type == 'people' %}on{% endif %}">
+					<span class="count" id="labels_count_people">{{ def_counts.people|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'people'}) }}">{{ phrase('agent.general.people') }}</a>
+				</li>
+				<li class="{% if label_type == 'tasks' %}on{% endif %}">
+					<span class="count" id="labels_count_tasks">{{ def_counts.tasks|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'tasks'}) }}">{{ phrase('agent.general.tasks') }}</a>
+				</li>
+				<li class="{% if label_type == 'tickets' %}on{% endif %}">
+					<span class="count" id="labels_count_tickets">{{ def_counts.tickets|default(0) }}</span>
+					<a href="{{ path('admin_labels', {'label_type': 'tickets'}) }}">{{ phrase('agent.general.tickets') }}</a>
+				</li>
+			</ul>
+		</article>
+	</section>
+</div>
+{% endblock %}
+{% block page %}
+<div
+	data-element-handler="DeskPRO.Admin.ElementHandler.LabelsPage"
+	data-delete-url="{{ path('admin_labels_del', {'label_type': label_type}) }}"
+	data-rename-url="{{ path('admin_labels_rename', {'label_type': label_type}) }}"
+>
+
+<nav class="page-top-hugnav">
+	<ul>
+		<li>
+			{{ phrase('admin.settings.sort') }}:
+			<a href="{{ path('admin_labels', {'label_type': label_type}) }}" style="{% if not order_by or order_by == 'alpha' %}font-weight: bold{% endif %}">{{ phrase('admin.general.alphabetical') }}</a>
+			/
+			<a href="{{ path('admin_labels', {'label_type': label_type, 'order_by': 'count'}) }}" style="{% if order_by == 'count' %}font-weight: bold{% endif %}">{{ phrase('admin.settings.usage_count') }}</a>
+		</li>
+	</ul>
+	<br class="clear" />
+</nav>
+
+<div class="new-label">
+	<form action="{{ path('admin_labels_new') }}" method="POST" id="new_label_form">
+		<input type="hidden" name="display_type" value="{{ label_type }}" />
+		<input type="text" placeholder="{{ phrase('admin.settings.new_label') }}" value="" name="label" /> <button class="clean-white small">{{ phrase('admin.settings.add_label') }}</button><br />
+		<div class="types">
+			{{ phrase('agent.general.types') }}:
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'articles' %}checked="checked"{% endif %} value="articles" /> {{ phrase('agent.general.articles') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'deals' %}checked="checked"{% endif %} value="deals" /> {{ phrase('admin.general.deals') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'downloads' %}checked="checked"{% endif %} value="downloads" /> {{ phrase('agent.general.downloads') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'feedback' %}checked="checked"{% endif %} value="feedback" /> {{ phrase('agent.general.feedback') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'news' %}checked="checked"{% endif %} value="news" /> {{ phrase('agent.general.news') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'organizations' %}checked="checked"{% endif %} value="organizations" /> {{ phrase('agent.general.organizations') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'people' %}checked="checked"{% endif %} value="people" /> {{ phrase('agent.general.people') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'tasks' %}checked="checked"{% endif %} value="tasks" /> {{ phrase('agent.general.tasks') }}</label>
+			<label><input type="checkbox" name="types[]" {% if label_type == 'all' or label_type == 'tickets' %}checked="checked"{% endif %} value="tickets" /> {{ phrase('agent.general.tickets') }}</label>
+		</div>
+	</form>
+</div>
+
+<ul class="labels-list" id="labels_list">
+	{% for label,count in labels %}
+		{% include 'AdminBundle:Settings:labels-row.html.twig' %}
+	{% endfor %}
+</ul>
+<br class="clear" />
+
+</div>
+{% endblock %}

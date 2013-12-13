@@ -1,0 +1,303 @@
+{%- macro get_sla_status(status) -%}
+	{%- if status == 'ok' -%}{{ phrase('agent.general.okay') }}
+	{%- elseif status == 'warning' -%}{{ phrase('agent.general.warning') }}
+	{%- elseif status == 'fail' -%}{{ phrase('agent.general.failed') }}{%- endif -%}
+{%- endmacro -%}
+{% if log.action_type == 'free' %}
+	{{ log.details.message }}
+{% elseif log.action_type == 'action_starter' %}
+	{% if log.details.event == 'new.email.user' %}
+		{{ phrase('agent.tickets.log_new_email_user') }}
+	{% elseif log.details.event == 'new.web.user.portal' %}
+		{{ phrase('agent.tickets.log_new_web_user_portal') }}
+	{% elseif log.details.event == 'new.web.user.embed' %}
+		{{ phrase('agent.tickets.log_new_web_user_embed') }}
+	{% elseif log.details.event == 'new.web.user.widget' %}
+		{{ phrase('agent.tickets.log_new_web_user_widget') }}
+	{% elseif log.details.event == 'new.email.agent' %}
+		{{ phrase('agent.tickets.log_new_email_agent') }}
+	{% elseif log.details.event == 'new.web.agent.portal' %}
+		{{ phrase('agent.tickets.log_new_web_agent_portal') }}
+	{% elseif log.details.event == 'new.web.api' %}
+		{{ phrase('agent.tickets.log_new_email_api') }}
+	{% elseif log.details.event == 'update.agent' %}
+		{% if log.details.has_reply  %}
+			{{ phrase('agent.tickets.log_update_agent_reply') }}
+		{% else %}
+			{{ phrase('agent.tickets.log_update_agent') }}
+		{% endif %}
+	{% elseif log.details.event == 'update.user' %}
+		{% if log.details.has_reply  %}
+			{{ phrase('agent.tickets.log_update_user_reply') }}
+		{% else %}
+			{{ phrase('agent.tickets.log_update_user') }}
+		{% endif %}
+	{% elseif log.details.event == 'update.escalation' %}
+		{{ phrase('agent.tickets.log_update_escalation') }}
+	{% else %}
+		{{ log.details.event }}
+	{% endif %}
+{% elseif log.action_type == 'changed_agent' %}
+	<span class="type">{{ phrase('agent.general.assigned_agent') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_agent_name|default(phrase('agent.general.unassigned'))}}</span>
+    {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_agent_name|default(phrase('agent.general.unassigned'))}}</span>
+{% elseif log.action_type == 'changed_agent_team' %}
+	<span class="type">{{ phrase('agent.general.assigned_team') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_agent_team_name|default(phrase('agent.general.none'))}}</span>
+    {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_agent_team_name|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'participant_added' %}
+	<span class="type">{{ phrase('agent.tickets.participant_added') }}</span>: <span class="new-val">{{log.details.email}}</span>
+{% elseif log.action_type == 'participant_removed' %}
+	<span class="type">{{ phrase('agent.tickets.participant_removed') }}</span>: <span class="old-val">{{log.details.email}}</span>
+{% elseif log.action_type == 'ticket_created' %}
+	{{ phrase('agent.general.ticket') }} <span class="new-val">{{ phrase('agent.general.id') }} {{log.details.ticket_id}}</span> {{ phrase('agent.tickets.lc_created') }}
+	{% if log.details.via_comment %}
+		<div stye="font-size:11px;">
+			&bull;
+			{% if log.details.via_comment.comment_type %}
+				{{ phrase('agent.tickets.log_created_via_comment', {id: log.details.via_comment.comment_id}) }}
+			{% endif %}
+			{% if log.details.via_comment.comment_type == 'articles' %}
+				{{ phrase('agent.tickets.log_on_article', {title: details.via_comment.comment_content_title, id: log.details.via_comment.comment_content_id}) }}
+			{% elseif log.details.via_comment.comment_type == 'downloads' %}
+				{{ phrase('agent.tickets.log_on_download', {title: details.via_comment.comment_content_title, id: log.details.via_comment.comment_content_id}) }}
+			{% elseif log.details.via_comment.comment_type == 'news' %}
+				{{ phrase('agent.tickets.log_on_news', {title: details.via_comment.comment_content_title, id: log.details.via_comment.comment_content_id}) }}
+			{% elseif log.details.via_comment.comment_type == 'feedback' %}
+				{{ phrase('agent.tickets.log_on_feedback', {title: details.via_comment.comment_content_title, id: log.details.via_comment.comment_content_id}) }}
+			{% endif %}
+		</div>
+	{% endif %}
+{% elseif log.action_type == 'subject' %}
+	{{ phrase('agent.tickets.subject_changed_from') }} <span class="old-val">{{ log.details.old_subject }}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{ log.details.new_subject }}</span>
+{% elseif log.action_type == 'ticket_split' %}
+    {{ phrase('agent.tickets.ticket_split_from') }} <span class="old-val">{{ phrase('agent.general.id') }} {{log.details.from_ticket_id}}</span>
+{% elseif log.action_type == 'ticket_split_to' %}
+    {{ phrase('agent.tickets.ticket_split_to') }} <span class="old-val">{{ phrase('agent.general.id') }} {{log.details.to_ticket_id}}</span> ({{ phrase('agent.tickets.x_messages_moved', {'count': log.details.messages_moved|default(0)}) }})
+{% elseif log.action_type == 'merged' %}
+	{{ phrase('agent.general.ticket') }} <span class="old-val">{{ phrase('agent.general.id') }} {{log.id_before}}</span> {{ phrase('agent.tickets.merged_into_this') }}
+	{% if log.details.lost is not empty %}
+		<ul>
+		{% for type,data in log.details.lost %}
+			{% if type == 'fields' %}
+				{% for field_data in data %}
+					<li>{{ phrase('agent.general.lost_field', {field: field_data.0}) }}: {{ field_data.1 }}</li>
+				{% endfor %}
+			{% else %}
+				<li>{{ phrase('agent.general.lost_field', {field: type}) }}: {{ data }}</li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+	{% endif %}
+{% elseif log.action_type == 'merged_message' %}
+    {{ phrase('agent.general.message') }} <span class="old-val">{{ phrase('agent.general.id') }} {{log.details.message_id}}</span> {{ phrase('agent.tickets.into_this_from_ticket', {'id':log.details.old_ticket_id}) }}
+{% elseif log.action_type == 'merged_attach' %}
+    {{ phrase('agent.tickets.attachment') }} <span class="old-val">{{ phrase('agent.general.id') }} {{log.id_object}}</span> {{ phrase('agent.tickets.into_this_from_ticket', {'id':log.id_before}) }}
+{% elseif log.action_type == 'labels_added' %}
+	{{ phrase('agent.general.labels_added') }}: <span class="new-val">{{ log.details.labels|implode(', ') }}</span>
+{% elseif log.action_type == 'labels_removed' %}
+	{{ phrase('agent.general.labels_removed') }}: <span class="new-val">{{ log.details.labels|implode(', ') }}</span>
+{% elseif log.action_type == 'changed_category' %}
+	<span class="type">{{ phrase('agent.general.category') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_category_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_category_title|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'changed_department' %}
+	<span class="type">{{ phrase('agent.general.department') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_department_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_department_title|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'changed_language' %}
+	<span class="type">{{ phrase('agent.general.language') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_language_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_language_title|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'changed_organization' %}
+	<span class="type">{{ phrase('agent.general.organization') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_org_name|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_org_name|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'changed_subject' %}
+	<span class="type">{{ phrase('agent.general.subject') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_subject|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_subject|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'changed_person' %}
+	<span class="type">{{ phrase('admin.api.user_owner') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{ phrase('agent.general.id') }} {{log.details.old_person_id}} {{old_person_name}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{ phrase('agent.general.id') }} {{log.details.new_person_id}} {{new_person_name}}</span>
+{% elseif log.action_type == 'executed_triggers' %}
+	<span class="type">{{ phrase('agent.general.ticket_triggers') }}</span> {{ phrase('agent.tickets.applied') }}:
+	<span class="new-val">{{ log.details.trigger_titles }}</span>
+{% elseif log.action_type == 'executed_escalations' %}
+	<span class="type">{{ phrase('agent.general.ticket_escalations') }}</span> {{ phrase('agent.tickets.applied') }}:
+	<span class="new-val">{{ log.details.trigger_titles }}</span>
+{% elseif log.action_type == 'message_created' %}
+	<span style="{{ layout.actiontext_style('type') }}">
+		{% if log.details.is_agent_note %}
+			{{ phrase('agent.tickets.new_note') }}
+		{% else %}
+			{{ phrase('agent.tickets.new_message') }}
+		{% endif %}
+	</span>
+	{% if log.details.message_id %}<span class="new-val message-id-txt" data-message-id="{{ log.details.message_id }}">{{ phrase('agent.general.id') }} {{log.details.message_id}}</span>{% endif %}
+	{% if log.details.ip_address %}
+    {{ phrase('agent.tickets.from_web', {'address':log.details.ip_address}) }}
+	{% endif %}
+	{% if log.details.email %}
+    {{ phrase('agent.tickets.from_email', {'address':log.details.email}) }}
+	{% endif %}
+	&mdash;
+	<a href="{{ path('agent_ticket_message_window', {ticket_id: ticket.id, message_id: log.details.message_id, _rt: security_token('request_token', 10800)}) }}" onclick="window.open($(this).attr('href'), 'msgwin', 'status=0,toolbar=0,location=0,menubar=0,directories=0,resizable=1,scrollbars=1,height=600,width=780'); return false;">{{ phrase('agent.general.view') }} <i class="icon-external-link" style="font-size: 11px;"></i></a>
+{% elseif log.action_type == 'message_removed' %}
+	{% if log.details.is_agent_note %}
+		<span class="type">{{ phrase('agent.tickets.log_note_deleted') }}</span>
+	{% else %}
+		<span class="type">{{ phrase('agent.tickets.log_message_deleted') }}</span>
+	{% endif %}
+	<span class="new-val {% if log.details.old_message %}expand{% endif %}" data-set=".set-orig">{{ phrase('agent.general.id') }} {{log.details.message_id}}</span>
+	{% if log.details.is_agent_message %}
+		({{ phrase('agent.tickets.log_written_by_agent', {name: log.details.person_name}) }})
+	{% else %}
+		({{ phrase('agent.tickets.log_written_by', {name: log.details.person_name, id: log.details.person_id }) }})
+	{% endif %}
+	{% if log.details.old_message %}
+		<div class="expand-set set-orig" style="display: none">
+			<div style="width: 95%; max-height: 200px; overflow: auto; font-size: 11px;">{{ phrase('agent.tickets.log_message_old_message') }}:<br/>
+				<textarea style="width: 80%; height: 150px; font-family: Consolas, Monaco, monospace;">{{ log.details.old_message }}</textarea>
+			</div>
+		</div>
+	{% endif %}
+{% elseif log.action_type == 'changed_priority' %}
+	<span class="type">{{ phrase('agent.general.priority') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_priority_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_priority_title|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'changed_workflow' %}
+	<span class="type">{{ phrase('agent.general.workflow') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_workflow_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_workflow_title|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'changed_urgency' %}
+	<span class="type">{{ phrase('agent.general.urgency') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_urgency}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_urgency}}</span>
+{% elseif log.action_type == 'changed_product' %}
+	<span class="type">{{ phrase('agent.general.product') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{log.details.old_product_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_product_title|default(phrase('agent.general.none'))}}</span>
+{% elseif log.action_type == 'attach_added' %}
+	<span class="type">{{ phrase('agent.tickets.new_attachment') }}</span> <span class="new-val">{{ phrase('agent.general.id') }} {{log.details.attach_id}} {{ log.details.filename }}</span>
+{% elseif log.action_type == 'attach_removed' %}
+	<span class="type">{{ phrase('agent.tickets.attachment_deleted') }}</span> <span class="old-val">{{ phrase('agent.general.id') }} {{log.details.old_attach_id}} {{ log.details.filename }}</span>
+	{% if log.details.message_id %}
+		(<span class="old-val">{{ phrase('agent.general.id') }} {{log.details.message_id}}</span>
+		{% if log.details.message_person_name %} {{ log.details.message_person_name }}{% endif %}
+	{% endif %}
+{% elseif log.action_type == 'changed_status' %}
+	<span class="type">{{ phrase('agent.general.status') }}</span> {{ phrase('agent.tickets.changed_from') }}
+	{% if log.details.old_status %}
+		{% set phrase_name = 'agent.tickets.status_' ~ log.details.old_status|replace({'.': '_'}) %}
+		<span class="old-val">{% if has_phrase(phrase_name) %}{{ phrase(phrase_name) }}{% else %}{{ log.details.old_status }}{% endif %}</span>
+	{% else %}
+		<span class="old-val">{{ phrase('agent.general.none') }}</span>
+	{% endif %}
+	{% set phrase_name = 'agent.tickets.status_' ~ log.details.new_status|replace({'.': '_'}) %}
+	{{ phrase('agent.tickets.changed_to') }} <span class="new-val">{% if has_phrase(phrase_name) %}{{ phrase(phrase_name) }}{% else %}{{ log.details.new_status }}{% endif %}</span>
+{% elseif log.action_type == 'changed_hold' %}
+	{% if log.details.is_hold %}{{ phrase('agent.tickets.ticket_put_on_hold') }}{% else %}{{ phrase('agent.tickets.ticket_removed_from_hold') }}{% endif %}
+{% elseif log.action_type == 'changed_custom_field' %}
+	<span class="type">{{ log.details.field_name }}</span> {{ phrase('agent.tickets.changed_from') }}
+	<span class="old-val">{{ log.details.value_before|default('(no value)')|raw }}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{ log.details.value_after|default('(no value)')|raw }}</span>
+{% elseif log.action_type == 'ticket_sla_added' %}
+	{{ phrase('agent.tickets.log_sla_added') }}: <span class="new-val">{{ log.details.title }}</span>
+	{% if log.details.sla_status != 'ok' or log.details.is_completed %}
+		({% if log.details.sla_status != 'ok' %}{{ _self.get_sla_status(log.details.sla_status) }}{% endif %}{% if log.details.sla_status != 'ok' and log.details.is_completed %}, {% endif %}{% if log.details.is_completed %}{{ phrase('agent.general.requirements_complete') }}{% endif %})
+	{% endif %}
+{% elseif log.action_type == 'ticket_sla_removed' %}
+	{{ phrase('agent.tickets.log_sla_removed') }}: <span class="new-val">{{ log.details.title }}</span>
+	{% if log.details.sla_status != 'ok' or log.details.is_completed %}
+		({% if log.details.sla_status != 'ok' %}{{ _self.get_sla_status(log.details.sla_status) }}{% endif %}{% if log.details.sla_status != 'ok' and log.details.is_completed %}, {% endif %}{% if log.details.is_completed %}{{ phrase('agent.general.requirements_complete') }}{% endif %})
+	{% endif %}
+{% elseif log.action_type == 'ticket_sla_updated' %}
+	{{ phrase('agent.tickets.log_sla_updated') }}: <span class="type">{{ log.details.title }}</span>
+	{% if log.details.status_changed %}
+		<span class="type">{{ phrase('agent.general.status') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span class="old-val">{{ _self.get_sla_status(log.details.original_status) }}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{ _self.get_sla_status(log.details.sla_status) }}</span>.
+	{% endif %}
+	{% if log.details.is_completed_changed %}
+		<span class="type">{{ phrase('agent.general.requirements') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span class="old-val">{{ log.details.original_is_completed ? 'Complete' : 'Incomplete' }}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{ log.details.is_completed ? 'Complete' : 'Incomplete'  }}</span>.
+	{% endif %}
+{% elseif log.action_type == 'agent_notify' %}
+	<span class="new-val expand">{{ phrase('agent.tickets.count_agents', {'count':log.details.who_emailed|length}) }}</span> {{ phrase('agent.tickets.notified_of') }}
+
+	{% if log.details.type == 'newticket'%}{{ phrase('agent.tickets.lc_new_ticket') }}
+	{% elseif log.details.type == 'newreply' %}{{ phrase('agent.tickets.lc_new_reply') }}
+	{% elseif log.details.type == 'updated' %}{{ phrase('agent.tickets.lc_update') }}
+	{% else %}{{ log.details.type }}
+	{% endif %}
+
+	{% if log.details.from_name or log.details.from_email %}
+		({{ phrase('agent.tickets.log_sent_from', {email: log.details.from_name ~ ' ' ~ log.details.from_email }) }})
+	{% endif %}
+
+	<div class="expand-set" style="display: none">
+		<ul>
+			{% for info in log.details.who_emailed %}
+				<li>
+					{% if not info.person_name or info.person_name == info.person_email %}
+						{{ info.person_email }}
+					{% else %}
+						{{ info.person_name }} &lt;{{ info.person_email }}&gt;
+					{% endif %}
+
+					{% if info.info %}
+						{% if info.info.filters %}({{ phrase('agent.tickets.log_sub_on_filter') }}: {{ info.info.filters|join(', ') }})
+						{% elseif info.info.is_via_trigger %}({{ phrase('agent.tickets.log_trigger_forced_notif') }})
+						{% endif %}
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% elseif log.action_type == 'user_notify' %}
+	<span class="new-val expand" data-set=".set-emailed">{{ phrase('agent.tickets.count_users', {'count':log.details.who_emailed|length}) }}</span> {{ phrase('agent.tickets.notified_of') }}
+
+	{% if log.details.type == 'newticket' %}{{ phrase('agent.tickets.lc_new_ticket') }}
+	{% elseif log.details.type == 'newticket_agent' %}{{ phrase('agent.tickets.lc_new_ticket_agent') }}
+	{% elseif log.details.type == 'newreply' %}{{ phrase('agent.tickets.lc_new_reply') }}
+	{% elseif log.details.message %}{{ log.details.message|replace({'DeskPRO:emails_user:custom_': ''}) }}
+	{% else %}{{ log.details.type }}
+	{% endif %}
+
+	{% if log.details.who_cced|length %}
+        {% set phrase_part %}
+            <span class="new-val expand" data-set=".set-cced">{{ phrase('agent.tickets.count_users', {'count':log.details.who_cced|length}) }}</span>
+        {% endset %}
+        {{ phrase('agent.tickets.and_count_were_cced', {'display_count':phrase_part,'count':log.details.who_cced|length}, true) }}
+	{% endif %}
+
+	{% if log.details.from_name or log.details.from_email %}
+		({{ phrase('agent.tickets.log_sent_from', {email: log.details.from_name ~ ' ' ~ log.details.from_email }) }})
+	{% endif %}
+
+	<div class="expand-set set-emailed" style="display: none">
+		<ul>
+			{% for info in log.details.who_emailed %}
+				<li>
+					{% if not info.person_name or info.person_name == info.person_email %}
+						{{ info.person_email }}
+					{% else %}
+						{{ info.person_name }} &lt;{{ info.person_email }}&gt;
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div class="expand-set set-cced" style="display: none">
+		<ul>
+			{% for info in log.details.who_cced %}
+				<li>
+					{% if not info.person_name or info.person_name == info.person_email %}
+						{{ info.person_email }}
+					{% else %}
+						{{ info.person_name }} &lt;{{ info.person_email }}&gt;
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% elseif log.action_type == 'message_edit' %}
+	<span class="new-val expand" data-set=".set-orig">{{ phrase('agent.tickets.log_message_updated', {id: log.details.message_id}) }}</span>
+	<div class="expand-set set-orig" style="display: none">
+		<div style="width: 95%; max-height: 200px; overflow: auto; font-size: 11px;">{{ phrase('agent.tickets.log_message_old_message') }}<br/>
+			<textarea style="width: 80%; height: 150px; font-family: Consolas, Monaco, monospace;">{{ log.details.old_message }}</textarea>
+		</div>
+	</div>
+{% elseif hide_unknow%}
+	{{ log.action_type }}
+{% endif %}

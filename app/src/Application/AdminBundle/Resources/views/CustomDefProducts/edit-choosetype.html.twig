@@ -1,0 +1,10 @@
+{% set def_type = 'people' %}
+{% extends 'AdminBundle:CustomDefAbstract:edit-choosetype.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_products') }}">{{ phrase('agent.general.products') }}</a></li>
+		<li><a href="{{ path('admin_customdefproducts') }}">{{ phrase('admin.custom_fields.product_fields') }}</a></li>
+		<li>{{ phrase('admin.general.choose_field_type') }}</li>
+	</ul>
+{% endblock %}

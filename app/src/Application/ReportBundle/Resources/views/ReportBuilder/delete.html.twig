@@ -1,0 +1,11 @@
+{% extends 'ReportBundle:ReportBuilder:layout.html.twig' %}
+{% block inner_page %}
+<form action="{{ path('report_builder_delete', {'report_builder_id': report.id|default(0)}) }}" method="post">
+
+	<p>Are you sure you want to delete the report {{report.getTitle(false)}}?</p>
+	<button class="btn">Delete Report</button>
+
+	<input type="hidden" name="process" value="1" />
+	{{ form_token() }}
+</form>
+{% endblock %}

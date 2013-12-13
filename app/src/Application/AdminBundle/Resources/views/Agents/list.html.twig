@@ -1,0 +1,178 @@
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.AgentListPage' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/AgentListPage.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a href="{{ path('admin_agents_newpre') }}">{{ phrase('admin.agents.add_agent') }}</a></li>
+			{% if add_from_usersource %}
+				{% if add_from_usersource|length > 1 %}
+					<li class="add" id="add_from_us_menu_trigger" style="margin-left: 6px"><a href="#">Add from usersource</a></li>
+				{% else %}
+					{% for us in add_from_usersource %}
+						<li class="add" style="margin-left: 6px"><a href="{{ path('admin_agents_new_fromusersource', {usersource_id: us.id}) }}">Add from: {{ us.title }}</a></li>
+					{% endfor %}
+				{% endif %}
+			{% endif %}
+		</ul>
+		{% if add_from_usersource and add_from_usersource|length > 1 %}
+			<ul id="add_from_us_menu" style="display: none;">
+				{% for us in add_from_usersource %}
+					<li><a href="{{ path('admin_agents_new_fromusersource', {usersource_id: us.id}) }}">Add from: {{ us.title }}</a></li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</nav>
+	<ul>
+		<li>{{ phrase('agent.general.agents') }}</li>
+	</ul>
+{% endblock %}
+{% block prepage %}
+	<div style="padding: 10px 10px 0 10px;">
+		{{ design.helpbox() }}
+			<p>{{ phrase('admin.agents.explain_agents') }}</p>
+			<p>{{ phrase('admin.agents.explain_agent_teams') }}</p>
+		{{ design.helpbox_end() }}
+	</div>
+{% endblock %}
+{% block sidebar_right %}
+	<div class="dp-page-box" style="margin-top: 0;">
+		<div class="resource-item-list">
+			<header>
+				<div class="controls">
+					<a class="clean-white small" href="{{ path('admin_agents_groups_new') }}">{{ phrase('agent.feedback.status_new') }}</a>
+				</div>
+				<h4>{{ phrase('admin.agents.permission_groups') }}</h4>
+			</header>
+			<article>
+				<article class="box-hint">{{ phrase('admin.agents.explain_permission_group') }}</article>
+				<ul>
+					{% for usergroup in all_usergroups %}
+						<li class="usergroup usergroup-{{usergroup.id}}" data-usergroup-id="{{usergroup.id}}">
+							<a class="title" href="{{ path('admin_agents_groups_edit', {'usergroup_id': usergroup.id}) }}">{{usergroup.title}}</a>
+							<div class="dp-icon-list">
+								<ul>
+									{% for id in usergroup_member_ids[usergroup.id] if all_agents[id] %}
+										{% set agent = all_agents[id] %}
+										<li><img src="{{ agent.getPictureUrl(30) }}" class="tipped" title="{{ agent.display_name }}" /></li>
+									{% endfor %}
+								</ul>
+								<br class="clear" />
+							</div>
+						</li>
+					{% else %}
+						{{ phrase('admin.agents.no_perm_groups_yet') }} <a href="{{ path('admin_agents_groups_new') }}">{{ phrase('admin.agents.click_here') }}</a> {{ phrase('admin.agents.to_create_one_now') }}
+					{% endfor %}
+				</ul>
+			</article>
+		</div>
+	</div>
+
+	<div class="dp-page-box">
+		<div class="resource-item-list dp-icon-group">
+			<header>
+				<div class="controls">
+					<a class="clean-white small" href="{{ path('admin_agents_teams_new') }}">{{ phrase('agent.feedback.status_new') }}</a>
+				</div>
+				<h4>{{ phrase('agent.general.teams') }}</h4>
+			</header>
+			<article>
+				<article class="box-hint">{{ phrase('admin.agents.explain_teams') }}</article>
+				<ul>
+					{% for team in all_teams %}
+						<li class="agent-team team-{{team.id}}" data-team-id="{{team.id}}">
+							<a class="title" href="{{ path('admin_agents_teams_edit', {'team_id': team.id}) }}">{{team.name}}</a>
+							<div class="dp-icon-list">
+								<ul>
+									{% for id in team_member_ids[team.id] if all_agents[id] %}
+										{% set agent = all_agents[id] %}
+										<li><img src="{{ agent.getPictureUrl(30) }}" class="tipped" title="{{ agent.display_name }}" /></li>
+									{% endfor %}
+								</ul>
+								<br class="clear" />
+							</div>
+						</li>
+					{% else %}
+						<li>
+							{{ phrase('admin.agents.no_teams_yet') }} <a href="{{ path('admin_agents_teams_new') }}">{{ phrase('admin.agents.click_here') }}</a> {{ phrase('admin.agents.to_create_one_now') }}
+						</li>
+					{% endfor %}
+				</ul>
+			</article>
+		</div>
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="dp-page-box">
+
+<div class="page-content agent-listing" style="padding-top: 0;">
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th class="single-title">{{ phrase('agent.general.agent') }}</th>
+					<th class="r-col" width="16"><img title="{{ phrase('admin.agents.can_access_admin_interface') }}" src="{{ asset('images/admin/icons/zone-admin.png') }}" /></th>
+					<th class="r-col" width="16"><img title="{{ phrase('admin.agents.can_access_reporting_interface') }}" src="{{ asset('images/admin/icons/zone-reports.png') }}" /></th>
+					<th class="r-col" width="16"><img title="{{ phrase('admin.agents.can_access_billing_interface') }}" src="{{ asset('images/admin/icons/zone-billing.png') }}" /></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for person in all_agents %}
+					{% if person.is_vacation_mode %}
+					<tr class="vacation-mode" data-agent-id="{{ person.id }}">
+						<td class="title" colspan="4">
+							<div class="vacation-mode-desc">
+								{{ phrase('admin.agents.vacation_mode') }}
+							</div>
+							<img src="{{ person.getPictureUrl(28) }}" align="left" style="margin-right: 6px;" />
+							<h4><a href="{{ path('admin_agents_edit', {'person_id': person.id} )}}">{{person.display_name}}</a></h4>
+							<address>{{person.primary_email_address}}</address>
+						</td>
+					</tr>
+					{% else %}
+						<tr data-agent-id="{{ person.id }}">
+							<td class="title">
+								{% if person.id in online_agents %}
+									<span class="online-badge">
+										online now
+										{% if person.id in online_agents_userchat %}
+											<em class="tipped kill-chat-session" data-agent-id="{{ person.id }}" title="Click here to sign the agent out of chat">/ available for chat</em>
+										{% endif %}
+									</span>
+								{% endif %}
+								<img src="{{ person.getPictureUrl(28) }}" align="left" style="margin-right: 6px;" />
+								<h4><a href="{{ path('admin_agents_edit', {'person_id': person.id} )}}">{{person.display_name}}</a></h4>
+								<address>{{person.primary_email_address}}</address>
+							</td>
+							<td class="prop r-col">{% if person.can_admin %}<img src="{{ asset('images/agent/icons/check.png') }}" />{% else %}&nbsp;{% endif %}</td>
+							<td class="prop r-col">{% if person.can_reports %}<img src="{{ asset('images/agent/icons/check.png') }}" />{% else %}&nbsp;{% endif %}</td>
+							<td class="prop r-col">{% if person.can_billing %}<img src="{{ asset('images/agent/icons/check.png') }}" />{% else %}&nbsp;{% endif %}</td>
+						</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+<div>
+
+{% if online_agents|length %}
+	<br/>
+	There are {{ online_agents|length }} online agents using the agent interface
+	&bull; <a href="{{ path('admin_login_logs') }}">View the login log</a>
+	<br/>
+{% endif %}
+
+{% if count_deleted %}
+	<div class="deleted-text">
+        <a href="{{ path('admin_agents_deleted') }}">{{ phrase('admin.agents.deleted_agents_exist', {'count':count_deleted}) }}</a>.
+	</div>
+{% endif %}
+
+{% include 'AdminBundle:Agents:edit-agent-overlays.html.twig' %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+<dp:subject>{{ phrase('user.email_subjects.feedback_new-approved') }}</dp:subject>
+{{ phrase('user.emails.feedback_thank-you', {'title':feedback.title}) }}
+
+<br /><br />
+
+{{ phrase('user.emails.feedback_approved') }}
+
+<br /><br />
+
+{{ phrase('user.emails.label_view-online') }}:
+<a href="{{ url_full('user_feedback_view', {'slug': feedback.url_slug}) }}">
+	{{ url_full('user_feedback_view', {'slug': feedback.url_slug}) }}
+</a>

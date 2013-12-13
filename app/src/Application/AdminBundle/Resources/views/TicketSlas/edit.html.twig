@@ -1,0 +1,386 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/SlaEdit.js') }}"></script>
+{% endblock %}
+{% set no_show_actions = ['add_sla', 'remove_sla', 'set_sla_status', 'set_sla_complete', 'recalculate_sla_status'] %}
+{% set no_show_criteria = ['sla', 'sla_status'] %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+	function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.SlaEdit();
+	}
+
+	function SlaEditPage_initTerms() {
+		var basename;
+
+		{% if sla.warning_trigger %}
+			{% for action in sla.warning_trigger.actions %}
+				{% if action.type not in no_show_actions %}
+					basename = this.getBaseName('warning_actions');
+					this.getActionEditor('warning_actions').addNewRow(
+						$('#warning_action_terms'),
+						basename,
+						{ type: '{{action.type}}', op: '{{action.op}}', options: {{action.options|json_encode|raw}} }
+					);
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+
+		{% if sla.fail_trigger %}
+			{% for action in sla.fail_trigger.actions %}
+				{% if action.type not in no_show_actions %}
+					basename = this.getBaseName('fail_actions');
+					this.getActionEditor('fail_actions').addNewRow(
+						$('#fail_action_terms'),
+						basename,
+						{ type: '{{action.type}}', op: '{{action.op}}', options: {{action.options|json_encode|raw}} }
+					);
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+
+		{% if sla.apply_trigger %}
+			{% for action in sla.apply_trigger.terms %}
+				{% if action.type not in no_show_criteria %}
+					basename = this.getBaseName('apply_criteria');
+					this.getCriteriaEditor('apply_criteria').addNewRow(
+						$('#apply_trigger_terms'),
+						basename,
+						{ type: '{{action.type}}', op: '{{action.op}}', options: {{action.options|json_encode|raw}} }
+					);
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	}
+</script>
+{% endblock %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_tickets_slas') }}">SLAs</a></li>
+	<li>{% if sla.id %}Edit SLA{% else %}New SLA{% endif %}</li>
+</ul>
+	{% if sla.id %}
+	<nav>
+		<ul>
+			<li class="delete"><a href="{{ path('admin_tickets_sla_delete', {'sla_id': sla.id, _dp_security_token: security_token('delete_sla') }) }}" class="click-confirm" data-confirm="Are you sure you want to delete this SLA?">{{ phrase('agent.general.delete') }}</a></li>
+		</ul>
+	</nav>
+{% endif %}
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_tickets_sla_edit', {'sla_id': sla.id|default(0)}) }}" method="post" class="dp-form sla-edit">
+
+	{% if errors %}
+	<ul id="errors_container">
+		{% for error in errors %}
+		<li>{{ error }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+	{% if show_warning_time_err %}
+		<ul id="errors_container">
+			<li>
+				The SLA Warning happens before an SLA fails, so the time for an SLA Warning must be lower than the SLA time.
+			</li>
+		</ul>
+	{% endif %}
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Title</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="title" value="{{sla.title}}" maxlength="100" />
+		</div>
+	</div>
+
+	<div class="dp-form-row-group" style="margin-top: 30px" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>SLA Type</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group {% if sla.sla_type == 'first_response' or not sla.sla_type %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="sla_type" value="first_response" {% if sla.sla_type == 'first_response' or not sla.sla_type %}checked="checked"{%endif%} />
+						Time until first response</label>
+				</div>
+				<div class="dp-input-group {% if sla.sla_type == 'resolution' %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="sla_type" value="resolution" {% if sla.sla_type == 'resolution' %}checked="checked"{%endif%} />
+						Time until ticket resolution</label>
+				</div>
+				<div class="dp-input-group {% if sla.sla_type == 'waiting_time' %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="sla_type" value="waiting_time" {% if sla.sla_type == 'waiting_time' %}checked="checked"{%endif%} />
+						User waiting time until ticket resolution</label>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row-group" style="margin-top: 30px" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Hours</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group {% if sla.active_time == 'default' or not sla.active_time %}on{% endif %}">
+					<a style="float:right" href="{{ path('admin_features_work_hours') }}">Edit Default Working Hours</a>
+					<label><input type="radio" class="option-trigger" name="active_time" value="default" {% if sla.active_time == 'default' or not sla.active_time %}checked="checked"{%endif%} />
+						Default ticket working hours</label>
+					<div style="margin-left: 30px; margin-top: 3px">
+						{% if default_work_hours.active_time == 'all' %}
+							24 hours a day, 7 days a week
+						{% else %}
+							{{ "%02d:%02d - %02d:%02d"|format(default_work_hours.start_hour, default_work_hours.start_minute, default_work_hours.end_hour, default_work_hours.end_minute) }}
+							(time zone: {{ default_work_hours.timezone|default(app.getSetting('core.default_timezone')) }})
+							{%- for day,null in default_work_hours.days -%},
+								{% if day == 0 -%}{{ phrase('agent.time.long-day_sunday') }}
+								{%- elseif day == 1 -%}{{ phrase('agent.time.long-day_monday') }}
+								{%- elseif day == 2 -%}{{ phrase('agent.time.long-day_tuesday') }}
+								{%- elseif day == 3 -%}{{ phrase('agent.time.long-day_wednesday') }}
+								{%- elseif day == 4 -%}{{ phrase('agent.time.long-day_thursday') }}
+								{%- elseif day == 5 -%}{{ phrase('agent.time.long-day_friday') }}
+								{%- elseif day == 6 -%}{{ phrase('agent.time.long-day_saturday') }}{%- endif %}
+							{%- endfor %} (excluding holidays)
+						{% endif %}
+					</div>
+				</div>
+				<div class="dp-input-group {% if sla.active_time == 'all' %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="active_time" value="all" {% if sla.active_time == 'all' %}checked="checked"{%endif%} />
+						24 hours a day, 7 days a week</label>
+				</div>
+				<div class="dp-input-group {% if sla.active_time == 'work_hours' %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="active_time" value="work_hours" {% if sla.active_time == 'work_hours' %}checked="checked"{%endif%} />
+						Set working hours
+					</label>
+					<ul class="dp-group-options sla-work-hours" style="display: none">
+						<li class="sla-work-time">
+							<label>Time</label>
+							<div>
+								<select name="work_start_hour">
+								{% for i in 0..23 %}
+									<option value="{{ i }}" {% if i == sla.work_start_hour %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select>:<select name="work_start_minute">
+								{% for i in 0..59 %}
+									<option value="{{ i }}" {% if i == sla.work_start_minute %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select>
+								<span class="sla-to">to</span>
+								<select name="work_end_hour">
+								{% for i in 0..23 %}
+									<option value="{{ i }}" {% if i == sla.work_end_hour %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select>:<select name="work_end_minute">
+								{% for i in 0..59 %}
+									<option value="{{ i }}" {% if i == sla.work_end_minute %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select></div>
+						</li>
+
+						<li class="sla-timezone">
+							<label>Time Zone</label>
+							<div>
+								<select name="work_timezone">
+								{% for tz in timezones %}
+									<option value="{{ tz }}" {% if sla.work_timezone == tz %}selected="selected"{% endif %}>{{ tz }}</option>
+								{% endfor %}
+								</select>
+							</div>
+						</li>
+
+						<li class="sla-work-days">
+							<label>Working Days</label>
+							<div>
+								<label><input type="checkbox" name="work_days[]" value="1" {% if sla.work_days[1] %}checked="checked"{% endif %} /> Mon</label>
+								<label><input type="checkbox" name="work_days[]" value="2" {% if sla.work_days[2] %}checked="checked"{% endif %} /> Tue</label>
+								<label><input type="checkbox" name="work_days[]" value="3" {% if sla.work_days[3] %}checked="checked"{% endif %}/> Wed</label>
+								<label><input type="checkbox" name="work_days[]" value="4" {% if sla.work_days[4] %}checked="checked"{% endif %} /> Thu</label>
+								<label><input type="checkbox" name="work_days[]" value="5" {% if sla.work_days[5] %}checked="checked"{% endif %} /> Fri</label>
+								<label><input type="checkbox" name="work_days[]" value="6" {% if sla.work_days[6] %}checked="checked"{% endif %} /> Sat</label>
+								<label><input type="checkbox" name="work_days[]" value="0" {% if sla.work_days[0] %}checked="checked"{% endif %} /> Sun</label>
+							</div>
+						</li>
+
+						<li class="sla-work-holidays" id="holidays">
+							<label>Holidays</label>
+							<div class="sla-holiday-years">
+								<select id="holiday_year">
+								{% for year in years %}
+									<option value="{{ year }}">{{ year }}</option>
+								{% endfor %}
+								</select>
+							</div>
+
+							<ul class="sla-holidays" id="holiday_options" data-count="{{ sla.work_holidays|length }}" data-months="{{ months|json_encode }}">
+								<li id="holiday_template" style="display:none">
+									<span class="remove delete-icon"></span>
+									<span class="date">[date]</span>
+									-
+									<span class="name">[name]</span>
+									<span class="repeat">(repeats annually)</span>
+									<span class="add-all">(adding to all SLAs)</span>
+								</li>
+							{% for key,holiday in sla.holidays_sorted %}
+								<li {% if holiday.year %}data-year="{{ holiday.year }}"{% endif %}
+									data-month="{{ holiday.month }}"
+									data-day="{{ holiday.day }}"
+								>
+									<span class="remove delete-icon"></span>
+									<span class="date">{{ holiday.day }} {{ months[holiday.month] }}{% if holiday.year %} {{ holiday.year }}{% endif %}</span>
+									-
+									<span class="name">{{ holiday.name }}</span>
+									{% if not holiday.year %}<span class="repeat">(repeats annually)</span>{% endif %}
+									<input type="hidden" name="work_holidays[{{ key }}][name]" value="{{ holiday.name }}" />
+									<input type="hidden" name="work_holidays[{{ key }}][day]" value="{{ holiday.day }}" />
+									<input type="hidden" name="work_holidays[{{ key }}][month]" value="{{ holiday.month }}" />
+									<input type="hidden" name="work_holidays[{{ key }}][year]" value="{{ holiday.year }}" />
+								</li>
+							{% endfor %}
+							</ul>
+
+							<div class="sla-holiday-add">
+								<input class="date" id="holiday_date" type="text" placeholder="Date" style="width: 75px" />
+								<input class="name" id="holiday_name" type="text" placeholder="Name" style="width: 150px" />
+								<label><input id="holiday_repeat" type="checkbox" value="1" /> Repeats annually</label>
+								<label><input id="holiday_add_all" type="checkbox" value="1" /> Add to all SLAs</label>
+								<button id="holiday_add" class="btn small">Add</button>
+							</div>
+						</li>
+
+
+						<li class="alert-message block-message note">
+							Time will only be logged towards the SLA warning or failure within working hours.
+							The warning and failure time units below should reflect the amount of time that passes during working hours only.
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row" style="margin-top: 30px; {% if show_warning_time_err %}border: 2px solid red; padding: 6px;{% endif %}">
+		<div class="dp-form-label">
+			<label>SLA Warning</label>
+		</div>
+		<div class="dp-form-input">
+			<span class="sla-type-text first_response">When a ticket has not received a response in</span>
+			<span class="sla-type-text resolution">When a ticket is not resolved in</span>
+			<span class="sla-type-text waiting_time">When a user has been waiting more than</span>
+
+			<input type="text" name="sla_warning_time" value="{{ sla.warning_trigger ? sla.warning_trigger.getOptionTime() : 30 }}" size="10" style="width: 40px; position:relative; top: 2px;" class="small" />
+			<select name="sla_warning_scale" class="select2">
+				{% for scale,label in {'minutes': phrase('admin.tickets.minutes'), 'hours': phrase('admin.tickets.hours'), 'days': phrase('admin.tickets.days'), 'weeks': phrase('admin.tickets.weeks'), 'months': phrase('admin.tickets.months')} %}
+					<option {% if (sla.warning_trigger ? sla.warning_trigger.getOptionScale() : 'minutes') == scale %}selected="selected"{% endif %} value="{{ scale }}">{{ label }}</option>
+				{% endfor %}
+			</select>
+			of SLA countable time, the ticket is close to failing the SLA.
+			<div class="dp-sub-section" style="border-top: none; margin-top: 2px">
+				<div class="terms-wrap trigger-actions">
+					<div class="terms-input" id="warning_action_terms"></div>
+					<div class="term-row add-term-row" data-name="warning_actions"><span class="add-term">{{ phrase('agent.general.widget_add') }}</span> Add Action</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row" style="margin-top: 30px">
+		<div class="dp-form-label">
+			<label>SLA Failure</label>
+		</div>
+		<div class="dp-form-input">
+			<span class="sla-type-text first_response">When a ticket has not received a response in</span>
+			<span class="sla-type-text resolution">When a ticket is not resolved in</span>
+			<span class="sla-type-text waiting_time">When a user has been waiting more than</span>
+
+			<input type="text" name="sla_fail_time" value="{{ sla.fail_trigger ? sla.fail_trigger.getOptionTime() : 60 }}" size="10" style="width: 40px; position:relative; top: 2px;" class="small" />
+			<select name="sla_fail_scale" class="select2">
+				{% for scale,label in {'minutes': phrase('admin.tickets.minutes'), 'hours': phrase('admin.tickets.hours'), 'days': phrase('admin.tickets.days'), 'weeks': phrase('admin.tickets.weeks'), 'months': phrase('admin.tickets.months')} %}
+					<option {% if (sla.fail_trigger ? sla.fail_trigger.getOptionScale() : 'minutes') == scale %}selected="selected"{% endif %} value="{{ scale }}">{{ label }}</option>
+				{% endfor %}
+			</select>
+			of SLA countable time, the ticket has failed the SLA.
+			<div class="dp-sub-section" style="border-top: none; margin-top: 2px">
+				<div class="terms-wrap trigger-actions">
+					<div class="terms-input" id="fail_action_terms"></div>
+					<div class="term-row add-term-row" data-name="fail_actions"><span class="add-term">{{ phrase('agent.general.widget_add') }}</span> Add Action</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row" style="margin-top: 30px">
+		<div class="dp-form-label">
+			<label>SLA Application</label>
+		</div>
+		<div class="dp-form-input">
+			<select name="apply_type" class="select2" id="apply_type_select">
+				<option value="all" {% if sla.apply_type == 'all' %}selected="selected"{% endif %}>Apply to all tickets</option>
+				<option value="priority" {% if sla.apply_type == 'priority' %}selected="selected"{% endif %}>Apply when a user submits a ticket with a specific priority</option>
+				<option value="criteria" {% if sla.apply_type == 'criteria' %}selected="selected"{% endif %}>Apply to new tickets with specific criteria</option>
+				<option value="manual" {% if sla.apply_type == 'manual' %}selected="selected"{% endif %}>Agents manually assign the SLA</option>
+				<option value="people_orgs" {% if sla.apply_type == 'people_orgs' %}selected="selected"{% endif %}>Apply to the following people and organizations</option>
+			</select>
+
+			<div class="apply_type_row" id="apply_type_show_priority" style="display:none; margin-top: 5px">
+				<select name="apply_priority_id" class="select2" data-select-width="auto">
+				{% for priority_id,name in priorities %}
+					<option value="{{ priority_id }}" {% if sla.apply_priority and sla.apply_priority.id == priority_id %}selected="selected"{% endif %}>{{ name }}</option>
+				{% endfor %}
+				</select>
+			</div>
+
+			<div class="apply_type_row" id="apply_type_show_criteria" style="display:none; margin-top: 5px">
+				<div id="apply_trigger_container" class="dp-sub-section" style="border-top: none;">
+					<div class="terms-wrap trigger-criteria">
+						<div class="terms-input" id="apply_trigger_terms"></div>
+						<div class="term-row add-term-row" data-name="apply_criteria"><span class="add-term">{{ phrase('agent.general.widget_add') }}</span> Add Criteria</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="apply_type_row" id="apply_type_show_people_orgs" style="display:none; margin-top: 5px">
+				<div style="overflow: hidden">
+					<label style="float: left">People:</label>
+					<div style="margin-left: 100px;"><input type="hidden" name="person_ids" id="person_ids" data-select-width="auto" data-select-width-shrink="20" value="{% for id,null in selected_people %}{{ id }},{% endfor %}" data-selected="{{ selected_people|json_encode }}" /></div>
+				</div>
+				<div style="overflow: hidden; margin-top: 5px">
+					<label style="float: left">Organizations:</label>
+					<div style="margin-left: 100px;"><input type="hidden" name="organization_ids" id="organization_ids" data-select-width="auto" data-select-width-shrink="20" value="{% for id,null in selected_organizations %}{{ id }},{% endfor %}" data-selected="{{ selected_organizations|json_encode }}" /></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="alert-message block-message note">
+		This SLA will not be automatically applied to existing tickets. It will only be automatically applied to new tickets that meet your requirements.
+		{% if sla.id %}If you change SLA types or time settings, these changes will not be fully applied to existing tickets with this SLA until the SLA is removed and re-added or the ticket's state changes.{% endif %}
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Save SLA</button>
+	</footer>
+
+	{{ form_token() }}
+	<input type="hidden" name="process" value="1" />
+</form>
+
+{% include 'AdminBundle:TicketTriggers:criteria.html.twig' with {
+	'classname': 'criteria-tpl',
+	'term_options': term_options,
+	'no_show_fields': no_show_criteria,
+	'event_trigger': criteria_trigger.event_trigger,
+	'event_trigger_master': criteria_trigger.getMasterEvent(),
+	'event_trigger_sub': criteria_trigger.getSubEvent(),
+} %}
+
+{% include 'AdminBundle:TicketTriggers:actions.html.twig' with {
+	'classname': 'actions-tpl',
+	'term_options': term_options,
+	'no_show_fields': no_show_actions,
+	'trigger': action_trigger,
+	'event_trigger': action_trigger.event_trigger,
+	'event_trigger_master': action_trigger.getMasterEvent(),
+	'event_trigger_sub': action_trigger.getSubEvent(),
+} %}
+{% endblock %}

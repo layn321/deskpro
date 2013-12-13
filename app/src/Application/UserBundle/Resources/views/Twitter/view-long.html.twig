@@ -1,0 +1,121 @@
+{% extends 'UserBundle::layout.html.twig' %}
+{% set title -%}
+	{% if long.is_public %}
+		Long tweet by @{{ long.status.user.screen_name }}
+	{% elseif long.status.recipient and not can_view %}
+		Private tweet
+	{% else %}
+		Private tweet by @{{ long.status.user.screen_name }}
+	{% endif %}
+{%- endset %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_long_tweet_view', {'long_id': long.id}) }}">{{ title }}</a></li>
+{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+
+<section class="dp-tweet dp-content-page dp-content-post">
+	<article style="border-top: none">
+		{% if can_view %}
+			<div class="dp-status-body">
+				<div class="dp-photo">
+					<a href="https://twitter.com/{{ long.status.user.screen_name }}" target="_blank"><img src="{{ long.status.user.profile_image_url }}" width="48" height="48" border="0" /></a>
+				</div>
+				<div class="dp-main-status-body">
+					<h4>
+						<a href="https://twitter.com/{{ long.status.user.screen_name }}" target="_blank" class="dp-name">{{ long.status.user.name }}</a>
+						<a href="https://twitter.com/{{ long.status.user.screen_name }}" target="_blank" class="dp-screen-name">@{{ long.status.user.screen_name }}</a>
+					</h4>
+
+					<div class="dp-status-text">{{ long.parsed_text|raw }}</div>
+
+					{% if long.status.isMessage() %}
+						<time class="timeago" title="{{long.status.date_created|date('c', 'UTC')}}">{{long.status.date_created|date('day')}}</time>
+					{% else %}
+						<a href="https://twitter.com/{{ long.status.user.screen_name }}/status/{{ long.status.id }}" target="_blank" class="timeago" title="{{long.status.date_created|date('c', 'UTC')}}">{{long.status.date_created|date('day')}}</a>
+					{% endif %}
+
+					{% if long.status.in_reply_to_status and not long.status.isMessage() %}
+						<div class="dp-extra-container">
+							{% set reply = long.status.in_reply_to_status %}
+							<div class="dp-in-reply-to">
+								In reply to
+								<a href="https://twitter.com/{{ reply.user.screen_name }}/status/{{ reply.id }}"><span class="dp-user"><strong>@{{ reply.user.screen_name }}</strong></span>
+								"{{ reply.getClippedText(70) }}"</a>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+
+				{% if not long.status.isMessage() %}
+					<ul class="dp-status-buttons">
+						<li class="dp-reply"><a href="https://twitter.com/intent/tweet?in_reply_to={{ long.status.id }}"><em></em>Reply</a></li>
+						<li class="dp-retweet"><a href="https://twitter.com/intent/retweet?tweet_id={{ long.status.id }}"><em></em>Retweet</a></li>
+						<li class="dp-favorite"><a href="https://twitter.com/intent/favorite?tweet_id={{ long.status.id }}"><em></em>Favorite</a></li>
+					</ul>
+				{% endif %}
+			</div>
+		{% else %}
+			{% if app.session.get('twitter_user_id') %}
+				<p>This is a private message that is not directed at you. You do not have permission to view it.</p>
+			{% else %}
+				{% if long.status.recipient %}
+					<p>This is a private message. You must sign in with Twitter to view this message.</p>
+				{% else %}
+					<p>This is a private message for @{{ long.for_user.screen_name }}. You must sign in with Twitter to view this message.</p>
+				{% endif %}
+				<div style="text-align: center; margin-top: 10px;">
+					<a href="{{ path('user_long_tweet_view', {'long_id': long.id, 'start': 1}) }}" class="dp-dp-btn dp-btn-primary">Sign in with Twitter</a>
+				</div>
+			{% endif %}
+		{% endif %}
+	</article>
+</section>
+
+<script type="text/javascript">
+(function() {
+  if (window.__twitterIntentHandler) return;
+  var intentRegex = /twitter\.com(\:\d{2,4})?\/intent\/(\w+)/,
+      windowOptions = 'scrollbars=yes,resizable=yes,toolbar=no,location=yes',
+      width = 550,
+      height = 420,
+      winHeight = screen.height,
+      winWidth = screen.width;
+
+  function handleIntent(e) {
+    e = e || window.event;
+    var target = e.target || e.srcElement,
+        m, left, top;
+
+    while (target && target.nodeName.toLowerCase() !== 'a') {
+      target = target.parentNode;
+    }
+
+    if (target && target.nodeName.toLowerCase() === 'a' && target.href) {
+      m = target.href.match(intentRegex);
+      if (m) {
+        left = Math.round((winWidth / 2) - (width / 2));
+        top = 0;
+
+        if (winHeight > height) {
+          top = Math.round((winHeight / 2) - (height / 2));
+        }
+
+        window.open(target.href, 'intent', windowOptions + ',width=' + width +
+                                           ',height=' + height + ',left=' + left + ',top=' + top);
+        e.returnValue = false;
+        e.preventDefault && e.preventDefault();
+      }
+    }
+  }
+
+  if (document.addEventListener) {
+    document.addEventListener('click', handleIntent, false);
+  } else if (document.attachEvent) {
+    document.attachEvent('onclick', handleIntent);
+  }
+  window.__twitterIntentHandler = true;
+}());
+</script>
+
+{% endblock %}

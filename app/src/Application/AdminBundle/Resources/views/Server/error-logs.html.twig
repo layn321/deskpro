@@ -1,0 +1,73 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('admin.general.error_logs') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<tbody>
+			<tr>
+				<td>DeskPRO Error Log</td>
+				<td>
+					{% set url %}{{ app.getSetting('core.deskpro_url') }}?_sys=errorlog&amp;_={{ static_security_token_secret(config_hash ~ 'errorlog', 86400) }}{% endset %}
+					<a href="{{ url }}" target="_blank">{{ url }}</a>
+				</td>
+			</tr>
+			<tr>
+				<td>Web PHP Error Log</td>
+				<td>
+					{% set url %}{{ app.getSetting('core.deskpro_url') }}?_sys=errorlog&amp;_={{ static_security_token_secret(config_hash ~ 'errorlog', 86400) }}&amp;web{% endset %}
+					<a href="{{ url }}" target="_blank">{{ url }}</a>
+				</td>
+			</tr>
+			<tr>
+				<td>Command-line PHP Error Log</td>
+				<td>
+					{% set url %}{{ app.getSetting('core.deskpro_url') }}?_sys=errorlog&amp;_={{ static_security_token_secret(config_hash ~ 'errorlog', 86400) }}&amp;cli{% endset %}
+					<a href="{{ url }}" target="_blank">{{ url }}</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<br />
+<br />
+
+{% if logs.count() %}
+	<div class="check-grid item-list">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th colspan="4" style="text-align: left; padding-left: 8px;">
+						<div style="float:right">
+							<a class="clean-white" href="{{ path('admin_server_error_logs', {download:1}) }}">Download error.log report file</a>
+						</div>
+						There are {{ logs.count() }} logged errors.
+						<a href="{{ path('admin_server_error_logs_clear', {x: security_token('clear_error_logs') }) }}">Clear all logged errors</a>.
+					</th>
+				</tr>
+				<tr>
+					<th width="50">{{ phrase('agent.general.id') }}</th>
+					<th>{{ phrase('agent.general.message') }}</th>
+					<th width="180">{{ phrase('agent.general.date') }}</th>
+					<th>Details&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for log in logs %}
+					<tr>
+						<td>{{log.id}}</td>
+						<td>{{log.summary}}</td>
+						<td>{{log.date}}</td>
+						<td><a href="{{ path('admin_server_error_logs_view', {'log_id': log.id}) }}">{{ phrase('admin.general.view') }}</a></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endif %}
+{% endblock %}

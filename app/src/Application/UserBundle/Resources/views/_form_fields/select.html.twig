@@ -1,0 +1,5 @@
+<select name="{{attributes.name}}" id="{{attributes.id}}" class="input-select" {% if attributes.multiple %}multiple="multiple" size="5"{% endif %}>
+	{% for choice in choices %}
+		<option value="{{choice.attributes.value}}" {% if choice.checked %}selected="selected"{% endif %}>{{choice.label}}</option>
+	{% endfor %}
+</select>

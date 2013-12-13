@@ -1,0 +1,93 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<div style="float:right; padding: 6px 6px 0 0">
+	<input type="text" id="settings_filter" value="" placeholder="{{ phrase('admin.settings.filter') }}" style="width: 200px;" />
+</div>
+<ul>
+	<li><a href="{{ path('admin_settings') }}">{{ phrase('agent.general.settings') }}</a></li>
+	<li>{{ phrase('agent.general.advanced') }}</li>
+</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/SettingsAdvanced.js') }}"></script>
+<style type="text/css">
+	.setting-input {
+		background-color: transparent;
+		border: 1px solid transparent;
+		cursor: pointer;
+		padding: 1px;
+		width: 99%;
+	}
+
+	.setting-input:hover, .setting-input:focus {
+		border: 1px solid #6D7985;
+	}
+
+	.setting-filter-form {
+		float: right;
+		font-size: 10px;
+		font-weight: bold;
+		padding: 1px 1px 0 0;
+	}
+
+	#settings_filter {
+		margin-left: 8px;
+		background-color: #fff;
+		padding: 1px;
+		border:  1px solid #979FAD;
+		font-size: 10px;
+		width: 150px;
+	}
+</style>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" charset="utf-8">
+function _page_exec() {
+	window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.SettingsAdvanced();
+}
+</script>
+{% endblock %}
+{% block page %}
+
+<div style="text-align: right; padding-bottom: 5px;">
+	<a href="#" id="revert_all_btn">{{ phrase('admin.settings.revert_all_settings') }}</a>
+</div>
+
+<div class="content-table">
+	<table cellspacing="0" cellpadding="0" width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left" width="200">{{ phrase('agent.general.name') }}</th>
+				<th style="text-align:left">{{ phrase('admin.general.default_value') }}</th>
+				<th style="text-align:left">{{ phrase('admin.settings.set_value') }}</th>
+			</tr>
+		</thead>
+		<tbody id="settings_rows">
+			{% for set_name,info in show_settings %}
+				<tr class="adv-setting {% if info.default != info.set %}changed{% endif %}">
+					<td>
+						{{set_name}}
+						<span class="revert tipped" title="{{ phrase('admin.settings.revert_settings_to_default') }}">{{ phrase('admin.general.revert') }}</span>
+					</td>
+					<td><input class="setting-input dp-set-default" value="{{ info.default }}" /></td>
+					<td><input  value="{{ info.set }}" class="setting-input dp-set-value" data-setting-name="{{set_name}}" /></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div id="revert_all_warn" style="width: 400px; height: 150px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.settings.revert_settings') }}</h4>
+	</div>
+	<div class="overlay-content">
+		{{ phrase('admin.settings.confirm_revert_all') }}
+	</div>
+	<div class="overlay-footer">
+		<a href="{{ path('admin_settings_adv', {revert_all: security_token('revert_all')}) }}" class="clean-white">{{ phrase('admin.settings.revert_all_settings') }}</a>
+	</div>
+</div>
+
+{% endblock %}

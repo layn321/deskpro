@@ -1,0 +1,16 @@
+User-agent: *
+Disallow: /app/
+Disallow: /data/
+Disallow: /web/
+Disallow: /admin/
+Disallow: /agent/
+Disallow: /api/
+Disallow: /billing/
+Disallow: /reports/
+Disallow: /install/
+Disallow: /index.php/admin/
+Disallow: /index.php/agent/
+Disallow: /index.php/api/
+Disallow: /index.php/billing/
+Disallow: /index.php/reports/
+Disallow: /index.php/install/

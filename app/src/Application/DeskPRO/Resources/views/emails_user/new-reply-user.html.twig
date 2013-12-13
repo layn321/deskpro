@@ -1,0 +1,16 @@
+<dp:subject>{{ phrase('user.email_subjects.tickets_re') }}</dp:subject>
+
+{{ phrase('user.emails.greeting') }}
+
+<br /><br />
+
+{{ phrase('user.emails.ticket_reply-confirm') }}
+
+<br /><br />
+
+<dp:ticket-history />
+
+<br /><br />
+
+{{ phrase('user.emails.ticket_access_ticket_online') }}
+<a href="{{ ticket.link }}">{{ ticket.link }}</a>

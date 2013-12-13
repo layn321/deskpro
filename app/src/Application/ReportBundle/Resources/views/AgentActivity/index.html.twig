@@ -1,0 +1,202 @@
+{% set this_page = 'agent_activity_index' %}
+{% extends 'ReportBundle::layout.html.twig' %}
+{% block nav_block %}
+{% endblock %}
+{% set url_agent_or_team_id %}{% if team_id %}team-{{ team_id }}{% elseif agent_id %}{{ agent_id }}{% else %}0{% endif %}{% endset %}
+{% block pagebar %}
+<ul>
+	<li>
+		Showing Agent Activity for:
+		<form style="display: inline">
+			<select id="agent_selector">
+				<option {% if agent_or_team_id == '0' %}selected="selected"{% endif %} value="{{ path('report_agent_activity_list', {'agent_or_team_id': 0, 'date':view_date|date('Y-m-d')}) }}">All Agents</option>
+				{% for agent in all_agents %}
+					<option {% if agent_or_team_id == '' ~ agent.id %}selected="selected"{% endif %} value="{{ path('report_agent_activity_list', {'agent_or_team_id': agent.id, 'date':view_date|date('Y-m-d')}) }}">
+						{{ agent.name }}
+					</option>
+				{% endfor %}
+				{% if agent_teams|length %}
+					<optgroup label="Teams">
+					{% for team in agent_teams %}
+						<option value="{{ path('report_agent_activity_list', {'agent_or_team_id': 'team-' ~ team.id, 'date':view_date|date('Y-m-d')}) }}" {% if agent_or_team_id == 'team-' ~ team.id %}selected="selected"{% endif %}>{{ team.name }}</option>
+					{% endfor %}
+					</optgroup>
+				{% endif %}
+			</select>
+		</form>
+		on
+		<span class="dp-nav-btn"><a href="{{ path('report_agent_activity_list', {'agent_or_team_id': url_agent_or_team_id, 'date':view_prev_date|date('Y-m-d')}) }}">&lt;</a></span>
+		<span class="dp-nav-btn datepicker"><a>{{ view_date|date('jS F Y') }}</a><em class="drop"></em><span class="hidden"></span></span>
+		{% if view_next_date %}
+			<span class="dp-nav-btn"><a href="{{ path('report_agent_activity_list', {'agent_or_team_id': url_agent_or_team_id, 'date': view_next_date|date('Y-m-d') }) }}">&gt;</a></span>
+		{% endif %}
+	</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<style type="text/css">
+#dp_admin_pagebar {
+	overflow: visible;
+}
+
+#dp_admin_pagebar .datepicker > a > em {
+	height: 6px;
+	margin-left: 8px;
+}
+
+#dp_admin_pagebar .datepicker > span {
+	font-size: 100%;
+	line-height: 100%;
+	text-shadow: none;
+}
+
+.reports_agent_activity_section .activity_table {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #CCCCCC;
+}
+
+.hour_cell {
+    text-align: center;
+}
+
+.activity_type_ticket .type_icon {
+    background-image: url({{ asset('images/agent/tabs/tabtype-ticket.png') }});
+}
+
+.activity_type_chat .type_icon {
+    background-image: url({{ asset('images/agent/tabs/tabtype-chat.png') }});
+}
+
+.activity_type_download .type_icon {
+    background-image: url({{ asset('images/agent/tabs/tabtype-download.png') }});
+}
+
+.activity_type_news .type_icon {
+    background-image: url({{ asset('images/agent/tabs/tabtype-news.png') }});
+}
+
+.activity_type_feedback .type_icon {
+    background-image: url({{ asset('images/agent/tabs/tabtype-feedback.png') }});
+}
+
+.activity_type_article .type_icon {
+    background-image: url({{ asset('images/agent/tabs/tabtype-content.png') }});
+}
+
+.activity .type_icon {
+    width: 15px;
+    height: 14px;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+	position: relative;
+	top: 3px;
+}
+
+.activity {
+    vertical-align: middle;
+}
+</style>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.datepicker > span').datepicker(
+                {
+                    'onSelect': function(dateText) {
+						document.location = "{{ path('report_agent_activity_list', {'agent_or_team_id': url_agent_or_team_id, 'date':''}) }}/" + dateText;
+					},
+                    'dateFormat': 'yy-mm-dd',
+                    'defaultDate': new Date({{ view_date|date('Y') }}, {{ view_date|date('m') }} -1, {{ view_date|date('d') }}),
+                    'maxDate': new Date({{ today|date('Y') }}, {{ today|date('m') }} -1, {{ today|date('d') }})
+                }
+        );
+        $('.datepicker').on('click', function(){
+            if($('.datepicker > span').hasClass('hidden')) {
+                $('.datepicker > span').removeClass('hidden');
+                $('.reports-popup-page-overlay').removeClass('hidden');
+            }
+            else {
+                $('.datepicker > span').addClass('hidden');
+                $('.reports-popup-page-overlay').addClass('hidden');
+            }
+        });
+        $('.reports-popup-page-overlay').on('click', function() {
+            $('.datepicker > a').click();
+        });
+        $('.activity_table > tbody > tr:odd').css('background-color', '#EEEEEE');
+        $('#agent_selector').on('change', function() {
+            document.location = $('#agent_selector').val();
+        })
+    });
+
+</script>
+<div class="reports_agent_activity_section">
+    {% if agents|length %}
+    <table class="activity_table">
+        <thead>
+            <tr>
+                <th>Hour</th>
+                {% for agent in agents %}
+                <th>{{ agent.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for hour in range(0,23) %}
+            <tr>
+                <td class="hour_cell">{{ '%02d'|format(hour) }}:00</td>
+                {% for agent in agents %}
+                <td>
+                    {% set hour_index = '_' ~ hour %}
+                    {% if activity[agent.id][hour_index] is defined %}
+                        {% for minute, logs in activity[agent.id][hour_index] %}
+                            {% set minute_display = '%02d'|format(minute) %}
+                            {% for row in logs %}
+                                {% set type = row.type %}
+                                {% set log = row.data %}
+                                {% if type == 'ticket' %}
+                                    {% set action_text %}
+                                    {% include 'ReportBundle:AgentActivity:ticket-log-actiontext.html.twig' %}
+                                    {% endset %}
+                                    {% if action_text|trim() is not empty %}
+                                    <div class="activity activity_type_{{ type }}"><div class="type_icon"></div>
+                                    ({{ minute_display }}) {{ action_text }} in
+                                    <a href="{{ app.request.getBaseUrl() }}/agent/#app.tickets,t:{{log.ticket.id}}">{{ log.ticket.subject }}</a>
+                                    </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="activity activity_type_{{ type }}"><div class="type_icon"></div>
+                                    {% if type == 'chat' %}
+                                        ({{ minute_display }}) Sent {{ row.count }} messages in chat
+                                        #<a href="{{ app.request.getBaseUrl() }}/agent/#app.userchat,c:{{row.conversation.id}}">{{row.conversation.id}}</a>
+                                    {% elseif type == 'news' %}
+                                        ({{ minute_display }}) Created news revision in
+                                        <a href="{{ app.request.getBaseUrl() }}/agent/#app.publish,n:{{log.id}}">{{ log.title }}</a>
+                                    {% elseif type == 'article' %}
+                                        ({{ minute_display }}) Created article revision in
+                                        <a href="{{ app.request.getBaseUrl() }}/agent/#app.publish,a:{{log.id}}">{{ log.title }}</a>
+                                    {% elseif type == 'download' %}
+                                        ({{ minute_display }}) Created download revision in
+                                        <a href="{{ app.request.getBaseUrl() }}/agent/#app.publish,d:{{log.id}}">{{ log.title }}</a>
+                                    {% elseif type == 'feedback' %}
+                                        ({{ minute_display }}) Created feedback revision in
+                                        <a href="{{ app.request.getBaseUrl() }}/agent/#app.feedback,a:{{log.id}}">{{ log.title }}</a>
+                                    {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No activity found for this date.</p>
+    {% endif %}
+    <div class="reports-popup-page-overlay hidden"></div>
+</div>
+{% endblock %}

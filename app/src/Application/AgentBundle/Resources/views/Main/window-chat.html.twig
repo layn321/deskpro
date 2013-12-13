@@ -1,0 +1,68 @@
+<div id="agent_chat_panel">
+	<header>
+		<div>
+			<ul id="agent_chat_panel_listviews">
+				<li data-tab-for="#agent_chat_panel .agents-list" class="active agents"><a><span class="user-icon">{{ phrase('agent.general.agents') }}</span></a></li>
+				{% if app.getSetting('core.use_agent_team') %}{% if agent_teams|length %}<li data-tab-for="#agent_chat_panel .teams-list" class="teams"><a><span class="team-icon">{{ phrase('agent.general.teams') }}</span></a></li>{% endif %}{% endif %}
+			</ul>
+		</div>
+		<span class="close-btn close-trigger"></span>
+	</header>
+	<section>
+		<div class="show-offline">
+			<label><input type="checkbox" class="show-offline-opt" />{{ phrase('agent.chat.show_offline') }}</label>
+		</div>
+		<div class="agents-list">
+			<div class="online-list">
+				<h6>{{ phrase('agent.chat.online') }}</h6>
+				<ul id="agent_online_list" class="list">
+					<li class="no-agents">{{ phrase('agent.chat.no_online_agents') }}</li>
+				</ul>
+			</div>
+			<div class="offline-list">
+				<h6>{{ phrase('agent.chat.offline') }}</h6>
+				<ul id="agent_offline_list" class="list">
+					{% for agent in agents %}
+						<li
+							class="agent-{{ agent.id }} {% if agent.id == app.user.id or agent.id in online_agent_ids %}online-now{% endif %}"
+							style="{% if agent.id == app.user.id or agent.id in online_agent_ids %}display: none;{% endif %}"
+							data-agent-id="{{ agent.id }}"
+							data-email="{{ agent.primary_email_address }}"
+							data-agent-name="{{ agent.display_name }}"
+							data-agent-short-name="{{ agent.getDisplayContactShort(4) }}"
+							data-picture-url="{{ agent.getPictureUrl(30) }}"
+							data-picture-url-sizable="{{ agent.getPictureUrl('_SIZE_') }}"
+						>
+							<div class="avatar" style="background-image: url({{ agent.getPictureUrl(30) }});"></div>
+							{{ agent.display_name }}
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		{% if app.getSetting('core.use_agent_team') %}
+		<div class="teams-list" style="display: none;">
+			<ul id="agent_team_list" class="list">
+				{% for team in agent_teams %}
+					<li
+						class="team-{{ team.id }}"
+						data-team-id="{{ team.id }}"
+						data-team-name="{{ team.name }}"
+						data-picture-url=""
+						data-picture-url-sizable=""
+						data-member-ids="{% for m in team.members %}{{ m.id }}{% if not loop.last %},{% endif %}{% endfor %}"
+					>
+						{#<div class="avatar" style="background-image: url({{ asset('images/icons.png') }});"></div>#}
+						{{ team.name }}
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% endif %}
+	</section>
+	<footer>
+		<button class="view-history view-history-trigger">{{ phrase('agent.chat.chat_history') }}</button>
+	</footer>
+</div>
+
+<div id="agent_chats_wrapper"></div>

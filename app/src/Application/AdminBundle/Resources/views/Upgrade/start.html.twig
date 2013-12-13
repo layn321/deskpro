@@ -1,0 +1,253 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+		<li>Upgrading DeskPRO</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="alert-message block-message info" style="border: 2px solid #CADFE5; margin-bottom: 15px;">
+	<h3>Your Version</h3>
+	<p>
+		You are using DeskPRO v4 build #{{ constant('DP_BUILD_NUM') }} (built on {{ constant('DP_BUILD_TIME')|date('Y-m-d') }}).
+	</p>
+	<br />
+
+	{% if version_info.build %}
+		<h3>Latest Version</h3>
+		<p>
+			The latest build is
+				<span class="{% if version_info.build == constant('DP_BUILD_TIME') %}{% else %}label important{% endif %}">#{{ version_info.build_num }}</span>
+				(built on {{ version_info.build|date('Y-m-d') }}).
+		</p>
+		{% if version_info.count_behind %}
+			<p>You are <span class="label" style="text-shadow: none; color: #000;">{{ version_info.count_behind }} version{% if version_info.count_behind != 1 %}s{% endif %} behind</span>. You can upgrade using one of the options outlined below.</p>
+		{% else %}
+			<p>Your helpdesk is up to date.</p>
+		{% endif %}
+	{% else %}
+		<p>
+			We were unable to make a network connection to our server to retrieve version information. This may indicate your server is behind a firewall.
+		</p>
+	{% endif %}
+</div>
+
+{% if version_info.build %}
+	{% set network_okay = true %}
+{% else %}
+	{% set network_okay = false %}
+{% endif %}
+
+{#######################################################################################################################
+ # Automatic
+ ######################################################################################################################}
+
+<div class="page-content" style="padding-top: 0;">
+	<div class="content-table template-dir">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th colspan="2" class="single-title">
+						<h1 class="toggle-section expanded">Schedule Automatic Upgrade</h1>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<div style="position:relative">
+
+							{% if not network_okay %}
+								<div class="warning-block-overlay">
+									<article>
+										<p>
+											We could not make a connection to our server. The automatic ugprader requires an active connection
+											to our server so we can download updates.
+										</p>
+
+										<p>
+											If your server is behind a firewall, disable it now and then refresh the page.
+										</p>
+									</article>
+								</div>
+							{% endif %}
+
+							<form class="dp-form" method="POST" action="{{ path('admin_upgrade') }}">
+								<input type="hidden" name="start" value="1" />
+								<div {% if app.getVariable('cron_is_problem') %}style="opacity: 0.4"{% endif %}>
+									<p style="margin-bottom: 15px">
+										Start the upgrade:
+										&nbsp;&nbsp;<br />
+										<label><input type="radio" name="minutes" value="0" checked="checked" /> Now</label>
+										&nbsp;&nbsp;
+										<label><input type="radio" name="minutes" value="0" /> Wait 5 minutes to allow agents to finish their work</label>
+									</p>
+
+									<p style="margin-bottom: 15px">
+										Before applying the upgrade:
+										&nbsp;&nbsp;<br />
+										<label><input type="checkbox" name="backup_files" value="1" checked="checked" /> Backup the current DeskPRO source files</label>
+										&nbsp;&nbsp;
+										<label><input type="checkbox" name="backup_db" value="1" checked="checked" /> Backup my database</label>
+									</p>
+
+									<p style="margin-bottom: 18px">
+										While the helpdesk is offline, show this message to users:
+										<input style="margin-top: 3px;" type="text" name="user_message" value="{{ app.getSetting('core.helpdesk_disabled_message') }}" />
+									</p>
+								</div>
+
+								{% if app.getVariable('cron_is_problem') %}
+									<p>
+										Scheduled tasks do not appear to be running. The automatic upgrader requires scheduled tasks.
+									</p>
+									<p>
+										<a class="btn primary" href="{{ path('admin_settings_cron') }}">Click here for information on scheduled tasks</a>
+									</p>
+								{% else %}
+									<p><button class="btn primary">Schedule Upgrade &rarr;</button></p>
+								{% endif %}
+							</form>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+{#######################################################################################################################
+ # Interactive
+ ######################################################################################################################}
+
+<div class="page-content agent-listing" style="padding-top: 0;">
+	<div class="content-table template-dir">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th colspan="2" class="single-title">
+						<h1 class="toggle-section">Using the interactive upgrader from the command-line</h1>
+					</th>
+				</tr>
+			</thead>
+			<tbody style="display: none">
+				<tr>
+					<td>
+						<p>
+							DeskPRO includes an automatic interactive upgrader that makes keeping your helpdesk up to date easy.
+							All you need to do run the "upgrade.php" file from the command-line.
+						</p>
+
+						<div style="text-align: center;">
+							<img src="{{ asset('images/instructions/interactive-upgrader.png') }}" />
+						</div>
+
+						<p>
+							Run this command to start the upgrader and then follow the simple on-screen instructions:
+						</p>
+						<code class="code-box nowrap">{{ php_path|default('/path/to/php') }} {{ constant('DP_WEB_ROOT') }}/upgrade.php</code>
+						<div class="small-note-box">
+							{% if not php_path %}
+								<br />
+								<strong>{{ phrase('agent.general.note_attn') }}:</strong>
+								{{ phrase('admin.settings.could_not_find_php_use_real') }}
+							{% endif %}
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+{#######################################################################################################################
+ # Manual
+ ######################################################################################################################}
+
+<div class="page-content agent-listing" style="padding-top: 0;">
+	<div class="content-table template-dir">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th colspan="2" class="single-title">
+						<h1 class="toggle-section {% if not network_okay %}expanded{% endif %}">Manually downloading updates</h1>
+					</th>
+				</tr>
+			</thead>
+			<tbody style="{% if network_okay %}display: none{% endif %}">
+				<tr>
+					<td>
+						<div class="box-section">
+							<h2>Step 1: Download newest version</h2>
+							<p>
+								Download the latest DeskPRO version from <a href="http://deskpro.com/downloads/DeskPRO.zip">deskpro.com/downloads/DeskPRO.zip</a>
+							</p>
+						</div>
+
+						<div class="box-section">
+							<h2>Step 2: Make a backup</h2>
+							<p>
+								You should make a backup of your current files and database. You can use the upgrade utility that comes with DeskPRO to help you with these tasks.
+							</p>
+							<p>
+								To make a backup of your files and database, run these commands:
+							</p>
+							<code class="code-box nowrap">
+								{{ php_path|default('/path/to/php') }} {{ constant('DP_WEB_ROOT') }}/upgrade.php --backup-files<br />
+								{{ php_path|default('/path/to/php') }} {{ constant('DP_WEB_ROOT') }}/upgrade.php --backup-db
+							</code>
+							<div class="small-note-box">
+								{% if not php_path %}
+									<br />
+									<strong>{{ phrase('agent.general.note_attn') }}:</strong>
+									{{ phrase('admin.settings.could_not_find_php_use_real') }}
+								{% endif %}
+							</div>
+						</div>
+
+						<div class="box-section">
+							<h2>Step 3: Install updated files</h2>
+							<p>
+								Extract the .zip package you downloaded and copy all of the files to your DeskPRO installation directory,
+								overwriting old files.
+							</p>
+							<ul class="standard-list" style="margin-left: 15px;">
+								<li>Make sure you keep your config.php file</li>
+								<li>Make sure you keep everything under the data/ directory</li>
+							</ul>
+						</div>
+
+						<div class="box-section">
+							<h2>Step 4: Install database updates</h2>
+							Finally, execute the command to run the database queries required to upgrade your database:
+							<code class="code-box nowrap">
+								{{ php_path|default('/path/to/php') }} {{ constant('DP_WEB_ROOT') }}/upgrade.php --run-db-upgrade
+							</code>
+							<div class="small-note-box">
+								{% if not php_path %}
+									<br />
+									<strong>{{ phrase('agent.general.note_attn') }}:</strong>
+									{{ phrase('admin.settings.could_not_find_php_use_real') }}
+								{% endif %}
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('h1.toggle-section').on('click', function() {
+			if ($(this).hasClass('expanded')) {
+				$(this).removeClass('expanded').closest('table').find('tbody').hide();
+			} else {
+				$(this).addClass('expanded').closest('table').find('tbody').show();
+			}
+		});
+	});
+</script>
+{% endblock %}

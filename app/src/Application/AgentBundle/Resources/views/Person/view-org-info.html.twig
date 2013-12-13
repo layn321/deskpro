@@ -1,0 +1,18 @@
+<div class="table-content contact-list contact-list-wrapper org" data-organization-id="{{ person.organization.name }}">
+	<strong>
+		{% if person.organization_position %}{{ person.organization_position }}, {% endif %}
+		{% if person.organization_manager %}Manager, {% endif %}
+		<a class="org_link as-popover" data-route="page:{{ path('agent_org_view', {'organization_id': person.organization.id}) }}">{{ person.organization.name }}</a>
+	</strong>
+
+	{% set members_count_row %}
+		<li class="count">
+			<a data-route="listpane:{{ path('agent_peoplesearch_customfilter') }}?terms[0][type]=person_organization&amp;terms[0][op]=is&amp;terms[0][organization_id]={{person.organization.id}}"><i class="org-members-count-{{ person.organization.id }}">{{ phrase('agent.people.count_members', {'count':org_members_count}) }}</i></a>
+		</li>
+	{% endset %}
+	{% include 'AgentBundle:Common:profile-view-contact-display.html.twig' with {
+		'contact_data': org_contact_data,
+		'show_only': ['website', 'email', 'email_domain'],
+		'bottom_extra': members_count_row
+	} %}
+</div>

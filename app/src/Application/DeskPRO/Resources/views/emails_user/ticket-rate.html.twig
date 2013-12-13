@@ -1,0 +1,62 @@
+<dp:subject>{{ phrase('user.email_subjects.ticket-rate') }}</dp:subject>
+<table border="0" width="100%" border="0" cellpadding="0" cellspacing="0"><tr>
+	<td style="vertical-align: top;" width="80" valign="middle">
+		<img src="{{ message.person.getPictureUrl(80) }}" alt="{{ message.person.display_name }}" style="float:left; margin: 0 11px 0 0;" />
+	</td>
+	<td style="vertical-align: top;" valign="middle">
+		<p>{{ phrase('user.tickets.rate-intro', {name: message.person.display_name, subject: ticket.subject}) }}</p>
+		<p>{{ phrase('user.tickets.rate-question') }}</p>
+
+		<table class="dp-layout" width="550"><tr>
+			<td width="33%">
+				<div style="padding: 10px">
+					<div class="dp-rate-box dp-positive">
+						<div class="rate-icon">
+							☺
+						</div>
+						<div class="rate-text">
+							<a href="{{ url_full('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, 'rating': 1}) }}">
+								{{ phrase('user.tickets.rate-positive') }}
+							</a>
+						</div>
+					</div>
+				</div>
+			</td>
+			<td width="33%">
+				<div style="padding: 10px">
+					<div class="dp-rate-box dp-neutral">
+						<div class="rate-icon">
+							&mdash;
+						</div>
+						<div class="rate-text">
+							<a href="{{ url_full('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, 'rating': 0}) }}">
+								{{ phrase('user.tickets.rate-neutral') }}
+							</a>
+						</div>
+					</div>
+				</div>
+			</td>
+			<td width="33%">
+				<div style="padding: 10px">
+					<div class="dp-rate-box dp-negative">
+						<div class="rate-icon">
+							☹
+						</div>
+						<div class="rate-text">
+							<a href="{{ url_full('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, 'rating': -1}) }}">
+								{{ phrase('user.tickets.rate-negative') }}
+							</a>
+						</div>
+					</div>
+				</div>
+			</td>
+		</tr></table>
+	</td>
+</tr></table>
+
+<br /><br />
+
+{{ phrase('user.emails.ticket_access_ticket_online') }}
+<a href="{{ url_full('user_tickets_view', {'ticket_ref': ticket.access_code}) }}">
+	{{ url_full('user_tickets_view', {'ticket_ref': ticket.access_code}) }}
+</a>

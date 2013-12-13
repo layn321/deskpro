@@ -1,0 +1,91 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.PublishSearch';
+	</script>
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-article"></i> {{ phrase('agent.publish.news_list_title', {count: num_results}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	<section class="feedback-simple-list list-listing">
+		<section class="search-reuslts page-set" data-page="{{ page }}">
+			{% for news in results %}
+				<article
+					class="row-item news news-{{news.id}} related-is-linkable"
+					data-content-type="news"
+					data-content-id="{{ news.id }}"
+					data-route="page:{{ path('agent_news_view', {'news_id': news.id}) }}"
+					data-route-title="@selector(a.row-title)"
+					data-route-openclass="open"
+				>
+					<div class="top-row">
+						<div class="top-row-left">
+							<h3>
+								<a class="row-title click-through">{{ news.title }}</a>
+							</h3>
+						</div>
+						<div class="top-row-right visible-related-content-controls">
+							<div class="bound-faded"></div>
+							<span class="tipped related-link" title="{{ phrase('agent.general.add_as_related') }}"></span>
+							<span class="tipped related-unlink" title="{{ phrase('agent.general.remove_as_related') }}"></span>
+						</div>
+					</div>
+					<hr class="clear-top" />
+					<div class="extra-fields">
+						<ul>
+							<li>
+								<span class="prop-title">{{ phrase('agent.general.category') }}</span>
+								<span class="prop-val">{{ news.category.full_title }}</span>
+							</li>
+
+							<li>
+								<span class="prop-title">{{ phrase('agent.general.author') }}</span>
+								<span class="prop-val">{{ news.person.display_name }}</span>
+							</li>
+
+							<li>
+								<span class="prop-title">{{ phrase('agent.general.date_created') }}</span>
+								<span class="prop-val">{{ news.date_created|date('day')}}</span>
+							</li>
+						</ul>
+						<br class="clear" />
+					</div>
+				</article>
+			{% endfor %}
+		</section>
+
+		{% if num_results %}
+			<footer class="results-nav">
+				<div class="cursor">
+					{{ phrase('agent.general.page_x_of_y', {page: page, num_pages: pageinfo.last}) }}
+				</div>
+				{% if num_results > per_page %}
+					<ul class="pagenav {% if not pageinfo.prev %}no-prev{% endif %} {% if not pageinfo.next %}no-next{% endif %}">
+						<li class="prev" {% if pageinfo.prev %}data-route="listpane:{{ path('agent_publish_search', {content_type: 'news', p: pageinfo.prev, cache_id: cache_id}) }}"{% endif %}></li>
+						<li class="next" {% if pageinfo.next %}data-route="listpane:{{ path('agent_publish_search', {content_type: 'news', p: pageinfo.next, cache_id: cache_id}) }}"{% endif %}></li>
+					</ul>
+				{% endif %}
+			</footer>
+		{% endif %}
+	</section>
+
+{% endblock pane_content %}

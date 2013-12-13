@@ -1,0 +1,120 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul xmlns="http://www.w3.org/1999/html">
+		<li>Queued Outgoing Mail</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{{ design.helpbox() }}
+	<p>
+		This page lists all of the outgoing email that the helpdesk is trying to send.
+		If mail failed to send for some reason (for example, an SMTP server was down), then the message
+		is saved here where you can decide to retry it later.
+	</p>
+
+	<div style="border-top: 1px solid #ccc; padding: 5px 8px 8px 8px;">
+		<strong>Display Options</strong><br/>
+
+		<form action="{{ path('admin_sendmail_queue_index') }}" method="GET">
+			<label><input type="checkbox" name="show_failed" value="1" {% if view_options.show_failed %}checked="checked"{% endif %} /> Show failed ({{ count_failed }})</label>
+			&nbsp;&nbsp;
+			<label><input type="checkbox" name="show_queued" value="1" {% if view_options.show_queued %}checked="checked"{% endif %} /> Show queued ({{ count_queued }})</label>
+			&nbsp;&nbsp;
+			Filter To: <input type="text" name="filter_to" style="padding: 1px; margin: 0; line-height: 1px; font-size: 11px; width:100px;" value="{{ view_options.filter_to }}" />
+			&nbsp;&nbsp;
+			Filter From: <input type="text" name="filter_from" style="padding: 1px; margin: 0; line-height: 1px; font-size: 11px; width:100px;" value="{{ view_options.filter_from }}" />
+			&nbsp;&nbsp;
+			Filter Subject: <input type="text" name="filter_subject" style="padding: 1px; margin: 0; line-height: 1px; font-size: 11px; width:100px;" value="{{ view_options.filter_subject }}" />
+			&nbsp;&nbsp;
+			<button class="dp-btn dp-btn-small" style="padding: 3px; line-height: 100%; position: relative; top: -1px;" type="submit">Update</button>
+		</form>
+	</div>
+{{ design.helpbox_end() }}
+
+<form action="{{ path('admin_sendmail_queue_massactions') }}" method="POST">
+	<div class="check-grid item-list">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th colspan="4" style="text-align: left; padding-left: 8px;">
+						<div style="float:right">
+							<input type="checkbox" id="toggle_check" />
+						</div>
+						{% if num_results == 1 %}1 Result{% else %}{{ num_results }} Results{% endif %}
+					</th>
+				</tr>
+			</thead>
+			<tbody id="sendmail_list">
+				{% for r in results %}
+					<tr>
+						<td width="10" style="white-space: nowrap" nowrap="nowrap"><a href="{{ path('admin_sendmail_queue_view', {id: r.id}) }}"><i class="icon-envelope"></i> #{{ r.id }}</a></td>
+						<td>
+							<table cellspacing="0" cellpadding="0" width="100%">
+								<tr>
+									<td width="55" style="font-size: 11px; text-align: right; color: #666; font-weight: bold; padding-right: 6px;">Subject:</td>
+									<td>{{ r.subject }}</td>
+								</tr>
+								<tr>
+									<td style="font-size: 11px; text-align: right; color: #666; font-weight: bold; padding-right: 6px;">To:</td>
+									<td>{{ r.to_address }}</td>
+								</tr>
+								<tr>
+									<td style="font-size: 11px; text-align: right; color: #666; font-weight: bold; padding-right: 6px;">From:</td>
+									<td>{{ r.from_address }}</td>
+								</tr>
+								<tr>
+									<td style="font-size: 11px; text-align: right; color: #666; font-weight: bold; padding-right: 6px;">Attempts:</td>
+									<td>
+										{{ r.attempts }}
+
+										{% if not r.date_next_attempt %}
+											(failed)
+										{% else %}
+											(Next attempt at {{ r.date_next_attempt|date('fulltime') }})
+										{% endif %}
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td style="text-align: right; padding-right: 8px;">
+							{{ r.date_created|date('fulltime') }}
+							<input class="sendmail_ids_check" type="checkbox" name="sendmail_ids[]" value="{{ r.id }}" />
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="10" style="text-align: center;">
+							No results
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+
+			{% if results %}
+				<tbody>
+					<tr>
+						<td colspan="10" style="background-color: #E8E8E8; text-align: right; vertical-align: middle" valign="middle">
+							With Selected:
+							<button class="dp-btn dp-btn-small tipped" name="action" value="resend" data-tipped-options="maxWidth: 250" title="Queues messages for resend immediately.">Resend</button>
+							<button class="dp-btn dp-btn-small tipped" name="action" value="resend_from" data-tipped-options="maxWidth: 250" title="Queues messages for resend immediately and changes their 'From' address/account">Resend From...</button>
+							<button class="dp-btn dp-btn-small tipped" name="action" value="delete" data-tipped-options="maxWidth: 250" title="Deletes messages from the queue. Messages will NOT be sent.">Delete</button>
+						</td>
+					</tr>
+				</tbody>
+			{% endif %}
+		</table>
+	</div>
+</form>
+
+<script type="text/javascript">
+$('#toggle_check').on('click', function(ev) {
+	if (this.checked) {
+		$('#sendmail_list').find('.sendmail_ids_check').prop('checked', true);
+	} else {
+		$('#sendmail_list').find('.sendmail_ids_check').prop('checked', false);
+	}
+});
+</script>
+{% endblock %}

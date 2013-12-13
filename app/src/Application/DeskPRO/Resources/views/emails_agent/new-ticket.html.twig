@@ -1,0 +1,23 @@
+{{ set_tplvar('agent_notification_footer', 'ticket-notify') }}
+{{ set_tplvar('agent_reply_above_line', true) }}
+<dp:subject>
+	{% if ticket.agent.id == agent.id %}
+		{{ phrase('agent.emails.subject_new_ticket_assigned') }}
+	{% elseif ticket.agent_team and agent.getHelper('AgentTeam').isTeamMember(ticket.agent_team.id) %}
+		{{ phrase('agent.emails.subject_new_ticket_assignedteam') }}
+	{% else %}
+		{{ phrase('agent.emails.subject_new_ticket') }}
+	{% endif %}
+</dp:subject>
+
+<dp:user-reply />
+
+<br /><br />
+
+<h1>{{ phrase('agent.general.ticket') }}</h1>
+
+{{ phrase('agent.emails.ticket_was_created', {name: ticket.person.getDisplayContact()}) }}
+
+<br /><br />
+
+<dp:ticket-properties-table />

@@ -1,0 +1,344 @@
+/** sprite: cssagent-interface-print_flag-icons; sprite-image: url(../../build/images/cssagent-interface-print_sprite-flag-icons.png); sprite-layout: vertical */
+/** sprite: cssagent-interface-print_ui-v; sprite-image: url(../../build/images/cssagent-interface-print_sprite-ui-v.png); sprite-layout: vertical */
+/** sprite: cssagent-interface-print_ui-h; sprite-image: url(../../build/images/cssagent-interface-print_sprite-ui-h.png); sprite-layout: horizontal */
+.less-rule {
+  color: #000;
+}
+/**
+* Set a 1px border of color on each side
+*/
+/**
+* Set a black drop shadow
+*/
+/**
+* Set rounded corners
+*/
+/**
+* Set a radius on each corner
+*/
+/**
+* Set an inner black shadow
+*/
+/**
+* Set an inner shadow with your own oclor
+*/
+/**
+* Full box shadow
+*/
+/**
+* Transition effect
+*/
+.noselect {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.boxmodel-border-box {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}
+.imgel {
+  overflow: hidden;
+  text-indent: -1000px;
+}
+.status.urgency-10,
+.marker-urgency-data.urgency-10 {
+  -khtml-opacity: 1;
+  -moz-opacity: 1;
+  opacity: 1;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  -webkit-transition: opacity 0.5s linear;
+  -moz-transition: opacity 0.5s linear;
+  -o-transition: opacity 0.5s linear;
+  -ms-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
+}
+body.timer-mark .status.urgency-10,
+body.timer-mark .marker-urgency-data.urgency-10 {
+  -khtml-opacity: 0.6;
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+  -webkit-transition: opacity 0.5s linear;
+  -moz-transition: opacity 0.5s linear;
+  -o-transition: opacity 0.5s linear;
+  -ms-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
+}
+body {
+  background: #fff !important;
+  text-shadow: none !important;
+  color: #000 !important;
+  overflow: visible !important;
+  border: none !important;
+}
+#dp_content_info {
+  display: none !important;
+}
+#dp_content_wrap .tabViewDetailContent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+#dp_nav,
+#dp_header,
+#dp_source,
+#dp_list,
+#dp_devbar,
+#tabNavigationPane {
+  display: none !important;
+}
+.clear {
+  clear: both !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#dp_window,
+#dp_center,
+#dp_content,
+#dp_content_wrap,
+#dp_content_wrap > div.tabViewDetailContent,
+#dp_content_wrap > div.tabViewDetailContent > .with-scrollbar,
+.with-scrollbar .scroll-viewport,
+.with-scrollbar .scroll-content {
+  position: inherit !important;
+  overflow: visible !important;
+  background-color: #fff !important;
+  color: #000 !important;
+  text-shadow: none !important;
+  border: none !important;
+}
+a {
+  color: #000 !important;
+  text-decoration: underline !important;
+}
+header.page-header h1 {
+  padding: 0 !important;
+  margin: 0 0 10px 0 !important;
+  color: #000;
+  font-size: 18px !important;
+}
+header.page-header {
+  border-bottom: none !important;
+  padding-bottom: 0px !important;
+}
+header.page-header .id-number {
+  float: right !important;
+  background: #fff !important;
+  border: 1px solid #ACB6BF !important;
+}
+.page-ticket section.description-area .controls,
+.page-ticket .set-hold,
+.page-ticket .reply-box-wrap {
+  display: none !important;
+}
+.page-ticket,
+.page-ticket .main-content {
+  box-shadow: none !important;
+  background-color: #fff !important;
+  border: none !important;
+}
+.tickets-msg-controls {
+  display: none !important;
+}
+header.page-header .meta-line .status span,
+header.page-header .meta-line .category > span {
+  background: #fff !important;
+  border: 1px solid #ACB6BF !important;
+  text-shadow: none !important;
+  color: #000 !important;
+}
+.tagit-new {
+  display: none;
+}
+.tagit-choice span {
+  padding: 4px !important;
+}
+.tagit-choice a.close {
+  display: none;
+}
+.flagged-wrap li {
+  display: none !important;
+}
+.flagged-wrap li.on {
+  display: block !important;
+  background-color: #fff !important;
+  border: none !important;
+}
+.flagged-wrap li span {
+  width: auto !important;
+  padding-left: 19px !important;
+  text-indent: 0 !important;
+}
+article.content-message .avatar {
+  display: none;
+}
+article.content-message .content {
+  margin-left: 0;
+}
+article.content-message .content header .message-counter.with-gear {
+  background: none;
+}
+.profile-box-container > header {
+  background: #fff !important;
+  border-bottom: none !important;
+  padding: 6px 0 4px 3px !important;
+}
+.profile-box-container > header h4 {
+  font-size: 14px !important;
+  color: #000;
+  text-transform: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+section.description-area .info-list {
+  font-size: 11px !important;
+  color: #000;
+}
+section.description-area .info-list dt {
+  width: 150px;
+}
+section.description-area .info-list dd {
+  margin-left: 165px;
+}
+.full-time {
+  display: inline;
+}
+.timeago {
+  display: none !important;
+}
+.deskpro-menu-outer {
+  display: none !important;
+}
+.tagit-new {
+  visibility: hidden !important;
+}
+.btn-small-add,
+.edit-gear {
+  visibility: hidden !important;
+}
+.page-ticket .people-box .user-link {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: #fff;
+}
+.profile-box-container > header {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: none !important;
+}
+.profile-box-container > section {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: none;
+  border-bottom: 2px solid #B8BABD;
+  margin-bottom: 15px;
+  padding-bottom: 25px;
+}
+.profile-box-container.ticket-messages > section {
+  border-bottom: none;
+}
+.profile-box-container:last-of-type > section {
+  border-bottom: none;
+}
+body.print-overlay #dp_content {
+  display: none !important;
+}
+body.print-overlay .dp-overlay-container,
+body.print-overlay .dp-overlay-container > section.dp-overlay,
+body.print-overlay .dp-overlay-container > section.dp-overlay > article {
+  position: relative;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  border: 0;
+  margin: 0;
+}
+body.print-overlay .dp-overlay-container > section.dp-overlay > header {
+  display: none;
+}
+body.print-overlay .dp-overlay-container > section.dp-overlay > footer {
+  display: none;
+}
+body.print-overlay .dp-overlay-container th.check-all,
+body.print-overlay .dp-overlay-container td.check-all {
+  width: 1px;
+  overflow: hidden;
+  padding: 0;
+}
+body.print-overlay .dp-overlay-container th.check-all input,
+body.print-overlay .dp-overlay-container td.check-all input {
+  visibility: hidden;
+  padding: 0;
+  margin: 0;
+}
+body.print-overlay .dp-overlay-container table {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: none;
+}
+body.print-overlay .dp-overlay-container th {
+  background-color: #C2C5CA;
+  text-shadow: none;
+  font-size: 13px;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  color: #000;
+  padding: 8px;
+}
+body.print-overlay .dp-overlay-container td {
+  background-color: #fff;
+  color: #000 !important;
+}
+body.print-overlay .dp-overlay-backdrop {
+  display: none !important;
+  background-color: #fff !important;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+}
+.page-ticket header {
+  height: 100px !important;
+  overflow: hidden;
+}
+.scroll-content > table {
+  width: 95% !important;
+  margin: 0 !important;
+}
+.scroll-content > table > td {
+  margin: 0;
+  padding: 0;
+}

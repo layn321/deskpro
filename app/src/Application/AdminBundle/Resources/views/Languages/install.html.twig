@@ -1,0 +1,47 @@
+{% extends 'AdminBundle:Languages:lang-layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_langs') }}">{{ phrase('admin.general.languages') }}</a></li>
+	<li>{{ phrase('admin.languages.new_language') }}</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<div class="page-content agent-listing" style="padding-top: 0;">
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th class="single-title">Language</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for id,title in packs %}
+					<tr>
+						<td>
+							<div style="float:right">
+								{% if installed_packs[id] %}
+									{% if id == 'default' %}
+										<strong>Installed</strong>
+									{% else %}
+										<strong>Installed</strong>
+									{% endif %}
+								{% else %}
+									<a class="clean-white" href="{{ path('admin_langs_install_pack', {id: id}) }}">Install Language</a>
+								{% endif %}
+							</div>
+							<h4>
+								{% if installed_packs[id] %}
+									<a href="{{ path('admin_langs_editlang', {language_id: installed_packs[id]}) }}">{{ title }}</a>
+								{% else %}
+									{{ title }}
+								{% endif %}
+							</h4>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}

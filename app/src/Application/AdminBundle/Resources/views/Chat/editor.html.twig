@@ -1,0 +1,230 @@
+{% set this_page = 'chat_editor' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/ChatEditor.js') }}"></script>
+<script type="text/javascript">
+var CHAT_DISPLAY_DATA = {{ page_data|json_encode|raw }};
+</script>
+	<style type="text/css">
+		.field-agent-only {
+			margin-left: 10px;
+			background: #DBE3E8;
+			line-height: 100%;
+			padding: 1px 4px;
+			border-radius: 4px;
+			-webkit-border-radius: 4px;
+			border: 1px solid #B2B9C1;
+		}
+
+		.orange-pip {
+			background: url({{ asset('images/agent/icons/bullet_orange.png') }}) no-repeat 100% 50%;
+			padding-right: 20px;
+		}
+
+		.content-tabs ul a {
+			color: #000;
+			text-decoration: none;
+		}
+	</style>
+{% endblock %}
+{% block page_nav_inner %}
+<div class="page-nav-block" {% if is_default %}style="display: none"{% endif %}>
+	<div class="inner-shadow"></div>
+	<section class="top">
+		<header>
+			<h4>Chat Fields</h4>
+		</header>
+		<article id="chat_elements">
+			<ul>
+				<li class="draggable" data-item-id="chat_department" data-edit-title="Edit Departments" data-edit-url="{{ path('admin_departments', {type:'chat'}) }}"><label>{{ phrase('agent.general.department') }}</label></li>
+				{% if section == 'create' %}
+					<li class="draggable" data-item-id="person_name"><label>Name</label></li>
+					<li class="draggable" data-item-id="person_email"><label>Email Address</label></li>
+				{% endif %}
+				{% for field in custom_chat_fields %}
+					<li class="draggable" {% if field.field_def.is_agent_field %}data-is-agent-field="1"{% endif %} data-item-id="chat_field[{{field.field_def.id}}]" data-edit-title="{{ phrase('admin.general.edit_field') }}" data-edit-url="{{ path('admin_customdefchat_edit', {field_id: field.field_def.id}) }}">
+						<label>{{field.title}}</label>
+					</li>
+				{% endfor %}
+			</ul>
+		</article>
+	</section>
+</div>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li><a href="{{ path('admin_chat_editor_reset', {security_token: security_token('reset_editor') }) }}" onclick="return confirm('Are you sure you want to reset all layouts? This will revert all layouts to their defaults and any customisations you have made will be lost.');">Reset All Layouts</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>Chat Layout Editor</li>
+		{% if department %}
+			<li>{{ department.full_title }}</li>
+		{% else %}
+			<li>Default Layout</li>
+		{% endif %}
+	</ul>
+{% endblock %}
+{% block content %}
+
+<div style="padding: 10px 10px 0 10px">
+{{ design.helpbox() }}
+	<p>
+        You can edit the form a user sees when they create a chat. Just drag options from the left into the area below to enable more fields.
+	</p>
+{{ design.helpbox_end() }}
+</div>
+
+<div class="pagetop-option">
+	<input type="checkbox" class="onoff-slider" id="per_department_check" data-update-url="{{ path('admin_chat_editor_toggleper') }}" {% if app.getSetting('core_chat.per_department_form') %}checked="checked"{% endif %}/> Enable custom layouts
+	{% if app.getSetting('core_chat.per_department_form') %}
+		<div class="sub">
+			<select id="department_switcher">
+				<option value="0" {% if 0 in dep_ids_custom %}class="custom"{% endif %} {% if not department %}selected="selected"{% endif %} data-refresh-url="{{ path('admin_chat_editor_dep', {'department_id': '0', 'section': section}) }}">Default Layout</option>
+				{% for dep in app.departments.getRootNodes() if dep.is_chat_enabled %}
+					{% if dep.children|length %}
+						<optgroup label="{{ dep.title }}">
+							{% for subdep in dep.children %}
+								<option {% if subdep.id in dep_ids_custom %}class="custom"{% endif %} data-full-title="{{ dep.title }} &gt; {{ subdep.title }}" value="{{subdep.id}}" {% if department.id == subdep.id %}selected="selected"{% endif %} data-refresh-url="{{ path('admin_chat_editor_dep', {'department_id': subdep.id, 'section': section}) }}">{{subdep.title}}</option>
+							{% endfor %}
+						</optgroup>
+					{% else %}
+						<option {% if dep.id in dep_ids_custom %}class="custom"{% endif %} value="{{dep.id}}" {% if department.id == dep.id %}selected="selected"{% endif %} data-refresh-url="{{ path('admin_chat_editor_dep', {'department_id': dep.id, 'section': section}) }}">{{dep.title}}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+		</div>
+	{% endif %}
+</div>
+
+<div class="content-tabs" {% if is_default %}style="display: none;"{% endif %}>
+	<nav>
+		<span class="saving-text" id="saving_text" style="display: none">{{ phrase('agent.general.saving') }}</span>
+		<ul>
+			<li {% if section == 'create' %}class="on"{% endif %}>
+				<div {% if 'create' in custom_sections %}class="orange-pip"{% endif %}>
+					<a href="{{ path('admin_chat_editor_dep', {'department_id': department.id|default('0')}) }}">Layout</a>
+				</div>
+			</li>
+		</ul>
+		<br />
+	</nav>
+
+	<section {% if is_default %}style="display: none"{% endif %}>
+		<form
+			action="{{ path('admin_chat_editor_dep_save', {'department_id': department.id|default(0), 'section': section }) }}"
+			method="post"
+			class="dp-page-box"
+			id="admin_chat_editor"
+			data-element-handler="DeskPRO.Admin.ElementHandler.ChatEditor"
+			data-section="{{section}}"
+		>
+		<ul id="admin_chat_editor_items" class="dp-form">
+			<li class="no-items-notice">
+				{{ phrase('admin.tickets.drag_drop_fields') }}
+			</li>
+		</ul>
+		</form>
+	</section>
+</div>
+
+{% if is_default %}<br/>{% endif %}
+
+{############################
+ # Main row template
+ ############################}
+<script type="text/x-deskpro-plain" id="editor_row_tpl">
+	<li class="form-item dp-form-row">
+		<div class="dp-block-controls">
+			<ul>
+				<li class="dp-edit-fields"><span></span></li>
+				<li class="dp-edit edit-field-trigger"><span></span></li>
+				<li class="dp-remove remove-field-trigger"><span></span></li>
+				<li class="dp-move"><span></span></li>
+			</ul>
+		</div>
+		<div class="dp-form-label">
+			<label class="field-title"></label>
+			<span class="field-agent-only" style="display:none">Agent Only</span>
+		</div>
+		<article class="dp-form-input"></article>
+
+		<div class="field-options-overlay" style="width: 760px; height: 260px; display: none;">
+			<div class="overlay-title">
+				<span class="close-trigger close-overlay"></span>
+				<h4>Field Options</h4>
+			</div>
+			<div class="overlay-content">
+				<div class="dp-form">
+					<div class="choices-container"></div>
+					<div class="dp-form-row">
+						<div class="dp-form-label">
+							<label>
+								<input type="checkbox" class="agent_only" name="agent_only" value="1" />
+								Only show this field for agents
+							</label>
+							<br />
+							<br />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</li>
+</script>
+
+{############################
+ # Person Name
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_person_name">
+	<div class="person_name">
+		<input type="text" />
+	</div>
+</script>
+
+{############################
+ # Person Email
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_person_email">
+	<div class="person_email">
+		<input type="text" />
+	</div>
+</script>
+
+{############################
+ # Department
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_chat_department">
+	<div class="subject">
+		<select>
+			<option>Choose a department...</option>
+			{% for dep in app.departments.getPersonDepartments(app.user, 'chat') %}
+				{% if dep.children|length %}
+					<optgroup label="{{ dep.title }}">
+						{% for sub in dep.children %}
+							<option>{{ sub.title }}</option>
+						{% endfor %}
+					</optgroup>
+				{% else %}
+					<option>{{ dep.title }}</option>
+				{% endif %}
+			{% endfor %}
+		</select>
+	</div>
+</script>
+
+{############################
+ # Custom fields
+ ############################}
+
+{% for field in custom_chat_fields %}
+	<script type="text/x-deskpro-plain" id="rendered_field_chat_field_{{field.id}}">
+		<div class="chat-field field-value">
+			{{ render_custom_field_form(field) }}
+		</div>
+	</script>
+{% endfor %}
+
+{% endblock %}

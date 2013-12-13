@@ -1,0 +1,109 @@
+{% set this_page = 'website_widgets' %}
+{% extends 'AdminBundle:Portal:layout.html.twig' %}
+{% block pagetitle %}
+	Change Favicon
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript">
+$(document).ready(function() {
+	var wrapper = $('#new_favi');
+	var idbase = 'new_favi';
+	$('.template-upload', wrapper).attr('id', idbase + 'up')
+	$('.template-download', wrapper).attr('id', idbase + 'down')
+	wrapper.fileupload({
+		url: BASE_URL + 'admin/misc/accept-upload',
+		dropZone: wrapper,
+		autoUpload: true,
+		uploadTemplateId: idbase + 'up',
+		downloadTemplateId: idbase + 'down',
+		done: function (e, data) {
+			var that = $(this).data('fileupload'),
+				template,
+				preview;
+
+			// Means the widget is no longer visible (eg tab closed before upload finished)
+			if (!that) {
+				return;
+			}
+
+			if (data.context) {
+				data.context.each(function (index) {
+					var file = ($.isArray(data.result) &&
+							data.result[index]) || {error: 'emptyResult'};
+					if (file.error && that._adjustMaxNumberOfFiles) {
+						that._adjustMaxNumberOfFiles(1);
+					}
+					that._transition($(this)).done(
+						function () {
+							var node = $(this);
+							template = that._renderDownload([file])
+								.css('height', node.height())
+								.replaceAll(node);
+							that._forceReflow(template);
+							that._transition(template).done(
+								function () {
+									data.context = $(this);
+									that._trigger('completed', e, data);
+								}
+							);
+						}
+					);
+				});
+			} else {
+				template = that._renderDownload(data.result)
+					.appendTo(that.options.filesContainer);
+				that._forceReflow(template);
+				that._transition(template).done(
+					function () {
+						data.context = $(this);
+						that._trigger('completed', e, data);
+					}
+				);
+			}
+		}
+	}).bind('fileuploadstart', function() {
+		$('p.explain', wrapper).hide();
+	}).bind('fileuploadadd', function() {
+		$('.files', wrapper).empty();
+	});
+});
+</script>
+{% endblock %}
+{% block pagebar %}
+<ul>
+	<li>Change Favicon</li>
+</ul>
+{% endblock %}
+{% block page %}
+	The favicon icon is the small icon displayed in your browser URL bar.<br/><br/>
+
+	<form action="{{ path('admin_portal_uploadfavicon') }}" method="POST">
+		{% if app.getSetting('core.favicon_blob_id') %}
+			<strong>Current Favicon</strong><br/>
+			<div style="padding: 10px; border: 1px solid #ccc; display: inline-block; margin-right: 10px;"><img src="{{ app.request.getBaseUrl()|replace({'/index.php': ''}) }}/{{ app.getSetting('core.favicon_blob_url') }}" /></div>
+			<button class="btn">Remove</button>
+			<br/><br/>
+		{% endif %}
+
+		<div id="new_favi">
+			<strong>Upload a new favicon</strong><br/>
+			<input type="file" name="file-upload" />
+			<div class="files"></div>
+
+			<script class="template-upload" type="text/text/x-tmpl">
+				<p>Upliading ...</p>
+			</script>
+			<script class="template-download" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				<div style="padding: 10px;">
+					<div style="padding: 10px; border: 1px solid #ccc; display: inline-block; margin-right: 10px;"><img src="{{ '{%=file.download_url%}' }}" width="16" height="16" /></div>
+					<input type="hidden" name="new_blob_auth_id" value="{{ '{%=file.blob_auth_id%}' }}" />
+					<button class="btn">Save</button>
+				</div>
+				{{ '{% } %}' }}
+			</script>
+		</div>
+	</form>
+
+	<br/><br/>
+{% endblock %}

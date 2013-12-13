@@ -1,0 +1,49 @@
+{##
+ # The block that lists related content in content pages
+ ##}
+{% if related_content['articles']|length or related_content['feedback']|length or related_content['news']|length or related_content['downloads']|length %}
+<div class="dp-related-list dp-well dp-well-small">
+	<table cellpadding="0" cellspacing="0" width="100%"><tr>
+		{% set count = 0 %}
+		{% for itemtype in ['articles', 'feedback', 'news', 'downloads'] %}
+			{% set items = related_content[itemtype] %}
+			{% if items|length %}
+				<td {% if related_content|length > 1 %}width="50%"{% endif %} valign="top">
+					{% if itemtype == 'articles' %}
+						<h5>{{ phrase('user.knowledgebase.related_articles') }}</h5>
+						<ul>
+							{% for rel in items %}
+								<li> <a href="{{ path('user_articles_article', {'slug': rel.url_slug}) }}">{{ rel.title }}</a></li>
+							{% endfor %}
+						</ul>
+					{% elseif itemtype == 'downloads' %}
+						<h5>{{ phrase('user.downloads.related_downloads') }}</h5>
+						<ul>
+							{% for rel in items %}
+								<li> <a href="{{ path('user_downloads_file', {'slug': rel.url_slug}) }}">{{ rel.title }}</a></li>
+							{% endfor %}
+						</ul>
+					{% elseif itemtype == 'news' %}
+						<h5>{{ phrase('user.news.related_news') }}</h5>
+						<ul>
+							{% for rel in items %}
+								<li> <a href="{{ path('user_news_view', {'slug': rel.url_slug}) }}">{{ rel.title }}</a></li>
+							{% endfor %}
+						</ul>
+					{% elseif itemtype == 'feedback' %}
+						<h5>{{ phrase('user.feedback.related_feedback') }}</h5>
+						<ul>
+							{% for rel in items %}
+								<li> <a href="{{ path('user_feedback_view', {'slug': rel.url_slug}) }}">{{ rel.title }}</a></li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</td>
+
+				{% set count = count + 1 %}
+				{% if count % 2 == 0 %}</tr><tr>{% endif %}
+			{% endif %}
+		{% endfor %}
+	</tr></table>
+</div>
+{% endif %}

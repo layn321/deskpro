@@ -1,0 +1,52 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_emailgateways') }}">Email Accounts</a></li>
+		{% if type == 'errors' %}<li><a href="{{ path('admin_emailgateway_errors') }}">Errors</a></li>
+		{% elseif type == 'all' %}<li><a href="{{ path('admin_emailgateway_all') }}">Email Sources</a></li>
+		{% else %}<li><a href="{{ path('admin_emailgateway_rejections') }}">Rejections</a></li>{% endif %}
+		<li>{{ phrase('admin.general.gateway_source_id', {id: source.id}) }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<tbody>
+			<tr>
+				<td class="title on" width="200"><strong>{{ phrase('agent.general.id') }}</strong></td>
+				<td>
+					{{source.id}}
+					<hr />
+					<a class="clean-white tipped" title="Deletes this rejection log and the original email source." href="{{ path('admin_emailgateway_errors_delete', {id: source.id, security_token: security_token('delete_gateway_error')}) }}">{{ phrase('agent.general.delete') }}</a>
+					<a class="clean-white tipped" title="Download the raw email source" href="{{ source.blob.getDownloadUrl() }}">Download Source ({{ source.blob.getReadableFilesize() }})</a>
+					<a class="clean-white tipped" title="Attempts to reprocess the email." href="{{ path('admin_emailgateway_reprocess', {id: source.id, security_token: security_token('reprocess_gateway_error')}) }}">Reprocess Email</a>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="title on"><strong>{{ phrase('agent.general.date') }}</strong></td>
+				<td>{{source.date_created|date('fulltime')}}</td>
+			</tr>
+
+			<tr>
+				<td class="title on"><strong>{{ phrase('admin.general.error_type') }}</strong></td>
+				<td>{{source.error_code_title}}</td>
+			</tr>
+
+			<tr>
+				<td class="title on"><strong>Email Source</strong></td>
+				<td><textarea style="width:98%; height:200px; font-size: 11px; font-family:Monaco, 'Courier New', courier, monospace;">{{ source.getRawSource() }}</textarea></td>
+			</tr>
+
+			<tr>
+				<td class="title on"><strong>{{ phrase('admin.general.additional_data') }}</strong></td>
+				<td>
+					<textarea style="width:98%; height:200px; font-size: 11px; font-family:Monaco, 'Courier New', courier, monospace;">{{data_structure}}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

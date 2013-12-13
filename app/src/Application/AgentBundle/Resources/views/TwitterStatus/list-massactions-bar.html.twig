@@ -1,0 +1,182 @@
+<header class="list-selection-bar">
+	<input class="selection-control" type="checkbox" style="left: 14px" />
+	{{ phrase('agent.general.x_selected', {'num_placeholder': '<span class="selected-count" style="margin-left: 5px">0</span>'}, true) }}
+
+	<a class="perform-action perform-actions-trigger disabled">
+		<span>{{ phrase('agent.general.perform_actions') }}</span>
+	</a>
+
+	{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+	<div
+		class="mass-actions-overlay-container mass-actions"
+		data-base-id="{{ tplvars.baseId }}"
+	>
+		<section id="twitter-mass-action-overlay" class="mass-actions-overlay">
+			<header>
+				<span class="close close-trigger"></span>
+				<h1>
+					{{ phrase('agent.general.apply_to_x_selections', {'placeholder': '<span class="selected-tickets-count"></span>'}, true) }}
+				</h1>
+			</header>
+			<article>
+				{{ agentui.scroll_containers('', '') }}
+				<div class="dp-radio-expander-form">
+					<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+						<div class="dp-form-row">
+							<div class="dp-form-input">
+								<div class="dp-input-group">
+									<label>
+										<input type="radio" class="option-trigger" name="action" value="reply" />
+										{{ phrase('agent.general.reply') }}
+									</label>
+
+									<div class="dp-group-options twitter-message-send" style="display: none">
+										<div class="new-message" style="text-align: left; max-width: 350px; border-top: none;">
+											<ul class="message-type">
+												<li class="on public" data-type="public">
+													{{ phrase('agent.general.public') }}
+												</li>
+												<li class="private" data-type="private">
+													{{ phrase('agent.general.private') }}
+												</li>
+											</ul>
+											<input type="hidden" class="message-type-hidden" name="type" value="public" />
+											<div class="message-block">
+												{{ phrase('agent.twitter.from_account') }}:
+												{% if app.user.getTwitterAccounts()|length == 1 %}
+													{% set account = app.user.getTwitterAccounts()[0] %}
+												{% endif %}
+												{% if account %}
+													@{{ account.user.screen_name }}
+												{% else %}
+													<i>{{ phrase('agent.twitter.corresponding_twitter_account') }}</i>
+												{% endif %}
+												<textarea name="text"></textarea>
+												<div class="is-not-loading">
+													<span class="character-count">{{ phrase('agent.twitter.char_remaining', {num_chars: '<em>140</em>'}, true) }}</span>
+													<span class="over-options" style="display: none"><label class="tipped" title="{{ phrase('agent.twitter.split_to_multiple_explain') }}"><input type="checkbox" name="split" value="1" checked="checked" /> {{ phrase('agent.twitter.split_to_multiple') }}</label></span>
+												</div>
+											</div>
+										</div>
+
+										<div class="execute-row" style="text-align: left">
+											<span class="is-not-loading">
+												<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+											</span>
+											<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+										</div>
+									</div>
+								</div>
+
+								<div class="dp-input-group">
+									<label>
+										<input type="radio" class="option-trigger" name="action" value="retweet" />
+										{{ phrase('agent.twitter.retweet') }}
+									</label>
+
+									<span class="dp-group-options" style="display: none">
+										<span class="is-not-loading">
+											<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+										</span>
+										<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+									</span>
+								</div>
+
+								<div class="dp-input-group">
+									<label>
+										<input type="radio" class="option-trigger" name="action" value="unretweet" />
+										{{ phrase('agent.twitter.unretweet') }}
+									</label>
+
+									<span class="dp-group-options" style="display: none">
+										<span class="is-not-loading">
+											<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+										</span>
+										<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+									</span>
+								</div>
+
+								<div class="dp-input-group">
+									<label>
+										<input type="radio" class="option-trigger" name="action" value="favorite" />
+										{{ phrase('agent.general.favorite') }}
+									</label>
+
+									<span class="dp-group-options" style="display: none">
+										<span class="is-not-loading">
+											<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+										</span>
+										<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+									</span>
+								</div>
+
+								<div class="dp-input-group">
+									<label>
+										<input type="radio" class="option-trigger" name="action" value="unfavorite" />
+										{{ phrase('agent.general.remove_favorite') }}
+									</label>
+
+									<span class="dp-group-options" style="display: none">
+										<span class="is-not-loading">
+											<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+										</span>
+										<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+									</span>
+								</div>
+
+								<div class="dp-input-group">
+									<label>
+										<input type="radio" class="option-trigger" name="action" value="assign" />
+										{{ phrase('agent.general.assign') }}
+									</label>
+									<div class="dp-group-options" style="display: none; text-align: left; padding-top: 3px">
+										<label>
+											<select name="assign" class="agents_sel dpe_select" style="min-width: 170px" >
+												<option value="">{{ phrase('agent.general.none') }}</option>
+												<optgroup label="{{ phrase('agent.general.agents') }}">
+													{% for agent in app.agents.getAgents() %}
+														{% if not account or account.hasPerson(agent) %}
+															<option data-icon="{{ agent.getPictureUrl(20) }}" value="agent:{{ agent.id }}">{{ agent.display_name }}</option>
+														{% endif %}
+													{% endfor %}
+												</optgroup>
+												{% if app.agent_teams.getTeams()|length %}
+													<optgroup label="{{ phrase('agent.general.teams') }}">
+														{% for team in app.agent_teams.getTeams() %}
+															<option value="agent_team:{{ team.id }}">{{ team.name }}</option>
+														{% endfor %}
+													</optgroup>
+												{% endif %}
+											</select>
+										</label>
+										<div class="execute-row" style="text-align: left">
+											<span class="is-not-loading">
+												<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+											</span>
+											<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+										</div>
+									</div>
+								</div>
+
+								<div class="dp-input-group">
+									<label>
+										<input type="radio" class="option-trigger" name="action" value="archive" />
+										{{ phrase('agent.general.archive') }}
+									</label>
+
+									<span class="dp-group-options" style="display: none">
+										<span class="is-not-loading">
+											<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+										</span>
+										<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{{ agentui.scroll_containers_end() }}
+			</article>
+		</section>
+	</div>
+</header>

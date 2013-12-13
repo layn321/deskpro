@@ -1,0 +1,60 @@
+{{ set_tplvar('agent_notification_footer', 'ticket-notify') }}
+{{ set_tplvar('agent_reply_above_line', true) }}
+<dp:subject>
+	{% if type_flag == 'assigned' %}
+		{% set action = phrase('agent.emails.ticket_action_assigned') %}
+	{% elseif type_flag == 'assigned_team' %}
+		{% set action = phrase('agent.emails.ticket_action_assigned_team') %}
+	{% elseif type_flag == 'added_part' %}
+		{% set action = phrase('agent.emails.ticket_action_followed') %}
+	{% elseif type_flag == 'status_changed' %}
+		{% if ticket.status == 'awaiting_agent' %}
+			{% set action = phrase('agent.emails.ticket_action_status_agent') %}
+		{% elseif ticket.status == 'awaiting_user' %}
+			{% set action = phrase('agent.emails.ticket_action_status_user') %}
+		{% elseif ticket.status == 'resolved' %}
+			{% set action = phrase('agent.emails.ticket_action_status_resolved') %}
+		{% elseif ticket.status_code == 'hidden.deleted' %}
+			{% set action = phrase('agent.emails.ticket_action_deleted') %}
+		{% elseif ticket.status_code == 'hidden.spam' %}
+			{% set action = phrase('agent.emails.ticket_action_spam') %}
+		{% else %}
+			{% set action = phrase('agent.emails.ticket_action_updated') %}
+		{% endif %}
+	{% else %}
+		{% set action = phrase('agent.emails.ticket_action_updated') %}
+	{% endif %}
+	[#{{ ticket.id }} {{action}}] Re: {{ ticket.subject }}{% if sla and sla_status == 'warning' %} ({{ phrase('agent.emails.ticket_sla_warning') }}){% elseif sla and sla_status == 'fail' %} ({{ phrase('agent.emails.ticket_sla_failed') }}){% endif %}
+</dp:subject>
+{%- set phrase_part -%}
+	{% if action_performer and action_performer.getId() %}
+		{{ action_performer.getDisplayContact() }}
+	{% elseif sla %}
+		{{ phrase('agent.general.sla') }} {{ sla.title }}{% if sla_status == 'warning' %} ({{ phrase('agent.general.warning') }}){% elseif sla_status == 'fail' %} ({{ phrase('agent.general.failed') }}){% endif %}
+	{% else %}
+		{{ phrase('agent.general.system_user') }}
+	{% endif %}
+{%- endset -%}
+{{ phrase('agent.emails.user_updated_ticket', {name: phrase_part, subject: ticket.subject|e}, true) }}
+{% if type_flag == 'assigned' %}
+	{{ phrase('agent.emails.updated_ticket_assigned') }}
+{% elseif type_flag == 'assigned_team' %}
+	{{ phrase('agent.emails.updated_ticket_assigned_team', {team: ticket.agent_team.name}) }}
+{% elseif type_flag == 'added_part' %}
+	{{ phrase('agent.emails.updated_ticket_followed') }}
+{% endif %}
+
+<br /><br />
+
+<h1>{{ phrase('agent.general.ticket') }}</h1>
+<dp:ticket-properties-table />
+
+<br /><br />
+
+<h1>{{ phrase('agent.tickets.ticket_changes') }}</h1>
+<dp:ticket-logs />
+
+<br /><br />
+
+<h1>{{ phrase('agent.general.message_history') }}</h1>
+<dp:agent-ticket-history />

@@ -1,0 +1,24 @@
+{##
+ # The twitter sidebar block
+ ##}
+
+<section class="dp-sidebar-block">
+	<header>
+		<h3>
+			{{ phrase('user.portal.twitter-user-link', {'name':twitter_name}) }}
+		</h3>
+	</header>
+	<article class="dp-written dp-twitter-list">
+		<ul>
+		{% for item in feed_items %}
+			<li>
+				{{ item.text|raw }}
+				<a href="http://twitter.com/{{ item.screen_name }}/status/{{ item.id }}" class="timeago" title="{{ item.date|date('c', 'UTC') }}">{{ item.date|date('fulltime') }}</a>
+			</li>
+		{% endfor %}
+		</ul>
+		<div class="dp-more">
+			<a href="http://twitter.com/{{ twitter_name }}">{{ phrase('user.portal.twitter-view-more', {'name':twitter_name}) }}</a>
+		</div>
+	</article>
+</section>

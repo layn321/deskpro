@@ -1,0 +1,116 @@
+{##
+ # The navigation bar in the feedback section that lets a user change the category, status
+ # and sort options.
+ ##}
+
+<ul class="dp-nav dp-nav-tabs dp-feedback-nav dp-nav-thicksep">
+	<li class="dp-dropdown dp-alt-option dp-first" style="float: {% if is_rtl() %}right{% else %}left{% endif %};">
+		<a href="#" class="dp-dropdown-toggle" data-toggle="dp-dropdown">
+			{% if category.id %}
+				<span class="dp-info-prefix">{{ phrase('user.feedback.category') }}:</span>
+				{{ category.full_title }}
+			{% else %}
+				{{ phrase('user.feedback.all_types') }}
+			{% endif %}
+			<b class="dp-caret"></b>
+		</a>
+		<ul class="dp-dropdown-element dp-cat-list" id="dp_feedback_cat_menu">
+			<li {% if depth %}class="dp-sub dp-sub-depth-{{ depth }}"{% endif %}>
+				<i class="dp-icon-repeat"></i>
+				<a href="{{ path('user_feedback', {'status': status, 'order_by': search_options.order_by}) }}">{{ phrase('user.feedback.all_types') }}</a>
+				<span class="dp-badge dp-small">{{ category_counts[0]['all']|default(0) }}</span>
+			</li>
+			<li class="sep"></li>
+			{% macro cat_li(category_counts, status, order_by, cat, depth) %}
+				{% if not depth %}{% set depth = 0 %}{% endif %}
+				<li {% if depth %}class="dp-sub dp-sub-depth-{{ depth }}"{% endif %}>
+					<i class="dp-icon-folder-close"></i>
+					<a href="{{ path('user_feedback', {'status': status, 'slug': cat.url_slug, 'order_by': order_by}) }}">{{ phrase_object(cat) }}</a>
+					<span class="dp-badge dp-small">{{ category_counts[cat.id]['all']|default(0) }}</span>
+				</li>
+				{% if cat.getChildren()|length %}
+					{% for child in cat.getChildren() %}
+						{{ _self.cat_li(category_counts, status, order_by, child, depth+1) }}
+					{% endfor %}
+				{% endif %}
+			{% endmacro %}
+			{% for cat in feedback_cats %}
+				{{ _self.cat_li(category_counts, status, search_options.order_by, cat) }}
+			{% endfor %}
+		</ul>
+	</li>
+	<li class="dp-dropdown dp-alt-option dp-last" style="float: {% if is_rtl() %}right{% else %}left{% endif %};">
+		<a href="#" class="dp-dropdown-toggle" data-toggle="dp-dropdown">
+			<span class="dp-info-prefix">{{ phrase('user.feedback.status') }}:</span>
+			{% if status_cat %}
+				{{ phrase_object(status_cat) }}
+			{% else %}
+				{% if status == 'open' %}{{ phrase('user.feedback.status_open') }}
+				{% elseif status == 'gathering-feedback' %}{{ phrase('user.feedback.status_new') }}
+				{% elseif status == 'any-status' %}{{ phrase('user.feedback.status_any') }}
+				{% elseif status == 'active' %}{{ phrase('user.feedback.status_active') }}
+				{% elseif status == 'closed' %}{{ phrase('user.feedback.status_closed') }}
+				{% endif %}
+			{% endif %}
+			<b class="dp-caret"></b>
+		</a>
+		<ul class="dp-dropdown-element dp-cat-list" id="dp_feedback_cat_menu">
+			<li>
+				<i class="dp-icon-th"></i>
+				<a href="{{ path('user_feedback', {'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by}) }}">{{ phrase('user.feedback.status_open') }}</a>
+				<span class="dp-badge dp-small">{{ status_counts['open']|default(0) }}</span>
+			</li>
+			<li>
+				<i class="dp-icon-repeat"></i>
+				<a href="{{ path('user_feedback', {'status': 'any-status', 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by}) }}">{{ phrase('user.feedback.status_any') }}</a>
+				<span class="dp-badge dp-small">{{ status_counts['all']|default(0) }}</span>
+			</li>
+			<li class="sep thick"></li>
+			<li>
+				<i class="dp-icon-asterisk"></i>
+				<a href="{{ path('user_feedback', {'status': 'gathering-feedback', 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by}) }}">{{ phrase('user.feedback.status_new') }}</a>
+				<span class="dp-badge dp-small">{{ status_counts['new']|default(0) }}</span>
+			</li>
+			<li class="sep"></li>
+			<li>
+				<i class="dp-icon-time"></i>
+				<a href="{{ path('user_feedback', {'status': 'active', 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by}) }}">{{ phrase('user.feedback.status_active') }}</a>
+				<span class="dp-badge dp-small">{{ status_counts['active']|default(0) }}</span>
+			</li>
+			{% for status in active_status_cats %}
+				<li class="dp-sub">
+					<i class="dp-icon-time"></i>
+					<a href="{{ path('user_feedback', {'status': 'active.'~status.id, 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by}) }}">{{ phrase_object(status) }}</a>
+					<span class="dp-badge dp-small">{{ status_counts[status.id]|default(0) }}</span>
+				</li>
+			{% endfor %}
+			<li class="sep"></li>
+			<li>
+				<i class="dp-icon-inbox"></i>
+				<a href="{{ path('user_feedback', {'status': 'closed', 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by}) }}">{{ phrase('user.feedback.status_closed') }}</a>
+				<span class="dp-badge dp-small">{{ status_counts['closed']|default(0) }}</span>
+			</li>
+			{% for status in closed_status_cats %}
+				<li class="dp-sub">
+					<i class="dp-icon-inbox"></i>
+					<a href="{{ path('user_feedback', {'status': 'active.'~status.id, 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by}) }}">{{ phrase_object(status) }}</a>
+					<span class="dp-badge dp-small">{{ status_counts[status.id]|default(0) }}</span>
+				</li>
+			{% endfor %}
+		</ul>
+	</li>
+
+	<li class="{% if search_options.order_by == 'i-voted' %}dp-active{% endif %}">
+		<a href="{{ path('user_feedback', {'status': status, 'slug': category.url_slug|default('all-categories'), 'order_by': 'i-voted'}) }}">{{ phrase('user.feedback.sort_i-voted') }}</a>
+	</li>
+	<li class="{% if search_options.order_by == 'most-voted' %}dp-active{% endif %}">
+		<a href="{{ path('user_feedback', {'status': status, 'slug': category.url_slug|default('all-categories'), 'order_by': 'most-voted'}) }}">{{ phrase('user.feedback.sort_most-votes') }}</a>
+	</li>
+	<li class="{% if search_options.order_by == 'newest' %}dp-active{% endif %}">
+		<a href="{{ path('user_feedback', {'status': status, 'slug': category.url_slug|default('all-categories'), 'order_by': 'newest'}) }}">{{ phrase('user.feedback.sort_newest') }}</a>
+	</li>
+	<li class="{% if search_options.order_by == 'popular' %}dp-active{% endif %}">
+		<a href="{{ path('user_feedback', {'status': status, 'slug': category.url_slug|default('all-categories'), 'order_by': 'popular'}) }}">{{ phrase('user.feedback.status_popular') }}</a>
+	</li>
+	<li class="dp-label-tab"><em>{{ phrase('user.feedback.sort_by') }}:</em></li>
+</ul>

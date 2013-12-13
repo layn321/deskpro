@@ -1,0 +1,66 @@
+{% extends 'AdminBundle:TicketTriggers:ticket-trigger-tpl.html.twig' %}
+{% block pagebar %}
+	{% if trigger.id and not trigger.sys_name %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_tickettriggers_delete', {id: trigger.id, auth: security_token('delete_trigger') }) }}" class="confirm-delete-trigger" data-prompt="{{ phrase('admin.tickets.confirm_delete_trigger') }}">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+	<ul>
+		<li><a href="{{ path('admin_ticketescalations') }}">Escalations</a></li>
+		<li>
+			{% if trigger.id %}
+				Edit Escalation
+			{% else %}
+				New Escalation
+			{% endif %}
+		</li>
+	</ul>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript">
+function TicketTriggerEditPage_init()
+{
+	var self = this;
+	var update = function() {
+		var val = $('#event_trigger').val();
+		if (val == 'new.web.user.widget' || val == 'new.web.user.embed') {
+			self.criteriaEditor1.enableType('creation_system_option');
+			self.criteriaEditor2.enableType('creation_system_option');
+		} else {
+			self.criteriaEditor1.disableType('creation_system_option');
+			self.criteriaEditor2.disableType('creation_system_option');
+		}
+	};
+	$('#event_trigger').on('change', update);
+	update();
+}
+</script>
+{{ parent() }}
+{% endblock %}
+{% block event_row %}
+{% if trigger.event_trigger == 'time.open' %}When a ticket has been open for
+{% elseif trigger.event_trigger == 'time.user_waiting' %}The time a ticket has been Awaiting Agent is
+{% elseif trigger.event_trigger == 'time.total_user_waiting' %}The total time a ticket has been Awaiting Agent is
+{% elseif trigger.event_trigger == 'time.agent_waiting' %}The time a ticket has been Awaiting User is
+{% elseif trigger.event_trigger == 'time.resolved' %}When the ticket has been Resolved for
+{% elseif trigger.event_trigger == 'sla.warning' or trigger.event_trigger == 'sla.fail' %}When the ticket is not Resolved in
+{% endif %}
+	<input type="hidden" name="trigger[event_trigger]" value="{{ trigger.event_trigger }}" />
+	<input type="text" name="event_trigger_time" value="{{ trigger.getOptionTime() }}" size="10" style="width: 80px; position:relative; top: 1px;" class="small" />
+	<select name="event_trigger_scale">
+		{% for scale,label in {'minutes': phrase('admin.tickets.minutes'), 'hours': phrase('admin.tickets.hours'), 'days': phrase('admin.tickets.days'), 'weeks': phrase('admin.tickets.weeks'), 'months': phrase('admin.tickets.months')} %}
+			<option {% if trigger.getOptionScale() == scale %}selected="selected"{% endif %} value="{{ scale }}">{{ label }}</option>
+		{% endfor %}
+	</select>
+{% if trigger.event_trigger == 'sla.warning' %} of SLA countable time, the ticket is close to failing the SLA.{% endif %}
+{% if trigger.event_trigger == 'sla.fail' %} of SLA countable time, the ticket has failed the SLA.{% endif %}
+{% endblock %}
+{% block footer_row %}
+	{% if not trigger.id %}
+		<div class="alert-message block-message note">
+			Note: This new escalation will only affect <strong>new</strong> tickets created from now on. Existing tickets will never match this escalation.
+		</div>
+	{% endif %}
+{% endblock %}

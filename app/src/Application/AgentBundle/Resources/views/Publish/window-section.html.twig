@@ -1,0 +1,211 @@
+{% extends 'AgentBundle::source-pane-layout.html.twig' %}
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+{% block pane_main_tab %}
+	<li class="tab active" data-tab-id="pane-content-main"><i class="icon-dp-article"></i> {{ phrase('agent.chrome.nav_publish') }}</li>
+{% endblock %}
+{% block pane_content %}
+<div class="pane-content pane-content-main">
+
+	<section class="pane-section dp-collapsible dp-collapsible-open" id="publish_section_pending">
+		<header>
+			<h1>
+				<em class="dp-collapsible-toggle-btn"><i class="icon-x"></i></em>
+				{{ phrase('agent.general.pending') }}
+			</h1>
+		</header>
+		<article>
+			<ul class="nav-list nav-list-small">
+				{% if counts.validating_comments %}
+					<li class="is-nav-item" data-route="listpane:{{ path('agent_publish_validatingcomments') }}">
+						<div class="item">
+							<h3>{{ phrase('agent.publish.comments_to_validate') }}</h3>
+							<em class="counter list-counter" id="publish_validating_comments_count">{{ counts.validating_comments|default(0) }}</em>
+						</div>
+					</li>
+				{% endif %}
+				{% if counts.validating_content %}
+					<li class="is-nav-item auto-load-route" data-route="listpane:{{ path('agent_publish_validatingcontent') }}">
+						<div class="item">
+							<h3>{{ phrase('agent.publish.content_to_validate') }}</h3>
+							<em class="counter list-counter" id="publish_validating_count">{{ counts.validating_content|default(0) }}</em>
+						</div>
+					</li>
+				{% endif %}
+				<li class="is-nav-item" data-route="listpane:{{ path('agent_kb_pending') }}">
+					<div class="item">
+						<h3>{{ phrase('agent.publish.pending_articles') }}</h3>
+						<em class="counter list-counter" id="kb_pending_count">{{ counts.pending|default(0) }}</em>
+					</div>
+				</li>
+				{% if counts.drafts %}
+				<li class="is-nav-item" data-route="listpane:{{ path('agent_public_drafts', {'type': 'mine'}) }}">
+					<div class="item">
+						<h3>{{ phrase('agent.publish.draft_content') }}</h3>
+						<em class="counter list-counter" id="publish_drafts_count">{{ counts.drafts|default(0) }}</em>
+					</div>
+				</li>
+				{% endif %}
+				{% if counts.all_drafts %}
+					<li class="is-nav-item" data-route="listpane:{{ path('agent_public_drafts', {'type': 'all'}) }}">
+						<div class="item">
+							<em class="counter list-counter" id="publish_drafts_count">{{ counts.all_drafts|default(0) }}</em>
+							<h3>{{ phrase('agent.publish.all_draft_content') }}</h3>
+						</div>
+					</li>
+				{% endif %}
+			</ul>
+		</article>
+	</section>
+
+	{% if app.getSetting('core.apps_kb') %}
+		<section class="pane-section dp-collapsible dp-collapsible-open" id="publish_section_kb">
+			<header>
+				<h1>
+					<em class="dp-collapsible-toggle-btn"><i class="icon-x"></i></em>
+					{{ phrase('agent.general.knowledgebase') }}
+				</h1>
+			</header>
+			<article>
+				<ul class="nav-list nav-list-small nav-list-tree">
+					{% include 'AgentBundle:Publish:kb-cat-list.html.twig' with {'cats': kb_cats, 'counts': kb_cats_counts, 'depth': 0 } %}
+					<li class="new-cat-trigger new-cat">
+						<div class="item" data-route="poppage:{{ path('agent_publish_cats_newform', {type: 'article'}) }}">
+							<i class="icon-folder-close-alt"></i>
+							<h3>{{ phrase('agent.publish.add_new_category') }}</h3>
+						</div>
+					</li>
+				</ul>
+
+				{% if app.getLanguages().isMultiLang() and kb_translate_queue[0] %}
+					<nav class="pane-section-tabs border-top" style="margin: 15px 0 3px 0;">
+						<ul>
+							<li class="on"><span>{{ phrase('agent.general.translations') }}</span></li>
+							<li class="invis-last"></li>
+						</ul>
+					</nav>
+					<ul class="nav-list nav-list-small nav-list-tree">
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_kb_list', {pending_translate: 1}) }}">
+								<i class="dp-toggle-icon click-through icon-caret-right"></i>
+								<h3>{{ phrase('agent.publish.untranslated_articles') }}</h3>
+								<em class="counter list-counter">{{ kb_translate_queue[0] }}</em>
+							</div>
+							<ul class="nav-list nav-list-small indented" style="display: none;">
+								{% for lang_id, count in kb_translate_queue if lang_id > 0 and count > 0 %}
+									<li class="is-nav-item">
+										<div class="item" data-route="listpane:{{ path('agent_kb_list', {pending_translate: 1, language_id: lang_id}) }}">
+											<h3>{{ app.languages.get(lang_id).title }}</h3>
+											<em class="counter list-counter">{{ count }}</em>
+										</div>
+									</li>
+								{% endfor %}
+							</ul>
+						</li>
+					</ul>
+				{% endif %}
+			</article>
+		</section>
+	{% endif%}
+
+	{% if app.getSetting('core.apps_news') %}
+		<section class="pane-section dp-collapsible" id="publish_section_news">
+			<header>
+				<h1>
+					<em class="dp-collapsible-toggle-btn"><i class="icon-x"></i></em>
+					{{ phrase('agent.general.news') }}
+				</h1>
+			</header>
+			<article>
+				<ul class="nav-list nav-list-small nav-list-tree">
+					{% include 'AgentBundle:Publish:news-cat-list.html.twig' with {'cats': news_cats, 'counts': news_cats_counts, 'depth': 0 } %}
+					<li class="new-cat-trigger new-cat">
+						<div class="item" data-route="poppage:{{ path('agent_publish_cats_newform', {type: 'news'}) }}">
+							<i class="icon-folder-close-alt"></i>
+							<h3>{{ phrase('agent.publish.add_new_category') }}</h3>
+						</div>
+					</li>
+				</ul>
+			</article>
+		</section>
+	{% endif %}
+
+	{% if app.getSetting('core.apps_downloads') %}
+		<section class="pane-section dp-collapsible" id="publish_section_downloads">
+			<header>
+				<h1>
+					<em class="dp-collapsible-toggle-btn"><i class="icon-x"></i></em>
+					{{ phrase('agent.general.downloads') }}
+				</h1>
+			</header>
+			<article>
+				<ul class="nav-list nav-list-small nav-list-tree">
+					{% include 'AgentBundle:Publish:downloads-cat-list.html.twig' with {'cats': download_cats, 'counts': download_cats_counts, 'depth': 0 } %}
+					<li class="new-cat-trigger new-cat">
+						<div class="item" data-route="poppage:{{ path('agent_publish_cats_newform', {type: 'download'}) }}">
+							<i class="icon-folder-close-alt"></i>
+							<h3>{{ phrase('agent.publish.add_new_category') }}</h3>
+						</div>
+					</li>
+				</ul>
+			</article>
+		</section>
+	{% endif %}
+
+	<section class="pane-section dp-collapsible" id="publish_section_comments" {% if not counts.comments.all %}style="display: none;"{% endif %}>
+		<header>
+			<h1>
+				<em class="dp-collapsible-toggle-btn"><i class="icon-x"></i></em>
+				{{ phrase('agent.general.comments') }}
+			</h1>
+		</header>
+		<article>
+			<ul class="nav-list nav-list-small nav-list-tree">
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_publish_listcomments', {'type': 'all'}) }}">
+						<i class="dp-toggle-icon click-through icon-caret-right"></i>
+						<h3>{{ phrase('agent.publish.all_comments') }}</h3>
+						<em class="counter list-counter" id="publish_all_comments_count">{{ counts.comments.all|default(0) }}</em>
+					</div>
+					<ul class="nav-list nav-list-small indented" style="display: none;">
+						<li class="is-nav-item" {% if not counts.comments.articles  %}style="display: none;"{% endif %}>
+							<div class="item" data-route="listpane:{{ path('agent_publish_listcomments', {'type': 'articles'}) }}">
+								<h3>{{ phrase('agent.publish.article_comments') }}</h3>
+								<em class="counter list-counter" id="publish_articles_comments_count">{{ counts.comments.articles|default(0) }}</em>
+							</div>
+						</li>
+						<li class="is-nav-item" {% if not counts.comments.news %}style="display: none;"{% endif %}>
+							<div class="item" data-route="listpane:{{ path('agent_publish_listcomments', {'type': 'news'}) }}">
+								<h3>{{ phrase('agent.publish.news_comments') }}</h3>
+								<em class="counter list-counter" id="publish_news_comments_count">{{ counts.comments.news|default(0) }}</em>
+							</div>
+						</li>
+						<li class="is-nav-item" {% if not counts.comments.downloads %}style="display: none;"{% endif %}>
+							<div class="item" data-route="listpane:{{ path('agent_publish_listcomments', {'type': 'downloads'}) }}">
+								<h3>{{ phrase('agent.publish.download_comments') }}</h3>
+								<em class="counter list-counter" id="publish_downloads_comments_count">{{ counts.comments.downloads|default(0) }}</em>
+							</div>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</article>
+	</section>
+
+	<section class="pane-section dp-collapsible last" id="publish_section_glossary">
+		<header>
+			<h1>
+				<em class="dp-collapsible-toggle-btn"><i class="icon-x"></i></em>
+				{{ phrase('agent.publish.glossary') }}
+			</h1>
+		</header>
+		<article>
+			{% include 'AgentBundle:Publish:kb-glossary.html.twig' %}
+			<br class="clear" />
+		</article>
+	</section>
+</div>
+
+<div class="pane-content pane-content-search" style="display: none;">
+	{% include 'AgentBundle:Publish:window-search.html.twig' %}
+</div>
+{% endblock %}

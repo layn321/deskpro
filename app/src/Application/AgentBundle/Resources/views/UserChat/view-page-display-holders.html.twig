@@ -1,0 +1,45 @@
+{% if not baseId %}{% set baseId = el_uid() %}{% endif %}
+<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table">
+	{# Custom fields#}
+	{% for f in custom_fields %}
+		<tbody class="chat_field_{{f.id}} custom-field item" data-field-type="chat_field" data-item-id="{{f.id}}" data-custom-field-handler="{{f.field_handler}}" style="display:none">
+			<tr class="mode-display">
+				<th width="120">
+					<span class="custom-field edit-trigger chat_field_{{f.id}}" data-item-id="{{f.id}}">{{f.title}}:</span>
+				</th>
+				<td>
+					<div class="custom-field content chat_field_{{f.id}}" data-item-id="{{f.id}}">
+						{% if not convo.hasCustomField(f.id) %}
+							{{ phrase('agent.general.none') }}
+						{% else %}
+							{{ render_custom_field(f) }}
+						{% endif %}
+					</div>
+				</td>
+			</tr>
+			<tr class="mode-edit">
+				{% if f.field_def.isFormField() %}
+					<th width="120">{{ f.title }}:</th>
+					<td>
+						<div class="custom-field field-input chat_field_{{f.id}}" data-item-id="{{f.id}}">
+							{{ render_custom_field_form(f) }}
+						</div>
+					</td>
+				{% else %}
+					<td>
+						<span class="custom-field edit-trigger chat_field_{{f.id}}" data-item-id="{{f.id}}">{{f.title}}:</span>
+					</td>
+					<td>
+						<div class="custom-field content chat_field_{{f.id}}" data-item-id="{{f.id}}">
+							{% if not chat.hasCustomField(f.id) %}
+								{{ phrase('agent.general.none') }}
+							{% else %}
+								{{ render_custom_field(f) }}
+							{% endif %}
+						</div>
+					</td>
+				{% endif %}
+			</tr>
+		</tbody>
+	{% endfor %}
+</table>

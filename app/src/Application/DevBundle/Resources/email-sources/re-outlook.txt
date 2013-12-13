@@ -1,0 +1,454 @@
+Delivered-To: hello@deskpro.com
+Received: by 10.64.129.233 with SMTP id nz9csp34642ieb;
+        Mon, 18 Jun 2012 02:44:27 -0700 (PDT)
+Received: by 10.180.100.2 with SMTP id eu2mr22702570wib.10.1340012666816;
+        Mon, 18 Jun 2012 02:44:26 -0700 (PDT)
+Return-Path: <deskpro@gmail.com>
+Received: from mail-we0-f176.google.com (mail-we0-f176.google.com [74.125.82.176])
+        by mx.google.com with ESMTPS id a59si20597824wel.133.2012.06.18.02.44.26
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Mon, 18 Jun 2012 02:44:26 -0700 (PDT)
+Received-SPF: pass (google.com: domain of deskpro@gmail.com designates 74.125.82.176 as permitted sender) client-ip=74.125.82.176;
+Authentication-Results: mx.google.com; spf=pass (google.com: domain of deskpro@gmail.com designates 74.125.82.176 as permitted sender) smtp.mail=deskpro@gmail.com; dkim=pass header.i=@gmail.com
+Received: by weyr3 with SMTP id r3so4938186wey.21
+        for <hello@deskpro.com>; Mon, 18 Jun 2012 02:44:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=from:to:references:in-reply-to:subject:date:message-id:mime-version
+         :content-type:x-mailer:thread-index:content-language;
+        bh=PbXVfDoSg4ZNmgD03rNncE7j7wehamXOvWVowaEEH1g=;
+        b=favJs4YoaXCJVjv6nCMpwRJN0i1uQXAzkRrGDykLIH85f/mrV8GIgbUSVas353cIFy
+         XPZa/avK09LWlhUDirR+BrzZzHvtUdfuCcTaXVD4ohXUWCTZFdpKV8f81q/EmuQ/r/un
+         BKNuLQuA6pn693bz/avIYsVdUUxKBo7b+1jJqFm/UCBsAS0g1CROIMUdCFQ/euqdWJE9
+         QGPTUfFmoBPquZiqy7ofacP5D5MPF6oD3Ub2hZw1gluZ71KqWL+aBfJzLssU4mE4P1mJ
+         RpyX1edaKi8QcbL0y7gNktHKAl/NNQN7YMeigWHhqrDiAgFqCyG4mSsl5rYwfeUUVcGQ
+         XStw==
+Received: by 10.216.196.90 with SMTP id q68mr8709593wen.130.1340012662832;
+        Mon, 18 Jun 2012 02:44:22 -0700 (PDT)
+Return-Path: <deskpro@gmail.com>
+Received: from DESKPROCHRIS ([5.10.152.89])
+        by mx.google.com with ESMTPS id hv7sm42746434wib.0.2012.06.18.02.44.21
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Mon, 18 Jun 2012 02:44:22 -0700 (PDT)
+From: "chris Padfield" <deskpro@gmail.com>
+To: "'DeskPRO'" <hello@deskpro.com>
+References: <TAC-DRNY9PWBZNGAWJDYH.4fdef7eb19f4d9.96606260-1@31f0c190a9fae9ddce49e552afc6c911>
+In-Reply-To: <TAC-DRNY9PWBZNGAWJDYH.4fdef7eb19f4d9.96606260-1@31f0c190a9fae9ddce49e552afc6c911>
+Subject: RE: New Reply: Test Subject - 2012-06-18 10:36:27
+Date: Mon, 18 Jun 2012 10:44:21 +0100
+Message-ID: <025801cd4d36$f0700ba0$d15022e0$@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0259_01CD4D3F.5235D330"
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AQGBXU5WH6lmnOYPhjhPKHylXNn+NZeXsznQ
+Content-Language: en-gb
+
+This is a multipart message in MIME format.
+
+------=_NextPart_000_0259_01CD4D3F.5235D330
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+What happens if I reply?
+
+=20
+
+From: DeskPRO [mailto:hello@deskpro.com]=20
+Sent: 18 June 2012 10:42
+To: Christopher Padfield
+Subject: New Reply: Test Subject - 2012-06-18 10:36:27
+
+=20
+
+_______________________.
+
+
+=3D=3D=3D Enter your reply above this line =3D=3D=3D=20
+
+A user has replied to "Test Subject - 2012-06-18 10:36:27"=20
+
+=09
+
+=20
+
+
+Ticket Properties=20
+
+
+
+View Online
+
+ <http://support.deskpro.com/agent/#app.tickets,t:72807> =
+http://support.deskpro.com/agent/#app.tickets,t:72807=20
+
+
+ID
+
+72807
+
+
+Agent
+
+None
+
+
+Team
+
+None
+
+
+Category
+
+None
+
+
+Product
+
+None
+
+
+Priority
+
+None
+
+
+Workflow
+
+None
+
+
+Status
+
+Open=20
+
+=20
+
+
+Messages=20
+
+
+
+On Mon, 18th Jun 2012 at 9:42 am, Christopher Nadeau <chris@nadeau.ws> =
+wrote:
+
+
+
+User reply=20
+
+=20
+
+-- Christopher
+
+=09
+
+=20
+
+
+On Mon, 18th Jun 2012 at 9:40 am, Christopher Nadeau wrote:
+
+
+
+Test Reply=20
+
+=20
+
+--
+
+Christopher Nadeau
+
+Senior Developer, DeskPRO Ltd.
+
+www.deskpro.com
+
+=09
+
+=20
+
+
+On Mon, 18th Jun 2012 at 9:38 am, Christopher Nadeau <chris@nadeau.ws> =
+wrote:
+
+
+
+Test Subject - 2012-06-18 10:36:31=20
+
+=20
+
+-- Christopher
+
+=09
+
+
+
+(#DRNY9PWBZNGAWJDYH)=20
+
+
+=20
+
+DeskPRO =C2=B7  <http://www.deskpro.com/> http://www.deskpro.com/=20
+
+=20
+
+
+------=_NextPart_000_0259_01CD4D3F.5235D330
+Content-Type: text/html;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
+xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" =
+xmlns=3D"http://www.w3.org/TR/REC-html40"><head><meta =
+http-equiv=3DContent-Type content=3D"text/html; charset=3Dutf-8"><meta =
+name=3DGenerator content=3D"Microsoft Word 14 (filtered =
+medium)"><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:Helvetica;
+	panose-1:2 11 6 4 2 2 2 2 2 4;}
+@font-face
+	{font-family:Helvetica;
+	panose-1:2 11 6 4 2 2 2 2 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:purple;
+	text-decoration:underline;}
+p
+	{mso-style-priority:99;
+	mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";}
+span.EmailStyle18
+	{mso-style-type:personal-reply;
+	font-family:"Calibri","sans-serif";
+	color:#1F497D;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;}
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 72.0pt 72.0pt 72.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]--></head><body lang=3DEN-GB link=3Dblue =
+vlink=3Dpurple><div class=3DWordSection1><p class=3DMsoNormal><span =
+style=3D'font-size:11.0pt;font-family:"Calibri","sans-serif";color:#1F497=
+D'>What happens if I reply?<o:p></o:p></span></p><p =
+class=3DMsoNormal><span =
+style=3D'font-size:11.0pt;font-family:"Calibri","sans-serif";color:#1F497=
+D'><o:p>&nbsp;</o:p></span></p><div><div =
+style=3D'border:none;border-top:solid #B5C4DF 1.0pt;padding:3.0pt 0cm =
+0cm 0cm'><p class=3DMsoNormal><b><span lang=3DEN-US =
+style=3D'font-size:10.0pt;font-family:"Tahoma","sans-serif"'>From:</span>=
+</b><span lang=3DEN-US =
+style=3D'font-size:10.0pt;font-family:"Tahoma","sans-serif"'> DeskPRO =
+[mailto:hello@deskpro.com] <br><b>Sent:</b> 18 June 2012 =
+10:42<br><b>To:</b> Christopher Padfield<br><b>Subject:</b> New Reply: =
+Test Subject - 2012-06-18 10:36:27<o:p></o:p></span></p></div></div><p =
+class=3DMsoNormal><o:p>&nbsp;</o:p></p><div><p class=3DMsoNormal =
+style=3D'mso-line-height-alt:.75pt'><span =
+style=3D'font-size:1.0pt;color:white'>_______________________.<o:p></o:p>=
+</span></p></div><table class=3DMsoNormalTable border=3D0 =
+cellspacing=3D0 cellpadding=3D0 width=3D"100%" =
+style=3D'width:100.0%'><tr><td valign=3Dtop =
+style=3D'background:white;padding:0cm 0cm 0cm 0cm'><p class=3DMsoNormal =
+style=3D'margin-bottom:12.0pt'><span =
+style=3D'font-family:"Helvetica","sans-serif";color:#242424'>=3D=3D=3D =
+Enter your reply above this line =3D=3D=3D <br><br>A user has replied to =
+&quot;Test Subject - 2012-06-18 10:36:27&quot; =
+<o:p></o:p></span></p><table class=3DMsoNormalTable border=3D0 =
+cellspacing=3D0 cellpadding=3D0 width=3D"100%" =
+style=3D'width:100.0%'><tr><td style=3D'padding:0cm 0cm 0cm =
+0cm'></td></tr></table><p class=3DMsoNormal><span =
+style=3D'font-family:"Helvetica","sans-serif";color:#242424;display:none'=
+><o:p>&nbsp;</o:p></span></p><table class=3DMsoNormalTable border=3D0 =
+cellspacing=3D0 cellpadding=3D0 width=3D"100%" =
+style=3D'width:100.0%'><tr><td style=3D'padding:0cm 0cm 3.0pt 0cm'><p =
+class=3DMsoNormal><span =
+style=3D'font-size:13.5pt;font-family:"Helvetica","sans-serif";color:#242=
+424'>Ticket Properties <o:p></o:p></span></p></td></tr><tr><td =
+style=3D'padding:0cm 0cm 0cm 0cm'><table class=3DMsoNormalTable =
+border=3D0 cellspacing=3D0 cellpadding=3D0 width=3D"100%" =
+style=3D'width:100.0%'><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>View Online<o:p></o:p></p></td><td =
+style=3D'padding:2.25pt 2.25pt 2.25pt 2.25pt'><p class=3DMsoNormal><a =
+href=3D"http://support.deskpro.com/agent/#app.tickets,t:72807"><span =
+style=3D'color:#0065A3'>http://support.deskpro.com/agent/#app.tickets,t:7=
+2807 </span></a><o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>ID<o:p></o:p></p></td><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>72807<o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>Agent<o:p></o:p></p></td><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>None<o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>Team<o:p></o:p></p></td><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>None<o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>Category<o:p></o:p></p></td><td =
+style=3D'padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>None<o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>Product<o:p></o:p></p></td><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>None<o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>Priority<o:p></o:p></p></td><td =
+style=3D'padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>None<o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>Workflow<o:p></o:p></p></td><td =
+style=3D'padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>None<o:p></o:p></p></td></tr><tr><td width=3D130 =
+style=3D'width:97.5pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'><p =
+class=3DMsoNormal>Status<o:p></o:p></p></td><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 2.25pt'><p class=3DMsoNormal>Open =
+<o:p></o:p></p></td></tr></table></td></tr></table><p =
+class=3DMsoNormal><span =
+style=3D'font-family:"Helvetica","sans-serif";color:#242424;display:none'=
+><o:p>&nbsp;</o:p></span></p><table class=3DMsoNormalTable border=3D0 =
+cellspacing=3D0 cellpadding=3D0 width=3D"100%" =
+style=3D'width:100.0%'><tr><td style=3D'padding:4.5pt 0cm 4.5pt 0cm'><p =
+class=3DMsoNormal><span =
+style=3D'font-size:13.5pt;font-family:"Helvetica","sans-serif";color:#242=
+424'>Messages <o:p></o:p></span></p></td></tr><tr><td =
+style=3D'padding:0cm 0cm 0cm 0cm'><table class=3DMsoNormalTable =
+border=3D0 cellspacing=3D0 cellpadding=3D0 width=3D620 =
+style=3D'width:465.0pt'><tr><td style=3D'padding:2.25pt 2.25pt 2.25pt =
+2.25pt'><p class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#6D6D6D'>On Mon, 18th Jun 2012 at 9:42 am, Christopher =
+Nadeau &lt;<a href=3D"mailto:chris@nadeau.ws">chris@nadeau.ws</a>&gt; =
+wrote:<o:p></o:p></span></p></td></tr><tr><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 4.5pt'><table class=3DMsoNormalTable border=3D0 =
+cellspacing=3D0 cellpadding=3D0 width=3D"100%" =
+style=3D'width:100.0%'><tr><td style=3D'border:none;border-left:solid =
+#00174B 1.0pt;padding:0cm 0cm 0cm 6.0pt'><div><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>User reply <o:p></o:p></span></p></div><div><div><p =
+class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'><o:p>&nbsp;</o:p></span></p></div><p =
+class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>--&nbsp;Christopher<o:p></o:p></span></p></div></td>=
+</tr></table></td></tr><tr><td style=3D'padding:2.25pt 2.25pt 4.5pt =
+2.25pt'></td></tr></table><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";display:none'><o:p>&nbsp;</o:p></span></p><table =
+class=3DMsoNormalTable border=3D0 cellspacing=3D0 cellpadding=3D0 =
+width=3D620 style=3D'width:465.0pt'><tr><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 2.25pt'><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#6D6D6D'>On Mon, 18th Jun 2012 at 9:40 am, Christopher =
+Nadeau wrote:<o:p></o:p></span></p></td></tr><tr><td =
+style=3D'padding:2.25pt 2.25pt 2.25pt 4.5pt'><table =
+class=3DMsoNormalTable border=3D0 cellspacing=3D0 cellpadding=3D0 =
+width=3D"100%" style=3D'width:100.0%'><tr><td =
+style=3D'border:none;border-left:solid #00174B 1.0pt;padding:0cm 0cm 0cm =
+6.0pt'><div><p class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>Test Reply <o:p></o:p></span></p></div><div><div><p =
+class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'><o:p>&nbsp;</o:p></span></p></div><div><div><p =
+class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>--<o:p></o:p></span></p></div><div><p =
+class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>Christopher =
+Nadeau<o:p></o:p></span></p></div><div><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>Senior Developer, DeskPRO =
+Ltd.<o:p></o:p></span></p></div><div><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'><a =
+href=3D"http://www.deskpro.com">www.deskpro.com</a><o:p></o:p></span></p>=
+</div></div></div></td></tr></table></td></tr><tr><td =
+style=3D'padding:2.25pt 2.25pt 4.5pt 2.25pt'></td></tr></table><p =
+class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";display:none'><o:p>&nbsp;</o:p></span></p><table =
+class=3DMsoNormalTable border=3D0 cellspacing=3D0 cellpadding=3D0 =
+width=3D620 style=3D'width:465.0pt'><tr><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 2.25pt'><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#6D6D6D'>On Mon, 18th Jun 2012 at 9:38 am, Christopher =
+Nadeau &lt;<a href=3D"mailto:chris@nadeau.ws">chris@nadeau.ws</a>&gt; =
+wrote:<o:p></o:p></span></p></td></tr><tr><td style=3D'padding:2.25pt =
+2.25pt 2.25pt 4.5pt'><table class=3DMsoNormalTable border=3D0 =
+cellspacing=3D0 cellpadding=3D0 width=3D"100%" =
+style=3D'width:100.0%'><tr><td style=3D'border:none;border-left:solid =
+#00174B 1.0pt;padding:0cm 0cm 0cm 6.0pt'><div><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>Test Subject - 2012-06-18 10:36:31 =
+<o:p></o:p></span></p></div><div><div><p class=3DMsoNormal =
+style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'><o:p>&nbsp;</o:p></span></p></div><p =
+class=3DMsoNormal style=3D'line-height:125%'><span =
+style=3D'font-size:9.0pt;line-height:125%;font-family:"Helvetica","sans-s=
+erif";color:#00174B'>--&nbsp;Christopher<o:p></o:p></span></p></div></td>=
+</tr></table></td></tr><tr><td style=3D'padding:2.25pt 2.25pt 4.5pt =
+2.25pt'></td></tr></table></td></tr></table><p class=3DMsoNormal><span =
+style=3D'font-family:"Helvetica","sans-serif";color:#242424'><br><br></sp=
+an><span =
+style=3D'font-family:"Helvetica","sans-serif";color:white'>(#DRNY9PWBZNGA=
+WJDYH)</span><span =
+style=3D'font-family:"Helvetica","sans-serif";color:#242424'> =
+<o:p></o:p></span></p></td></tr><tr><td valign=3Dtop =
+style=3D'background:white;padding:0cm 0cm 0cm 0cm'><div =
+style=3D'border:none;border-top:solid #C5C5C5 1.5pt;padding:0cm 0cm 0cm =
+0cm;margin-top:11.25pt'><p class=3DMsoNormal><span =
+style=3D'font-size:9.0pt;font-family:"Helvetica","sans-serif";color:#9494=
+94'>&nbsp;<o:p></o:p></span></p></div><p =
+style=3D'mso-margin-top-alt:4.5pt;margin-right:0cm;margin-bottom:0cm;marg=
+in-left:0cm;margin-bottom:.0001pt'><span =
+style=3D'font-size:9.0pt;font-family:"Helvetica","sans-serif";color:#9494=
+94'><a href=3D"DeskPRO"><span style=3D'color:#949494'>DeskPRO</span></a> =
+=C2=B7 <a href=3D"http://www.deskpro.com/"><span =
+style=3D'color:#949494'>http://www.deskpro.com/</span></a> =
+<o:p></o:p></span></p></td></tr></table><p =
+class=3DMsoNormal><o:p>&nbsp;</o:p></p></div></body></html>
+------=_NextPart_000_0259_01CD4D3F.5235D330--
+
+

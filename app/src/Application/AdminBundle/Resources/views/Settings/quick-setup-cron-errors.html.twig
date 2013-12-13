@@ -1,0 +1,91 @@
+<div class="alert-message block-message error">
+	<h1>We detected an error with your scheduled task</h1>
+	<p>
+		Your scheduled task appears to be running, but we have detected problems with the server that is causing
+		errors. You need to fix these errors before the required tasks will be run properly.
+	</p>
+	<hr />
+	{% if not ini_path and web_ini_path and is_zendserver and get_instance_ability('is_windows') %}
+		<div style="background-color: #FDFFC2; padding: 5px; margin: 15px;">
+			<p>
+				We have detected that you are using Zend Server. There is a known problem with Zend Server when using the php-win.exe
+				binary and where no php.ini is loaded.
+			</p>
+			<p>
+				The simplest solution is to create a new ini file at C:\WINDOWS\php.ini
+			</p>
+			{% if web_ini_path %}
+				<p>
+					The php.ini file you are currently using on the web server is located at: {{ web_ini_path }}<br />
+					You may be able to simply copy this entire file.
+				</p>
+			{% endif %}
+		</div>
+	{% endif %}
+	<ul>
+		{% set show_phpini = false %}
+	{% for code in error_codes %}
+		<li>
+			{% if code == 'php_version' %}
+				The PHP version used to execute the scheduled task is outdated. Your web server and your command-line
+				versions of PHP are different. You need to upgrade your command-line version of PHP to at least 5.3.2.
+			{% elseif code == 'pdo_ext' or code == 'pdo_mysql_ext' %}
+				{% set show_phpini = true %}
+				PHP does not have the <a href="http://php.net/manual/en/pdo.installation.php">pdo and pdo_mysql</a> extension enabled.
+				You will need to activate these extensions in php.ini.
+			{% elseif code == 'iconv_ext' %}
+				{% set show_phpini = true %}
+				PHP does not have the <a href="http://php.net/manual/en/iconv.installation.php">iconv</a> or
+				<a href="http://php.net/manual/en/mbstring.installation.php">mbstring</a> extensions enabled.
+				You will need to activate one of these extensions in php.ini.
+			{% elseif code == 'json_ext' %}
+				{% set show_phpini = true %}
+				PHP does not have the <a href="http://php.net/manual/en/json.installation.php">json extension</a> enabled.
+				You will need to activate this extension in php.ini.
+			{% elseif code == 'libxml_ext' %}
+				{% set show_phpini = true %}
+				PHP does not have the <a href="http://php.net/manual/en/book.libxml.php">libxml extension</a> enabled.
+				You will need to rebuild PHP with libxml enabled.
+			{% elseif code == 'libxml_version' %}
+				{% set show_phpini = true %}
+				Your version of PHP was built against a very old version of libxml (libxml is used by the <a href="http://php.net/manual/en/book.libxml.php">libxml extension</a>).
+				Older versions of libxml contain bugs that can lead to problems parsing HTML email. You need to update the version of <a href="http://xmlsoft.org/">libxml</a> on your server, and then re-build PHP.
+			{% elseif code == 'ctype_ext' %}
+				{% set show_phpini = true %}
+				PHP does not have the <a href="http://php.net/manual/en/ctype.installation.php">ctype extension</a> enabled.
+				You will need to activate this extension in php.ini.
+			{% elseif code == 'tokenizer_ext' %}
+				{% set show_phpini = true %}
+				PHP does not have the <a href="http://php.net/manual/en/tokenizer.installation.php">tokenizer extension</a> enabled.
+				You will need to activate this extension in php.ini.
+			{% elseif code == 'memory_limit' %}
+				{% set show_phpini = true %}
+				PHP's <a href="http://php.net/manual/en/ini.core.php#ini.memory-limit">memory limit</a> is set too low.
+				Edit your php.ini and set memory_limit to at least 128M.
+			{% elseif code == 'php_functions' %}
+				PHP is disabling functions with the <a href="http://php.net/manual/en/ini.core.php#ini.disable-functions">disable_functions</a> directive.
+				Edit your php.ini and remove the line setting disable_functions.
+			{% elseif code == 'data_write' %}
+				The data directory is not writable by the user that executes the scheduled task.
+				Ensure that the user who runs the task is able to write to your data directory at {{ data_dir }}
+			{% elseif code == 'db_connect' %}
+				The scheduled task was unable to connect to the MySQL database.
+			{% else %}
+				An unknown error occurred that prevented scheduled tasks from running. Here is the error log file from data/logs/error.log:
+				<textarea style="font-size: 11px; font-family: Consolas, Monaco, monospace; width: 90%; height: 150px">{{ code }}: {{ error_log }}</textarea>
+				<br/>You should contact <a href="mailto:support@deskpro.com">support@deskpro.com</a> for assistance in resolving this error.
+			{% endif %}
+		</li>
+	{% endfor %}
+	{% if show_phpini %}
+		<p>
+			It is possible that these errors are caused by a difference in PHP configuration. Often, the web server and the
+			command-line use different php.ini files.
+			{% if ini_path %}
+				We have detected the php.ini file being used by the scheduled task is:<br/><var>{{ ini_path }}</var>
+			{% else %}
+				We were unable to determine the path to the php.ini file used by the scheduled task, you will need to locate it manually.
+			{% endif%}
+		</p>
+	{% endif %}
+</div>

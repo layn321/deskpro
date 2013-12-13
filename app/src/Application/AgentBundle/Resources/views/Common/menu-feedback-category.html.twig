@@ -1,0 +1,10 @@
+<ul class="menu category_id {{add_classname}}" data-option-name="category_id" style="display:none">
+	{% for cat in categories %}
+		<li
+			class="cat-{{cat.id}}"
+			data-option-value="{{cat.id}}"
+			data-full-title="{{subcat.full_title}}"
+			{% if cat.depth %}style="margin-left: {{ 10 * cat.depth }}px; font-size: 90%;"{% endif %}
+		>{{cat.title}}</li>
+	{% endfor %}
+</ul>

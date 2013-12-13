@@ -1,0 +1,84 @@
+<article
+	class="row-item task task-{{ task.id }} {% if task.is_completed %}completed{% endif %}"
+	data-due-date="{{ task.date_due|date('day') }}"
+	data-task-id="{{ task.id }}"
+
+	{% if task.isOverdue() %}data-in-sublist-overdue="1"
+	{% elseif task.isDueToday(app.user) %}data-in-sublist-today="1"
+	{% else %}data-in-sublist-future="1"
+	{% endif %}
+
+	{% if task.assigned_agent.id == app.user.id or (not task.assigned_agent.id and not task.assigned_agent_team.id and task.person.id == app.user.id)  %}data-in-my="1"{% endif %}
+	{% if task.assigned_agent_team.id and app.user.getHelper('Agent').isTeamMember(task.assigned_agent_team.id) %}data-in-my-teams="1"{% endif %}
+	{% if task.person.id == app.user.id and task.assigned_agent_team or (task.assigned_agent and task.assigned_agent.id != app.user.id) %}data-in-delegated="1"{% endif %}
+>
+	<div class="task-title">
+		<span class="expand-collapse-icon"></span>
+		{% if task.person.id == app.user.id %}<i class="delete-task" data-confirm="{{ phrase('agent.tasks.delete_confirm') }}"></i>{% endif %}
+		<input type="checkbox" class="item-select" value="{{ task.id }}" {% if task.is_completed %}checked="checked"{% endif %} />
+		<h5>{{ task.title }}</h5>
+	</div>
+	<div class="task-sub-wrap">
+		<div class="task-info" {% if task.is_completed %}style="display: none"{% endif %}>
+			<ul>
+					<li class="noval opt-trigger date_due"><label>{% if not task.date_due %}{{ phrase('agent.tasks.no_due_date') }}{% else %}{{ task.date_due|date('day') }}{% endif %}</label><span class="drop-icon"></span></li>
+					<li class="noval opt-trigger visibility"><label>{% if task.visibility %}{{ phrase('agent.general.public') }}{% else %}{{ phrase('agent.general.private') }}{% endif %}</label><span class="drop-icon"></span></li>
+					<li class="noval opt-trigger assigned_agent" style="overflow:hidden; height: 18px; position: relative;">
+						<label>
+							{% if task.assigned_agent and task.assigned_agent.id != app.user.id %}{{ task.assigned_agent.display_name }}
+							{% elseif task.assigned_agent_team %}{{ task.assigned_agent_team.name }}
+							{% else %}{{ phrase('agent.general.me') }}{% endif %}
+						</label><span class="drop-icon"></span>
+						<select class="agents_sel dpe_select"  style="min-width: 170px;" data-invisible-trigger="1">
+							<optgroup label="Agents">
+								{% for agent in app.agents.getAgents() %}
+									<option {% if (task.assigned_agent and agent.id == task.assigned_agent.id) or (not task.assigned_agent and not task.assigned_agent_team and agent.id == app.user.id) %}selected="selected"{% endif %} data-icon="{{ agent.getPictureUrl(20) }}" value="agent:{{ agent.id }}">{{ agent.display_name }}</option>
+								{% endfor %}
+							</optgroup>
+							{% if app.agent_teams.getTeams()|length %}
+								<optgroup label="Teams">
+									{% for team in app.agent_teams.getTeams() %}
+										<option value="agent_team:{{ team.id }}" {% if task.assigned_agent_team and task.assigned_agent_team.id == team.id %}selected="selected"{% endif %}>{{ team.name }}</option>
+									{% endfor %}
+								</optgroup>
+							{% endif %}
+						</select>
+					</li>
+					<li class="comment-btn" style="float:right;">
+						<label>{{ phrase('agent.general.add_comment') }}</label><span class="drop-icon"></span>
+					</li>
+			</ul>
+		</div>
+		{% if not noShowLinked and task.task_associations|length %}
+			<div class="task-linked">
+				{% for assoc in task.task_associations %}
+					<span class="assoc">
+						{% if assoc['ticket'] is defined %}{{ phrase('agent.tasks.linked_ticket') }}: <a data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': assoc.ticket.id}) }}">{{ assoc.ticket.subject }}</a>{% endif %}
+					</span>
+					<span class="assoc">
+						{% if assoc['deal'] is defined %}{{ phrase('agent.tasks.linked_deal') }}: <a data-route="ticket:{{ path('agent_deal_view', {'deal_id': assoc.deal.id}) }}">{{ assoc.deal.title }}</a>{% endif %}
+					</span>
+				{% endfor %}
+			</div>
+		{% endif %}
+		<div class="task-comments notes-wrap" {% if not task.comments|length or task.is_completed %}style="display: none"{% endif %}>
+			<ul class="task-comment-list">
+				{% for comment in task.comments %}
+					{% include 'AgentBundle:Task:comment-li.html.twig' with {'comment': comment} %}
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="new-comment" style="display: none">
+			<div class="comment-input">
+				<textarea placeholder="{{ phrase('agent.tasks.enter_your_comment') }}"></textarea>
+				<div class="is-not-loading">
+					<button class="clean-white small save-comment-trigger">{{ phrase('agent.general.add_comment') }}</button>
+					{{ phrase('agent.tasks.or') }} <span class="cancel-comment-trigger">{{ phrase('agent.general.cancel') }}</span>
+				</div>
+				<div class="is-loading">
+					{{ phrase('agent.general.saving') }}
+				</div>
+			</div>
+		</div>
+	</div>
+</article>

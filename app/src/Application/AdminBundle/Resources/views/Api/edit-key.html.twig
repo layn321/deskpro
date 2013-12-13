@@ -1,0 +1,75 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_api_keylist') }}">API Keys</a></li>
+	{% if apikey.id %}
+		<li>Edit API Key</li>
+	{% else %}
+		<li>Add API Key</li>
+	{% endif %}
+</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_api_editkey', {'id': apikey.id|default(0)}) }}" method="post" class="dp-form">
+
+	{% if errors %}
+	<ul id="errors_container">
+		{% for error in errors %}
+		<li>{{ error }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Note</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="note" value="{{apikey.note}}" />
+		</div>
+	</div>
+
+	<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>API Key Type</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger" name="is_super" value="1" {% if is_super %}checked="checked"{% endif %} />
+						Super User
+					</label>
+					<div>A super user key is not associated with a particular agent. Every request must specify the agent performing the action.</div>
+				</div>
+
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger" name="is_super" value="0" {% if not is_super %}checked="checked"{% endif %} />
+						Specific Agent
+					</label>
+					<div>Perform all API requests as a specific agent.</div>
+					<div class="dp-group-options" style="display: none">
+						<select name="agent_id">
+							<option value="0">&nbsp;</option>
+							{% for agent in agents %}
+								<option value="{{ agent.id }}" {% if agent_id == agent.id %}selected="selected"{% endif %}>{{ agent.display_name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Save API Key</button>
+	</footer>
+
+	{{ form_token() }}
+	<input type="hidden" name="process" value="1" />
+
+</form>
+
+{% endblock %}

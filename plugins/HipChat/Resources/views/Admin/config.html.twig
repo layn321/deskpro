@@ -1,0 +1,22 @@
+{% extends 'AdminBundle:Plugins:config.html.twig' %}
+{% block inner_form %}
+
+<div class="setting_field_row">
+	<h4>HipChat Setup</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label>API Token</label>
+			<input type="text" name="settings[api_token]" value="{{ app.getSetting(plugin.id ~ '.api_token') }}" style="width: 50%; padding: 5px" />
+			<p>This is the API token for HipChat account. This can be created <a href="https://www.hipchat.com/admin/api" target="_blank">here</a>.</p>
+		</div>
+
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[notify]" value="1" {% if app.getSetting(plugin.id ~ '.notify') %}checked="checked"{% endif %} />
+				Notify room members of a new message</label>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="set_settings[]" value="notify" />
+
+{% endblock %}

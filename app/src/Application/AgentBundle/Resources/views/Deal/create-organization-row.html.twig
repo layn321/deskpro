@@ -1,0 +1,15 @@
+<div class="add-new-org-container">
+<div class="col">
+	<h4>{{ phrase('agent.general.name') }}</h4>
+	{% if organization.id %}
+		{{ organization.name }}
+	{% else %}
+		<input type="text" name="newdeal[organizations][name]" class="name" value="{{ organization.name }}" />
+	{% endif %}
+</div>
+<br class="clear" />
+<footer>
+   <button class="save-org-trigger clean-white small">{{ phrase('agent.deal.add_organization') }}</button>
+   <button class="cancel-org-trigger clean-white small">{{ phrase('agent.general.cancel') }}</button>
+</footer>
+</div>

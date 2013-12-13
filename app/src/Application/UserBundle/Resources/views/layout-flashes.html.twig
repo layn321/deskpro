@@ -1,0 +1,48 @@
+{##
+ # Included at the top of the main content section of every page. It
+ # used to show status messages.
+ ##}
+
+{% if app.session.getFlashes() %}
+	<div class="dp-flashes">
+		{% if app.session.getFlash('new_ticket_login') %}
+			<div class="dp-alert alert-block dp-alert-success">{{ phrase('user.tickets.flash_new_ticket_login') }}</div>
+		{% endif %}
+		{% if app.session.getFlash('new_ticket_validating_email') %}
+			<div class="dp-alert alert-block">{{ phrase('user.tickets.flash_new_ticket_validating_email', {email: app.session.getFlash('new_ticket_validating_email')}) }}</div>
+		{% endif %}
+		{% if app.session.getFlash('new_ticket_email') %}
+			<div class="dp-alert dp-alert-success">{{ phrase('user.tickets.new_ticket_email', {email: app.session.getFlash('new_ticket_email')}) }}</div>
+		{% endif %}
+		{% if app.session.getFlash('register_done') %}
+			<div class="dp-alert dp-alert-success">
+				{% if app.session.getFlash('register_done_email_validate') %}
+					{{ phrase('user.profile.register_done_validate_email') }}
+				{% elseif app.session.getFlash('register_done_agent_validate') %}
+					{{ phrase('user.profile.register_done_validate_agent') }}
+				{% else %}
+					{{ phrase('user.profile.register_done') }}
+				{% endif %}
+			</div>
+		{% endif %}
+		{% if app.session.getFlash('email_prefs_saved') %}
+			<div class="dp-alert alert-block dp-alert-success">
+				{{ phrase('user.profile.email_preferences_updated') }}
+			</div>
+		{% endif %}
+	</div>
+{% endif %}
+{% if app.user.id and not app.user.is_agent_confirmed %}
+	<div class="dp-flashes">
+		<div class="dp-alert dp-alert-error">
+			{{ phrase('user.profile.you_are_waiting_agent_validation') }}
+		</div>
+	</div>
+{% endif %}
+{% if app.session.hasFlash('password_saved') %}
+	<div class="dp-flashes">
+		<div class="dp-alert dp-alert-success">
+			{{ phrase('user.profile.password_updated') }}
+		</div>
+	</div>
+{% endif %}

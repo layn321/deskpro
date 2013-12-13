@@ -1,0 +1,23 @@
+{% set count = ''%}
+{% set dealType = ''%}
+{% set dealTypeId = ''%}
+<ul class="sub-group">
+{% for  deals in opendeals%}
+    {% for deal in deals%}
+        {% if loop.index == 1%}
+            {% set count = deal%}
+        {%elseif loop.index == 2%}
+            {% set dealType = deal%}
+        {% else %}
+            {% set dealTypeId = deal%}
+        {%endif%}    
+    {%endfor%}
+
+    <li>
+        <span class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': dealTypeId}) }}">
+                <span class="list-counter" id="deals_enterprise_sale">{{count|default(0)}}</span>
+                {{dealType}}
+        </span>
+     </li>
+{%endfor%}
+</ul>

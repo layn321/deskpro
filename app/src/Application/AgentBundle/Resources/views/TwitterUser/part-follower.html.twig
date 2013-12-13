@@ -1,0 +1,57 @@
+{% set user = follower.user %}
+<article
+	class="row-item twitter-user user-{{ user.id }} {{ extra_class }} {% if not no_archive and follower.is_archived %}archived{% endif %}"
+	data-user-id="{{ user.id }}"
+>
+	<div class="user-body">
+		{% if not no_archive %}
+			<i class="status-archived user-action tipped" title="Unarchive" {% if not follower.is_archived %}style="display:none"{% endif %}></i>
+			<i class="status-archive user-action tipped" title="Archive" {% if follower.is_archived %}style="display:none"{% endif %}></i>
+		{% endif %}
+		<div class="photo" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">
+			<img src="{{ user.profile_image_url }}" width="48" height="48" border="0" />
+		</div>
+		<div class="info">
+			<h4>
+				<span class="name user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ user.name }}</span>
+				<span class="screen-name user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">@{{ user.screen_name }}</span>
+			</h4>
+			<div class="description">{{ user.description }}</div>
+		</div>
+
+		<div class="extra-container extra-row">
+			<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ phrase('agent.twitter.tweets') }}: {{ user.statuses_count }}</span>
+			<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ phrase('agent.twitter.following') }}: {{ user.friends_count }}</span>
+			<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ phrase('agent.twitter.followers') }}: {{ user.followers_count }}</span>
+			<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ phrase('agent.twitter.interactions') }}: {{ user.countAccountInteractions(account) }}</span>
+		</div>
+	</div>
+	<div class="message-sent-confirmation" style="display: none">
+		{{ phrase('agent.twitter.message_sent') }}: <span class="message"></span>
+	</div>
+	<div class="new-message" style="display: none">
+		{% include 'AgentBundle:TwitterStatus:message-block.html.twig' with {
+			'account': account,
+			'default_type': 'public',
+			'default_text': '@' ~ user.screen_name ~ ' ',
+			'send_text': phrase('agent.twitter.send_tweet'),
+			'reply_form_extra': '<input type="hidden" name="user_id" value="' ~ user.id ~ '" />'
+		} %}
+	</div>
+	<div class="user-info">
+		<ul>
+			{% if user.id in account.friend_ids %}
+				<li class="noval opt-trigger unfollow">
+					<label>{{ phrase('agent.twitter.unfollow') }}</label>
+				</li>
+			{% else %}
+				<li class="noval opt-trigger follow">
+					<label>{{ phrase('agent.twitter.follow') }}</label>
+				</li>
+			{% endif %}
+			<li class="noval opt-trigger message">
+				<label>{{ phrase('agent.twitter.send_tweet') }}</label><span class="drop-icon"></span>
+			</li>
+		</ul>
+	</div>
+</article>

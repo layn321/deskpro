@@ -1,0 +1,23 @@
+{% extends 'ReportBundle:Billing:layout.html.twig' %}
+{% block inner_page %}
+	<h1>
+		{{report.title_final}}
+	</h1>
+	{% if report.description %}<p>{{ report.description|nl2br }}</p>{% endif %}
+
+	<form action="{{ path('report_billing_report', {'report_id' : report.id}) }}" class="dp-form" method="post">
+
+		<div class="report-actions">
+			<button class="btn" name="output" value="csv">CSV</button>
+			<button class="btn" name="run" value="1" onclick="window.print(); return false;">Print</button>
+		</div>
+
+		{% include 'ReportBundle:ReportBuilder:results.html.twig' %}
+
+		{{ form_token() }}
+
+		{% for key, val in params %}
+			<input type="hidden" name="params[{{ key }}]" value="{{ val }}" />
+		{% endfor %}
+	</form>
+{% endblock %}

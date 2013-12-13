@@ -1,0 +1,8 @@
+{% macro help_header_start(id) %}
+	<div class="admin-help-header {{id}}" {# {% if not app.person.shouldShowMessage(id) %}style="display:none"{% endif %} #}>
+		<div class="close-trigger" data-message-id="{{id}}"></div>
+{% endmacro %}
+
+{% macro help_header_end(id) %}
+	</div>
+{% endmacro %}

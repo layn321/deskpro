@@ -1,0 +1,33 @@
+<li class="account account-{{ account.id }}" data-account-id="{{ account.id }}" style="position:relative">
+	<div style="float:right">
+		<a class="edit-icon" href="{{ path('admin_twitter_accounts_edit', {'account_id': account.id}) }}">{{ phrase('agent.general.edit') }}</a>
+		<a class="delete-icon click-confirm" href="{{ path('admin_twitter_accounts_delete', {'account_id': account.id, 'security_token': security_token('delete_twitter')}) }}" data-confirm="Are you sure you want to remove this Twitter account?">{{ phrase('agent.general.delete') }}</a>
+	</div>
+	<div style="float:left">
+		<img src="{{ account.user.profile_image_url }}" width="28" height="28" border="0" />
+	</div>
+	<div style="float:left; margin-left: 10px">
+		<strong>{{ account.user.name }}</strong>
+		<div style="font-size: 90%; margin-top: 3px;">@{{ account.user.screen_name }}</div>
+	</div>
+	<div style="float:left; margin-left: 250px;position:absolute">
+		<div>
+			<strong>Twitter access:</strong>
+			{% if verified[account.id] %}
+				<span style="color:green">{{ phrase('agent.general.verified') }}</span>
+			{% else %}
+				<span style="color:red" class="tipped" title="{{ errors[account.id] }}">{{ phrase('admin.twitter.error') }}</span>
+			{% endif %}
+		</div>
+		<div style="margin-top: 2px">
+			<strong>Agents with access:</strong>
+			{% for agent in account.persons -%}
+				{% if loop.index > 1 %},{% endif %}
+				{{ agent.display_name }}
+			{%- else %}
+				None
+			{% endfor %}
+		</div>
+	</div>
+	<div style="clear:both"></div>
+</li>

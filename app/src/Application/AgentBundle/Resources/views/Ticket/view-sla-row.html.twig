@@ -1,0 +1,37 @@
+<tr data-sla-id="{{ticket_sla.sla.id}}" data-sla-status="{{ ticket_sla.sla_status }}">
+	<td>
+		<span class="sla-status-icon {{ ticket_sla.sla_status }} tipped"
+			{% if ticket_sla.sla_status == 'ok' %}title="{{ phrase('agent.general.okay') }}"
+			{% elseif ticket_sla.sla_status == 'warning' %}title="{{ phrase('agent.general.warning') }}"
+			{% elseif ticket_sla.sla_status == 'fail' %}title="{{ phrase('agent.general.failed') }}"{% endif %}
+		></span>
+		{{ ticket_sla.sla.title }}
+	</td>
+	<td class="warn-date">
+		{% if ticket_sla.warn_date %}
+			<span title="{{ticket_sla.warn_date|date('fulltime')}}"><time class="timeago" datetime="{{ticket_sla.warn_date|date('c', 'UTC')}}"></time></span>
+		{% else %}
+			{{ phrase('agent.general.na') }}
+		{% endif %}
+	</td>
+	<td class="fail-date">
+		{% if ticket_sla.fail_date %}
+			<span title="{{ticket_sla.fail_date|date('fulltime')}}"><time class="timeago" datetime="{{ticket_sla.fail_date|date('c', 'UTC')}}"></time></span>
+		{% else %}
+			{{ phrase('agent.general.na') }}
+		{% endif %}
+	</td>
+	{% if ticket_sla.sla.apply_type == 'manual' and ticket_perms.modify_slas %}
+		{% if ticket_sla.is_completed %}
+			<td class="completed"><a href="{{ path('agent_ticket_sladelete', {ticket_id: ticket.id, sla_id: ticket_sla.sla.id, security_token: security_token('delete_sla'), '_rt': security_token('request_token', 10800)}) }}" class="sla-delete tipped" title="{{ phrase('agent.general.requirements_complete') }}{% if ticket_sla.completed_time_taken %} ({{ ticket_sla.completed_time_taken|time_length }}){% endif %}. Click to remove SLA."></a></td>
+		{% else %}
+			<td class="delete"><a href="{{ path('agent_ticket_sladelete', {ticket_id: ticket.id, sla_id: ticket_sla.sla.id, security_token: security_token('delete_sla'), '_rt': security_token('request_token', 10800)}) }}" class="sla-delete tipped" title="{{ phrase('agent.general.remove') }}"></a></td>
+		{% endif %}
+	{% else %}
+		{% if ticket_sla.is_completed %}
+			<td class="completed"><span class="tipped" title="{{ phrase('agent.general.requirements_complete') }}{% if ticket_sla.completed_time_taken %} ({{ ticket_sla.completed_time_taken|time_length }}){% endif %}."></span></td>
+		{% else %}
+			<td>&nbsp;</td>
+		{% endif %}
+	{% endif %}
+</tr>

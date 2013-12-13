@@ -1,0 +1,137 @@
+{% extends 'UserBundle::layout-simple-iframe.html.twig' %}
+{% block head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/User/TicketFormWidget/TicketFormWin.js') }}"></script>
+<script type="text/javascript">
+var ticketFormWin = new DeskPRO.User.WebsiteWidget.TicketFormWin();
+$(document).ready(function() {
+	ticketFormWin.initPage();
+});
+</script>
+<script type="text/javascript">
+var ticketReader = {
+	getCategoryId: function() {
+		var cat = $('select.category_id');
+		var catId = cat.val();
+
+		var subCat = $('.sub-options-category_id.sub-options-' + catId);
+		if (subCat.length) {
+			var subCatId = $('select', subCat).val();
+			return parseInt(subCatId) || 0;
+		}
+
+		return parseInt(catId) || 0;
+	},
+	getPriorityVal: function() {
+		var id = this.getPriorityId();
+		if (!id) {
+			return -999999999;
+		}
+
+		if (!window.DESKPRO_TICKET_PRI_MAP || !window.DESKPRO_TICKET_PRI_MAP[id]) {
+			return 0;
+		}
+
+		return parseInt(window.DESKPRO_TICKET_PRI_MAP[id]);
+	},
+	getPriorityId: function() {
+		var cat = $('select.priority_id');
+		var catId = cat.val();
+
+		var subCat = $('.sub-options-priority_id.sub-options-' + catId);
+		if (subCat.length) {
+			var subCatId = $('select', subCat).val();
+			return parseInt(subCatId) || 0;
+		}
+
+		return parseInt(catId) || 0;
+	},
+	getProductId: function() {
+		var cat = $('select.product_id');
+		var catId = cat.val();
+
+		var subCat = $('.sub-options-product_id.sub-options-' + catId);
+		if (subCat.length) {
+			var subCatId = $('select', subCat).val();
+			return parseInt(subCatId) || 0;
+		}
+
+		return parseInt(catId) || 0;
+	},
+	getOrganizationId: function() {
+		return {{ app.user.organization.id|default(0) }};
+	},
+	getWorkflow: function() {
+		return 0;
+	}
+};
+</script>
+<script type="text/javascript">
+{{ ticket_display_js|raw }}
+</script>
+<script src="{{ asset('javascripts/DeskPRO/User/ElementHandler/NewTicket.js') }}"></script>
+{% endblock %}
+{% block content %}
+<div
+	class="dp-newticket-page with-handler {% if not set_dep_id %}require-js{% endif %}"
+	data-element-handler="DeskPRO.User.ElementHandler.NewTicket"
+	data-suggestions-url="{{ path('user_search_similarto', {'content_type': 'article'}) }}"
+>
+
+{% if errors|length %}
+	<div class="alert-message error">
+		{{ phrase('user.tickets.form_errors_correct') }}
+		<!--
+		{{ debug_var(error_fields) }}
+		{{ debug_var(errors) }}
+		-->
+	</div>
+{% endif %}
+<form action="{{ path('user_tickets_new_simple', {for_department_id: set_dep_id}) }}{% if app.getRequest().query.has('_debug') %}?_debug{% endif %}" method="post" id="dp_newticket_form" enctype="multipart/form-data" class="with-form-validator">
+	{{ form_token('newticket') }}
+	<input type="hidden" name="preticket_status_id" id="dp_newticket_preticket_status_id" value="" />
+	<input type="hidden" name="process" value="1" />
+	<input type="hidden" name="is_iframe" value="1" />
+	<input type="hidden" name="redirect_after" id="dp_newticket_redirect_after" value="{{ redirect_after }}" />
+	<!-- DP_WEBSITE_URL_FIELD -->
+
+	{###############
+	 # Email
+	 ###############}
+
+	<div class="dp-control-group {% if error_fields[form_key_prefix ~ 'email'] %}dp-error{% endif %}" {% if hide_email_field and not error_fields[form_key_prefix ~ 'email'] %}style="display:none;"{% endif %}>
+		<div class="dp-control-label">
+			<label><strong>{{ phrase('user.general.your_email_address') }} *</strong></label>
+		</div>
+		<div class="dp-controls dp-fill">
+			<input type="text" name="newticket[person][email]" value="{{ newticket.person.email }}" data-field-validators="DeskPRO.Form.EmailValidator" />
+			<div class="dp-help-inline dp-error-explain">
+				{{ phrase('user.general.form_fix_email') }}
+			</div>
+		</div>
+	</div>
+
+	{#--- FIELDS CONTAINER ---#}
+	<div id="fields_container">
+		{# First time outputs items in order and visible depending on the page data #}
+		{% include 'UserBundle:NewTicket:field-list-loop.html.twig' with {'page_data': default_page_data, 'mode': 'default', 'page_data_field_ids': page_data_field_ids }%}
+	</div>
+	{#--- FIELDS CONTAINER ---#}
+
+	<div class="dp-related-search dp-well" id="dp_newticket_related_container" style="display: none">
+		<h4>{{ phrase('user.tickets.we_found_helpful_content') }}</h4>
+		<div class="subline">{{ phrase('user.tickets.title_links_safe') }}</div>
+		<div class="dp-list results">
+		</div>
+		<div class="more-link" style="display: none;">
+			{% set phrase_part %}
+			<span class="count">0</span>
+			{% endset %}
+			<a>{{ phrase('user.tickets.view_more_results', {'part':phrase_part}, true) }}</a>
+		</div>
+	</div>
+
+	<input class="dp-btn dp-btn-primary" type="submit" value="{{ phrase('user.tickets.submit') }}" />
+</form>
+
+</div>
+{% endblock %}

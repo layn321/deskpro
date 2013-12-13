@@ -1,0 +1,70 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_tickettriggers') }}">{{ phrase('admin.general.triggers') }}</a></li>
+		<li>
+			Import/Export Triggers
+		</li>
+	</ul>
+{% endblock %}
+{% block page %}
+	<div class="content-table template-dir trigger-dir" style="margin-top: 8px;">
+		<table width="100%" class="simple">
+			<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<h1 class="noexpand">
+							Export Triggers
+						</h1>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td width="100">
+						<a class="clean-white" href="{{ path('admin_tickettriggers_export_download', {type: 'all'}) }}">Download All</a>
+					</td>
+					<td>
+						Download all triggers and escalations
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<br/>
+
+	<div class="content-table template-dir trigger-dir" style="margin-top: 8px;">
+		<table width="100%" class="simple">
+			<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<h1 class="noexpand">
+							Import Triggers
+						</h1>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<form action="{{ path('admin_tickettriggers_import') }}" enctype="multipart/form-data" method="POST">
+							<input type="file" name="file-upload" /><br/>
+							<label>
+								<input type="checkbox" name="clear" /> Clear all existing triggers before importing
+							</label>
+							{% if app.isDebug() %}
+								<br/>
+								<label>
+									<input type="checkbox" name="keep_ids" /> Keep the same IDs
+								</label>
+							{% endif %}
+							<br/>
+							<button class="clean-white">Import Triggers</button>
+						</form>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

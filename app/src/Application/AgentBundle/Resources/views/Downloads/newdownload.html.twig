@@ -1,0 +1,145 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.NewDownload';
+
+pageMeta.title = '{{ phrase('agent.general.new_download') }}';
+pageMeta.uploadAttachUrl              = '{{ path('agent_accept_upload') }}';
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<div class="form-header-error" style="display: none">
+	{{ phrase('agent.publish.no_downlod_cats_error') }}
+</div>
+<div class="form-outer">
+
+{{ agentui.scroll_containers('page-new-download page-new-content') }}
+
+<a class="tab-anchor" href="#">&nbsp;</a>
+
+<form id="{{baseId}}_newdownload" class="keybound-submit">
+
+<div class="first section cat-section" id="{{baseId}}_cat_section">
+	<div class="content">
+		<div class="col">
+			<h4>{{ phrase('agent.general.category') }}</h4>
+			{% include 'AgentBundle:Common:select-standard.html.twig' with {
+				'name': 'newdownload[category_id]',
+				'id': baseId ~ '_cat',
+				'add_classname': 'category_id',
+				'add_attr': '',
+				'with_blank': 0,
+				'blank_title': '',
+				'categories': download_categories,
+				'allow_parent_sel': true,
+				'selected': state.newdownload.category_id
+			} %}
+			<div class="error-message category_id">{{ phrase('agent.publish.please_select_category') }}</div>
+		</div>
+		<div class="col">
+			<h4 class="light">{{ phrase('agent.general.status') }}</h4>
+			<select name="newdownload[status]">
+				{% if app.user.hasPerm('agent_publish.validate') %}
+					<option value="published">{{ phrase('agent.publish.status_published') }}</option>
+				{% endif %}
+				{% if constant('DP_DEBUG') or not app.user.hasPerm('agent_publish.validate') %}
+					<option value="hidden.validating" selected="selected">{{ phrase('agent.publish.status_published') }} ({{ phrase('agent.general.requires_validation') }})</option>
+				{% endif %}
+				<option value="hidden.unpublished">{{ phrase('agent.publish.status_hidden_unpublished') }}</option>
+				<option value="hidden.draft">{{ phrase('agent.publish.status_hidden_draft') }}</option>
+			</select>
+		</div>
+		<br class="clear" />
+	</div>
+</div>
+
+<div class="section file-section" id="{{baseId}}_file_section">
+	<div class="drop-file-zone"><h1>{{ phrase('agent.general.drop_here_to_attach') }}</h1></div>
+	<div class="content">
+		<div class="error-message attach">{{ phrase('agent.publish.please_choose_file') }}</div>
+		<div id="{{ baseId }}_file_upload_type" class="on">
+			<div class="content">
+				<h4 style="float:left;">{{ phrase('agent.general.file') }}</h4> <em style="font-size: 11px; margin-left: 10px; float: left;"><a href="#" class="switch-upload-type">{{ phrase('agent.publish.download_hotlink_btn') }}</a></em>
+				<br class="clear" />
+				<div id="{{baseId}}_file_section_up">
+					<input type="file" name="file-upload" multiple="multiple" />
+				</div>
+				{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'newdownload[attach]' } %}
+				<ul class="files file-list"></ul>
+			</div>
+			<div class="content" style="margin-top: 8px;">
+				<h4>{{ phrase('agent.general.filename') }}</h4>
+				<small style="font-size: 11px; margin-bottom: 4px;">{{ phrase('agent.publish.download_specify_filename') }}.</small><br />
+				<input type="text" name="newdownload[title]" id="{{baseId}}_title" value="{{ state.newdownload.title }}" />
+			</div>
+		</div>
+		<div id="{{ baseId }}_file_url_type" style="display: none;">
+			<div class="content" style="margin-top: 8px;">
+				<h4 style="float:left;">{{ phrase('agent.general.file') }}</h4> <em style="font-size: 11px; margin-left: 10px; float: left;"><a href="#" class="switch-upload-type">{{ phrase('agent.publish.download_upload_btn') }}</a></em>
+				<br class="clear" />
+				<input type="text" name="newdownload[fileurl]" value="{{ state.newdownload.file_url }}" /><br/>
+				<small style="font-size: 11px; margin-bottom: 4px;">{{ phrase('agent.publish.download_specify_url') }}</small><br />
+			</div>
+			<div class="content" style="margin-top: 8px;">
+				<h4>{{ phrase('agent.general.filesize') }}</h4>
+				<small style="font-size: 11px; margin-bottom: 4px;">{{ phrase('agent.publish.download_specify_filesize') }}</small><br />
+				<input type="text" name="newdownload[filesize]" value="{{ state.newdownload.filesize }}" />
+			</div>
+			<div class="content" style="margin-top: 8px;">
+				<h4>{{ phrase('agent.general.filename') }}</h4>
+				<small style="font-size: 11px; margin-bottom: 4px;">{{ phrase('agent.publish.download_specify_filename') }}</small><br />
+				<input type="text" name="newdownload[filename]" id="{{baseId}}_title" value="{{ state.newdownload.filename }}" />
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="section article-section" id="{{baseId}}_content_section">
+	<div class="content" style="padding-right: 10px;">
+		<h4>{{ phrase('agent.general.description') }}</h4>
+		<textarea type="text" name="newdownload[content]" id="{{baseId}}_content">{{ state.newdownload.content }}</textarea>
+	</div>
+</div>
+
+
+<div class="section other-section" id="{{baseId}}_other_section">
+	<div class="content">
+		{# Tab Container #}
+		<div class="tab-container">
+			<nav id="{{baseId}}_other_props_tabs_wrap">
+				<ul id="{{baseId}}_other_props_tabs">
+					<li data-tab-for="> .tab-properties">{{ phrase('agent.general.properties') }}</li>
+				</ul>
+			</nav>
+			<div class="content-wrapper" id="{{baseId}}_other_props_tabs_content" style="display: none">
+				{# Tab Properties #}
+				<div class="tab-properties" style="display: none">
+					<dl>
+						<dt class="prop">{{ phrase('agent.general.labels') }}</dt>
+						<dd class="prop">
+							<div class="tags-wrap article-tags">
+								<input type="text" value="{% for label in state.newdownload.labels %}{{label.label}},{% endfor %}" />
+							</div>
+						</dd>
+					</dl>
+				</div>
+				{# /Tab Properties #}
+			</div>
+		</div>
+		{# /Tab Container #}
+	</div>
+</div>
+
+<footer class="pop-footer">
+	<div class="is-not-loading">
+		<button class="submit-trigger clean-white">{{ phrase('agent.general.create_download') }} <kbd>{{ phrase('agent.general.altc') }}</kbd></button>
+	</div>
+	<div class="is-loading" style="padding-top: 9px;">
+		<img src="{{ asset('images/spinners/loading-small.gif') }}" />
+	</div>
+</footer>
+
+</form>
+
+</div>
+{{ agentui.scroll_containers_end() }}

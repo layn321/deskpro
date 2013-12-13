@@ -1,0 +1,277 @@
+{% set this_page = 'dashboard' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul xmlns="http://www.w3.org/1999/html">
+		<li>{{ phrase('admin.menu.admin_dashboard') }}</li>
+	</ul>
+{% endblock %}
+{% block sidebar_right %}
+
+	<div data-element-handler="DeskPRO.Admin.ElementHandler.DashNotice"></div>
+
+	<div class="dp-page-box">
+		<div class="resource-item-list">
+			<header>
+				<h4>{{ phrase('admin.general.deskpro_version') }}</h4>
+			</header>
+			<article data-element-handler="DeskPRO.Admin.ElementHandler.DashVersion">
+				You are using DeskPRO build <span class="tipped" title="Built on {{ constant('DP_BUILD_TIME')|date('Y-m-d') }}">#{{ constant('DP_BUILD_NUM') }}</span>.
+				<div id="version_info_expanded"></div>
+			</article>
+		</div>
+	</div>
+
+	{% include 'AdminBundle:Main:agents-box.html.twig' %}
+
+	<div class="dp-page-box">
+		<div class="resource-item-list">
+			<header>
+				<h4>Quick Stats</h4>
+			</header>
+			<article>
+				<ul>
+					<li>
+						Tickets Created Today: {{ stats.created_today }}
+					</li>
+					<li>
+						Tickets Resolved Today: {{ stats.resolved_today }}
+					</li>
+					<li>
+						Tickets Awaiting Agent: {{ stats.awaiting_agent }}
+					</li>
+				</ul>
+			</article>
+			<div style="text-align: center; padding-top: 4px;">
+				<a class="btn" href="{{ app.request.getBaseUrl() }}/reports">View more reports</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block page %}
+
+{% include 'AdminBundle:Main:welcome-box.html.twig' %}
+
+{% if app.getVariable('cron_is_problem') or is_cron_crash or error_count or gateway_error_count or sendmail_error_count or app.getSetting('core.error_unable_allocate_memory') or apc_misses_warn %}
+<div class="content-table" style="border: 1px solid #A31612;">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th class="single-title" colspan="2">
+					<div style="background: url({{ asset('images/agent/icons/flag-red.png') }}) no-repeat 0 50%; line-height: 18px; padding-left: 18px;">Problems</div>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if gateway_error_count %}
+				<tr>
+					<td>
+						There are <a href="{{ path('admin_emailgateway_errors') }}">{{ gateway_error_count }} logged email gateway errors</a>. You should investigate these errors and try to re-process the failed emails.
+					</td>
+				</tr>
+			{% endif %}
+			{% if sendmail_error_count %}
+				<tr>
+					<td>
+						There are <a href="{{ path('admin_sendmail_queue_index') }}">{{ sendmail_error_count }} logged sendmail errors</a>. These are outgoing email messages that failed to send. You should check these
+						to ensure your SMTP connections are working.
+					</td>
+				</tr>
+			{% endif %}
+			{% if error_count %}
+				<tr>
+					<td>
+						There are <a href="{{ path('admin_server_error_logs') }}">{{ error_count }} logged errors</a> that you should investigate.
+					</td>
+				</tr>
+			{% endif %}
+			{% if app.getSetting('core.error_unable_allocate_memory') %}
+				<tr>
+					<td>
+						<a href="#" class="hide-setting-error close-icon" data-setting="core.error_unable_allocate_memory">Hide</a>
+						APC has been unable to allocate memory for use by PHP. This indicates a misconfiguration with the APC PHP extension. <a href="http://www.cyberciti.biz/faq/linux-unix-php-warning-unable-to-allocate-memory-for-pool/" target="_blank">Learn more.</a>
+					</td>
+				</tr>
+			{% endif %}
+			{% if apc_misses_warn %}
+				<tr>
+					<td>
+						<strong>
+							APC is reporting cache misses {{ apc_miss_perc }}% of the time.
+						</strong>
+						This is usually means you have not configured APC with enough memory to cache DeskPRO's source files. A high miss-rate minimizes the effectiveness
+						of APC. To improve performance you need to allocate more memory by ediitng your php.ini file.
+						<a href="http://www.cyberciti.biz/faq/linux-unix-php-warning-unable-to-allocate-memory-for-pool/" target="_blank">Learn more.</a>
+						{% if apc_graph_html %}
+							<hr/>
+							{{ apc_graph_html|raw }}
+						{% endif %}
+					</td>
+				</tr>
+			{% endif %}
+			{% if app.getVariable('cron_is_problem') %}
+				<tr>
+					<td>
+						The scheduled tasks are either not running or the time between executions is too high.
+						<a href="{{ path('admin_settings_cron') }}">Learn how to fix this</a>.
+					</td>
+				</tr>
+			{% elseif is_cron_crash %}
+				<tr>
+					<td>
+						<p>
+							There may be a problem with scheduled tasks. Tasks appear to be configured on your server correctly,
+							but the job has been marked as active for {{ cron_running_time }}.
+							This almost certainly means there was a fatal error during processing and tasks did not exit cleanly.
+						</p>
+
+						<p>
+							You should investigate the <a href="{{ path('admin_server_error_logs') }}">error logs</a> and <a href="{{ path('admin_server_cron_logs') }}">task logs</a>, or contact
+							<a href="mailto:support@deskpro.com">support@deskpro.com</a>
+						</p>
+					</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+
+<br />
+{% endif %}
+
+{% include 'AdminBundle:Main:onboarding.html.twig' %}
+
+{% if show_task_status %}
+	<div class="alert-message block-message success">
+		There are currently tasks running in the background. These will run even if you are not connected to DeskPRO.<br />
+		<br />
+		The current background task status will be updated here periodically:
+		<span data-element-handler="DeskPRO.Admin.ElementHandler.TaskQueueStatus" data-task-group="data_import" style="font-weight: bold">Updating...</span>
+	</div>
+{% endif %}
+
+{% if notice_items.db_win_localhost or notice_items.apc_check or notice_items.openssl_ext or notice_items.magic_quotes_gpc_check %}
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th class="single-title" colspan="2">Notices</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if notice_items.db_win_localhost %}
+					<tr>
+						<td>
+							We recommend changing your MySQL host to 127.0.0.1 in config.php. On some versions of IIS, connecting through localhost
+							can yield very slow performance.
+						</td>
+					</tr>
+				{% endif %}
+				{% if notice_items.apc_check %}
+					<tr>
+						<td>
+							{% if get_instance_ability('isWindows') and get_instance_ability('isIis') %}
+								We recommend installing the <a href="http://www.php.net/manual/en/wincache.installation.php">WinCache extension</a> to dramatically improve performance.
+							{% else %}
+								We recommend installing the <a href="http://www.php.net/manual/en/apc.installation.php">APC extension</a> to dramatically improve performance.
+							{% endif %}
+						</td>
+					</tr>
+				{% endif %}
+				{% if notice_items.openssl_ext %}
+					<tr>
+						<td>
+							We recommend installing the OpenSSL extension so you can use web resources that require a secure connection (such as Gmail or Google Apps, secure email servers, Facebook or Twitter).
+						</td>
+					</tr>
+				{% endif %}
+				{% if notice_items.magic_quotes_gpc_check %}
+					<tr>
+						<td>
+							We recommend disabling <code>magic_quotes_gpc</code> in your php.ini for a small performance improvement.
+						</td>
+					</tr>
+				{% endif %}
+			</tbody>
+		</table>
+	</div>
+
+	<br />
+{% endif %}
+
+<div class="content-table">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th class="single-title" colspan="2">
+					Your License
+					<small style="font-size: 11px; font-weight: normal; position:relative;top: -1px;">(<a href="{{ app.request.getBaseUrl() }}/billing/">update</a>) </small>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="title">License ID</td>
+				<td class="prop">{{ lic.getLicenseId() }}</td>
+			</tr>
+			{% if lic.get('org') %}
+				<tr>
+					<td class="title">Licensor</td>
+					<td class="prop">{{ lic.get('org') }}</td>
+				</tr>
+			{% endif %}
+			{% if lic.isDemo() %}
+				<tr>
+					<td class="title">Demo License</td>
+					<td class="prop">{{ design.lic_expire_days('In') }}</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td class="title">Agents</td>
+					<td class="prop">{{ lic.getMaxAgents()|default('Unlimited') }}</td>
+				</tr>
+				<tr>
+					<td class="title">Expires</td>
+					<td class="prop">{{ design.lic_expire_days('In') }}</td>
+				</tr>
+
+				<tr>
+					<td class="" colspan="2" style="text-align: center">
+						<a href="http://www.deskpro.com/members/" class="btn">Add Agents</a>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<a href="{{ app.request.getBaseUrl() }}/billing/" class="btn">Update License</a>
+					</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+
+<script>
+$(function() {
+	$('.hide-setting-error').click(function() {
+		var $this = $(this);
+		if ($this.closest('tbody').find('tr').length <= 1) {
+			$this.closest('.content-table').remove();
+		} else {
+			$this.closest('td').remove();
+		}
+
+		var postData = [
+			{
+				name: 'set_settings[]',
+				value: $this.data('setting')
+			}
+		];
+
+		$.ajax({
+			url: '{{ path('admin_settings_saveform', {type: 'error_hide', auth: security_token('settings_error_hide')}) }}',
+			data: postData,
+			type: 'POST',
+			dataType: 'json'
+		});
+	});
+});
+</script>
+
+{% endblock %}

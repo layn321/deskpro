@@ -1,0 +1,32 @@
+{% if download.blob %}
+	{% if download.blob.is_image %}
+		<div class="thumb" style="float: right;">
+			<a href="{{ download.blob.download_url }}" target="_blank"><img src="{{ download.blob.getThumbnailUrl(50)  }}" /></a>
+		</div>
+	{% endif %}
+	<dl class="info-list">
+		<dt>{{ phrase('agent.general.filename') }}:</dt>
+		<dd class="filename-mark">{{ download.title }}</dd>
+
+		<dt>{{ phrase('agent.general.filesize') }}:</dt>
+		<dd>{{ download.blob.readable_filesize }}</dd>
+
+		<dt>{{ phrase('agent.general.download_url') }}:</dt>
+		<dd>
+			<a href="{{ path('user_downloads_file_download', {slug: download.url_slug}) }}" target="_blank" title="{{ download.blob.content_type }}">{{ helpdesk_url(download.blob.download_url) }}</a>
+		</dd>
+	</dl>
+{% else %}
+	<dl class="info-list">
+		<dt>{{ phrase('agent.general.filename') }}:</dt>
+		<dd class="filename-mark">{{ download.filename }}</dd>
+
+		<dt>{{ phrase('agent.general.filesize') }}:</dt>
+		<dd>{{ download.getReadableFileSize() }}</dd>
+
+		<dt>{{ phrase('agent.general.download_url') }}:</dt>
+		<dd>
+			<a href="{{ download.fileurl }}">{{ download.fileurl }}</a>
+		</dd>
+	</dl>
+{% endif %}

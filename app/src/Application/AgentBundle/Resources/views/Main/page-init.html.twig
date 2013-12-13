@@ -1,0 +1,123 @@
+<script type="text/javascript">
+	window.onload = function() {
+		if (typeof ZeroClipboard != "undefined") {
+			ZeroClipboard.setDefaults({
+				moviePath: "{{ asset('vendor/ZeroClipboard/ZeroClipboard.swf') }}"
+			});
+		}
+
+		if (DP_IS_DOMDUMP_VIEW) {
+			return;
+		}
+
+		if (!window.DESKPRO_DATA_REGISTRY) {
+			window.setTimeout(function() {
+				window.location.reload(false);
+			}, 1000);
+			return;
+		}
+
+		{% if not app.user.timezone or app.user.timezone == 'UTC' %}
+			{# When we have a UTC timezone and the time is wrong, then its a default and we should guess #}
+			if (DESKPRO_TIME_OUT_OF_SYNC) {
+				var detected = jstz.determine_timezone();
+				console.log("Detected Timezone: %o", detected.name());
+				if (detected.name()) {
+					$.ajax({
+						url: BASE_URL + 'agent/settings/profile/update-timezone.json',
+						type: 'POST',
+						dataType: 'json',
+						data: { timezone: detected.name() },
+						success: function() {
+							window.location.reload(false);
+						}
+					});
+
+					return;
+				}
+			}
+		{% endif %}
+
+		if (DP_DEBUG) {
+			DpErrorLog.saveUrl = null;
+		} else {
+			DpErrorLog.saveUrl = '{{ app.request.getBaseUrl() }}/dp/log-js-error.json';
+		}
+		DpErrorLog.init();
+
+		if (TraceKit) {
+			TraceKit.report.subscribe(function(errorReport) {
+				var message = errorReport.message || '';
+				var line    = null;
+				var script  = null;
+
+				var traceData = "";
+				if (errorReport.stack) {
+					for (var i = 0; i < errorReport.stack.length; i++) {
+						var item = errorReport.stack[i];
+
+						if (line === null) {
+							line   = item.line || 0;
+							script = item.url || '';
+						}
+
+						traceData += (item.func || '[anonymous]') + "() in " + item.url + ":" + (item.line || '0') + "\n";
+					}
+				}
+
+				if (window.console && window.console.debug) {
+					window.console.debug("[JS ERROR] %s: %s", message, traceData);
+				}
+
+				DpErrorLog.logError(message, traceData, script, line);
+			});
+		}
+
+		$('pane_list_content').css('display', '');
+		$('pane_content').css('display', '');
+
+		window.DeskPRO_Window = new DeskPRO.Agent.Window({
+			messageChanneler: {
+				ajaxMessagesUrl: BASE_PATH + 'get_messages.php',
+				lastMessageId: {{last_message_id}}
+			},
+			faviconCount: {% if app.user.getPref('agent.ui.favicon_count') %}'{{ app.user.getPref('agent.ui.favicon_count') }}'{% else %}false{% endif %},
+			desktopNotifications: {% if app.user.getPref('agent.ui.desktop_notifications') %}'{{ app.user.getPref('agent.ui.desktop_notifications') }}'{% else %}false{% endif %}
+		});
+
+		{% if app.user.getPref('agent.hide_claimed_chat', false) %}
+			DP_USERCHAT_HIDE_CLAIMED_CHAT = true;
+		{% else %}
+			DP_USERCHAT_HIDE_CLAIMED_CHAT = false;
+		{% endif %}
+
+		DP_POLLER_INTERVAL = 5000;
+		DP_POLLER_INTERVAL_FAST = 2000;
+
+		{% if constant('DP_DEBUG') %}
+			window.DeskPRO_Window.DEBUG = {
+				disableSectionHandlers: {% if js_debug.disableSectionHandlers %}true{% else %}false{% endif %},
+				noAutoLoadList: {% if js_debug.noAutoLoadList%}true{% else %}false{% endif %},
+				enableSectionHandlers: {% if js_debug.enableSectionHandlers %}{{ js_debug.enableSectionHandlers|json_encode|raw }}{% else %}false{% endif %},
+				logClientMessages: {% if js_debug.logClientMessages %}true{% else %}false{% endif %},
+				disableUrlFragments: {% if js_debug.disableUrlFragments%}true{% else %}false{% endif %}
+			};
+
+			{% if js_debug.pollerInterval %}
+				DP_POLLER_INTERVAL = {{ js_debug.pollerInterval }};
+			{% endif %}
+		{% endif %}
+
+		window.DeskPRO_Window.initPage();
+
+		{% if js_debug.autoLoadRoutes %}
+			{% for i in js_debug.autoLoadRoutes %}
+				window.DeskPRO_Window.runPageRoute('{{i[0]}}:{{ path(i[1], i[2]) }}');
+			{% endfor %}
+		{% endif %}
+
+		{% for convo in open_chats %}
+			window.DeskPRO_Window.runPageRoute('page:{{ path('agent_userchat_view', {'conversation_id': convo.id}) }}', {noToggle:true});
+		{% endfor %}
+	};
+</script>

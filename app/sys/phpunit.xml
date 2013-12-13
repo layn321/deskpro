@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+	backupStaticAttributes="false"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	processIsolation="true"
+	stopOnFailure="false"
+	syntaxCheck="true"
+	bootstrap="./tests/bootstrap.php"
+>
+  <testsuites>
+      <testsuite name="Project Test Suite">
+          <directory>./tests/Application/*</directory>
+          <directory>./tests/Orb</directory>
+          <directory>./tests/DeskPRO</directory>
+      </testsuite>
+  </testsuites>
+</phpunit>

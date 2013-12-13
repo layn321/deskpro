@@ -1,0 +1,140 @@
+{% extends base_edit_tpl %}
+{% block form_extra %}
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.custom_fields.how_to_display_the_options') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.field_type) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				{{ phrase('admin.custom_fields.options') }}
+				<span class="small-light-icon tipped" title="These are the pre-defined options that users can choose from. Click the 'Edit Choices' button to add, remove and re-order options."></span>
+			</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="choices-list-wrap" data-element-handler="DeskPRO.Admin.ElementHandler.SimpleHierarchyBuilder" data-with-default-select="true">
+				<button class="clean-white edit-choices-trigger">Edit Choices</button>
+				<div class="choices-list"></div>
+				<input type="hidden" name="choices_structure" class="choices_structure" value="{{ choices_structure|json_encode }}" />
+				<input type="hidden" name="choices_removed_structure" class="choices_removed" value="" />
+				<div class="default-select" style="display: none; padding-top: 8px;">
+					<span class="small-light-icon tipped" title="The option that is pre-selected when the form is first loaded."></span>
+					Default option: <select name="default_option" data-current-default="{{ field.default_value }}"></select>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% if not no_validation_options %}
+	<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>
+					{{ phrase('admin.custom_fields.user_validation') }}
+					<span class="small-light-icon tipped" title="Validation rules applied when agents create tickets or update tickets through the agent interface."></span>
+				</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger" name="fielddef[validation_type]" value="" {% if not editfield.validation_type %}checked="checked"{% endif %} />
+						{{ phrase('admin.custom_fields.no_validation') }}
+					</label>
+				</div>
+
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger require-selection-radio" name="fielddef[validation_type]" value="required" {% if editfield.validation_type == 'required' %}checked="checked"{% endif %} />
+						Require selections for this field
+					</label>
+					<div id="required_group" class="dp-group-options" style="display: none">
+						Min selections: {{ form_widget(form.min_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+						&nbsp;&nbsp;
+						Max selections: {{ form_widget(form.max_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>
+					{{ phrase('admin.custom_fields.agent_validation') }}
+					<span class="small-light-icon tipped" title="Validation rules applied when agents create tickets or update tickets through the agent interface."></span>
+				</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger" name="fielddef[agent_validation_type]" value="" {% if not editfield.agent_validation_type %}checked="checked"{% endif %} />
+						{{ phrase('admin.custom_fields.no_validation') }}
+					</label>
+				</div>
+
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger require-selection-radio" name="fielddef[agent_validation_type]" value="required" {% if editfield.agent_validation_type == 'required' %}checked="checked"{% endif %} />
+						Require selections for this field
+					</label>
+					<div id="required_group2" class="dp-group-options" style="display: none">
+						Min selections: {{ form_widget(form.agent_min_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+						&nbsp;&nbsp;
+						Max selections: {{ form_widget(form.agent_max_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+
+	<div id="define_choices_overlay" class="choice-builder-overlay" style="width: 600px; height: 500px; overflow:auto; display: none;">
+		<div class="overlay-title">
+			<span class="close-overlay close-trigger"></span>
+			<h4>Choice Builder</h4>
+		</div>
+		<div class="overlay-content">
+			<header>
+				<input type="text" class="new-option-title" placeholder="Add a new option" />
+				<select class="new-option-parent" style="display: none"></select>
+				<button class="clean-white new-option-trigger">Add</button>
+			</header>
+			<article>
+				<ul class="options-list">
+
+				</ul>
+			</article>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white save-trigger">Done</button>
+		</div>
+	</div>
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var typeField = $('#fielddef_field_type');
+	var updateReqFields = function() {
+		if (typeField.val() == 'select' || typeField.val() == 'radio') {
+			$('#required_group, #required_group2').hide().removeClass('dp-group-options');
+		} else {
+			$('#required_group, #required_group2').show().addClass('dp-group-options');
+		}
+	};
+
+	$('.require-selection-radio').on('click', function() {
+		$(this).closest('.dp-input-group').find('input[type="text"]').first().val(1);
+	});
+
+	typeField.on('change', updateReqFields);
+	updateReqFields();
+});
+</script>
+{% endblock %}

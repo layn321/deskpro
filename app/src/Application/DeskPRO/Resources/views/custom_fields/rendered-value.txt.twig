@@ -1,0 +1,18 @@
+{% set field_rendered %}
+	{% block field_rendered %}
+		{% if field_handler_name == 'Date' %}
+			{{ data.value|date('full') }}
+		{% elseif field_handler_name == 'Toggle' %}
+			{% if data.value == 1 %}
+				Checked
+			{% else %}
+				Unchecked
+			{% endif %}
+		{% else %}
+			{{ data.value }}
+		{% endif %}
+	{% endblock %}
+{% endset %}
+{% block content %}
+	{{ field_rendered }}{{ field_def.getHtmlOption()|raw }}
+{% endblock %}

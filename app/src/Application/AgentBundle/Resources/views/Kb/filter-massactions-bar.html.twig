@@ -1,0 +1,9 @@
+<header class="list-selection-bar">
+	<input type="checkbox" class="selection-control" />
+	{{ phrase('agent.general.x_selected', {'num_placeholder': '<span class="selected-count">0</span>'}, true) }}
+	<a class="perform-action perform-actions-trigger disabled">
+		<span>{{ phrase('agent.general.perform_actions') }}</span>
+	</a>
+
+	{% include 'AgentBundle:Kb:filter-massactions-overlay.html.twig' %}
+</header>

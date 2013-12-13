@@ -1,0 +1,38 @@
+<form>
+	<ul class="message-type">
+		<li class="public {% if not default_type or default_type == 'public' %}on{% endif %}" data-type="public">
+			{{ phrase('agent.general.public') }}
+		</li>
+		<li class="private {% if default_type == 'private' %}on{% endif %}" data-type="private">
+			{{ phrase('agent.general.private') }}
+		</li>
+	</ul>
+	<input type="hidden" class="message-type-hidden" name="type" value="{{ default_type == 'private' ? 'private' : 'public' }}" />
+	<div class="message-block">
+		{{ phrase('agent.twitter.from_account') }}:
+		{% if account %}
+			@{{ account.user.screen_name }}
+			<input type="hidden" name="account_id" value="{{ account.id }}" />
+		{% else %}
+			<select name="account_id">
+			{% for possible_account in accounts %}
+				<option value="{{ possible_account.id }}">@{{ possible_account.user.screen_name }}</option>
+			{% endfor %}
+			</select>
+		{% endif %}
+		<textarea name="text">{{ default_text }}</textarea>
+		<div class="is-not-loading">
+			<span class="character-count">{{ phrase('agent.twitter.char_remaining', {num_chars: '<em>140</em>'}, true) }}</span>
+			<span class="over-options" style="display: none"><label class="tipped" title="{{ phrase('agent.twitter.split_to_multiple_explain') }}"><input type="checkbox" name="split" value="1" checked="checked" /> {{ phrase('agent.twitter.split_to_multiple') }}</label></span>
+			<button class="clean-white small save-message-trigger">{{ send_text }}</button>
+			{% if not hide_cancel %}
+				<span class="cancel-message-trigger">{{ phrase('agent.general.cancel') }}</span>
+			{% endif %}
+		</div>
+		<div class="is-loading">
+			{{ phrase('agent.general.saving') }}
+		</div>
+	</div>
+
+	{{ reply_form_extra|raw }}
+</form>

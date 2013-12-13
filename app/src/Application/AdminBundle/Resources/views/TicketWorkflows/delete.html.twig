@@ -1,0 +1,16 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagetitle %}
+	<h1>{{ phrase('admin.tickets.delete_workflow') }}</h1>
+	<nav>
+		<a class="clean-white" href="{{ path('admin_ticketworks') }}">&larr; {{ phrase('admin.tickets.back_to_workflows') }}</a>
+	</nav>
+{% endblock %}
+{% block page %}
+
+<p>{{ phrase('admin.tickets.confirm_delete_workflow', {'title':workflow.title}) }}</p>
+
+<p>{{ phrase('admin.tickets.notice_workflow_will_be_removed') }}</p>
+
+<a class="btn" href="{{ path('admin_ticketworks_dodel', {'workflow_id': workflow.id, 'security_token': security_token('delete_workflow')}) }}">{{ phrase('admin.general.confirm_delete') }}</a>
+
+{% endblock %}

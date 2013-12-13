@@ -1,0 +1,53 @@
+<li class="blob-{{ blob.id }}" data-blob-id="{{ blob.id }}">
+	{% if blob.isImage() %}
+		<img src="{{ path('serve_blob', {'blob_auth_id': blob.auth_id, 'filename': blob.filename, 's': 50, 'size-fit': '1'}) }}" alt="" class="preview" />
+	{% endif %}
+	<a href="{{ blob.download_url }}" target="_blank">{{ blob.display_title }}</a>
+	<span class="size">({{ blob.readable_filesize }})</span>
+	{% if insert_controls %}
+		<div class="insert-controls">
+			<label>
+				<input type="blob_append[]" value="{{ blob.id }}" checked="checked" />
+				{{ phrase('agent.general.list_as_article_attachment') }}
+			</label>
+			{{ phrase('agent.general.andor') }} <a href="" class="insert-link" data-blob-id="{{ blob.id }}">{{ phrase('agent.general.insert_title') }}</a>
+			<div class="insert-controls-overlay">
+				<div class="overlay-title" style="padding:  6px;">
+					{{ phrase('agent.general.insert_title', {'title':blob.display_title}) }}
+				</div>
+				<div class="overlay-content" style="padding-bottom: 15px; max-height: 500px; overflow: auto;">
+
+					<strong>{{ phrase('agent.general.url') }}</strong><br />
+					<input type="hidden" class="insert-url-code" value="![attach:{{ blob.id }} url]" />
+					<button class="dp-button">{{ phrase('agent.general.insert') }} {{ phrase('agent.general.inserts_plaintext_url') }}</button><br />
+					{{ phrase('agent.general.inserts_plaintext_url') }}
+
+					<hr />
+
+					<strong>{{ phrase('agent.general.link') }}</strong><br />
+					<input type="hidden" class="insert-link-code" value="![attach:{{ blob.id }} link:{{ '{{label}}' }}]" />
+					{{ phrase('agent.general.label') }}: <input type="text" class="link-label" value="{{ blob.display_title }}" /> <button class="dp-button">{{ phrase('agent.general.inserts_file_link') }}</button><br />
+					{{ phrase('agent.general.inserts_file_link') }}
+
+					{% if blob.isImage() %}
+						<hr />
+
+						<strong>{{ phrase('agent.general.full_image') }}</strong>
+						<input type="hidden" class="insert-image-code" value="![attach:{{ blob.id }} image]" />
+						<button class="dp-button">{{ phrase('agent.general.insert_image') }}</button><br />
+						{{ phrase('agent.general.inserts_full_image') }}
+
+						<hr />
+
+						<strong>{{ phrase('agent.general.linked_thumbnail') }}</strong>
+						<input type="hidden" class="insert-thumb-code" value="![attach:{{ blob.id }} thumb:{{ '{{width}},{{height}}' }}]" />
+						{{ phrase('agent.general.width') }}: <input type="text" class="thumb-width" value="50" />
+						{{ phrase('agent.general.height') }}: <input type="text" class="thumb-height" value="50" />
+						<button class="dp-button">{{ phrase('agent.general.insert_thumbnail') }}</button><br />
+						{{ phrase('agent.general.inserts_thumbnail_with_link') }}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</li>

@@ -1,0 +1,83 @@
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.AgentTeamEditPage' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	{% if team.id %}
+	<nav>
+		<ul>
+			<li class="tools" id="tools_menu_trigger"><a></a><em></em></li>
+		</ul>
+	</nav>
+	<ul id="tools_menu" style="display: none">
+		<li id="delete_overlay_trigger">{{ phrase('admin.agents.delete_team') }}</li>
+	</ul>
+	{% endif %}
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		{% if team.id %}
+			<li>{{ phrase('admin.agents.edit_team') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.agents.new_team') }}</li>
+		{% endif %}
+	</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/AgentTeamEditPage.js') }}"></script>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_agents_teams_edit', {'team_id': team.id|default(0)}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.title') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="team[name]" value="{{team.name}}" />
+		</div>
+	</div>
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.members') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="checkbox-rows">
+				<ul>
+					{% for agent in agents %}
+					<li>
+						<label>
+							<input type="checkbox" name="team[members][]" value="{{ agent.id }}" {% if team_members[agent.id] %}checked="checked"{% endif %} />
+							{{ agent.display_name }}
+						</label>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<button class="btn primary save-trigger">{{ phrase('agent.general.save') }}</button>
+</form>
+
+{% if team.id %}
+<div id="delete_overlay" style="width: 400px; height: 150px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.agents.delete_agent') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<p>{{ phrase('admin.agents.notice_deleting_teams') }}</p>
+	</div>
+	<div class="overlay-footer">
+		<form action="{{ path('admin_agents_teams_del', {'team_id': team.id, 'security_token': security_token('delete_team')}) }}" method="get">
+			<button class="clean-white">
+			{% set phrase_part %}<span class="agent-name">{{ team.name }}</span></button>{% endset %}
+            {{ phrase('admin.agents.delete_name', {'name':phrase_part}, true) }}
+		</form>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

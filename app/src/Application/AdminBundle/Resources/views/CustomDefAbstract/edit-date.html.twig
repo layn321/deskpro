@@ -1,0 +1,127 @@
+{% extends base_edit_tpl %}
+{% block form_extra %}
+<script>
+    $(document).ready(function(){$('.datepicker_trigger input').datepicker({
+		dateFormat: 'yy-mm-dd'
+	})});
+</script>
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+    <div class="dp-form-row">
+        <div class="dp-form-label">
+            <label>{{ phrase('admin.general.default_value') }}</label>
+        </div>
+        <div class="dp-form-input">
+            <div class="dp-input-group">
+                <label>
+                    <input type="radio" class="option-trigger" name="fielddef[default_mode]" value="current" {% if editfield.default_current == 'current' %}checked="checked"{% endif %} />
+                    {{ phrase('admin.general.default_current_date') }}
+                </label>
+            </div>
+
+            <div class="dp-input-group">
+                <label>
+                    <input type="radio" class="option-trigger" name="fielddef[default_mode]" value="specify" {% if editfield.default_mode == 'specify' %}checked="checked"{% endif %} />
+                    {{ phrase('admin.general.default_specify') }}
+                </label>
+                <div id="agent_required_group" class="dp-group-options datepicker_trigger" style="display: none">
+                    {{ form_widget(form.default_value) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not no_validation_options %}
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>Valid Weekdays</label>
+	</div>
+	<div class="dp-form-input">
+		<div class="dp-input-group">
+			{{ form_widget(form.date_valid_dow) }}
+		</div>
+	</div>
+</div>
+
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+    <div class="dp-form-row">
+        <div class="dp-form-label">
+            <label>Valid Dates</label>
+        </div>
+        <div class="dp-form-input">
+            <div class="dp-input-group">
+                <label>
+                    <input type="radio" class="option-trigger" name="fielddef[date_valid_type]" value="0" {% if not editfield.date_valid_type %}checked="checked"{% endif %} />
+					No date validation
+                </label>
+            </div>
+
+            <div class="dp-input-group">
+                <label>
+                    <input type="radio" class="option-trigger" name="fielddef[date_valid_type]" value="date" {% if editfield.date_valid_type == 'date' %}checked="checked"{% endif %} />
+                    Date range
+                </label>
+                <div id="agent_required_group" class="dp-group-options datepicker_trigger" style="display: none">
+                    Between
+					{{ form_widget(form.date_valid_date1, {
+						attr: {style: 'width:100px'}
+					}) }}
+					and
+					{{ form_widget(form.date_valid_date2, {
+						attr: {style: 'width:100px'}
+					}) }}
+					<span class="small-light-icon tipped" title="Both options are optional. For example, to have 'any date after {{ 'now'|date('F jS') }}' you would enter '{{ 'now'|date('Y-m-d') }}' in the first box and leave the second box empty."></span>
+                </div>
+            </div>
+
+			<div class="dp-input-group">
+                <label>
+                    <input type="radio" class="option-trigger" name="fielddef[date_valid_type]" value="range" {% if editfield.date_valid_type == 'range' %}checked="checked"{% endif %} />
+                    Days before/after
+                </label>
+                <div id="agent_required_group" class="dp-group-options" style="display: none">
+                    Date selected must be between
+					{{ form_widget(form.date_valid_range1, {
+						attr: {style: 'width:50px'}
+					}) }}
+					and
+					{{ form_widget(form.date_valid_range2, {
+						attr: {style: 'width:50px'}
+					}) }}
+					days from time of submission
+					<span class="small-light-icon tipped" title="Both options are optional and can be negative. For example, to have 'no more than 3 days before today' you would enter '-3' in the first box and leave the second box empty."></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>Required for users</label>
+	</div>
+	<div class="dp-form-input">
+		<div class="dp-input-group">
+			<label>
+				{{ form_widget(form.required) }}
+				&nbsp; Required
+			</label>
+		</div>
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>Required for agents</label>
+	</div>
+	<div class="dp-form-input">
+		<div class="dp-input-group">
+			<label>
+				{{ form_widget(form.agent_required) }}
+				&nbsp; Required
+			</label>
+		</div>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

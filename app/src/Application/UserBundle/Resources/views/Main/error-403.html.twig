@@ -1,0 +1,42 @@
+{##
+ # Error page displayed for permission errors. If a user tries to access a page directly by typing in a URL
+ # manually, but they do not have permission to use the content, they will get this 403 error.
+ ##}
+
+{% set page_noindex = true %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> {{ phrase('user.error.permission-denied-title') }}</li>
+{% endblock %}
+{% block content %}
+
+{% if app.getLastException()._dp_sn %}
+	<!-- [SN{{ app.getLastException()._dp_sn }}] -->
+{% endif %}
+
+<section class="dp-content-post dp-content-page">
+	<header>
+		<h3 style="margin-bottom: 0">
+			{% if error_title %}
+				{{ error_title }}
+			{% else %}
+				{{ phrase('user.error.permission-denied-title') }}
+			{% endif %}
+		</h3>
+	</header>
+	<article>
+		{% if error_message %}
+			{{ error_message }}
+		{% else %}
+			{{ phrase('user.error.permission-denied') }}
+		{% endif %}
+
+		{% if app.user.is_guest %}
+			<p>
+				{{ phrase('user.error.permission-denied-login', {'login_url': path('user_login')}) }}
+			</p>
+		{% endif %}
+	</article>
+</section>
+<!-- DeskPRO -->
+{% endblock %}

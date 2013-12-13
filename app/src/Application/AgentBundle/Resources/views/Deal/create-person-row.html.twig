@@ -1,0 +1,30 @@
+<div class="add-new-user-container">
+
+<div class="col">
+	<h4>{{ phrase('agent.general.email_address') }}</h4>
+	{% if person.id %}
+		{{ person.primary_email_address }}
+	{% else %}
+		<input type="text" name="newdeal[person][email_address]" class="email" value="{{ person.primary_email_address }}" />
+	{% endif %}
+</div>
+
+<div class="col">
+	<h4>{{ phrase('agent.general.name') }}</h4>
+	{% if person.id %}
+		{{ person.name }}
+	{% else %}
+		<input type="text" name="newdeal[person][name]" class="name" value="{{ person.name }}" />
+	{% endif %}
+
+
+	{% if person.id %}
+		<a data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}">{{ phrase('agent.general.view_profile') }}</a>
+	{% endif %}
+</div>
+<br class="clear" />
+<footer>
+   <button class="save-trigger clean-white small">{{ phrase('agent.deal.add_user') }}</button>
+   <button class="cancel-trigger clean-white small">{{ phrase('agent.general.cancel') }}</button>
+</footer>
+</div>

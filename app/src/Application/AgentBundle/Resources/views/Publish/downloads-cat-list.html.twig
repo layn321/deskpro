@@ -1,0 +1,23 @@
+{% for cat in cats %}
+	<li class="is-nav-item cat-{{ cat.id }}" id="publish_dlcat_{{ cat.id }}">
+		<div class="item with-title" data-route="listpane:{{ path('agent_downloads_list', {'category_id':cat.id}) }}">
+			{% if download_repo.getChildren(cat)|length %}
+				<i class="dp-toggle-icon click-through icon-caret-right"></i>
+			{% endif %}
+			<h3>
+				{% if depth and not kb_repo.getChildren(cat)|length %}&mdash;{% endif %}
+				<span class="title-text">{{ cat.title }}</span>
+			</h3>
+			<div class="dp-fader"></div>
+			<em class="counter list-counter"
+				id="kb_cat_count_{{ cat.id }}"
+				data-count="{{ counts[cat.id]|default(0) }}"
+			>{{ counts[cat.id]|default(0) }}</em>
+		</div>
+		{% if download_repo.getChildren(cat)|length %}
+			<ul class="nav-list nav-list-small indented" style="display: none;">
+				{% include 'AgentBundle:Publish:downloads-cat-list.html.twig' with {'cats': download_repo.getChildren(cat), 'counts': counts, 'depth': depth+1 } %}
+			</ul>
+		{% endif %}
+	</li>
+{% endfor %}

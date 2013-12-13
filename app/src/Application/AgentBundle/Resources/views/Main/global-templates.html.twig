@@ -1,0 +1,287 @@
+{% import 'AgentBundle:Common:optionbox-macros.html.twig' as optionbox %}
+{#
+	This file contains global JS templates and menus and other such
+	resources used throughout.
+#}
+
+<div id="deskpro_window_templates" style="display: none;">
+
+{# Comment Menu #}
+<ul id="comment_tools_menu" data-menu-flag="copy-menu">
+	<li data-action="edit">{{ phrase('agent.general.edit_comment') }}</li>
+	<li data-action="delete">{{ phrase('agent.general.delete_comment') }}</li>
+	<li data-action="create-ticket">{{ phrase('agent.general.create_ticket') }}</li>
+</ul>
+
+{# Comment Validation Menu #}
+<ul id="comment_validation_menu" data-menu-flag="copy-menu">
+	<li data-action="approve">{{ phrase('agent.general.validate_comment') }}</li>
+	<li data-action="delete">{{ phrase('agent.general.delete_comment') }}</li>
+</ul>
+
+{# Popover tempalte #}
+<script type="text/x-deskpro-plain" id="popover_tpl">
+	<div class="mass-actions-overlay-container open popover-wrapper doc-layer">
+		<section class="mass-actions-overlay">
+			<header>
+				<span class="close close-trigger"></span>
+				<h1 class="tab-title"></h1>
+				<span class="move-to-tab">{{ phrase('agent.general.move_to_tab') }}</span>
+			</header>
+			<article class="popover-inner">
+
+			</article>
+		</section>
+	</div>
+</script>
+
+{# Popover tempalte #}
+<script type="text/x-deskpro-plain" id="fragment_overlay_tpl">
+    <div class="dp-overlay-container fragment-overlay overlay-loading doc-layer">
+		<section class="dp-overlay">
+			<header><span class="close close-trigger"></span></header>
+			<article></article>
+		</section>
+    </div>
+</script>
+
+<script type="text/x-deskpro-plain" id="comment_edit_tpl">
+	<div class="comment-edit">
+		<textarea class="comment"></textarea><br />
+		<button class="dp-button xx-small save-trigger">{{ phrase('agent.general.save') }}</button>
+	</div>
+</script>
+
+{# Phone-country code menu #}
+<ul id="phone_countrycode_menu">
+	{% for info in phone_country_info %}
+		<li
+			class="{{ info.country_code }}"
+			data-country-name="{{ info.country_name }}"
+			data-country-code="{{ info.country_code }}"
+			data-calling-code="{{ info.calling_code }}"
+		><span class="icon-flag icon-flag-{{info.country_code|lower}}">{{ info.calling_code }} {{ info.country_name }}</span></li>
+	{% endfor %}
+</ul>
+
+{##############################################################}
+{# Feedback related #}
+{##############################################################}
+
+<ul id="feedback_category_menu" data-menu-type="feedback-category-menu" data-menu-flag="copy-menu">
+	{% for cat in app.getDataService('FeedbackCategory').getRootNodes() %}
+		{% if last_with_child %}
+			<li class="sep">-</li>
+		{% endif %}
+		{% if cat.children|length %}
+			<li data-category-id="{{cat.id}}" class="section-title cat-{{cat.id}}">{{cat.title}}</li>
+			{% for subcat in cat.children %}
+				<li data-category-id="{{subcat.id}}" data-parent-id="{{cat.id}}" class="cat-{{cat.id}} cat-{{subcat.id}}">{{subcat.title}}</li>
+			{% endfor %}
+			{% set last_with_child = true %}
+		{% else %}
+			<li data-category-id="{{cat.id}}" class="cat-{{cat.id}}">{{cat.title}}</li>
+			{% set last_with_child = false %}
+		{% endif %}
+	{% endfor %}
+</ul>
+
+<ul id="feedback_status_menu" data-menu-type="feedback-status-menu" data-menu-flag="copy-menu">
+	<li
+		class="status-new"
+		data-status-type="new"
+		data-option-value="new"
+	>{{ phrase('agent.feedback.status_new') }}</li>
+	<li
+		class="section-title status-active"
+		data-status-type="active"
+		data-option-value="active"
+	>{{ phrase('agent.feedback.status_active') }}</li>
+	{% for cat in app.getDataService('FeedbackStatusCategory').getActiveCategories() %}
+		<li
+			class="status-{{cat.id}}"
+			data-status-type="active"
+			data-option-value="active.{{cat.id}}"
+		>{{cat.title}}</li>
+	{% endfor %}
+	<li
+		class="section-title status-closed"
+		data-status-type="closed"
+		data-option-value="closed"
+	>{{ phrase('agent.tickets.status_closed') }}</li>
+	{% for cat in app.getDataService('FeedbackStatusCategory').getClosedCategories() %}
+		<li
+			class="status-{{cat.id}}"
+			data-status-type="closed"
+			data-option-value="closed.{{cat.id}}"
+		>{{cat.title}}</li>
+	{% endfor %}
+</ul>
+
+{##############################################################}
+{# Search related #}
+{##############################################################}
+
+<script type="text/x-deskpro-plain" id="related_content_newitem">
+	<li>
+		<button class="clean-white small remove">Remove</button>
+		<a class="link-title link-route with-route"></a>
+	</li>
+</script>
+
+{#
+	This isnt a jQuery template. Its used in TabStrip.js because
+	it needs an html string, and jQuery creates real HTML elements.
+#}
+<script type="text/x-deskpro-tmpl" id="tab_loading_template">
+	%startScript%
+	pageMeta.title = '{{ phrase('agent.general.loading') }}';
+	%endScript%
+
+	<div class="tab-loading"></div>
+</script>
+
+<div id="global_ajax_error" style="display:none;">
+	<div class="ajax-error-overlay mass-actions-overlay">
+		<div class="overlay-title">
+			<button class="clean-white small" id="global_ajax_error_submit" style="position: absolute; right: 40px; top: 8px;">{{ phrase('agent.interface.report_this_error_to_deskpro') }}</button>
+			<h4>
+				{{ phrase('agent.general.error') }}
+			</h4>
+		</div>
+		<div class="overlay-content">
+			<p class="server-error-desc">{{ phrase('agent.general.server_error_explain') }}.</p>
+			<div id="global_ajax_error_info" style="font-size: 9px; margin-top: 8px;"></div>
+			<div class="loading-on">{{ phrase('agent.interface.error_report_submitting') }}</div>
+			<div class="success-on">
+				<p>{{ phrase('agent.interface.error_report_thank_you') }}</p>
+				<p>
+                    {% set phrase_part %}
+                        <a href="mailto:support@deskpro.com">{{ phrase('agent.general.supportdeskprocom') }}</a>
+                    {% endset %}
+                    {{ phrase('agent.interface.error_report_disclaimer', {'email':phrase_part}, true) }}
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="alert_overlay" style="display:none;">
+	<div class="alert-overlay mass-actions-overlay">
+		<div class="overlay-title">
+			<span class="close-trigger">{{ phrase('agent.general.dismiss') }}</span>
+			<h4>{{ phrase('agent.general.alert') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<p id="alert_overlay_msg"></p>
+		</div>
+	</div>
+</div>
+<div id="refresh_alert_overlay" style="display:none;">
+	<div class="alert-overlay mass-actions-overlay" style="width: 500px; height: 200px;">
+		<div class="overlay-title">
+			<h4>{{ phrase('agent.general.refresh_required') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<p>
+				{{ phrase('agent.general.refresh_required_explain', {name: '<span class="admin-name"></span>'}, true) }}
+			</p>
+			<br/>
+			<p>
+				{{ phrase('agent.general.refresh_required_auto', {secs: '<span class="countdown"></span>'}, true) }}
+			</p>
+		</div>
+	</div>
+	<div class="overlay-footer">
+		<button class="okay-trigger clean-white">{{ phrase('agent.general.refresh_now') }}</button>
+		<button class="cancel-trigger clean-white">{{ phrase('agent.general.do_not_refresh') }}</button>
+	</div>
+</div>
+<div id="confirm_overlay" style="display:none;">
+	<div class="confirm-overlay mass-actions-overlay">
+		<div class="overlay-title">
+			<h4>{{ phrase('agent.general.confirm') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<p id="confirm_overlay_msg"></p>
+		</div>
+	</div>
+	<div class="overlay-footer">
+		<button class="okay-trigger clean-white">{{ phrase('agent.general.okay') }}</button>
+		<button class="cancel-trigger clean-white">{{ phrase('agent.general.cancel') }}</button>
+	</div>
+</div>
+
+<div id="prompt_overlay" style="display:none;">
+	<div class="prompt-overlay mass-actions-overlay">
+		<div class="overlay-title">
+			<h4></h4>
+		</div>
+		<div class="overlay-content">
+			<p id="prompt_overlay_msg"></p>
+			<div class="input-wrap"><input type="text" id="prompt_overlay_input" /></div>
+		</div>
+		<div class="overlay-footer">
+			<button class="okay-trigger clean-white">{{ phrase('agent.general.okay') }}</button>
+			<button class="cancel-trigger clean-white">{{ phrase('agent.general.cancel') }}</button>
+		</div>
+	</div>
+</div>
+
+<section class="dp-overlay" id="password_confirm" data-element-handler="DeskPRO.Agent.ElementHandler.PasswordPrompt">
+	<header>
+		<span class="close close-trigger"></span>
+		<h1>{{ phrase('agent.login.enter_password') }}</h1>
+	</header>
+	<article>
+		<div class="explain-wrap"></div>
+		<div class="error-wrap">{{ phrase('agent.login.login_failed') }}</div>
+		<div class="input-wrap">
+			<input type="password" autocomplete="off" class="password-input" value="" />
+		</div>
+	</article>
+	<footer>
+		<button class="continue-trigger clean-white">{{ phrase('agent.general.continue') }}</button>
+	</footer>
+</section>
+
+<section class="dp-overlay" id="time_outofsync" data-element-handler="DeskPRO.Agent.ElementHandler.TimezoneSwitch" style="z-index: 99999; width: 450px; height: 300px;">
+	<header>
+		<span class="close close-trigger"></span>
+		<h1>{{ phrase('agent.general.update_tz_region') }}</h1>
+	</header>
+	<article style="padding: 10px;">
+		<p>
+			{{ phrase('agent.general.tz_wrong_explain') }}
+		</p>
+		<br />
+		<p>
+			{{ phrase('agent.general.current_profile_tz') }}: <span class="server_time">{{ 'now'|date('time') }}</span>.<br />
+			{{ phrase('agent.general.current_computer_tz') }}: <span class="js_time"></span>.
+		</p>
+		<br />
+		<p>
+			{{ phrase('agent.general.update_region_question') }}
+		</p>
+		<br />
+		<select name="timezone" class="timezone" style="width: 300px">
+			<option value="">{{ phrase('agent.general.select_your_region') }}</option>
+			{% for title,tz in app.getTimezoneList() %}
+				<option value="{{ tz }}" {% if tz == app.user.timezone %}selected="selected"{% endif %}>{{ title }}</option>
+			{% endfor %}
+		</select>
+	</article>
+	<footer>
+		<button class="continue-trigger clean-white">{{ phrase('agent.general.save') }}</button>
+		<button class="dismiss-trigger clean-white">{{ phrase('agent.general.dismiss') }}</button>
+	</footer>
+</section>
+
+{% include 'AgentBundle:AgentChat:chat-layout-templates.html.twig' %}
+{% include 'AgentBundle:UserChat:chat-layout-templates.html.twig' %}
+
+<script type="text/x-deskpro-plain" id="tickets_snippet_shell_tpl">{% include 'AgentBundle:TextSnippets:tickets-widget-shell.html.twig' with { snippet_cats: ticket_snippet_cats } %}</script>
+<script type="text/x-deskpro-plain" id="chat_snippet_shell_tpl">{% include 'AgentBundle:TextSnippets:chat-widget-shell.html.twig' with { snippet_cats: chat_snippet_cats } %}</script>
+
+{{ tpl_source('snippet_rows_tpl', 'AgentBundle:TextSnippets:snippet-rows.html.twig') }}
+
+</div>

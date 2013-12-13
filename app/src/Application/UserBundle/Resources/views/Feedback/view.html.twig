@@ -1,0 +1,104 @@
+{##
+ # The full feedback view page.
+ ##}
+
+{% import 'UserBundle:Common:macros-social.html.twig' as social %}
+{% set this_section = 'feedback' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+	<meta property="og:url" content="{{ path('user_feedback_view', {'slug': feedback.url_slug}) }}" />
+	<meta property="og:title" content="{{feedback.title}}" />
+	<meta property="og:type" content="article" />
+	<link rel="canonical" href="{{ url('user_feedback_view', {'slug': feedback.url_slug}) }}" />
+{% endblock %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_feedback') }}">{{ phrase('user.feedback.feedback') }}</a></li>
+	{% for cat in category_path %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_feedback', {'slug': cat.url_slug}) }}">{{ phrase_object(cat) }}</a></li>
+	{% endfor %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_feedback_view', {'slug': feedback.url_slug}) }}">{{feedback.title}}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ feedback.title }}
+	-
+	{{ phrase('user.feedback.feedback') }}
+	{% for cat in category_path %}
+		/ {{ phrase_object(cat) }}
+	{% endfor %}
+{% endblock %}
+{% block content %}
+
+<section class="dp-article-post dp-content-post dp-content-page">
+	<header class="dp-feedback-row {% if has_voted_this %}dp-voted-row{% endif %}">
+		<table class="dp-layout" width="100%"><tr>
+			<td style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 16px;">{% include 'UserBundle:Feedback:voting-widget.html.twig' %}</td>
+			<td class="dp-row-contain" width="100%">
+				{% if feedback.status != 'hidden' %}
+					<span class="dp-feedback-status" style="float: {% if is_rtl() %}left{% else %}right{% endif %}; margin-{% if is_rtl() %}right{% else %}left{% endif %}: 6px;">
+						{% if feedback.status_category %}
+							{{ phrase_object(feedback.status_category) }}
+						{% else %}
+							{% if feedback.status == 'new' %}{{ phrase('user.feedback.status_new') }}
+							{% elseif feedback.status == 'active' %}{{ phrase('user.feedback.status_active') }}
+							{% elseif feedback.status == 'closed' %}{{ phrase('user.feedback.status_closed') }}
+							{% endif %}
+						{% endif %}
+					</span>
+				{% endif %}
+				<h3 style="margin-bottom: 0">{{ feedback.title }}</h3>
+				<ul class="dp-post-info">
+					<li class="dp-author"><i class="dp-icon-user"></i> {{ feedback.person.display_name_user }}</li>
+					<li class="dp-category"><i class="dp-icon-book"></i> <a href="{{ path('user_feedback', {'slug': feedback.category.url_slug}) }}">{{ phrase_object(feedback.category) }}</a></li>
+					{% if display.user_category %}
+						<li class="dp-user-category"><i class="dp-icon-folder-close"></i> {{ display.user_category.getTitle() }}</li>
+					{% endif %}
+					<li class="dp-date"><i class="dp-icon-calendar"></i> {{ feedback.date_created|date('full') }}</li>
+				</ul>
+				{% if feedback.hidden_status and app.user.is_agent %}
+					<div class="sub-note">{{ phrase('user.general.can-view-because-agent') }}</div>
+				{% endif %}
+			</td>
+		</tr></table>
+	</header>
+	<article>
+
+		{% if feedback.status_code == 'hidden.validating' %}
+			<div class="dp-alert dp-alert-info">
+				{{ phrase('user.feedback.note_awaiting-validation')}}
+			</div>
+		{% endif %}
+
+		{{ feedback.content_html|raw }}
+		{% if feedback.attachments|length %}
+			<ul class="attachment-list">
+				{% for attach in feedback.attachments %}
+					<li class="{% if attach.blob.isImage() %}is-image{% else %}dp-fileicon dp-fileicon-{{attach.blob.extension|default('none')}}{% endif %}" rel="message-{{message.id}}">
+						{% if attach.blob.isImage() %}
+							<a href="{{ attach.blob.download_url }}" target="_blank"><img src="{{ path('serve_blob', {'blob_auth_id': attach.blob.auth_id, 'filename': attach.blob.filename, 's': 50, 'size-fit': '1'}) }}" alt="" class="preview" /></a>
+						{% endif %}
+						<a href="{{ attach.blob.download_url }}" target="_blank">{{attach.blob.filename}}</a>
+						<span class="size">({{ attach.blob.readable_filesize }})</span>
+					</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</article>
+	<footer>
+		{% include 'UserBundle:Common:labels-box.html.twig' with {'labels': feedback.labels} %}
+		{% include 'UserBundle:Common:related-box.html.twig' with { object: feedback, type: 'feedback', related_content: related_content } %}
+
+		{% if app.getSetting('core.show_share_widget') %}
+			{{ social.social_block(url('user_feedback_view', {'slug': feedback.url_slug}), feedback.title) }}
+		{% endif %}
+	</footer>
+</section>
+
+{% include 'UserBundle:Common:comments-box.html.twig' with {
+	'type': 'feedback',
+	'comments': comments,
+	'form_action': path('user_feedback_newcomment', {'feedback_id': feedback.id}),
+	'check_perm': 'feedback.comment',
+	'no_comment_form': (feedback.status == 'closed')
+} %}
+
+{% endblock %}

@@ -1,0 +1,195 @@
+{% set this_page = 'report_agent_feedback_index' %}
+{% extends 'ReportBundle::layout.html.twig' %}
+
+{% block nav_block %}
+{% include 'ReportBundle:AgentFeedback:nav.html.twig' %}
+{% endblock %}
+
+{% block page_js_exec %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.datepicker > span > span').datepicker(
+                {
+                    'changeMonth': true,
+                    'changeYear': true,
+                    'changeDay': false,
+                    'showButtonPanel': false,
+                    'dateFormat': 'yy-mm',
+                    'closeText': 'Done',
+                    'defaultDate': new Date({{ view_date|date('Y') }}, {{ view_date|date('m') }} - 1, 1),
+                    'onChangeMonthYear': function(year, month, inst) {
+                        $(this).datepicker('setDate', new Date(year, month - 1, 1));
+                    },
+                }
+        );
+
+        $('.datepicker-btn-done').on('click', function(){
+            var date = $('.datepicker > span > span').datepicker('getDate');
+            document.location = "{{ path('report_agent_feedback_summary', {'date':''}) }}/" + date.getFullYear() + '-' + (date.getMonth() + 1);
+        }).button();
+
+        $('.datepicker > a').on('click', function(){
+            if($('.datepicker > span').hasClass('hidden')) {
+                $('.datepicker > span').removeClass('hidden');
+                $('.reports-popup-page-overlay').removeClass('hidden');
+            }
+            else {
+                $('.datepicker > span').addClass('hidden');
+                $('.reports-popup-page-overlay').addClass('hidden');
+            }
+        });
+
+        $('.reports-popup-page-overlay').on('click', function() {
+            $('.datepicker > a').click();
+        });
+    });
+</script>
+{% endblock %}
+{% block html_head %}
+<style>
+.reports_agent_feedback_summary_section > table .border-right {
+    border-right-style: dashed;
+    border-right-color: #AAAAAA;
+    border-right-width: 1px;
+}
+
+.reports_agent_feedback_summary_section > table tr.border-top {
+    border-top-style: dashed;
+    border-top-color: #AAAAAA;
+    border-top-width: 1px;
+}
+
+.reports_agent_feedback_summary_section > table .border-bottom {
+    border-bottom-style: dashed;
+    border-bottom-color: #AAAAAA;
+    border-bottom-width: 1px;
+}
+
+.reports_agent_feedback_summary_section > table td.rating_1,
+.reports_agent_feedback_summary_section > table td.left-column {
+    text-align: right;
+}
+
+.reports_agent_feedback_summary_section > table th {
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.reports_agent_feedback_summary_section > table th,
+.reports_agent_feedback_summary_section > table td {
+    padding: 18px;
+    vertical-align: middle;
+}
+
+.reports_agent_feedback_summary_section > table img {
+    vertical-align: middle;
+    opacity: .7;
+}
+
+.ui-datepicker {
+    border: none;
+}
+
+.datepicker > span {
+    padding: 4px;
+}
+
+button.datepicker-btn-done {
+    float: right;
+    margin: 4px;
+}
+
+.datepicker.nodays .ui-datepicker-calendar {
+    display: none;
+}
+
+i.rating {
+	font-size: 15pt;
+	font-weight: normal;
+	font-style: normal;
+	display: inline;
+	text-align: center;
+	line-height: 10px;
+	position: relative;
+	top: 2px;
+}
+
+i.rating.positive {
+	color: #16B300;
+}
+
+i.rating.neutral {
+	color: #849C96;
+}
+
+i.rating.negative {
+	color: #A21B22;
+}
+</style>
+{% endblock %}
+
+{% block pagebar %}
+{% endblock %}
+
+{% block page %}
+<div class="reports_agent_feedback_summary_section">
+    <table>
+        <tr>
+            <td class="border-right datepicker-cell"><span class="datepicker nodays drop-down"><a>{{ view_date|date('M Y') }}<em></em></a><span class="hidden ui-widget-content ui-corner-all"><span></span><button class="datepicker-btn-done">Done</button></span></span></td>
+            {% for agent in agents %}
+                <th class="{% if not loop.last %}border-right{% endif %}" colspan="3">{{ agent.getDisplayName() }}</th>
+            {% endfor %}
+        </tr>
+        {% for i,day in days %}
+            <tr>
+                <td class="border-right left-column">{{ day|date('jS') }}</td>
+
+                {% for agent in agents %}
+                    <td class="{% if not summary[i][agent.id][1] %}no-feedback{% endif %}">
+						<div>
+							<i class="rating positive">☺</i>
+							{{ summary[i][agent.id][1]|default(0) }}
+						</div>
+                    </td>
+					<td class="{% if not summary[i][agent.id][0] %}no-feedback{% endif %}">
+						<div>
+							<i class="rating neutral">&mdash;</i>
+							{{ summary[i][agent.id][0]|default(0) }}
+						</div>
+                    </td>
+                    <td class="{% if not loop.last %}border-right{% endif %} {% if not summary[i][agent.id][-1] %}no-feedback{% endif %}">
+						<div>
+							<i class="rating negative">☹</i>
+							{{ summary[i][agent.id][-1]|default(0) }}
+						</div>
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        <tr class="border-top">
+            <td class="border-right left-column">Total</td>
+            {% for agent in agents %}
+                <td class="{% if not totals[agent.id][1] %}no-feedback{% endif %}">
+					<div>
+						<i class="rating positive">☺</i>
+						{{ totals[agent.id][1]|default(0) }}
+					</div>
+                </td>
+				<td class="{% if not totals[agent.id][0] %}no-feedback{% endif %}">
+					<div>
+						<i class="rating neutral">&mdash;</i>
+						{{ totals[agent.id][0]|default(0) }}
+					</div>
+                </td>
+                <td class="{% if not loop.last %}border-right{% endif %} {% if not totals[agent.id][-1] %}no-feedback{% endif %}">
+					<div>
+						<i class="rating negative">☹</i>
+						{{ totals[agent.id][-1]|default(0) }}
+					</div>
+                </td>
+            {% endfor %}
+        </tr>
+    </table>
+    <div class="reports-popup-page-overlay hidden"></div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.database_dsn') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.db_dsn) }}
+		<br />
+        <small>{{ phrase('admin.user_registration.enter_dsn_mysql') }}</small>
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.database_user') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.db_username) }}
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.database_password') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.db_password) }}
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.table_prefix') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.table_prefix) }}
+		<br />
+		<small>{{ phrase('admin.user_registration.enter_table_prefix_here') }}</small>
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.url_password_check') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.check_service_url) }}
+		<br />
+		<small>{{ phrase('admin.user_registration.lbl_url_password_check') }}</small>
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.password_check_service_key') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.check_service_key) }}
+		<br />
+		<small>{{ phrase('admin.user_registration.lbl_password_key') }}</small>
+	</div>
+</div>

@@ -1,0 +1,341 @@
+<!DOCTYPE HTML>
+<html lang="en" id="dp_login_page">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+<meta charset="utf-8" />
+<meta name="robots" content="NOINDEX" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>{{ phrase('agent.general.log_in') }}</title>
+<script type="text/javascript">
+	if (typeof pageMeta !== 'undefined') pageMeta.goToLogin = true;
+</script>
+<style type="text/css">
+	html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+	td { margin: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+	body { line-height: 1; }
+	ol, ul { list-style: none; }
+	blockquote, q { quotes: none; }
+	blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+	a:focus, button:focus, input:focus, textarea:focus, submit:focus { outline: 0; }
+	b, i { font-weight: inherit; font-style: inherit; }
+	b { font-weight: bold; }
+	i { font-style: italic; }
+	ins { text-decoration: none; }
+	del { text-decoration: line-through; }
+	table { border-collapse: collapse; border-spacing: 0; }
+	td { vertical-align: top; }
+
+	html {
+		background: #91ada1 url('{{ asset('images') }}/login/background.jpg') no-repeat center top fixed;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
+
+	body {
+		font-family: Helvetica, Arial, Geneva, sans-serif;
+		font-size: 13px;
+	}
+
+	.pull-left {
+		float: left;
+	}
+	.pull-right {
+		float: right;
+	}
+	a {
+		color: #1b72b3;
+		text-decoration: none;
+	}
+	a:hover {
+		color: #1b72b3;
+		text-decoration: underline;
+	}
+
+	.text-info {
+		line-height: 145%;
+	}
+
+	.text-info p {
+		margin: 17px 0;
+	}
+
+	.text-info ul {
+		list-style-type: disc;
+		margin-left: 25px;
+	}
+
+	.text-info ol {
+		list-style-type: decimal;
+	}
+
+	.text-info ol li {
+		margin: 15px 0;
+	}
+
+	.text-info ol li img {
+		max-width: 100%;
+	}
+
+	#dp_login {
+		position: relative;
+	}
+	#dp_login #wrapper {
+		width: 360px;
+		position: absolute;
+		top: 40px;
+		left: 50%;
+		margin-left: -180px;
+	}
+	#dp_login #wrapper .client-logo {
+		position: relative;
+		height: 110px;
+		background: #fff;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		overflow: hidden;
+	}
+	#dp_login #wrapper .client-logo .drag-files {
+		margin: 10px;
+		padding: 10px;
+		height: 58px;
+		width: 318px;
+		text-align: center;
+		border: 1px dashed #7b838b;
+		color: #7b838b;
+		font-weight: bold;
+		display: table;
+	}
+	#dp_login #wrapper .client-logo .drag-files:hover {
+		cursor: move;
+	}
+	#dp_login #wrapper .client-logo .drag-files p {
+		display: table-cell;
+		vertical-align: middle;
+		text-align: center;
+	}
+	#dp_login #wrapper .client-logo .drag-files .progress-bar {
+		height: 4px;
+		width: 200px;
+		border: 1px solid #2e83c2;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		margin: 10px auto 0;
+		overflow: hidden;
+	}
+	#dp_login #wrapper .client-logo .drag-files .progress-bar span {
+		background: #2e83c2;
+		display: block;
+		height: 4px;
+	}
+	#dp_login #wrapper .client-logo .logo {
+		text-align: center;
+		margin-top: 20px;
+	}
+	#dp_login #wrapper .client-logo .error {
+		color: #e74c3c;
+	}
+	#dp_login #wrapper .dialog-box {
+		min-height: 270px;
+		margin: 20px 0;
+		background: #fafafb;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+		-moz-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+		-webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+	}
+	#dp_login #wrapper .dialog-box .title {
+		background: #2b2f33;
+		color: #838b92;
+		height: 50px;
+		line-height: 54px;
+		font-size: 14px;
+		padding: 0 30px;
+		font-weight: bold;
+		-webkit-border-radius: 3px 3px 0 0;
+		-moz-border-radius: 3px 3px 0 0;
+		-ms-border-radius: 3px 3px 0 0;
+		-o-border-radius: 3px 3px 0 0;
+		border-radius: 3px 3px 0 0;
+	}
+	#dp_login #wrapper .dialog-box .content {
+		padding: 10px 30px;
+	}
+	#dp_login #wrapper .dialog-box .content form p {
+		position: relative;
+		margin: 20px 0;
+		color: #838b92;
+	}
+	#dp_login #wrapper .dialog-box .content form p br {
+		display: none;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset label {
+		margin: 0;
+		padding: 0;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p input[type="text"],
+	#dp_login #wrapper .dialog-box .content form fieldset p input[type="email"],
+	#dp_login #wrapper .dialog-box .content form fieldset p input[type="password"] {
+		display: block;
+		padding: 0 12px 0 42px;
+		width: 244px;
+		height: 40px;
+		line-height: 40px;
+		margin: 0;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		border: solid 1px #c3c4c7;
+		box-shadow: none;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p input:focus {
+		border-color: #1b72b3;
+		color: #1b72b3;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p input.wrong {
+		border-color: #e74c3c;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p .label {
+		cursor: text;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p i {
+		position: absolute;
+		left: 12px;
+		top: 11px;
+		font-size: 18px;
+		color: #656c73;
+		opacity: 0.35;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset i.icon-lock {
+		font-size: 20px;
+		left: 14px;
+	}
+	#dp_login #wrapper .dialog-box .content form input[type="submit"] {
+		border: none;
+		display: block;
+		background: #1b72b3;
+		height: 42px;
+		padding: 0 15px;
+		text-align: center;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		color: #fff;
+		font-size: 14px;
+	}
+	#dp_login #wrapper .dialog-box .content form input[type="submit"]:hover {
+		background: #2e83c2;
+		cursor: pointer;
+	}
+	#dp_login #wrapper .dialog-box .content form input.full-width {
+		width: 300px;
+		padding: 0;
+	}
+	#dp_login #wrapper .dialog-box .content form p.text-right {
+		text-align: right;
+		margin-bottom: 10px;
+	}
+	#dp_login #wrapper .dialog-box .content form .go-back {
+		margin-left: 10px;
+		line-height: 42px;
+	}
+	#dp_login #wrapper .dialog-box .content .error {
+		background: #e74c3c;
+		color: #fff;
+		padding: 12px 15px;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	#dp_login #wrapper .dialog-box .content .warning {
+		background: #FFE887;
+		border: 2px solid #C3AD4C;
+		color: #000;
+		padding: 12px 15px;
+		margin: 0 -18px;
+		line-height: 115%;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	#dp_login #wrapper .dialog-box .content .success {
+		background: #27ae60;
+		color: #fff;
+		padding: 12px 15px;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	#dp_login #wrapper .deskpro-logo {
+		height: 100px;
+		background: url('{{ asset('images') }}/login/logo-deskpro.png') no-repeat center center;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	#dp_login #wrapper .deskpro-logo:hover {
+		opacity: 0.75;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	#client_logo_img {
+		position: relative;
+	}
+
+	#client_logo_img > div.img {
+		width: 360px;
+		height: 110px;
+		background-position: 50% 50%;
+		background-repeat: no-repeat;
+	}
+</style>
+<script type="text/javascript" charset="utf-8" src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<div id="dp_login">
+	<div id="wrapper">
+
+		{% if logo_blob %}
+			<div class="client-logo">
+				<div id="client_logo_img">
+					<div class="img" {% if logo_blob %}style="background-image: url({{ logo_blob.getThumbnailUrl('360x100') }}&size-fit=1)"{% endif %}></div>
+				</div>
+			</div>
+		{% endif %}
+
+		<div class="dialog-box">
+			{% block content %}{% endblock %}
+		</div>
+		<div class="deskpro-logo">
+	</div>
+</div>
+
+<link rel="stylesheet" href="{{ asset('fonts/font-awesome.min.css') }}" type="text/css" />
+</body>
+</html>

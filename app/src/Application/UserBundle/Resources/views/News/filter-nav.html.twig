@@ -1,0 +1,41 @@
+{##
+ # The navigation bar displayed on the news main page that lets the user change the category.
+ ##}
+
+<ul class="dp-nav dp-nav-tabs dp-feedback-nav dp-nav-thicksep">
+	<li class="dp-dropdown dp-active dp-alt-option dp-first" style="float: {% if is_rtl() %}right{% else %}left{% endif %};">
+		<a href="#" class="dp-dropdown-toggle" data-toggle="dp-dropdown">
+			{% if category.id %}
+				<span class="dp-info-prefix">{{ phrase('user.news.category') }}:</span>
+				{{ category.full_title }}
+			{% else %}
+				{{ phrase('user.news.all-categories') }}
+			{% endif %}
+			<b class="dp-caret"></b>
+		</a>
+		<ul class="dp-dropdown-element dp-cat-list">
+			<li {% if depth %}class="dp-sub dp-sub-depth-{{ depth }}"{% endif %}>
+				<i class="dp-icon-repeat"></i>
+				<a href="{{ path('user_news') }}">{{ phrase('user.news.all-categories') }}</a>
+				<span class="dp-badge dp-small">{{ category_counts['0_total']|default(0) }}</span>
+			</li>
+			<li class="sep"></li>
+			{% macro cat_li(category_counts, status, order_by, cat, depth) %}
+				{% if not depth %}{% set depth = 0 %}{% endif %}
+				<li {% if depth %}class="dp-sub dp-sub-depth-{{ depth }}"{% endif %}>
+					<i class="dp-icon-folder-close"></i>
+					<a href="{{ path('user_news', {'slug': cat.url_slug}) }}">{{ cat.title }}</a>
+					<span class="dp-badge dp-small">{{ category_counts[cat.id ~ '_total']|default(0) }}</span>
+				</li>
+				{% if cat.getChildren()|length %}
+					{% for child in cat.getChildren() %}
+						{{ _self.cat_li(category_counts, status, order_by, child, depth+1) }}
+					{% endfor %}
+				{% endif %}
+			{% endmacro %}
+			{% for cat in news_cats %}
+				{{ _self.cat_li(category_counts, status, search_options.order_by, cat) }}
+			{% endfor %}
+		</ul>
+	</li>
+</ul>

@@ -1,0 +1,25 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/GeneralList.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" charset="utf-8">
+window._page_exec_stack.push(function() {
+	window.DeskPRO_Page_TicketWidgets = new DeskPRO.Admin.PageHandler.GeneralList('#ticket_widgets');
+});
+</script>
+{% endblock %}
+{% block page_id "ticket_widgets" %}
+{% block content %}
+
+<div style="text-align:right; padding-bottom: 10px;">
+	<a class="icon tickets popout-trigger" href="{{ path('admin_ticketwidgets_new_choosetype') }}">{{ phrase('admin.tickets.create_new_widget') }}</a>
+</div>
+
+<ul class="item-list">
+	{% for widget in all_widgets %}
+		{% include 'AdminBundle:TicketWidgets:list-row.html.twig' %}
+	{% endfor %}
+</ul>
+
+{% endblock %}

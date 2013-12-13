@@ -1,0 +1,49 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_server_error_logs') }}">{{ phrase('admin.general.error_logs') }}</a></li>
+		<li>{{ phrase('admin.general.error_log_id', {'id':log.id}) }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="dp-form">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.id') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ log.id }}
+			<br />
+			<a class="clean-white" href="{{ path('admin_server_error_logs_view', {'log_id': log.id, download: 1}) }}">Download report file: log-{{ log.id }}.log</a>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.date') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ log.date }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Summary</label>
+		</div>
+		<div class="dp-form-input">
+			<textarea style="width:99%; height:200px; font-family:Monaco, 'Courier New', courier, monospace;">{{log.summary}}</textarea>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Raw</label>
+		</div>
+		<div class="dp-form-input">
+			<textarea style="width:99%; height:200px; font-family:Monaco, 'Courier New', courier, monospace;">{{log.log}}</textarea>
+		</div>
+	</div>
+</div>
+{% endblock %}

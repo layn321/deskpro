@@ -1,0 +1,13 @@
+{##
+ # This template is included at the bottom of ever page. You can use this to add your own
+ # website footer.
+ ##}
+<div class="deskpro-repeatable-field">
+	<div class="deskpro-repeatable-field-addbtn">{{ phrase('user.general.add') }}</div>
+	<div id="{{attributes.id}}_wrap" class="deskpro-repeatable-field-wrap">
+		{% for sub_field in field %}
+			{{field.render()|raw}}
+		{% endfor %}
+	</div>
+	<input type="hidden" class="deskpro-repeatable-field-tpl" value="{{field.getEmptyField('new_ID')}}" />
+</div>

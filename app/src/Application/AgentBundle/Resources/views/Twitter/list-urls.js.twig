@@ -1,0 +1,28 @@
+pageMeta.saveNoteUrl = '{{ path('agent_twitter_status_ajaxsave_note') }}';
+pageMeta.saveRetweetUrl = '{{ path('agent_twitter_status_ajaxsave_retweet') }}';
+pageMeta.saveUnretweetUrl = '{{ path('agent_twitter_status_ajaxsave_unretweet') }}';
+pageMeta.saveReplyUrl = '{{ path('agent_twitter_status_ajaxsave_reply') }}';
+pageMeta.saveFavoriteUrl = '{{ path('agent_twitter_status_ajaxsave_favorite') }}';
+pageMeta.saveArchiveUrl = '{{ path('agent_twitter_status_ajaxsave_archive') }}';
+pageMeta.saveDeleteUrl = '{{ path('agent_twitter_status_ajaxsave_delete') }}';
+pageMeta.saveAssignUrl = '{{ path('agent_twitter_status_ajaxsave_assign') }}';
+pageMeta.saveFollowUrl = '{{ path('agent_twitter_user_ajaxsave_follow') }}';
+pageMeta.saveUnfollowUrl = '{{ path('agent_twitter_user_ajaxsave_unfollow') }}';
+pageMeta.saveUserMessageUrl = '{{ path('agent_twitter_user_ajaxsave_message') }}';
+pageMeta.saveUserArchiveUrl = '{{ path('agent_twitter_user_ajaxsave_archive') }}';
+pageMeta.saveUserPersonUrl = '{{ path('agent_twitter_user_ajaxsave_person') }}';
+pageMeta.saveUserOrganizationUrl = '{{ path('agent_twitter_user_ajaxsave_organization') }}';
+pageMeta.tweetOverlayUrl = '{{ path('agent_twitter_status_tweet_overlay') }}';
+
+pageMeta.tweetSignature = {{ app.user.getTweetSignature()|json_encode|raw }};
+
+{% if account %}
+	pageMeta.agentMap = {
+	{% for person in account.persons %}
+		{% if person.id != app.user.id %}
+			{{ person.id }}: {name: {{ person.display_name|json_encode|raw }}, picture_url: {{ person.getPictureUrl(20)|json_encode|raw }}},
+		{% endif %}
+	{% endfor %}
+		0: null
+	};
+{% endif %}

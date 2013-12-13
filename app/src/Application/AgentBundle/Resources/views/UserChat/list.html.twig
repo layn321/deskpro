@@ -1,0 +1,79 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.UserChatFilter';
+		pageMeta.fetchResultsUrl = '{{ path('agent_userchat_filterlist', {filter_id: filter_id, filter_param: filter_param}) }}';
+		pageMeta.url_fragment = '{{ url_fragment('agent_userchat_filterlist', {filter_id: filter_id, filter_param: filter_param}) }}';
+		{% set baseId = el_uid() %}
+		pageMeta.baseId = '{{ tplvars.baseId }}';
+
+		pageMeta.perPage = 50;
+		pageMeta.resultIds = {{ chat_ids|json_encode|raw }};
+	</script>
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-chat"></i> {{ phrase('agent.userchat.list_title', {count: total}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	{% if chat_ids|length %}
+		<section class="list-listing">
+			{% include 'AgentBundle:UserChat:list-page.html.twig' %}
+		</section>
+
+		<footer class="results-nav">
+			<div class="cursor">
+				{% set phrase_part1 %}
+				<span class="results-showing-count" id="{{ tplvars.baseId }}_showing_count">{{ (page-1) * 50 + 1 }} - {{ (page - 1) * 50 + chat_ids|length }}</span>
+				{% endset %}
+				{% set phrase_part2 %}
+				<span class="results-total-count" id="{{ tplvars.baseId }}_total_count">{{ total }}</span>
+				{% endset %}
+				{{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+			</div>
+			{% if max_page != 1 %}
+			<ul class="pagenav {% if page == 1%}no-prev{% endif %} {% if page == max_page %}no-next{% endif %}">
+				<li class="prev"
+				{% if page != 1%}
+				data-route="listpane:{{ path('agent_userchat_filterlist', {'p': page - 1, 'filter_id': filter_id, 'group_var': group_var, 'group_val': group_val}) }}"
+				{% endif %}
+				>
+				</li>
+				<li class="next"
+				{% if page != max_page %}
+				data-route="listpane:{{ path('agent_userchat_filterlist', {'p': page + 1, 'filter_id': filter_id, 'group_var': group_var, 'group_val': group_val}) }}"
+				{% endif %}
+				>
+				</li>
+			</ul>
+			{% endif %}
+			<div class="loading">
+
+			</div>
+		</footer>
+	{% else %}
+		<section class="list-listing no-results">
+			<article class="row-item no-results">
+				<p style="padding: 15px;">{{ phrase('agent.general.there_are_no_results') }}</p>
+			</article>
+		</section>
+	{% endif %}
+
+{% endblock pane_content %}

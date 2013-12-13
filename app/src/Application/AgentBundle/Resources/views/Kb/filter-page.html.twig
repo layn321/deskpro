@@ -1,0 +1,109 @@
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for article in results %}
+		<article
+			class="row-item article article-{{article.id}} articles-{{article.id}} related-is-linkable"
+			data-content-type="articles"
+			data-content-id="{{ article.id }}"
+			data-route="article:{{ path('agent_kb_article', {'article_id': article.id}) }}"
+			data-route-title="@selector(a.row-title)"
+			data-route-openclass="open"
+		>
+			<input class="item-select" type="checkbox" value="{{article.id}}" />
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="row-title click-through"><span class="obj-title-article_{{ article.id }}">{{ article.real_title }}</span></a>
+					</h3>
+				</div>
+				<div class="top-row-right">
+					<div class="bound-fade"></div>
+				</div>
+				<div class="top-row-right visible-content-link-control">
+					<div class="bound-fade"></div>
+					<span class="tipped insert-content-link" title="Insert a link to this article" data-link="{{ article.getLink() }}" data-link-title="{{ article.real_title }}"></span>
+				</div>
+				<div class="top-row-right visible-ticket-controls">
+					<div class="bound-fade"></div>
+					<a href="javascript:" class="tipped kb-insert-link" title="{{ phrase('agent.general.insert_link') }}" data-article-id="{{ article.id }}"></a>
+					<a href="javascript:" class="tipped kb-insert-content" title="{{ phrase('agent.general.insert_content') }}" data-article-id="{{ article.id }}"></a>
+				</div>
+				<div class="top-row-right visible-related-content-controls">
+					<div class="bound-fade"></div>
+					<span class="tipped related-link" title="{{ phrase('agent.general.add_as_related') }}"></span>
+					<span class="tipped related-unlink" title="{{ phrase('agent.general.remove_as_related') }}"></span>
+				</div>
+			</div>
+			<hr class="clear-top" />
+			{% if display_fields|length %}
+				<div class="extra-fields">
+					<ul>
+						<li>
+							<span class="prop-title">
+								{{ phrase('agent.publish.status_' ~ article.status_code|replace({'.':'_'})) }}
+							</span>
+						</li>
+						{% for field in display_fields %}
+							{% if field == 'category' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.category') }}</span>
+									<span class="prop-val">{{ article.category_names }}</span>
+								</li>
+							{% elseif field == 'author' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.author') }}</span>
+									<span class="prop-val">{{ article.by_line }}</span>
+								</li>
+							{% elseif field == 'date_created' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.date_created') }}</span>
+									<span class="prop-val">{{ article.date_created|date('day')}}</span>
+								</li>
+							{% elseif field == 'num_comments' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.comments') }}</span>
+									<span class="prop-val">{{ comment_counts[article.id]|default(0) }}</span>
+								</li>
+							{% elseif field == 'labels' %}
+								{% if article.labels|length %}
+									<li>
+										<span class="prop-title">{{ phrase('agent.general.labels') }}</span>
+										<span class="prop-val labels">
+											{% for label in article.labels %}
+												<span class="listing-tag">{{ label }}</span>
+											{% endfor %}
+										</span>
+									</li>
+								{% endif %}
+							{% elseif field == 'rating' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.rating') }}</span>
+									<span class="prop-val">
+										{{ phrase('agent.general.x_up_votes', {count: article.up_votes}) }},
+										{{ phrase('agent.general.x_down_votes', {count: article.down_votes}) }}
+									</span>
+								</li>
+							{% elseif field == 'rating_votes' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.number_of_ratings') }}</span>
+									<span class="prop-val">
+										{{ article.num_ratings }}
+									</span>
+								</li>
+							{% elseif field == 'view_count' %}
+								{# VIEW_COUNTER
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.num_views') }}</span>
+									<span class="prop-val">{{ article.view_count|default(0) }}</span>
+								</li>
+								#}
+							{% endif %}
+						{% endfor %}
+					</ul>
+					<br class="clear" />
+				</div>
+			{% else %}
+				<br class="clear" />
+			{% endif %}
+		</article>
+	{% endfor %}
+</section>

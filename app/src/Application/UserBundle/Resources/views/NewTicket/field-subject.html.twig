@@ -1,0 +1,22 @@
+{##
+ # The subejct text box of the new ticket form
+ ##}
+
+<div class="dp-control-group {% if error_fields['ticket.subject'] %}dp-error{% endif %} dp-control-group-ticket_subject">
+	<div class="dp-control-label">
+		<label><strong>{{ phrase('user.tickets.subject') }} *</strong></label>
+	</div>
+	<div class="dp-controls dp-fill">
+		{{ form_widget(form.ticket.subject, {
+			'attr': {
+				'data-field-validators': 'DeskPRO.Form.LengthValidator',
+				'data-min-len': 5,
+				'placeholder': phrase('user.tickets.subject'),
+				'class': addclass
+			}
+		}) }}
+		<div class="dp-help-inline dp-error-explain">
+			{{ phrase('user.tickets.form_error_subject') }}
+		</div>
+	</div>
+</div>

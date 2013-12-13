@@ -1,0 +1,8 @@
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+<ul class="menu flag {{add_classname}}" data-option-name="flag" style="display:none">
+	<li data-option-value="none"><span class="icon icon-flag-none">{{ phrase('agent.general.none') }}</span></li>
+	<li class="sep">-</li>
+	{% for color in ['red', 'blue', 'yellow', 'green', 'orange', 'purple'] %}
+		<li data-option-value="{{color}}"><span class="icon icon-flag-{{colro}}">{{ flagnamer.flag_name(color, person) }}</span></li>
+	{% endfor %}
+</ul>

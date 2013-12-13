@@ -1,0 +1,125 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+	{% if filter %}
+		{% if filter.sys_name %}
+			pageMeta.url_fragment = '{{ url_fragment('agent_ticketsearch_runnamedfilter', {'filter_name': filter.sys_name}) }}';
+		{% else %}
+			pageMeta.url_fragment = '{{ url_fragment('agent_ticketsearch_runfilter', {'filter_id': filter.id}) }}';
+		{% endif %}
+
+		pageMeta.filter_id = {{filter_id}};
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TicketFilter';
+		pageMeta.refreshUrl = '{{ path('agent_ticketsearch_runfilter', {'filter_id': filter_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&group_by={{ group_by }}&grouping_option={{ grouping_option }}&view_name={{ view_name }}';
+		pageMeta.viewTypeUrl = '{{ path('agent_ticketsearch_runfilter', {'filter_id': filter_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&group_by={{ group_by }}&grouping_option={{ grouping_option }}&view_type=$view_type&view_name={{ view_name }}';
+		pageMeta.loadSingleUrl = '{{ path('agent_ticketsearch_singleticketrow', {'content_type': 'filter', 'content_id': filter_id|default('0')}) }}?ticket_id=$ticket_id&view_type=$view_type&view_name={{ view_name }}';
+	{% elseif sla_id %}
+		pageMeta.url_fragment = '{{ url_fragment('agent_ticketsearch_runsla', {'sla_id': sla_id, 'sla_status': sla_status}) }}';
+
+		pageMeta.sla_id = {{sla_id}};
+		pageMeta.sla_status = '{{ sla_status }}';
+		pageMeta.sla_filter = '{{ sla_filter }}';
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TicketSla';
+		pageMeta.refreshUrl = '{{ path('agent_ticketsearch_runsla', {'sla_id': sla_id, 'sla_status': sla_status}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&group_by={{ group_by }}&grouping_option={{ grouping_option }}&view_name={{ view_name }}';
+		pageMeta.viewTypeUrl = '{{ path('agent_ticketsearch_runsla', {'sla_id': sla_id, 'sla_status': sla_status}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&group_by={{ group_by }}&grouping_option={{ grouping_option }}&view_type=$view_type&view_name={{ view_name }}';
+		pageMeta.loadSingleUrl = '{{ path('agent_ticketsearch_singleticketrow', {'content_type': 'sla', 'content_id': sla_id|default('0')}) }}?ticket_id=$ticket_id&view_type=$view_type&view_name={{ view_name }}';
+
+	{% else %}
+		pageMeta.cache_id = {{cache_id}};
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TicketCustomFilter';
+		pageMeta.refreshUrl = '{{ path('agent_ticketsearch_runcustomfilter', {'cache_id': cache_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&group_by={{ group_by }}&grouping_option={{ grouping_option }}';
+		pageMeta.viewTypeUrl = '{{ path('agent_ticketsearch_runcustomfilter', {'cache_id': cache_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&group_by={{ group_by }}&grouping_option={{ grouping_option }}&view_type=$view_type&view_name={{ view_name }}';
+		pageMeta.loadSingleUrl = '{{ path('agent_ticketsearch_singleticketrow', {'content_type': 'filter', 'content_id': filter_id|default('0')}) }}?ticket_id=$ticket_id&view_type=$view_type&view_name={{ view_name }}';
+	{% endif %}
+	{% if not tickets %}
+		pageMeta.noResults = true;
+	{% endif %}
+	pageMeta.fetchResultsUrl = '{{ path('agent_ticketsearch_getpage') }}';
+
+	{% if filter.sys_name == 'agent' %}pageMeta.groupingIgnore=["agent","agent_team"];{% endif %}
+	{% if filter.sys_name == 'agent_team' %}pageMeta.groupingIgnore=["agent","agent_team"];{% endif %}
+	{% if filter.sys_name == 'unassigned' %}pageMeta.groupingIgnore=["agent"];{% endif %}
+
+	pageMeta.perPage = {{ per_page }};
+	pageMeta.ticketResultIds = {{ ticket_ids|json_encode|raw }};
+
+	pageMeta.view_name = '{{ view_name }}';
+
+	{% if set_group_term  %}
+		pageMeta.topGroupingTerm = '{{ set_group_term }}';
+		pageMeta.topGroupingOption = '{{ set_group_option }}';
+	{% endif %}
+
+	{% if group_by %}
+		pageMeta.groupBy = '{{ group_by }}';
+		pageMeta.groupByOption = '{{ grouping_option }}';
+	{% endif %}
+
+	pageMeta.baseId = '{{ tplvars.baseId }}';
+	</script>
+{% endblock %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	{% set phrase_part %}<span class="results-count-display">{{ ticket_ids|length }}</span>{% endset %}
+	<h1><i class="icon-dp-ticket"></i> {{ phrase('agent.tickets.list_title_counter', {x: phrase_part}, true) }} </h1>
+{% endblock %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	{% if ticket_ids|length %}
+		<div id="{{tplvars.baseId}}_is_results">
+			{% include 'AgentBundle:TicketSearch:filter-display-options-overlay.html.twig' %}
+
+			{% include 'AgentBundle:TicketSearch:filter-control-bar.html.twig' %}
+			{% include 'AgentBundle:TicketSearch:filter-grouping-bar.html.twig' %}
+			{% include 'AgentBundle:TicketSearch:filter-massactions-bar.html.twig' %}
+
+			<section class="list-listing" id="{{tplvars.baseId}}_results_wrap">
+				{% include 'AgentBundle:TicketSearch:part-results-simple-ext.html.twig' %}
+			</section>
+
+			<footer class="results-nav">
+				<div class="cursor">
+                    {% set phrase_part1 %}
+                    <span class="results-showing-count" id="{{tplvars.baseId}}_showing_count"></span>
+                    {% endset %}
+                    {% set phrase_part2 %}
+                    <span class="results-total-count" id="{{tplvars.baseId}}_total_count">{{ ticket_ids|length }}</span>
+                    {% endset %}
+                    {{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+				</div>
+				{% if ticket_ids|length > per_page %}
+					<ul class="pagenav no-prev">
+						<li class="prev"></li>
+						<li class="next"></li>
+					</ul>
+				{% endif %}
+				<div class="loading">
+
+				</div>
+			</footer>
+		</div>
+	{% endif %}
+
+	<section class="list-listing no-results" id="{{tplvars.baseId}}_no_results" {% if ticket_ids|length %}style="display:none"{% endif %}>
+		<article class="row-item no-results">
+			<p style="padding: 15px;">{{ phrase('agent.general.there_are_no_results') }}</p>
+		</article>
+	</section>
+
+{% endblock %}

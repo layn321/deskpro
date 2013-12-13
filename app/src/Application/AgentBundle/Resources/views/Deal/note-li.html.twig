@@ -1,0 +1,18 @@
+<li data-note-id="{{note.id}}" class="note-{{note.id}} note">
+	<div class="message">
+		<div class="message-avatar">
+			<img src="{{ note.agent.getPictureUrl(25) }}" alt="" width="25" height="25" />
+		</div>
+		<div class="message-body">
+			<div class="message-meta">
+				<time class="timeago" title="{{note.date_created|date('c', 'UTC')}}">{{note.date_created|date('day')}}</time>
+				<h4>{{note.agent.name}}:</h4>
+			</div>
+			<div class="message-text">
+				<p>
+					{{note.note_html|raw}}
+				</p>
+			</div>
+		</div>
+	</div>
+</li>

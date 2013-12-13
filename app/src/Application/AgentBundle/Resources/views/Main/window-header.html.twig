@@ -1,0 +1,452 @@
+<div id="dp_header">
+
+	{##########################################################################}
+	{# User Profile #}
+	{##########################################################################}
+
+	<div class="user-profile pull-left">
+		<img class="gravatar pull-left" src="{{ app.user.getPictureUrl(31) }}">
+		<div class="username">{{ phrase('agent.chrome.hello-user', {name: app.user.name}) }}</div>
+		<ul class="nav-profile">
+			<li id="user_settings_link"><i class="icon-cog"></i> <a>{{ phrase('agent.chrome.link_preferences') }}</a></li>
+			<li id="dp_header_help_trigger"><i class="icon-question-sign"></i> <a>{{ phrase('agent.chrome.link_help') }}</a></li>
+			<li onclick="window.location='{{ path('user_logout', {'auth': static_security_token('user_logout', 0)}) }}?to=agent'; return false;"><i class="icon-signout"></i> <a>{{ phrase('agent.chrome.link_logout') }}</a></li>
+		</ul>
+	</div>
+
+	<div class="extended-search-dialog" id="dp_header_help">
+		<h3>{{ phrase('agent.chrome.help-contact-us') }}</h3>
+		<div class="description">
+			{{ phrase('agent.chrome.help-contact-us-explain') }}
+		</div>
+
+		{% if app.getSetting('core.agent_enable_kb_shortcuts') %}
+			<h3>{{ phrase('agent.chrome.kbd-shortcuts') }}</h3>
+			<div class="description">
+				<table cellspacing="0" cellpadding="0" width="100%"><tr>
+					<td width="28%">
+						<h3>{{ phrase('agent.interface.creation') }}</h3>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_ticket') }}</kbd> {{ phrase('agent.interface.open_new_ticket_form') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_person') }}</kbd> {{ phrase('agent.interface.open_new_person_form') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_organisation') }}</kbd> {{ phrase('agent.interface.open_new_organization_form') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_task') }}</kbd> {{ phrase('agent.interface.open_new_task_form') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_article') }}</kbd> {{ phrase('agent.interface.open_new_article_form') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_feedback') }}</kbd> {{ phrase('agent.interface.open_new_feedback_form') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_news') }}</kbd> {{ phrase('agent.interface.open_new_news_form') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_new_download') }}</kbd> {{ phrase('agent.interface.open_new_download_form') }}
+						</div>
+					</td>
+					<td width="37%" style="padding-right: 6px;">
+						<h3>{{ phrase('agent.general.tickets') }}</h3>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_shift_r') }}</kbd> {{ phrase('agent.general.focus_reply_box') }}
+						</div>
+						<div class="row">
+							<kbd>shift+p</kbd> {{ phrase('agent.chrome.kbd-open-user-profile') }}
+						</div>
+						<div class="row">
+							<kbd>shift+o</kbd> {{ phrase('agent.chrome.kbd-open-org') }}
+						</div>
+
+						<h3>{{ phrase('agent.tickets.ticket_replying') }}</h3>
+						<div class="showmac">
+							<div class="row">
+								<kbd>ctrl+r</kbd> {{ phrase('agent.chrome.kbd-send-reply') }}
+							</div>
+							<div class="row">
+								<kbd>ctrl+s</kbd> {{ phrase('agent.chrome.kbd-open-snippets') }}
+							</div>
+							<div class="row">
+								<kbd>ctrl+o</kbd> {{ phrase('agent.chrome.kbd-open-send-actions') }}
+							</div>
+							<div class="row">
+								<kbd>ctrl+u</kbd> {{ phrase('agent.chrome.kbd-change-status-user') }}
+							</div>
+							<div class="row">
+								<kbd>ctrl+a</kbd> {{ phrase('agent.chrome.kbd-change-status-agent') }}
+							</div>
+							<div class="row">
+								<kbd>ctrl+d</kbd> {{ phrase('agent.chrome.kbd-change-status-resolved') }}
+							</div>
+						</div>
+						<div class="noshowmac">
+							<div class="row">
+								<kbd>alt+r</kbd> {{ phrase('agent.chrome.kbd-send-reply') }}
+							</div>
+							<div class="row">
+								<kbd>alt+s</kbd> {{ phrase('agent.chrome.kbd-open-snippets') }}
+							</div>
+							<div class="row">
+								<kbd>alt+o</kbd> {{ phrase('agent.chrome.kbd-open-send-actions') }}
+							</div>
+							<div class="row">
+								<kbd>alt+u</kbd> {{ phrase('agent.chrome.kbd-change-status-user') }}
+							</div>
+							<div class="row">
+								<kbd>alt+a</kbd> {{ phrase('agent.chrome.kbd-change-status-agent') }}
+							</div>
+							<div class="row">
+								<kbd>alt+d</kbd> {{ phrase('agent.chrome.kbd-change-status-resolved') }}
+							</div>
+						</div>
+
+					</td><td width="35%">
+						<h3>{{ phrase('agent.general.window_navigation') }}</h3>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_ctrl_shift_left') }}</kbd> {{ phrase('agent.interface.go_to_previous_tab') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_ctrl_shift_right') }}</kbd> {{ phrase('agent.interface.go_to_next_tab') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_ctrl_shift_c') }}</kbd> {{ phrase('agent.interface.close_current_tab') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_up_or_down') }}</kbd> {{ phrase('agent.general.filter_moves_cursor') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_enter') }}</kbd> {{ phrase('agent.general.filter_opens_selected') }}
+						</div>
+						<div class="row">
+							<kbd>{{ phrase('agent.interface.kbd_space') }}</kbd> {{ phrase('agent.general.filter_checks_selected') }}
+						</div>
+
+						<h3>{{ phrase('agent.chrome.quicksearch_title-people') }}</h3>
+						<div class="row">
+							<kbd>shift+o</kbd> {{ phrase('agent.chrome.kbd-open-org') }}
+						</div>
+					</td>
+				</tr></table>
+			</div>
+		{% endif %}
+	</div>
+
+	{##########################################################################}
+	{# Chat #}
+	{##########################################################################}
+
+	<div class="btn-group-chat pull-left" {% if not app.getSetting('core.apps_chat') or not app.user.hasPerm('agent_chat.use') %}style="display: none;"{% endif %}>
+		<a class="btn" id="dp_header_userchat_btn">
+			<div class="chat-big-icon pull-left"></div>
+				<span class="status">
+					<span class="dp-phrase-switch dp-phrase-on agent_chrome_chat_logged-in">{{ phrase('agent.chrome.chat_logged-in') }}</span>
+					<span class="dp-phrase-switch agent_chrome_chat_logged-out">{{ phrase('agent.chrome.chat_logged-out') }}</span>
+				</span>
+			<ul class="info">
+				<li><i class="icon-user"></i> <span class="dp-phrase agent_chrome_chat_online_agents" data-phrase-text="{{ phrase_code('agent.chrome.chat_online-agents') }}" data-phrase-html="1">{{ phrase('agent.chrome.chat_online-agents', {count:0}, true) }}</span></li>
+				<li><i class="icon-globe"></i> <span class="dp-phrase agent_chrome_chat_online_users" data-phrase-text="{{ phrase_code('agent.chrome.chat_online-users') }}" data-phrase-html="1">{{ phrase('agent.chrome.chat_online-users', {count:0}, true) }}</span></li>
+			</ul>
+			<div class="arrow">
+				<span class="caret"></span>
+			</div>
+		</a>
+
+		{####################}
+		{# Chat #}
+		{####################}
+		<div class="dp-header-group-chat-dropdown" id="dp_header_userchat_dropdown">
+			<table class="layout-table" width="100%"><tbody><tr>
+				<td class="column1" id="agent_status_menu_onlinelist">
+					<div id="agent_status_menu_me_list">
+					<div class="dp-not-loading">
+						<div class="avatar" style="background-image: url({{ app.user.getPictureUrl(31) }});"></div>
+						<a class="signin trigger-toggle-status">
+							<span class="dp-phrase-switch dp-phrase-on agent_chrome_chat_sign-in"><i class="icon-comments-alt"></i> {{ phrase('agent.chrome.chat_sign-in') }}</span>
+							<span class="dp-phrase-switch agent_chrome_chat_sign-out"><i class="icon-comments"></i> {{ phrase('agent.chrome.chat_sign-out') }}</span>
+						</a>
+					</div>
+					<div class="dp-is-loading pull-center">
+						<i class="spinner-flat"></i>
+					</div>
+				</div>
+				<div class="sound-row" id="sound_icon">
+					{{ phrase('agent.interface.chat-notification-vol') }} <i class="icon-volume-down"></i>
+				</div>
+				<ul class="agents list">
+					<li class="header">
+						<a href="#" class="agents-list-groupdep">{{ phrase('agent.chrome.chat_list_by-department') }}</a>
+						{{ phrase('agent.chrome.chat_list_agents-online', {}, true) }}
+					</li>
+				</ul>
+				<ul class="agents list department-grouped" style="display: none;">
+					{% for id,title in app.departments.getFullNames('chat') %}
+						<li class="dep dep-{{ id }}">
+							<h4>{{ title }}</h4>
+							<ul class="sub-list"></ul>
+						</li>
+					{% endfor %}
+				</ul>
+					<ul class="agents list normal">
+						{% for agent in agents %}
+							<li
+								data-department-ids="{{ agent_chat_depmap[agent.id]|join(',') }}"
+								class="agent agent-{{ agent.id }} {% if agent.id in userchat_online_agent_ids %}online-now{% endif %}"
+							>
+								<div class="avatar" style="background-image: url({{ agent.getPictureUrl(16) }});"></div>
+								{{ agent.display_name }}
+							</li>
+						{% endfor %}
+					</ul>
+				</td>
+				<td class="column2" id="agent_status_online_users">
+					{% include 'AgentBundle:UserTrack:header-table.html.twig' %}
+				</td>
+			</tr></tbody></table>
+		</div>
+	</div>
+
+	<div class="btn-group-actions pull-left">
+		<div class="btn-wrap create-group pull-left">
+			<a class="btn"><i class="icon-plus"></i><span class="btn-text">{{ phrase('agent.chrome.btn_create') }}</span></a>
+				<ul class="btn-menu">
+					{% if app.user.hasPerm('agent_tickets.create') %}
+						<li id="create_ticket_btn"><a><div class="wrap"><i class="icon-dp-ticket"></i></div>{{ phrase('agent.chrome.create_new-ticket') }} <kbd>t</kbd></a></li>
+					{% endif %}
+					{% if app.user.hasPerm('agent_people.create') %}
+						<li id="create_person_btn"><a><div class="wrap"><i class="icon-dp-person"></i></div>{{ phrase('agent.chrome.create_new-person') }} <kbd>p</kbd></a></li>
+					{% endif %}
+					{% if app.user.hasPerm('agent_org.create') %}
+						<li id="create_organization_btn"><a><div class="wrap"><i class="icon-dp-organization"></i></div>{{ phrase('agent.chrome.create_new-organization') }} <kbd>o</kbd></a></li>
+					{% endif %}
+					{% if app.getConfig('enable_twitter') and app.user.getTwitterAccountIds()|length %}
+						<li id="create_tweet_btn"><a><div class="wrap"><i class="icon-dp-twitter"></i></div>{{ phrase('agent.chrome.create_new-tweet') }} <kbd>w</kbd></a></li>
+					{% endif %}
+					{% if app.user.hasPerm('agent_publish.create') %}
+						<li id="create_article_btn"><a><div class="wrap"><i class="icon-dp-article"></i></div>{{ phrase('agent.chrome.create_new-article') }} <kbd>a</kbd></a></li>
+						<li id="create_news_btn"><a><div class="wrap"><i class="icon-dp-news"></i></div>{{ phrase('agent.chrome.create_new-news') }} <kbd>n</kbd></a></li>
+						<li id="create_download_btn"><a><div class="wrap"><i class="icon-dp-download"></i></div>{{ phrase('agent.chrome.create_new-download') }} <kbd>d</kbd></a></li>
+						<li id="create_feedback_btn"><a><div class="wrap"><i class="icon-dp-feedback" title="{{ phrase('agent.chrome.quicksearch_title-feedback') }}"></i></div>{{ phrase('agent.chrome.create_new-feedback') }} <kbd>i</kbd></a></li>
+					{% endif %}
+					{% if app.getSetting('core.apps_tasks') %}<li id="create_task_btn" class="last"><a><div class="wrap"><i class="icon-dp-task"></i></div>{{ phrase('agent.chrome.create_new-task') }} <kbd>k</kbd></a></li>{% endif %}
+				</ul>
+		</div>
+		<div class="btn-wrap pull-left">
+			<a class="btn dp-recent-btn"><i class="icon-time"></i><span class="btn-text">{{ phrase('agent.chrome.btn_recent') }}</span></a>
+			<div class="dp-recent-list-dropdown">
+				<header>
+					<input type="text" name="filter" class="filter" placeholder="{{ phrase('agent.chrome.recent_list-filter-info') }}" id="recent_tabs_list_filter" />
+				</header>
+				<article>
+					<ul id="recent_tabs_list">
+						<li id="recent_tabs_list_li_none">{{ phrase('agent.chrome.recent_list-none') }}</li>
+					</ul>
+				</article>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/x-deskpro-plain" id="recent_tabs_list_tpl">
+		<li>
+			<time></time>
+			<a>
+				<i class="icon-envelope dp-icon-placeholder"></i>
+				<strong></strong>
+				<span></span>
+			</a>
+		</li>
+	</script>
+
+	<div class="notifications-group pull-left" id="dp_header_notify_wrap">
+		<ul>
+			{% for type in ['tickets', 'people', 'chat', 'publish', 'tasks', 'twitter', 'none'] %}
+				{% set show = true %}
+				{% if type == 'tickets' and not app.user.hasPerm('agent_tickets.use') %}{% set show = false %}{% endif %}
+				{% if type == 'chat' and not (app.getSetting('core.apps_chat') and app.user.hasPerm('agent_chat.use')) %}{% set show = false %}{% endif %}
+				{% if type == 'people' and not app.user.hasPerm('agent_people.use') %}{% set show = false %}{% endif %}
+				{% if type == 'publish' and not (app.user.hasPerm('apps_feedback.use') or app.getSetting('core.apps_kb') or app.getSetting('core.apps_news') or app.getSetting('core.apps_downloads')) %}{% set show = false %}{% endif %}
+				{% if type == 'tasks' and not app.getSetting('core.apps_tasks') %}{% set show = false %}{% endif %}
+				{% if type == 'twitter' and not (app.getConfig('enable_twitter') and app.user.getTwitterAccountIds()|length) %}{% set show = false %}{% endif %}
+				{% if show %}
+					<li class="{{ type }} notification type-row" {% if type != 'none' %}style="display: none;"{% endif %}>
+						<span class="badge" {% if type != 'none' %}style="display: none;"{% endif %}>0</span>
+						<div class="dp-header-notify-menu">
+							<div class="arrow-up"></div>
+							<header>
+								<a class="pref-link trigger-notify-prefs" data-type="{{ type }}"><i class="icon-cog"></i></a>
+								{{ phrase('agent.chrome.notify_list-new-messages', {}, true) }}
+							</header>
+							<article>
+								<div class="no-notifications">
+									<h4>{{ phrase('agent.chrome.notify_list-no-notifications') }}</h4>
+								</div>
+								<ul class="notify-list" id="dp_notify_list"></ul>
+							</article>
+							<footer>
+								<a class="btn trigger-dismiss"><i class="icon-ban-circle"></i> {{ phrase('agent.chrome.notify_list-dismiss-all') }}</a>
+							</footer>
+						</div>
+					</li>
+				{% endif %}
+			{% endfor %}
+			{% if version_notices.count() %}
+				<li class="version-notes notification type-row" data-ids="{{ version_notices.getWaitingIds()|join(',') }}" id="notice_trigger">
+					<span class="badge no-count">{{ version_notices.count() }}</span>
+					<i class="icon-bullhorn"></i>
+				</li>
+			{% endif %}
+		</ul>
+
+		<script type="text/x-deskpro-plain" id="dp_header_notify_row_tpl">
+			<li class="inside">
+				<div class="dismiss"><i class="icon-remove"></i></div>
+				<time></time>
+				<big></big>
+				<small></small>
+			</li>
+		</script>
+	</div>
+
+	<div class="group pull-right" id="dp_header_logo_wrap">
+		<a href="http://www.deskpro.com/" target="_blank" class="logo"></a>
+	</div>
+
+	<div
+		class="searchbox pull-right"
+		id="dp_header_search_wrap"
+		data-element-handler="DeskPRO.Agent.ElementHandler.QuickSearch"
+		data-search-url="{{ path('agent_quicksearch') }}"
+	>
+		<input class="search" type="text" id="dp_search_box" placeholder="{{ phrase('agent.interface.quick-search-placeholder') }}" />
+		<span class="help" id="dp_search_box_help_trigger"><i class="icon-question-sign"></i></span>
+		<span class="loading-indicator" id="dp_search_box_loading"><i class="spinner-xsmall"></i></span>
+
+		<div class="quick-search-results" id="dp_search_box_list_wrap">
+			<ul id="dp_search_box_list"></ul>
+		</div>
+
+		<script
+			type="text/x-deskpro-plain"
+			id="dp_header_search_row_title_tpl"
+			data-title-ticket="{{ phrase('agent.chrome.quicksearch_title-tickets') }}"
+			data-icon-ticket="icon-dp-ticket"
+			data-title-person="{{ phrase('agent.chrome.quicksearch_title-people') }}"
+			data-icon-person="icon-dp-person"
+			data-title-organization="{{ phrase('agent.chrome.quicksearch_title-orgs') }}"
+			data-icon-organization="icon-dp-organization"
+			data-title-news="{{ phrase('agent.chrome.quicksearch_title-news') }}"
+			data-icon-news="icon-dp-news"
+			data-title-download="{{ phrase('agent.chrome.quicksearch_title-downloads') }}"
+			data-icon-download="icon-dp-download"
+			data-title-article="{{ phrase('agent.chrome.quicksearch_title-articles') }}"
+			data-icon-article="icon-dp-article"
+			data-title-feedback="{{ phrase('agent.chrome.quicksearch_title-feedback') }}"
+			data-icon-feedback="icon-dp-feedback"
+			data-title-chat="{{ phrase('agent.chrome.quicksearch_title-chat') }}"
+		>
+			<li class="title">
+				<i class="type-icon"></i>
+				<span class="type-title"></span>
+				<a class="show-more" href="#" data-phrase-text="{{ phrase_code('agent.chrome.search-show-more') }}" data-phrase-html="1"></a>
+			</li>
+		</script>
+		<script type="text/x-deskpro-plain" id="dp_header_search_row_tpl">
+			<li>
+				<a href="#">
+					<strong class="row-id"></strong>
+					<span class="row-title"></span>
+				</a>
+			</li>
+		</script>
+
+		<div class="extended-search-dialog" id="dp_header_search_help">
+			<h3>{{ phrase('agent.chrome.quicksearch_title') }}</h3>
+				<div class="description" style="text-align: center">
+					{{ phrase('agent.chrome.quicksearch_info') }}
+				</div>
+				<ul class="type-map">
+					<li>
+						<label>{{ phrase('agent.general.id') }}</label>
+						<ul class="types">
+							{% if app.user.hasPerm('agent_tickets.use') %}<li><i class="icon-dp-ticket" title="{{ phrase('agent.chrome.quicksearch_title-tickets') }}"></i></li>{% endif %}
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-person" title="{{ phrase('agent.chrome.quicksearch_title-people') }}"></i></li>{% endif %}
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-organization" title="{{ phrase('agent.chrome.quicksearch_title-orgs') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_kb') %}<li><i class="icon-dp-article" title="{{ phrase('agent.chrome.quicksearch_title-articles') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_feedback') %}<li><i class="icon-dp-feedback" title="{{ phrase('agent.chrome.quicksearch_title-feedback') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_news') %}<li><i class="icon-dp-news" title="{{ phrase('agent.chrome.quicksearch_title-news') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_download') %}<li><i class="icon-dp-download" title="{{ phrase('agent.chrome.quicksearch_title-downloads') }}"></i></li>{% endif %}
+						</ul>
+					</li>
+					<li>
+						<label>{{ phrase('agent.general.ref') }}</label>
+						<ul class="types">
+							{% if app.user.hasPerm('agent_tickets.use') %}<li><i class="icon-dp-ticket" title="{{ phrase('agent.chrome.quicksearch_title-tickets') }}"></i></li>{% endif %}
+						</ul>
+					</li>
+					<li>
+						<label>{{ phrase('agent.general.subject') }}</label>
+						<ul class="types">
+							{% if app.user.hasPerm('agent_tickets.use') %}<li><i class="icon-dp-ticket" title="{{ phrase('agent.chrome.quicksearch_title-tickets') }}"></i></li>{% endif %}
+						</ul>
+					</li>
+					<li>
+						<label>{{ phrase('agent.general.name') }}</label>
+						<ul class="types">
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-person" title="{{ phrase('agent.chrome.quicksearch_title-people') }}"></i></li>{% endif %}
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-organization" title="{{ phrase('agent.chrome.quicksearch_title-orgs') }}"></i></li>{% endif %}
+						</ul>
+					</li>
+					<li>
+						<label>{{ phrase('agent.general.email') }}</label>
+						<ul class="types">
+							{% if app.user.hasPerm('agent_tickets.use') %}<li><i class="icon-dp-ticket" title="{{ phrase('agent.chrome.quicksearch_title-tickets') }}"></i></li>{% endif %}
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-person" title="{{ phrase('agent.chrome.quicksearch_title-people') }}"></i></li>{% endif %}
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-organization" title="{{ phrase('agent.chrome.quicksearch_title-orgs') }}"></i></li>{% endif %}
+						</ul>
+					</li>
+					<li>
+						<label>{{ phrase('agent.general.title') }}</label>
+						<ul class="types">
+							{% if app.getSetting('core.apps_kb') %}<li><i class="icon-dp-article" title="{{ phrase('agent.chrome.quicksearch_title-articles') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_feedback') %}<li><i class="icon-dp-feedback" title="{{ phrase('agent.chrome.quicksearch_title-feedback') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_news') %}<li><i class="icon-dp-news" title="{{ phrase('agent.chrome.quicksearch_title-news') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_download') %}<li><i class="icon-dp-download" title="{{ phrase('agent.chrome.quicksearch_title-downloads') }}"></i></li>{% endif %}
+						</ul>
+					</li>
+					<li>
+						<label>{{ phrase('agent.general.labels') }}</label>
+						<ul class="types">
+							{% if app.user.hasPerm('agent_tickets.use') %}<li><i class="icon-dp-ticket" title="{{ phrase('agent.chrome.quicksearch_title-tickets') }}"></i></li>{% endif %}
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-person" title="{{ phrase('agent.chrome.quicksearch_title-people') }}"></i></li>{% endif %}
+							{% if app.user.hasPerm('agent_people.use') %}<li><i class="icon-dp-organization" title="{{ phrase('agent.chrome.quicksearch_title-orgs') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_kb') %}<li><i class="icon-dp-article" title="{{ phrase('agent.chrome.quicksearch_title-articles') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_feedback') %}<li><i class="icon-dp-feedback" title="{{ phrase('agent.chrome.quicksearch_title-feedback') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_news') %}<li><i class="icon-dp-news" title="{{ phrase('agent.chrome.quicksearch_title-news') }}"></i></li>{% endif %}
+							{% if app.getSetting('core.apps_download') %}<li><i class="icon-dp-download" title="{{ phrase('agent.chrome.quicksearch_title-downloads') }}"></i></li>{% endif %}
+						</ul>
+					</li>
+				</ul>
+
+				<div class="description" style="text-align: center; padding: 8px 0;">{{ phrase('agent.chrome.quicksearch_adv-explain') }}</div>
+				<ul class="list-with-icons" id="search_icons_nav">
+					{% if app.user.hasPerm('agent_tickets.use') %}<li class="tickets_section" data-target-section="tickets_section" title="{{ phrase('agent.chrome.quicksearch_title-tickets') }}"></li>{% endif %}
+					{% if app.user.hasPerm('agent_people.use') %}<li class="people_section" data-target-section="people_section" title="{{ phrase('agent.chrome.quicksearch_title-crm') }}"></li>{% endif %}
+					{% if app.getSetting('core.apps_feedback') %}<li class="feedback_section" data-target-section="feedback_section" title="{{ phrase('agent.chrome.quicksearch_title-feedback') }}"></li>{% endif %}
+					{% if app.getSetting('core.apps_kb') %}<li class="publish_section" data-target-section="publish_section" title="{{ phrase('agent.chrome.quicksearch_title-publish') }}"></li>{% endif %}
+				</ul>
+		</div>
+	</div>
+
+	<div class="panevis-switcher pull-right">
+		<ul>
+			<li class="view-source panevis-toggle-sourcepane" title="{{ phrase('agent.interface.viewbtn-source') }}"></li>
+			<li class="view1 panevis-toggle-tableview" title="{{ phrase('agent.interface.viewbtn-table') }}"></li>
+			<li class="view2 panevis-toggle-normalview" title="{{ phrase('agent.interface.viewbtn-normal') }}"></li>
+			<li class="view3 panevis-toggle-tabview" title="{{ phrase('agent.interface.viewbtn-tab') }}"></li>
+		</ul>
+	</div>
+</div>

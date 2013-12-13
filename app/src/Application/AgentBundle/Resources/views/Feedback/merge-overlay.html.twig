@@ -1,0 +1,85 @@
+<div class="extended-merge overlay">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.feedback.merge_feedback') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+		{% if other_feedback %}
+			<div class="merge-data-wrap">
+				<table class="merge-data">
+					<tbody>
+						<tr class="header-row">
+							<td class="first">&nbsp;</td>
+							<td colspan="2"><div class="switcher-wrap">
+								<div class="left-text merge-target-button" data-merge-id="{{ feedback.id }}" data-keep="1">{{ phrase('agent.general.merge_keep_this') }}</div>
+								<button class="switch-trigger clean-white" style="margin-top: 1px;">&lsaquo; {{ phrase('agent.general.merge_switch_btn') }} &rsaquo;</button>
+								<div class="right-text merge-target-button" data-merge-id="{{ other_feedback.id }}">{{ phrase('agent.general.merge_merge_this') }}</div>
+							</div></td>
+						</tr>
+					</tbody>
+					<tbody class="merge-data-rows">
+						<tr class="always-keep">
+							<th><div>{{ phrase('agent.general.id') }}</div></th>
+							<td width="50%">{{ feedback.id }}</td>
+							{% if other_feedback %}<td width="50%">{{ other_feedback.id }}</td>{% endif %}
+						</tr>
+						<tr class="always-keep">
+							<th><div>{{ phrase('agent.general.title') }}</div></th>
+							<td width="50%">{{ feedback.title }}</td>
+							{% if other_feedback %}<td width="50%">{{ other_feedback.title }}</td>{% endif %}
+						</tr>
+						<tr>
+							<th><div>{{ phrase('agent.general.category') }}</div></th>
+							<td width="50%">{{ feedback.category ? feedback.category.title : '' }}</td>
+							{% if other_feedback %}
+								<td width="50%">{{ other_feedback.category ? other_feedback.category.title : '' }}</td>
+							{% endif %}
+						</tr>
+						<tr class="always-keep">
+							<th><div>{{ phrase('agent.general.status') }}</div></th>
+							<td width="50%">{{ feedback.status_category ? feedback.status_category.title : '' }}</td>
+							{% if other_feedback %}
+								<td width="50%">{{ other_feedback.status_category ? other_feedback.status_category.title : '' }}</td>
+							{% endif %}
+						</tr>
+						<tr class="always-keep">
+							<th><div>{{ phrase('agent.general.date_created') }}</div></th>
+							<td width="50%">{{ feedback.date_created|date('fulltime') }}</td>
+							{% if other_feedback %}<td width="50%">{{ other_feedback.date_created|date('fulltime') }}</td>{% endif %}
+						</tr>
+						<tr class="mergeable">
+							<th><div>{{ phrase('agent.general.num_ratings') }}</div></th>
+							<td width="50%">{{ feedback.num_ratings }}</td>
+							{% if other_feedback %}
+								<td width="50%">{{ other_feedback.num_ratings }}</td>
+							{% endif %}
+						</tr>
+						<tr class="mergeable">
+							<th><div>{{ phrase('agent.general.comments') }}</div></th>
+							<td width="50%">{{ feedback.num_comments }}</td>
+							{% if other_feedback %}
+								<td width="50%">{{ other_feedback.num_comments }}</td>
+							{% endif %}
+						</tr>
+						{% if other_feedback %}
+						<tr class="mergeable">
+							<th><div>{{ phrase('agent.general.description') }}</div></th>
+							<td colspan="2"><em>{{ phrase('agent.feedback.merge_feedback_note') }}</em></td>
+						</tr>
+						{% endif %}
+					</tbody>
+				</table>
+			</div>
+		{% endif %}
+	</div>
+	{% if other_feedback %}
+		<div class="overlay-footer">
+			<div class="is-not-loading">
+				<button class="clean-white merge-trigger">{{ phrase('agent.feedback.merge_feedback_submit') }}</button>
+			</div>
+			<div class="is-loading">
+				<div class="loading-icon"></div>
+			</div>
+		</div>
+	{% endif %}
+</div>

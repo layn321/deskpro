@@ -1,0 +1,17 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+
+{% block section 'twitter' %}
+{% block sub_section 'accounts' %}
+
+{% block content %}
+
+<div class="error">
+	<h1>{{ phrase('admin.twitter.error') }}</h1>
+	{# @TODO print more descriptive messages #}
+	<p>{{ error.class }}: {{ error.message }}.</p>
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

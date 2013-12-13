@@ -1,0 +1,76 @@
+<div id="dp_first_login" data-element-handler="DeskPRO.Agent.ElementHandler.FirstLogin" style="display: none;">
+	<form action="{{ path('agent_settings_profile_savewelcome') }}" method="post">
+		<article>
+			{% if not is_first_login_name and app.user.name %}
+				<p>{{ phrase('agent.settings.welcome_to_deskpro_name', {name: app.user.name}) }}</p>
+				<p>
+					{{ phrase('agent.settings.first_login_set_pic') }}
+				</p>
+			{% else %}
+				<p>{{ phrase('agent.settings.welcome_to_deskpro') }}</p>
+				<p>
+					{{ phrase('agent.settings.first_login_set_name') }}
+				</p>
+			{% endif %}
+
+			<table cellspacing="0" cellpadding="0" border="0">
+				<tbody>
+					<tr>
+						<td>
+							{{ phrase('agent.general.name') }}:
+						</td>
+						<td>
+							<input type="text" class="name" value="{{ app.user.name }}" placeholder="" />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							{{ phrase('agent.general.timezone') }}:
+						</td>
+						<td>
+							<select class="timezone">
+								{% for tz in timezones %}
+									<option value="{{ tz }}" {% if app.user.getTimezone() == tz %}selected="selected"{% endif %}>{{ tz }}</option>
+								{% endfor %}
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td style="vertical-align: top">{{ phrase('agent.people.upload_new_picture') }}:</td>
+						<td>
+							<div class="profile-picture" style="height: 130px;">
+								<input type="file" name="file-upload" />
+								<div class="files"></div>
+								<script class="template-upload" type="text/x-tmpl">
+									{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+									<p>{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</p>
+									{{ '{% } %}' }}
+								</script>
+								<script class="template-download" type="text/x-tmpl">
+									<div>
+										{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+										{{ '{% if (file.error) { %}'}}
+											{{ '{%=file.error%}' }}
+										{{ '{% } else { %}'}}
+											<input type="hidden" class="new_blob_id" value="{{ '{%=file.blob_auth_id%}' }}" />
+											<img src="{{ '{%=file.download_url%}' }}?s=60" class="pic-new" data-setted-size="{{ '{%=file.download_url%}' }}?s=60" />
+										{{ '{% } %}' }}
+										{{ '{% } %}' }}
+									</div>
+								</script>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td></td>
+						<td>
+							<button class="clean-white save-trigger">{{ phrase('agent.settings.done_start_using') }} &rarr;</button>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</article>
+	</form>
+</div>

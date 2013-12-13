@@ -1,0 +1,16 @@
+{##
+ # The markup used for rendering custom date fields
+ ##}
+{% javascript 'javascripts/jquery/jquery.min.js' %}
+{% javascript 'javascripts/jquery/ui/jquery.ui.core.min.js' %}
+{% javascript 'javascripts/jquery/ui/jquery.ui.widget.min.js' %}
+{% javascript 'javascripts/jquery/ui/jquery.ui.datepicker.min.js' %}
+{% stylesheet 'javascripts/jquery/ui/themes/jquery.ui.all.css' with {'media': 'screen'} %}
+<input type="text" name="{{attributes.name}}" id="{{attributes.id}}" value="{{attributes.value}}" class="input-text input-text-date" size="13" />
+<script type="text/javascript">
+$(function() {
+	$( "#{{attributes.id}}" ).datepicker({
+		dateFormat: 'yy-mm-dd'
+	});
+});
+</script>

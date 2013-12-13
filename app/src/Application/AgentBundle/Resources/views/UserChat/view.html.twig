@@ -1,0 +1,469 @@
+<script>
+pageMeta.fragmentClass    = 'DeskPRO.Agent.PageFragment.Page.UserChat';
+pageMeta.title            = {{ convo.subjectLine|json_encode|raw }};
+pageMeta.url_fragment     = '{{ url_fragment('agent_userchat_view', {'conversation_id': convo.id}) }}';
+pageMeta.conversation_id  = {{convo.id}};
+pageMeta.youName          = {{ app.user.display_name|json_encode|raw }};
+pageMeta.youPictureUrl    = '{{ app.user.getPictureUrl(25) }}';
+pageMeta.tabIdClass       = 'user_chat_tab_{{convo.id}}';
+pageMeta.status           = '{{ convo.status }}';
+pageMeta.ended_by         = '{{ convo.ended_by }}';
+pageMeta.email            = {{ convo.person_email|json_encode|raw }};
+pageMeta.convo            = {{ convo_api|json_encode|raw }};
+pageMeta.userPictureUrl   = '{{ convo.getPersonPictureUrl() }}';
+
+pageMeta.session_id = {{ session.id|default(0) }};
+{% if convo.person.id %}
+pageMeta.viewPersonUrl = '{{ path('agent_people_view', {'person_id': convo.person.id}) }}';
+pageMeta.person_id = {{ convo.person.id }};
+{% else %}
+pageMeta.person_id = 0;
+{% endif %}
+
+{% if convo.person %}
+	pageMeta.chatTitle = '{{ convo.person.display_name }} ({{ convo.person.primary_email_address }})';
+{% else %}
+	pageMeta.chatTitle = '{{ phrase('agent.general.anonymous') }}';
+{% endif %}
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<div class="userchat-page">
+
+<header class="page-header">
+	<table cellspacing="titleline-layout" width="100%"><tr>
+		<td class="item"><h4 class="id-number">#{{ convo.id }}</h4></td>
+		<td width="100%">
+			<div class="fadeaway-container-outer">
+				<h1 class="fadeaway-container">
+					<i class="fadeaway-pip"></i>
+					<div class="fadeaway-content" title="{{ convo.getSubjectLine() }}">
+						<div>{{ convo.getSubjectLine() }}</div>
+					</div>
+				</h1>
+			</div>
+		</td>
+	</tr></table>
+    <div class="clear"></div>
+    <div class="meta-line">
+		<table cellspacing="0" cellpadding="0" width="100%"><tr>
+			<td style="white-space: nowrap; vertical-align: middle;" nowrap="nowrap" width="100">
+					{% if not ticket.department %}{% set blank_option = true %}{% endif %}
+					{% include 'AgentBundle:Common:select-department.html.twig' with {
+						'name': "department_id",
+						'blank_title': phrase('agent.general.none'),
+						'selected': convo.department.id|default(0),
+						'id': baseId ~ '_department_id',
+						'departments': app.departments.getPersonDepartments(app.user, 'chat', [convo.department.id|default(0)])
+					} %}
+			</td>
+			<td style="vertical-align: middle; padding-left: 8px;">
+				<div class="labels-line">
+					<input
+						type="hidden"
+						id="{{baseId}}_labels_input"
+						class="dpe_select dpe_select_noborder"
+						data-select-width="auto"
+						data-placeholder="{{ phrase('agent.general.add_a_label') }}"
+						value="{% for label in convo.labels %}{{ label.label }},{% endfor %}"
+					/>
+				</div>
+			</td>
+		</tr></table>
+        <div class="clear"></div>
+    </div>
+</header>
+
+<div id="{{baseId}}_chat_positioner">
+
+{{ dp_widgets(baseId, 'chat', 'header', 'below', convo_api) }}
+
+<table cellspacing="0" cellpadding="0" width="100%" class="people-box">
+    <tr>
+        <td width="50%" valign="top" class="first">
+			{{ dp_widgets(baseId, 'chat', 'people', 'above', convo_api) }}
+            <div class="profile-box-container">
+                <header>
+ 					{{ dp_widget_tabs_header(baseId, 'chat', 'people', {
+						(baseId ~ '_people_box_person'): phrase('agent.general.person') ~ (not convo.person ? ' (' ~ phrase('agent.general.anonymous') ~ ')' : '')
+					}) }}
+                </header>
+                <section id="{{baseId}}_people_box_person_container">
+                    <article id="{{baseId}}_people_box_person">
+                        <dl>
+                            <dt></dt>
+                            <dd style="padding:4px 11px 0 10px">
+                                {% if convo.person %}
+                                    <a class="user-link clean-white as-popover preload" data-route="person:{{ path('agent_people_view', {'person_id': convo.person.id}) }}" style="width: 100%; box-sizing: border-box; -moz-box-sizing: border-box;">
+                                        <span style="background-image: url('{{ convo.person.getPictureUrl(20) }}');">
+                                            {{ convo.person.display_name }}
+                                            <span class="email"><b class="pemail-{{convo.person.id}}" data-hide="@parent">{{ convo.person.email_address }}</b></span>
+                                        </span>
+                                    </a>
+                                {% else %}
+									<a class="user-link clean-white anon" style="width: 100%; box-sizing: border-box; -moz-box-sizing: border-box;">
+										{% if convo.person_email %}
+											<span style="background-image: url('{{ gravatar_for_email(convo.person_email, 20) }}');">
+										{% else %}
+											<span style="background-image: url('{{ path('serve_default_picture', {s: 20}) }}');">
+										{% endif %}
+										<span style="background-image: url('{{ convo.person.getPictureUrl(20) }}');">
+											{% if convo.person_name %}
+                                                {{ convo.person_name }}
+                                            {% else %}
+                                                {{ phrase('agent.general.anonymous') }}
+                                            {% endif %}
+                                            <span class="email"><b data-hide="@parent">{% if convo.person_email %}{{ convo.person_email }}{% else %}{{ phrase('agent.chat.no_email') }}{% endif %}</b></span>
+										</span>
+									</a>
+								{% endif %}
+                                <div class="clear"></div>
+                            </dd>
+                        </dl>
+
+						{% if convo.person and convo.person.id != session.person.id %}
+							<div style="font-size: 11px; margin: 0 0 2px 13px;">
+								<strong style="color: #d00;">{{ phrase('agent.chat.warning') }}</strong>:
+								{{ phrase('agent.userchat.ident_unconfirmed') }}
+								<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.chat.warning_email_address_not_unique') }}"></span>
+							</div>
+						{% endif %}
+
+						<button id="{{baseId}}_create_ticket_btn2" class="clean-white" style="margin: 0 0 5px 11px; {% if convo.status != 'ended' and convo.ended_by != 'timeout' %}display: none{% else %}display:block{% endif %}">{{ phrase('agent.userchat.create_ticket') }}</button>
+                    </article>
+					{{ dp_widget_tabs(baseId, 'chat', 'people', 'article', convo_api) }}
+                </section>
+            </div>
+			{{ dp_widgets(baseId, 'chat', 'people', 'below', convo_api) }}
+        </td>
+        <td width="50%" valign="top" class="second">
+			{{ dp_widgets(baseId, 'chat', 'assignments', 'above', convo_api) }}
+			<div class="profile-box-container">
+				<header>
+					<div class="controls">
+						<span class="edit-gear" id="{{baseId}}_assign_ob_trigger"></span>
+					</div>
+					{{ dp_widget_tabs_header(baseId, 'chat', 'assignments', {
+						(baseId ~ '_people_box_agent'): phrase('agent.general.assignments')
+					}) }}
+				</header>
+				<section id="{{baseId}}_people_box_agent_container">
+					<article id="{{baseId}}_people_box_agent">
+						<dl>
+							<dt class="agent-row">{{ phrase('agent.general.assigned_agent') }}</dt>
+							<dd class="agent-row">
+								<a class="agent-link prop-agent-id" id="{{baseId}}_assign_btn" data-agent-id="{{ convo.agent.id|default(0) }}" style="background-image: url('{{ convo.agent.getPictureUrl(20) }}');">{{ convo.agent.display_name|default(phrase('agent.general.unassigned')) }}</a>
+							</dd>
+
+							<dt class="followers-row" {% if not agent_parts|length %}style="display:none"{% endif %}>{{ phrase('agent.chat.other_agents') }}</dt>
+							<dd class="followers-row" {% if not agent_parts|length %}style="display:none"{% endif %}>
+								<ul id="{{baseId}}_followers_list" class="comma-list">
+									{% set has_others = false %}
+									{% for part in convo.participants %}
+										{% if not part.id == convo.id %}
+											{% set has_others = true %}
+											<li><span class="agent-link" data-agent-id="{{ part.id }}">{{ part.display_name }}</span></li>
+										{% endif %}
+									{% endfor %}
+									{% if not has_others %}
+										<li>{{ phrase('agent.chat.no_others') }}</li>
+									{% endif %}
+								</ul>
+							</dd>
+						</dl>
+					</article>
+					{{ dp_widget_tabs(baseId, 'chat', 'assignments', 'article', convo_api) }}
+				</section>
+			</div>
+			{{ dp_widgets(baseId, 'chat', 'assignments', 'below', convo_api) }}
+        </td>
+    </tr>
+</table>
+
+{{ dp_widgets(baseId, 'chat', 'chat', 'above', convo_api) }}
+
+</div>
+
+<div class="profile-box-container chat-box" id="{{ baseId }}_chat_view">
+	<header>
+		<div class="controls" id="{{baseId}}_field_edit_controls" style="display: none">
+			<div class="is-not-loading">
+				<span class="edit-gear" id="{{baseId}}_field_edit_start"></span>
+				<button class="cancel" id="{{baseId}}_field_edit_cancel" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+				<button class="save" id="{{baseId}}_field_edit_save" style="display: none">{{ phrase('agent.general.save') }}</button>
+			</div>
+			<span class="is-loading">{{ phrase('agent.general.saving') }}</span>
+		</div>
+		<nav data-element-handler="DeskPRO.ElementHandler.SimpleTabs" id="{{ baseId }}_main_tabs_nav"><ul>
+			<li data-tab-for="#{{baseId}}_chat">{{ phrase('agent.general.chat') }}</li>
+			<li data-tab-for="#{{ baseId }}_fields_display_main_wrap" id="{{ baseId }}_fields_display_main_wrap_tab" class="is-fields-tab">{{ phrase('agent.general.fields') }}</li>
+			{% if convo.visitor %}
+				<li data-tab-for="#{{baseId}}_session">{{ phrase('agent.userchat.visitor_info') }}</li>
+			{% endif %}
+			{% if convo.status == 'open' or block %}
+				<li data-tab-for="#{{baseId}}_block">{% if block %}{{ phrase('agent.userchat.user_is_blocked') }}{% else %}{{ phrase('agent.userchat.block_user') }}{% endif %}</li>
+			{% endif %}
+		</ul></nav>
+	</header>
+	<section>
+		<article id="{{baseId}}_chat" class="chat-tab">
+			<div class="messages chat-transcript {% if convo.status == 'ended' and convo.ended_by != 'timeout' %}chat-ended{% endif %}" id="{{baseId}}_messages_box">
+				{% for message in convo_messages|reverse %}
+					<div class="row server-ack {% if message.date_received %}user-ack{% endif %} {% if message.metadata.new_user_track %}user-track{% endif %} {% if message.is_sys %}sys{% elseif message.author.is_agent and message.author.id != convo.person.id %}agent{% else %}user{% endif%} message-{{ message.id }}">
+						{% if message.is_sys %}
+							<div class="message-content">
+								<div class="message">
+									{% if message.metadata.phrase_id %}
+										{% if message.is_html %}
+											{{ phrase('agent.userchat.'~ message.metadata.phrase_id, message.metadata, true) }}
+										{% else %}
+											{{ phrase('agent.userchat.'~ message.metadata.phrase_id, message.metadata) }}
+										{% endif %}
+									{% elseif message.is_html %}
+										{{message.content|raw}}
+									{% else %}
+										{{message.content}}
+									{% endif %}
+								</div>
+								<time>{{ message.date_created|date('time') }}</time>
+								<div class="chat-clear"></div>
+							</div>
+						{% elseif message.origin == 'agent' %}
+							<div class="message-content">
+								<div class="avatar tipped" title="{{ message.getAuthorName() }}"><img src="{{ message.getAuthorPictureUrl(25) }}" /></div>
+								<div class="chatSend">
+									<div class="chatMsgSend">
+										{% if message.is_html %}
+											{{message.content|raw}}
+										{% else %}
+											{{message.content}}
+										{% endif %}
+										<span class="bubbleLeft"></span>
+									</div>
+								</div>
+								<time>{{ message.date_created|date('time') }}</time>
+								<span class="ack-icon" {% if message.date_received %}title="User recieved message at: {{ message.date_received|date('fulltime') }}"{% endif %}></span>
+								<div class="chat-clear"></div>
+							</div>
+						{% else %}
+							<div class="message-content">
+								<div class="avatar tipped" title="{{ message.getAuthorName() }}"><img src="{{ message.getAuthorPictureUrl(25) }}" /></div>
+								<div class="chatRecieve">
+									<div class="chatMsgRecieve">
+										{% if message.is_html %}
+											{{message.content|raw}}
+										{% else %}
+											{% if message.content|length > 500 %}
+												{{ message.content|truncate(500, false) }}
+												<div class="truncated-wrap"><div class="truncated-btn">&bull; &bull; &bull;</div><textarea class="orig-message" style="display:none;">{{ message.content }}</textarea></div>
+											{% else %}
+												{{message.content|safe_link_urls}}
+											{% endif %}
+										{% endif %}
+										<span class="bubbleRight"></span>
+									</div>
+								</div>
+								<time>{{ message.date_created|date('time') }}</time>
+								<div class="chat-clear"></div>
+							</div>
+						{% endif %}
+					</div>
+				{% endfor %}
+				<div id="{{baseId}}_uploading_list" class="uploading-list">
+					<ul class="files"></ul>
+				</div>
+				<div class="row user-typing" style="display: none" id="{{baseId}}_user_typing">
+					<div class="message-content">
+						<div class="chatRecieve">
+							<div class="chatMsgRecieve">
+								<label>{{ phrase('agent.chat.user_typing') }}: </label>
+								<div class="prop-msg"></div>
+								<span class="bubbleRight"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="chatreply" id="{{baseId}}_replybox" style="{% if convo.status == 'ended' and convo.ended_by != 'timeout' %}display: none{% endif %};">
+				<div class="input-wrap">
+					<textarea placeholder="" id="{{baseId}}_replybox_txt" name="message"></textarea>
+					<input type="hidden" id="{{baseId}}_is_html_reply" name="is_html_reply" value="0" />
+					<div class="drop-file-zone drop-file-zone-rte chat"><h1>{{ phrase('agent.general.drop_here_to_insert_image') }}</h1></div>
+				</div>
+			</div>
+		</article>
+		<article id="{{baseId}}_fields_display_main_wrap" style="display: none;">
+			<div id="{{baseId}}_field_holders">
+				{% include 'AgentBundle:UserChat:view-page-display-holders.html.twig' %}
+			</div>
+		</article>
+		{% if convo.visitor %}
+			<article id="{{baseId}}_session" style="display: none;">
+				<div class="data-display-table-wrap">
+					<table cellspacing="0" cellpadding="0" width="100%" class="data-display-table">
+						<tbody>
+							<tr>
+								<th>{{ phrase('agent.general.ip_address') }}:</th>
+								<td>
+									{{ convo.visitor.last_track.ip_address }}
+								</td>
+							</tr>
+							<tr>
+								<th>{{ phrase('agent.general.user_agent') }}:</th>
+								<td>
+									{{ convo.visitor.last_track.user_agent }}
+								</td>
+							</tr>
+							{% if convo.session %}
+								<tr>
+									<th>{{ phrase('agent.usertrack.session_start_time') }}:</th>
+									<td>{{ convo.session.date_last|date('fulltime') }}</td>
+								</tr>
+							{% endif %}
+							{% if convo.visitor.visit_track %}
+								<tr>
+									<th>{{ phrase('agent.usertrack.session_landing_page') }}:</th>
+									<td>{{ convo.visitor.visit_track.page_url }}</td>
+								</tr>
+							{% endif %}
+							<tr>
+								<th>{{ phrase('agent.usertrack.initial_visit_time') }}:</th>
+								<td>
+									{{ convo.visitor.date_last|date('fulltime') }}
+								</td>
+							</tr>
+							{% if convo.visitor.initial_track %}
+							<tr>
+								<th>{{ phrase('agent.usertrack.initial_landing_page') }}:</th>
+								<td>
+									{{ convo.visitor.initial_track.page_url }}
+								</td>
+							</tr>
+							{% endif %}
+						</tbody>
+					</table>
+				</div>
+			</article>
+		{% endif %}
+		{% if convo.status == 'open' or block %}
+			<article id="{{baseId}}_block" style="direction: none; padding: 15px;">
+				{% if block %}
+					{{ phrase('agent.userchat.agent_blocked_user_on', {name: block.by_person.display_name, date: block.date_created|date('fulltime')}) }}
+					{% if block.reason %}<div>{{ phrase('agent.userchat.block_reason', {reason: block.reason}) }}</div>{% endif %}
+
+					<br /><br />
+					<button class="clean-white" id="{{baseId}}_unblock_user">{{ phrase('agent.userchat.unblock') }}</button>
+				{% else %}
+					{{ phrase('agent.userchat.block_title') }}<br />
+					{{ phrase('agent.general.reason') }}: <input type="text" id="{{baseId}}_block_reason" value="" style="width: 60%;" /><br />
+					<label>
+						<input type="checkbox" id="{{baseId}}_block_ip" /> {{ phrase('agent.userchat.block_ip_address') }}
+						<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.userchat.block_ip_address_info') }}"></span>
+					</label>
+
+					<br /><br />
+					<button class="clean-white" id="{{baseId}}_block_user">{{ phrase('agent.userchat.block_user') }}</button>
+				{% endif %}
+			</article>
+		{% endif %}
+	</section>
+</div>
+
+{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'attach[]'} %}
+
+<div class="optionbox reply-agent-team-ob with-footer" id="{{baseId}}_agent_assign_ob" data-assigned="{{ convo.agent.id|default('0') }}">
+	<header>
+		<h4>{{ phrase('agent.general.assignments') }}</h4>
+		<span class="close close-trigger"></span>
+	</header>
+	<div class="col">
+		<section data-section-name="agents">
+			<header>
+				<h3>{{ phrase('agent.general.assign_to') }}</h3>
+				<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+			</header>
+			<ul>
+				<li class="me last-me {% if convo.agent.id == app.user.id %}on{% endif %}">
+					<input type="radio" name="{{baseId}}_agent" value="{{ app.user.id }}" {% if convo.agent.id == app.user.id %}checked="checked"{% endif %} />
+					<label><span class="agent-pic agent-label-{{ app.user.id }}" style="background-image: url({{ app.user.getPictureUrl(16) }})">{{ phrase('agent.general.me') }}</span></label>
+				</li>
+
+				<li>
+					<input type="radio" name="{{baseId}}_agent" value="0" {% if not convo.agent %}checked="checked"{% endif %}  />
+					<label><span class="agent-pic agent-label-0">{{ phrase('agent.general.unassigned') }}</span></label>
+				</li>
+
+				{% for agent in agents %}
+				{% if agent.id != app.user.id %}
+				<li {% if convo.agent.id == agent.id %}class="on"{% endif %}>
+					<input type="radio" name="{{baseId}}_agent" value="{{ agent.id }}" {% if convo.agent.id == agent.id %}checked="checked"{% endif %} />
+					<label><span class="agent-pic agent-label-{{ agent.id }}" style="background-image: url({{ agent.getPictureUrl(16) }})">{{ agent.display_name }}</span></label>
+					<div class="bound-fade"></div>
+				</li>
+				{% endif %}
+				{% endfor %}
+			</ul>
+		</section>
+	</div>
+
+	<div class="col">
+		<section data-section-name="followers">
+			<header>
+				<h3>{{ phrase('agent.chat.invite_others') }}</h3>
+				<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+			</header>
+			<ul>
+				<li class="me last-me">
+					<input type="checkbox" name="{{bsaeId}}_part" value="{{ app.user.id }}" {% if app.user.id in participant_ids and convo.agent.id != app.user.id %}checked="checked"{% endif %} />
+					<label><span class="agent-pic agent-part-label-{{ app.user.id }}" style="background-image: url({{ app.user.getPictureUrl(16) }})">{{ phrase('agent.general.me') }}</span></label>
+				</li>
+
+				{% for agent in agents %}
+				{% if agent.id != app.user.id %}
+				<li {% if convo.participants[agent.id] and convo.agent.id != agent.id %}class="on"{% endif %}>
+					<input type="checkbox" name="{{bsaeId}}_part" value="{{ agent.id }}" {% if convo.participants[agent.id] and convo.agent.id != agent.id %}checked="checked"{% endif %} />
+					<label><span class="agent-pic agent-part-label-{{ agent.id }}" style="background-image: url({{ agent.getPictureUrl(16) }})">{{ agent.display_name }}</span></label>
+					<div class="bound-fade"></div>
+				</li>
+				{% endif %}
+				{% endfor %}
+			</ul>
+		</section>
+	</div>
+	<br class="clear" />
+	<footer>
+		<button class="save-trigger">{{ phrase('agent.general.apply') }}</button>
+	</footer>
+</div>
+
+<div id="{{baseId}}_closetab_prompt" style="display:none;">
+	<div class="confirm-overlay mass-actions-overlay">
+		<div class="overlay-title">
+			<h4>{{ phrase('agent.chat.title_leave_chat_prompt') }}</h4>
+		</div>
+		<div class="overlay-content">
+			{{ phrase('agent.chat.leave_chat_confirm') }}
+		</div>
+	</div>
+	<div class="overlay-footer prop-footer">
+		<button class="clean-white unassign-trigger">{{ phrase('agent.chat.leave_unassign') }}</button>
+		<button class="clean-white end-trigger">{{ phrase('agent.chat.leave_end') }}</button>
+	</div>
+</div>
+
+{{ dp_widgets(baseId, 'chat', '', '', convo_api) }}
+
+<div id="{{ baseId }}_view_fulle_message_overlay" style="display:none;">
+	<div class="alert-overlay mass-actions-overlay" style="width: 800px; height: 600px;">
+		<div class="overlay-title">
+			<span class="close-trigger">{{ phrase('agent.general.dismiss') }}</span>
+			<h4>{{ phrase('agent.userchat.full_message') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<div style="max-height: 500px; overflow: auto;" id="{{ baseId }}_view_full_message_content"></div>
+		</div>
+	</div>
+</div>
+
+</div>

@@ -1,0 +1,32 @@
+<?php
+$OUTPUT = array();
+
+foreach ($people_list as $person) {
+
+	$name = '';
+	if (!empty($person['first_name']) AND !empty($person['last_name'])) {
+		$name = $person['first_name'] . ' ' . $person['last_name'];
+	} elseif (!empty($person['name'])) {
+		$name = $person['name'];
+	} elseif (!empty($person['last_name'])) {
+		$name = $person['last_name'];
+	} elseif (!empty($person['first_name'])) {
+		$name = $person['first_name'];
+	} elseif (!empty($person['email'])) {
+		$name = $person['email'];
+	} else {
+		$name = 'User ' . $person['id'];
+	}
+
+	if (!$name) {
+		continue;
+	}
+
+	$OUTPUT[] = array(
+		'id' => $person['id'],
+		'value' => $person['id'],
+		'name' =>  $name,
+		'email' => $person['email'],
+		'label' => $name . ($person['email'] ? " <{$person['email']}>" : '')
+	);
+}

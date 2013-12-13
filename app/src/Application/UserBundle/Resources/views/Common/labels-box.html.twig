@@ -1,0 +1,14 @@
+{##
+ # The standard labels bar in content pages.
+ ##}
+
+{% if labels|length %}
+	<section class="dp-labels-box">
+		<ul>
+			<li class="dp-caption"><i class="dp-icon-tags"></i></li>
+			{% for label in labels %}
+				<li class="dp-tag"><a href="{{ path('user_search_labels', {'label': label.label}) }}">{{ label.label }}</a></li>
+			{% endfor %}
+		</ul>
+	</section>
+{% endif %}

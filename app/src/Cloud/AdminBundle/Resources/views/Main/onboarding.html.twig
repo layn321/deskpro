@@ -1,0 +1,345 @@
+{% import 'AdminBundle:Main:onboard-macro.html.twig' as onb %}
+{% if not onboard.isHideAll() and onboard.countComplete() < 16 %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/Onboarding.js') }}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	DeskPRO.ElementHandler_Exec(document.getElementById('onboard_wrap'));
+});
+</script>
+<div id="onboard_wrap" class="onboard-box-wrap">
+	<header>
+		<span class="dismiss-all">Dismiss All</span>
+		<h2>Getting Started</h2>
+	</header>
+	<div class="onboard-box" data-element-handler="DeskPRO.Admin.ElementHandler.Onboarding">
+		<ul class="tasklist">
+
+			{#####################################################################}
+			{# Email Accounts  #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'email-accounts', 'Turn emails into tickets') }}
+				<p>
+					Go to <a href="{{ path('admin_emailgateways') }}">Tickets &rarr; Email Accounts</a> to add new email accounts.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Add Agents #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'add-agents', 'Add my colleagues to the system') }}
+				<p>
+					Manage agent accounts <a href="{{ path('admin_agents') }}">Agents</a> section
+					or just use the form below to add them now.
+				</p>
+
+				<h4>Invite your collegaues</h4>
+				<p>
+					Enter the email addresses of the collegaues you want to invite (separate each address by a comma).
+					A new agent account will be created for them and they will get a welcome email.
+				</p>
+				<div class="agent-input">
+					<textarea class="address-list" placeholder="Enter email addresses separated by commans. For example: example@example.com, another@example.com"></textarea>
+					<button class="btn submit-trigger" data-submit-url="{{ path('admin_mass_add') }}"><em>Create accounts</em></button>
+				</div>
+				<div class="agents-result agents-loading" style="display: none;">
+					Please wait while we set up new accounts for your collegues. <em class="flat-spinner"></em>
+				</div>
+				<div class="agents-result agents-done" style="display: none;">
+					<p>We created new accounts for your collegues:</p>
+					<ul class="small-detail-list"></ul>
+				</div>
+			<div class="agents-result agents-error" style="display: none;">
+					<p class="error-text no_emails">Please enter valid email addresses into the text box</p>
+					<p class="error-text no_new_agents">The email addresses you entered all belong to existing agents</p>
+					<p class="error-text too_many">Please enter a maximum of 20 email addresses at a time.</p>
+					<p class="error-text license">Your license does not allow you to create any more agents. Go to your <a href="{{ app.request.getBaseUrl() }}/billing">Billing Interface</a> to add more.</p>
+				</div>
+
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Agent Interface #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'agent-interface', 'View a ticket from a support agent\'s perspective') }}
+				<p>
+					Support agents read and reply to tickets through the agent interface.
+					You can always get there from the URL <a href="{{ app.request.getBaseUrl() }}/agent">{{ app.request.getBaseUrl() }}/agent</a>.
+					You can also use the interface selector in the top-right corner of this page.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Custom Domain  #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'cloud-custom-domain', 'Use a custom domain') }}
+				<div class="custom_domain_done" style="{% if not app.getSetting('core.cloud_custom_domain') %}display: none{% endif %}">
+					<p>
+						Your custom domain name (<span class="custom_domain_label">{{ app.getSetting('core.cloud_custom_domain') }}</span>) is set up. Go
+						to the <a href="{{ path('admin_settings') }}">Settings</a> section if you want to remove or change it.
+					</p>
+					<p>
+						Note that custom domain changes take a few minutes to start working.
+					</p>
+				</div>
+				{% if not app.getSetting('core.cloud_custom_domain') %}
+					<div class="custom_domain_form">
+						<p>
+							To use a custom domain with your helpdesk:
+						</p>
+						<p>
+							1. Set up a DNS <var style="background-color: #D7DEE6; font-family: Consolas, Monaco, monospace; font-style: normal;">CNAME</var> record that points to <var style="background-color: #D7DEE6; font-family: Consolas, Monaco, monospace; font-style: normal;">{{ constant('DPC_SITE_DOMAIN') }}.</var>
+						</p>
+						<p>
+							2. Enter your custom domain name here:
+							<input type="text" class="custom_domain" value="{{ app.getSetting('core.cloud_custom_domain') }}" style="width: 200px;" placeholder="Enter your custom domain name" />
+							<button class="btn custom_domain_save" data-submit-url="{{ path('admin_settings_setcustomdomain') }}">Save</button>
+							<i class="flat-spinner custom_domain_loading" style="display: none"></i>
+						</p>
+						<p>
+							Please note that it may take a few minutes before your custom domain name starts working.
+						</p>
+					</div>
+				{% endif %}
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Ticket Fields #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'ticket-fields', 'Add departments or other fields to tickets') }}
+				<p>
+					Define new departments from <a href="{{ path('admin_departments', {type:'tickets'}) }}">Tickets &rarr; Departments</a>, and
+					add new fields from <a href="{{ path('admin_tickets_fields') }}">Tickets &rarr; Fields</a>.
+				</p>
+				<p>
+					After you have created your departments and fields, you can use the <a href="{{ path('admin_tickets_editor') }}">Layout Editor</a>
+					to customize which fields display for specific departments.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Portal #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'portal', 'Make the helpdesk portal look like my site') }}
+				<p>
+					Go to <a href="{{ path('admin_portal') }}">Portal &rarr; Portal Editor</a> to customize
+					your portal. Using the Portal Editor you can:
+				</p>
+				<ul class="small-detail-list">
+					<li>Customize your color scheme</li>
+					<li>Add a custom header or footer</li>
+					<li>Enable and disable sections</li>
+					<li>Add new sidebar blocks</li>
+					<li>Change your homepage</li>
+					<li>Add custom CSS</li>
+				</ul>
+				<br/>
+				<p>
+					Go to <a href="{{ path('admin_templates_user') }}">Portal &rarr; Templates</a> to edit the
+					raw HTML behind every page.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Email Templates #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'email-templates', 'Modify the emails sent to my users') }}
+				<p>
+					Go to <a href="{{ path('admin_templates_email') }}">Tickets &rarr; Email Notification Templates</a>
+					to change emails sent to users and also agents.
+				</p>
+				<p>
+					Using triggers from <a href="{{ path('admin_tickettriggers') }}">Tickets &rarr; Triggers</a>,
+					you can set specific email templates to send under specific circumstances. For example,
+					you might decide to send a special email for tickets that come into a special email address.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Embed: Form #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'embed-form', 'Add a contact form on our website') }}
+				<p>
+					Go to <a href="{{ path('admin_website_embeds') }}">Integrate &rarr; Website Embeds</a> to get an HTML snippet you can paste directly
+					into any webpage.
+				</p>
+				<p>
+					The HTML snippet inserts a simple contact form into the page. Only the form is added (no layouts or headers or footers). To your users,
+					it will seem like just another normal page on your website.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Embed: Tab #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'embed-tab', 'Add a support button on my website') }}
+				<p>
+					Go to <a href="{{ path('admin_website_embeds') }}">Integrate &rarr; Website Embeds</a> to get an HTML snippet you can paste directly
+					into any webpage.
+				</p>
+				<div class="figwrap">
+					<figure style="width: 237px;">
+						<a href="{{ path('admin_website_embeds') }}"><img src="{{ asset('images/instructions/support-tab.png') }}" /></a>
+						<figcaption>
+							The tab that is added to the side of your website
+						</figcaption>
+					</figure>
+				</div>
+				<p>
+					The "Website Tab" snippet adds a button to the left-side of your pages. When a user clicks on the button, a popup window
+					appears with content from your helpdesk like articles and news alongside a contact form where users can submit tickets.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# KB #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'agent-kb', 'Configure and build a knowledgebase') }}
+				<p>
+					Go to the Agent Interface (<a href="{{ app.request.getBaseUrl() }}/agent">{{ app.request.getBaseUrl() }}/agent</a>) and click on the "Publish" section.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Feedback #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'feedback', 'Receive feedback from users') }}
+				<p>
+					DeskPRO's feedback features are enabled by default. You can add a <a href="{{ path('admin_website_embeds') }}">support button</a> to your website
+					which has a form to submit feedback, but you can also use the feedback section from the <a href="{{ app.getSetting('core.deskpro_url') }}">helpdesk portal</a>.
+				</p>
+				<p>
+					Under the Feedback menu on this page, you can manage properties of the feedback system including:
+				</p>
+				<ul class="small-detail-list">
+					<li><a href="{{ path('admin_feedback_statuses') }}">Statuses</a> that define when an idea is being worked on, is finished or was declined</li>
+					<li><a href="{{ path('admin_feedback_cats') }}">Types</a> like 'Suggestions' or 'Bugs'</li>
+					<li>and <a href="{{ path('admin_feedback_usercats') }}">Categories</a> to help organize submissions</li>
+				</ul>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Embed: Chat #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'embed-chat', 'Add live chat on my website') }}
+				<p>
+					Go to the <a href="{{ path('admin_website_embeds') }}">Integrate &rarr; Website Embeds</a> to get an HTML snippet you can paste into any web page.
+				</p>
+				<div class="figwrap">
+					<figure style="width: 237px;">
+						<a href="{{ path('admin_website_embeds') }}"><img src="{{ asset('images/instructions/chat-widget.png') }}" /></a>
+						<figcaption>
+							The chat button that you can add to your website
+						</figcaption>
+					</figure>
+				</div>
+				<p>
+					Go to <a href="{{ path('admin_departments', {type:'chat'}) }}">Chat &rarr; Departments</a> to manage the chat departments your users can connect to.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Triggers #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'triggers', 'Automatically assign properties to tickets') }}
+				<p>
+					Go to <a href="{{ path('admin_tickettriggers') }}">Tickets &rarr; Triggers</a>
+					to configure triggers that will perform defined actions whenever a set
+					collection of criteria is met. For example, automatically place a ticket
+					into a certain department if it is sent to a specific email address.
+				</p>
+				<p>
+					Go to <a href="{{ path('admin_ticketescalations') }}">Tickets &rarr; Escalations</a>
+					to configure escalations, which are similar to triggers except they execute
+					based on time. For example, after a ticket has been open for two hours, increase
+					its urgency.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Agent Notifications #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'agent-notifications', 'Control email notifications sent to agents') }}
+				<p>
+					Agents can control their own notifications from the <a href="{{ app.request.getBaseUrl() }}/agent">Agent Interface</a>
+					by clicking on their profile icon in the top-left corner of the screen and choosing the "Ticket Notifications" option.
+				</p>
+				<p>
+					You as an admin can also change or override notification settings by going to <a href="{{ path('admin_tickettriggers') }}">Tickets &rarr; Triggers</a>
+					and then clicking on "<a href="{{ path('admin_agents_notifications') }}">Agent Notifications</a>".
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# SLAs #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'slas', 'Set up escalations or SLAs') }}
+				<p>
+					To create escalations, go to <a href="{{ path('admin_ticketescalations') }}">Tickets &rarr; Escalations</a>. Escalations
+					let you defined actions that are performed after a certain time during a ticket has been exceeded. For example, you might
+					want to increase the urgency of a ticket once it has been unresolved for a day.
+				</p>
+				<p>
+					SLA management is done from <a href="{{ path('admin_tickets_slas') }}">Tickets &rarr; SLAs</a>. With SLAs you define
+					goals that must be met, and what happens when they fail. In the agent interface your agents can see tickets and their SLAs,
+					and easily see at a glance which are about to fail.
+				</p>
+			{{ onb.end() }}
+
+			{#####################################################################}
+			{# Reports #}
+			{#####################################################################}
+
+			{{ onb.begin(onboard, 'reports', 'View reports about how my helpdesk is performing') }}
+				<p>
+					From the top-right corner of your screen, use the interface switcher to
+					switch to the <a class="reports" href="{{ app.request.getBaseUrl() }}/reports">Reports Interface</a>.
+				</p>
+				<div class="figwrap">
+					<figure style="width: 424px;">
+						<a class="reports" href="{{ app.request.getBaseUrl() }}/reports"><img src="{{ asset('images/instructions/reports.png') }}" /></a>
+						<figcaption>
+							Reports let you generate graphs and tables.
+						</figcaption>
+					</figure>
+				</div>
+			{{ onb.end() }}
+
+			<li id="onboard_question" class="onboard-info" data-submit-url="{{ path('admin_submit_deskpro_feedback') }}">
+				<header>
+					<div class="title">
+						<h3>How Do I...</h3>
+						<h2><i></i><input type="text" class="input-question" placeholder="Enter your question here" value="" /> <button class="btn submit-trigger"><em>Search</em></button></h2>
+					</div>
+				</header>
+				<article>
+					<span
+						style="background: url({{ asset('images/agent/close.png') }}) no-repeat; width: 18px; height: 18px; display: block; float:right; cursor:pointer; position:relative;top:-5px;right: -5px;"
+						onclick="$(this).closest('article').slideUp();"
+					></span>
+					<p>
+						Sorry, we couldn't find anything about that.
+					</p>
+					<p>
+						But we sent a message to our agents for you. One of them will get back to you soon at {{ app.user.primary_email_address }}.
+					</p>
+				</article>
+			</li>
+		</ul>
+	</div>
+</div>
+{% endif %}

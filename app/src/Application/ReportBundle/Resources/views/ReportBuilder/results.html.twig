@@ -1,0 +1,13 @@
+{% if error %}
+<div class="query-error">{{ error }}</div>
+{% else %}
+<div class="report-builder-results">
+	{% if includeQuery %}<div class="query">{{ query }}</div>{% endif %}
+	<div>Generated: {{ "now"|date('fulltime') }} ({{ "now"|date('P') }} GMT)</div>
+	{% if results %}
+		{{ results|raw }}
+	{% else %}
+		<div class="report-no-results">No results for this report.</div>
+	{% endif %}
+</div>
+{% endif %}

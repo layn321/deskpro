@@ -1,0 +1,40 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li class="add"><a href="{{ path('admin_api_newkey') }}">{{ phrase('admin.api.create_api_key') }}</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>API Keys</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<ul class="item-list">
+	{% for apikey in all_apikeys %}
+		<li>
+			<div>
+				<ul class="controls" style="float:right">
+					<li><a href="{{ path('admin_api_editkey', {'id': apikey.id}) }}" class="edit">{{ phrase('admin.api.viewedit') }}</a></li>
+					<li><a href="{{ path('admin_api_delkey', {'id': apikey.id, 'security_token': security_token('delete_api')}) }}" class="delete" onclick="return confirm('{{ phrase('admin.api.are_you_sure') }}');">{{ phrase('agent.general.delete') }}</a></li>
+				</ul>
+			</div>
+			<h4 style="margin-bottom: .2em">
+				{% if apikey.person %}
+					{{apikey.person.display_name}}
+				{% else %}
+					Super User API Key
+				{% endif %}
+			</h4>
+			{% if apikey.note %}<p>{{apikey.note}}</p>{% endif %}
+
+			<p>Key:
+				<input type="text" class="flat" value="{{apikey.id}}:{{apikey.code}}" style="width: 250px;" /></p>
+		</li>
+	{% else %}
+		{{ phrase('admin.api.no_api_keys_yet') }}
+	{% endfor %}
+</ul>
+
+{% endblock %}

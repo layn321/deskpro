@@ -1,0 +1,9 @@
+{##
+ # Search results in the "similar to" box of the new feedback form
+ ##}
+
+<ul>
+	{% for res in results %}
+		{% include 'UserBundle:Common:searchlist-simplerow.html.twig' with { type: res.type, item: res.object } %}
+	{% endfor %}
+</ul>

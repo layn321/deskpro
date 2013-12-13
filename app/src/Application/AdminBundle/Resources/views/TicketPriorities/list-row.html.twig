@@ -1,0 +1,16 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{{ design.dpgrid_content({class: 'top' ~ ' category-' ~ category.id, extra: "data-category-id='#{priority.id}' data-priority='#{priority.priority}'"}) }}
+{{ design.dpgrid_col({ class: 'l r', style: "width: 810px;"}) }}
+	<span class="field-id" style="float:right">ID: {{ priority.id }}</span>
+	<h2><a class="edit-trigger">{{priority.title}}</a></h2>
+{{ design.dpgrid_col_end() }}
+
+{{ design.dpgrid_col({ class: 'l r alt l-margin priority-col', style: "width: 80px;"}) }}
+	<em>{{priority.priority}}</em>
+{{ design.dpgrid_col_end() }}
+
+{{ design.dpgrid_col({ class: 'l r l-margin with-icon-only', style: "width: 16px"}) }}
+	<a href="{{ path('admin_ticketpris_del', {'priority_id': priority.id}) }}" class="delete"></a>
+{{ design.dpgrid_col_end() }}
+
+{{ design.dpgrid_content_end() }}

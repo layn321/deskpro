@@ -1,0 +1,54 @@
+{##
+ # Confirmation shown after a user has submitted feedback on a ticket message. This is in a popup window.
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}">{{ ticket.subject }}</a></li>
+{% endblock %}
+{% block content %}
+<section class="dp-portal-section" style="margin-top: 0;">
+	<header>
+		<h1>{{ phrase('user.tickets.feedback_thanks') }}</h1>
+	</header>
+	<article>
+		{% if feedback.rating == 1 %}
+			<form action="{{ path('user_tickets_feedback_closeticket', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, 'close_win': 1}) }}">
+				{{ form_token() }}
+				<p>
+					{{ phrase('user.tickets.feedback_thanks_pos') }}
+				</p>
+
+				<br />
+
+				<p>
+					{% if ticket.status != 'resolved' and ticket.status != 'closed' %}
+						<button class="dp-btn" type="submit">{{ phrase('user.tickets.feedback_close_btn') }}</button>
+
+						&nbsp;
+					{% endif %}
+
+					{% if app.user.id %}
+						<a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}" class="dp-btn dp-btn-primary">{{ phrase('user.general.go_back') }}</a>
+					{% else %}
+						<a href="{{ path('user') }}" class="dp-btn dp-btn-primary">{{ phrase('user.general.go_back') }}</a>
+					{% endif %}
+				</p>
+			</form>
+		{% else %}
+			<p>
+				{{ phrase('user.tickets.feedback_thanks_neg') }}
+			</p>
+
+			<br />
+
+			{% if app.user.id %}
+				<p>
+					<a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}" class="dp-btn dp-btn-primary">{{ phrase('user.general.go_back') }}</a>
+				</p>
+			{% endif %}
+		{% endif %}
+	</article>
+</section>
+{% endblock %}

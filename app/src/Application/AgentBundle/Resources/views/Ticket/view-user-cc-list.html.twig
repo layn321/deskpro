@@ -1,0 +1,3 @@
+{% for part in user_parts %}
+	{% include 'AgentBundle:Ticket:view-user-cc-row.html.twig' with {'person': part.person, 'ticket_perms':ticket_perms } %}
+{% endfor %}

@@ -1,0 +1,47 @@
+{% extends 'DeskPRO:emails_common:email-internal.html.twig' %}
+{% import 'DeskPRO:emails_common:layout-macros.html.twig' as layout %}
+{% block email_body %}
+<html>
+<head>
+	<style type="text/css">
+		{% include 'DeskPRO:emails_common:email-css.css.twig' %}
+		{% include 'DeskPRO:emails_common:email-custom-css.css.twig' %}
+	</style>
+</head>
+<body>
+<div class="dp-wrap">
+{% if tplvars.agent_reply_above_line and app.getSetting('core_tickets.gateway_agent_require_marker') %}=== <a class="DP_TOP_MARK" id="DP_TOP_MARK" name="DP_TOP_MARK">&nbsp;</a>{{ phrase('agent.emails.reply_above_line') }} ===<br /><br />{% endif %}
+{% if not tplvars.agent_reply_above_line %}<a class="DP_TOP_MARK" id="DP_TOP_MARK" name="DP_TOP_MARK">&nbsp;</a>{% endif %}
+<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td {% if not tplvars.agent_reply_above_line %}class="DP_TOP_MARK" name="DP_TOP_MARK"{% endif %}>
+
+<table border="0" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td valign="top" class="dp-layout-content">{% include 'DeskPRO:emails_common:email-header.html.twig' %}{% block content %}{% endblock %}</td>
+	</tr>
+	<tr>
+		<td valign="top" class="dp-layout-bottom">
+			<div class="dp-layout-bottom">
+				{% include 'DeskPRO:emails_common:email-footer.html.twig' %}
+			</div>
+		</td>
+	</tr>
+</table>
+{% block email_end %}{% endblock %}
+
+{% if tac %}
+	{{ layout.replycode(tac.access_code) }}
+{% elseif ticket %}
+	{{ layout.replycode(ticket.access_code) }}
+{% endif %}
+
+</td></tr></table>
+
+</div>
+
+{% if not tplvars.agent_reply_above_line %}
+	<!--DP_TOP_MARK--><a class="DP_TOP_MARK" id="DP_TOP_MARK" name="DP_TOP_MARK">&nbsp;</a>
+{% endif %}
+	<!--DP_BOTTOM_MARK--><a class="DP_BOTTOM_MARK" id="DP_BOTTOM_MARK" name="DP_BOTTOM_MARK">&nbsp;</a>
+</body>
+</html>
+{% endblock %}

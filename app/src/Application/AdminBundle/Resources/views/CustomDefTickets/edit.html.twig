@@ -1,0 +1,97 @@
+{% extends 'AdminBundle:CustomDefAbstract:edit.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+     <ul>
+		<li><a href="{{ path('admin_tickets_fields') }}">{{ phrase('admin.general.ticket_fields') }}</a></li>
+		{% if field.id %}
+			<li>{{ phrase('admin.general.edit_field') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.general.new_field') }}</li>
+		{% endif %}
+     </ul>
+
+	{% if field.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_customdeftickets_delete', {'field_id': field.id, 'security_token': security_token('delete_custom_field') }) }}" onclick="return confirm('Are you sure?');">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block form_extra2 %}
+	<div style="margin: -9px 0 14px 12px;" id="agent_validation_resolve_opt" style="display: none;">
+		<label>
+			<input type="checkbox" name="fielddef[agent_validation_resolve]" value="1" {% if field.getOption('agent_validation_resolve') %}checked="checked"{% endif %} />
+			Only enable agent validation when the ticket is being resolved
+		</label>
+	</div>
+
+	<script type="text/javascript">
+	$(document).ready(function() {
+		var res = $('#agent_validation_resolve_opt');
+		$('input[name="fielddef[agent_validation_type]"]').each(function() {
+			if ($(this).val() == '') {
+				res.hide();
+			} else {
+				res.show();
+			}
+
+			$(this).on('click', function() {
+				if ($(this).val() == '') {
+					res.hide();
+				} else {
+					res.show();
+				}
+			});
+		});
+	});
+	</script>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Agent Only</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="checkbox" name="fielddef[is_agent_field]" value="1" {% if field.is_agent_field %}checked="checked"{% endif %} />
+					Only show this field to agents (this option can be overriden in the <a href="{{ path('admin_tickets_editor') }}">layout editor</a>).
+				</label>
+			</div>
+		</div>
+	</div>
+	{% if custom_form_deps_default or custom_form_deps %}
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Add field to custom layouts</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group">
+					You have defined custom ticket form layouts in the <a href="{{ path('admin_tickets_editor') }}" target="_blank">Layout Editor</a>. Check the layouts you want to add this
+					new field to automatically:
+
+					<div class="checkbox-rows" style="width: 500px;">
+						<ul>
+							{% if custom_form_deps_default %}
+								<li>
+									<label>
+										<input type="checkbox" name="add_to_layouts[]" value="0" />
+										Default Layout
+									</label>
+								</li>
+							{% endif %}
+							{% for dep in custom_form_deps %}
+								<li>
+									<label>
+										<input type="checkbox" name="add_to_layouts[]" value="{{ dep.id }}" />
+										{{ dep.full_title }}
+									</label>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}

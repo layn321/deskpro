@@ -1,0 +1,50 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.NewTweet';
+pageMeta.title = 'New Tweet';
+pageMeta.tweetSignature = {{ app.user.getTweetSignature()|json_encode|raw }};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{{ agentui.scroll_containers('page-tweet-new') }}
+
+<a class="tab-anchor" href="#">&nbsp;</a>
+
+<form action="{{ path('agent_twitter_new_save') }}" method="post" id="{{baseId}}_form" class="twitter-message-send" style="width: 400px; margin: 10px auto;">
+	<div class="from-account" style="padding: 4px">
+		<span style="display: inline-block; width: 100px">{{ phrase('agent.twitter.from_account') }}:</span>
+		{% if account %}
+			@{{ account.user.screen_name }}
+			<input type="hidden" name="account_ids[]" value="{{ account.id }}" />
+		{% else %}
+			<span style="display: inline-block; width: 285px">
+				<select id="{{ baseId }}_from_account" name="account_ids[]" multiple="multiple" data-select-width="auto">
+				{% for possible_account in accounts %}
+					<option value="{{ possible_account.id }}">@{{ possible_account.user.screen_name }}</option>
+				{% endfor %}
+				</select>
+			</span>
+		{% endif %}
+	</div>
+	<div class="new-message" style="border-top: 0;">
+		<div class="message-block" style="margin-left: 0">
+			<textarea name="text" style="min-height: 100px"></textarea>
+			<div>
+				<span class="character-count">{{ phrase('agent.twitter.char_remaining', {num_chars: '<em>140</em>'}, true) }}</span>
+				<span class="over-options" style="display: none"><label class="tipped" title="{{ phrase('agent.twitter.split_to_multiple_explain') }}"><input type="checkbox" name="split" value="1" checked="checked" /> {{ phrase('agent.twitter.split_to_multiple') }}</label></span>
+			</div>
+		</div>
+	</div>
+</form>
+
+<footer class="pop-footer">
+	<div class="is-not-loading">
+		<button class="submit-trigger clean-white">{{ phrase('agent.general.save') }}</button>
+	</div>
+	<div class="is-loading" style="padding-top: 9px;">
+		<img src="{{ asset('images/spinners/loading-small.gif') }}" />
+	</div>
+</footer>
+
+{{ agentui.scroll_containers_end() }}

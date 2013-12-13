@@ -1,0 +1,80 @@
+{##
+ # The full view page for file downloads.
+ ##}
+
+{% import 'UserBundle:Common:macros-social.html.twig' as social %}
+{% set this_section = 'downloads' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+	<meta property="og:url" content="{{ path('user_downloads_file', {'slug': download.url_slug}) }}" />
+	<meta property="og:title" content="{{article.title}}" />
+	<meta property="og:type" content="article" />
+	<link rel="canonical" href="{{ url('user_downloads_file', {'slug': download.url_slug}) }}" />
+{% endblock %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_downloads') }}">{{ phrase('user.downloads.title') }}</a></li>
+	{% for cat in category_path %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_downloads', {'slug': cat.url_slug}) }}">{{cat.title}}</a></li>
+	{% endfor %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_downloads', {'slug': category.url_slug}) }}">{{category.title}}</a></li>
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_downloads_file', {'slug': download.url_slug}) }}">{{ download.title }}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ download.filename }}
+	-
+	{{ phrase('user.downloads.title') }}
+	{% for cat in category_path %}
+		/ {{cat.title}}
+	{% endfor %}
+	{{category.title}}
+{% endblock %}
+{% block content %}
+
+<section class="dp-article-post dp-content-post dp-content-page">
+	<header>
+		<h3 style="margin-bottom: 0">{{ download.title }}</h3>
+		<ul class="dp-post-info">
+			<li class="dp-author"><i class="dp-icon-user"></i> {{ download.person.display_name_user }}</li>
+			<li class="dp-date"><i class="dp-icon-calendar"></i> {{ download.date_created|date('full') }}</li>
+		</ul>
+	</header>
+	<article id="dp_article_content" style="overflow: hidden">
+		<div class="dp-download-btn-wrap">
+			<div class="dp-download-btn">
+				<a class="dp-btn dp-btn-primary" href="{{ path('user_downloads_file_download', {slug: download.url_slug}) }}">
+					{{ phrase('user.downloads.button-download') }}: {{ download.filename }} <small style="color: #fff;">({{ download.readable_filesize }})</small>
+				</a>
+			</div>
+		</div>
+
+		{{ download.content_html|raw }}
+		<br style="clear: {% if is_rtl() %}left{% else %}right{% endif %}; height: 1px;overflow: hidden" />
+	</article>
+	<footer>
+		{% include 'UserBundle:Common:labels-box.html.twig' with {'labels': download.labels} %}
+		{% include 'UserBundle:Common:related-box.html.twig' with { object: download, type: 'download', related_content: related_content } %}
+
+		{% if app.user.hasPerm('downloads.rate') %}
+			{% include 'UserBundle:Common:rating-bar.html.twig' with {'content_object': download} %}
+
+			{% if download.num_downloads %}
+				<div class="dp-view-wrap">
+					{{ phrase('user.downloads.downloads-count', {count: download.num_downloads}) }}
+				</div>
+			{% endif %}
+		{% endif %}
+
+		{% if app.getSetting('core.show_share_widget') %}
+			{{ social.social_block(url('user_downloads_file', {'slug': download.url_slug}), download.title) }}
+		{% endif %}
+	</footer>
+</section>
+
+{% include 'UserBundle:Common:comments-box.html.twig' with {
+	'type': 'feedback',
+	'comments': comments,
+	'form_action': path('user_downloads_newcomment', {'download_id': download.id}),
+	'check_perm': 'downloads.comment'
+} %}
+
+{% endblock %}

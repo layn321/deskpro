@@ -1,0 +1,87 @@
+<div class="pane-row add-to-search">
+	<table class="layout-table v-middle" width="100%">
+		<tr>
+			<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.name') }}</span></td>
+			<td style="padding: 0 5px;" width="10">
+				<select name="terms_expanded[person_name][op]" class="with-select2">
+					<option value="contains">{{ phrase('agent.general.is') }}</option>
+					<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</td>
+			<td>
+				<input class="full-width ensure-value" type="text" name="terms_expanded[person_name][options][name]" value="" />
+			</td>
+		</tr>
+	</table>
+</div>
+
+<div class="pane-row add-to-search">
+	<table class="layout-table v-middle" width="100%">
+		<tr>
+			<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.email') }}</span></td>
+			<td style="padding: 0 5px;" width="10">
+				<select name="terms_expanded[person_email][op]" class="with-select2">
+					<option value="contains">{{ phrase('agent.general.is') }}</option>
+					<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</td>
+			<td>
+				<input class="full-width ensure-value" type="text" name="terms_expanded[person_email][options][email]" value="" />
+			</td>
+		</tr>
+	</table>
+</div>
+
+{% if app.usergroups.getUserUsergroups()|length > 2 %}
+	<div class="pane-row add-to-search">
+		<table class="layout-table v-middle" width="100%">
+			<tr>
+				<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.usergroup') }}</span></td>
+				<td style="padding: 0 5px;" width="10">
+					<select name="terms_expanded[person_usergroup][op]" class="with-select2">
+						<option value="contains">{{ phrase('agent.general.is') }}</option>
+						<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+					</select>
+				</td>
+				<td>
+					<select name="terms_expanded[person_usergroup][options][usergroup_ids][]" multiple="multiple" class="with-select2 ensure-value">
+						{% for ug in app.usergroups.getUserUsergroups() %}
+							<option value="{{ ug.id }}">{{ ug.title }}</option>
+						{% endfor %}
+					</select>
+				</td>
+			</tr>
+		</table>
+	</div>
+{% endif %}
+
+<div class="with-search-builder">
+	<div class="search-form criteria_list add-to-search">
+		<div class="search-terms"></div>
+		<div class="add-term-row"><span class="add-term"><i class="icon-plus-sign"></i></span></div>
+	</div>
+
+	<div class="search-builder-tpl criteria_tpl" style="display:none">
+		<div class="row">
+			<div class="term">
+				<div class="remove-row-btn trigger-remove-row"><i class="icon-minus-sign"></i></div>
+				<div class="sep-row">
+					<div class="line"></div>
+					<strong>{{ phrase('agent.general.and') }}</strong>
+				</div>
+				<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+					<td class="builder-controls" style="vertical-align: middle;">
+						<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+							<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+						</tr></tbody></table>
+					</td>
+				</tr></tbody></table>
+			</div>
+		</div>
+		<div class="builder-type-choice" title="{{ phrase('agent.general.choose_criteria') }}" data-rule-type=""></div>
+
+		{% include 'DeskPRO:Common:people-search-criteria.html.twig' with {'term_options': term_options, 'id': false, 'classname': false, no_show_fields: ['person_name', 'person_email', 'person_email_domain', 'person_organization', 'person_usergroup']} %}
+	</div>
+</div>

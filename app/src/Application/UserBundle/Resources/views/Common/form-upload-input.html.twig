@@ -1,0 +1,60 @@
+{##
+ # The standard template used for the upload form control with ajax/drag+drop support
+ ##}
+
+{% if not field_name %}{% set field_name = "attach[]" %}{% endif %}
+{% if not good_field_name %}{% set good_field_name = "attach" %}{% endif %}
+{% if not blob_field_name %}{% set blob_field_name = "attach_ids[]" %}{% endif %}
+<div
+	class="with-handler {{ add_classname }} form-upload-section"
+	data-element-handler="DeskPRO.User.ElementHandler.FormUploadHandler"
+	data-upload-to="{{ path('user_accept_upload') }}"
+	data-security-token="{{ security_token('attach_temp') }}"
+	data-drop-document="1"
+>
+	<div class="dp-attach-limits">
+		{{ phrase('user.general.upload_maxsize', {size: app.getSetting('core.attach_user_maxsize')|filesize_display}) }}
+		{% if app.getSetting('core.attach_user_must_exts') %}
+			&middot; {{ phrase('user.general.upload_allowed_exts', {types: app.getSetting('core.attach_user_must_exts')}) }}
+		{% endif %}
+	</div>
+	<div class="dp-fallback">
+		{% for i in 0..5 %}
+			<input type="file" name="{{ field_name }}" />
+		{% endfor %}
+	</div>
+	<div class="dp-good-upload" style="display: none">
+		<script {% if upload_id %}id="{{ upload_id }}"{% endif %} class="template-upload" type="text/x-tmpl">
+			{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+			<li class="uploading">{{ '{%=file.name%}' }} <i class="spinner-flat"></i></li>
+			{{ '{% } %}' }}
+		</script>
+		<script {% if download_id %}id="{{ download_id }}"{% endif %} class="template-download" type="text/x-tmpl">
+			{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+			{{ '{% if (file.error) { %}'}}
+			<li class="error">
+				{{ '{%=file.error%}' }}
+			</li>
+			{{ '{% } else { %}'}}
+			<li>
+				<input type="hidden" name="{{ blob_field_name|default('attach_ids[]') }}" value="{{ '{%=file.blob_auth_id%}' }}" />
+				{% if not noremove %}<em class="remove-attach-trigger"></em>{% endif %}
+				<label><a href="{{ '{%=file.download_url%}' }}" target="_blank">{{ '{%=file.filename%}' }}</a><span>{{ '{%=file.filesize_readable%}' }}</span></label>
+			</li>
+			{{ '{% } %}' }}
+			{{ '{% } %}' }}
+		</script>
+		<div class="file-input">
+			{% if showField %}
+				<input type="file" name="{{ good_field_name }}" multiple="multiple" /> <button class="dp-btn">{{ phrase('user.general.upload') }}</button>
+			{% else %}
+				<div class="dp-hidden-file-upload">
+					<input type="file" name="{{ good_field_name }}" multiple="multiple" />
+					<a class="link">{{ phrase('user.general.upload_a_file') }}</a>
+				</div>
+			{% endif %}
+		</div>
+
+		<ul class="files file-list"></ul>
+	</div>
+</div>

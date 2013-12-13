@@ -1,0 +1,43 @@
+<section class="source-section sys-filters-section">
+	<header>
+		<h1>{{ phrase('agent.chat.chat_history') }}</h1>
+	</header>
+	<ul class="source-list">
+		{% if agent_chatted|length %}
+		<li>
+			<h3 class="title is-nav-item agent-0" data-route="listpane:{{ path('agent_agentchat_history', {'agent_id': '0'}) }}">
+				<span class="list-counter">{{ chatted_counts[0]|default(0) }}</span>
+				{{ phrase('agent.chat.agent_chats') }}
+			</h3>
+			<ul class="sub-group show">
+				{% for agent in agent_chatted %}
+					<li>
+						<span class="title is-nav-item agent-{{ agent.id }}" data-route="listpane:{{ path('agent_agentchat_history', {'agent_id': agent.id}) }}">
+							<span class="list-counter">{{ chatted_counts[agent.id]|default(0) }}</span>
+							{{ agent.display_name }}
+						</span>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
+		{% endif %}
+		{% if agent_team_chatted|length %}
+		<li>
+			<h3 class="title is-nav-item agent-team-0" data-route="listpane:{{ path('agent_agentchat_history_team', {'agent_team_id': '0'}) }}">
+				<span class="list-counter">{{ chatted_team_counts[0]|default(0) }}</span>
+				{{ phrase('agent.chat.team_chats') }}
+			</h3>
+			<ul class="sub-group show">
+				{% for agent_team in agent_team_chatted %}
+					<li>
+						<span class="title is-nav-item agent-team-{{ agent_team.id }}" data-route="listpane:{{ path('agent_agentchat_history_team', {'agent_team_id': agent_team.id}) }}">
+							<span class="list-counter">{{ chatted_team_counts[agent_team.id]|default(0) }}</span>
+							{{ agent_team.name }}
+						</span>
+					</li>
+				{% endfor %}
+			</ul>
+		</li>
+		{% endif %}
+	</ul>
+</section>

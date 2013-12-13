@@ -1,0 +1,100 @@
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
+<a href="{{ path('dev_lang_index') }}">Back</a>
+<h1>Checking Language files</h1>
+
+{# WRONG FILES #}
+<h2>Incorrect Ids</h2>
+<p>
+    IDs relate to a phrases location in a file. In some cases an id may be in the wrong file.
+</p>
+
+<table cellspacing="0" cellpadding="2" border="1" width="90%">
+    <tr><th>Id</th><th>Real file</th><th>Expected file</th></tr>
+        {% for id, details in wrong_files %}
+            <tr><td>{{details.id}}</td><td>{{details.realpath}}</td><td>{{details.expectpath}}</td></tr>
+        {% endfor %}
+</table>
+
+{# DUPLICATE IDS #}
+<h2>Duplicates by id</h2>
+<p>
+    IDs should be unique (exist once in languages files). Example of non-unique ids: array('id'=&gt;1,'id=&gt;2);
+    Duplicate ids should be fixed before any script is run!
+</p>
+
+{% for id in dupes.id %}
+<h3>Duplicates for {{id}}</h3>
+<table cellspacing="0" cellpadding="2" border="1" width="90%">
+    <tr><th>File</th><th>Line</th><th>Content</th></tr>
+
+    {% for row in by_id[id] %}
+        <tr><td>{{row.filename}}</td><td>{{row.line}}</td><td>{{row.content}}</td></tr>
+    {% endfor %}
+
+</table>
+{% endfor %}
+
+{# DUPLICATE CONTENT #}
+<h2>Duplicates by exact content</h2>
+
+{% for content in dupes.content %}
+<h3>Duplicates for:</h3>
+<pre>{{content.data}}</pre>
+<form method="post">
+<table cellspacing="0" cellpadding="2" border="1" width="90%">
+    <tr><th>File</th><th>Line</th><th>Id</th><th>Content</th></tr>
+
+    {% for id in content.ids %}
+    {% set row = by_id[id][0] %}
+    <tr>
+        <td>{{row.filename}}</td>
+        <td>{{row.line}}</td>
+        <td onclick="$('input[type=text]',$(this).parent().parent().parent().parent()).val($(this).text())">{{id}}</td>
+        <td>{{row.content}}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+    Id: <input type="text" name="id" size="100" value="{{content.id}}" /> {% if content.exists %}(exists){% endif %}
+    <input type="hidden" name="content" value="{{content.data}}">
+    <input type="submit" value="Globalise">
+ </form>
+{% endfor %}
+
+<h1>Checking phrases in php and twig files</h1>
+
+{# PHRASES IN PHP #}
+<h2>Phrases in php files</h2>
+
+{% for file, data in instances.file %}
+<h3>Instances for {{file}}</h3>
+<table cellspacing="0" cellpadding="2" border="1" width="90%">
+    <tr><th>Id</th><th>Line</th></tr>
+
+    {% for row in data %}
+        <tr><td>{{row.id}}</td><td>{{row.line}}</td></tr>
+    {% endfor %}
+
+</table>
+{% endfor %}
+<h2>Missing Ids</h2>
+<table cellspacing="0" cellpadding="2" border="1" width="90%">
+<tr><th>Id</th><th>File</th><th>Line</th></tr>
+
+    {% for id in missing %}
+        {% for row in instances.id[id] %}
+            <tr><td>{{id}}</td><td>{{row.filename}}</td><td>{{row.line}}</td></tr>
+        {% endfor %}
+    {% endfor %}
+</table>
+
+<h2>Unused Phrases</h2>
+<p>
+    Warning: This tool may produce false positives. It is not safe to remove these phrases blindly.
+</p>
+<table cellspacing="0" cellpadding="2" border="1" width="90%">
+    <tr><th>Id</th></tr>
+    {% for row in unused %}
+    <tr><td>{{row.display|raw}}</td></tr>
+    {% endfor %}
+</table>

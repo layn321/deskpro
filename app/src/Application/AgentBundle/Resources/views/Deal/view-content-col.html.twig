@@ -1,0 +1,340 @@
+{#People BOX#}
+<div class="profile-box-container people-box first" >
+
+    <header>
+        <h4>{{ phrase('agent.general.people') }}</h4>
+    </header>
+    <section id="{{baseId}}_people_box_person">
+    <article>
+        <div class="meta-line">
+            <dl class="table-list">
+                <dt class="type-labels">{{ phrase('agent.general.agent') }}</dt>
+                <dd class="controls">
+                    <span class="agent-link prop-agent-id">{{deal.assigned_agent.display_name|default(phrase('agent.general.unassigned'))}}</span><span class="edit-gear" id="{{baseId}}_assign_ob_trigger"></span>
+                </dd>
+                <dd class="assignments">
+                    <ul id="{{baseId}}_assign_btn">
+                            <li class="no-changes"><em>{{ phrase('agent.general.set_assignments') }}</em></li>
+                            <li style="display:none" class="assign-agent"><em>{{ phrase('agent.general.assign_agent') }}</em>: <span class="label"></span></li>
+
+                    </ul>
+                </dd>
+            </dl>
+        </div>
+
+        <div class="meta-line">
+            <dl class="table-list">
+                <dt class="type-labels">{{ phrase('agent.general.users') }}</dt>
+                <dd>
+                    <ul class="controls" id="{{baseId}}_members_list">
+
+                        {% for person in deal.peoples%}
+                        <li class="member-row member-{{ person.id }}" data-person-id="{{ person.id }}">
+                                <span data-person-id="{{ person.id }}"><b>{{ person.display_name }}</b> &lt;{{person.primary_email.email}}&gt; </span>
+                                <span class="remove btn-small-remove remove-row-trigger">x</span>
+
+                        </li>
+                        {% endfor%}
+                        <li class="newpersonrow" id="{{baseId}}_person_assign_btn"><span class="btn-small-add"></span>{{ phrase('agent.deal.add_user') }}</li>
+
+                    </ul>
+                </dd>
+                <dd>
+                        <button class="clean-white small switch-user" id="{{baseId}}_switch_user" style="display: none">{{ phrase('agent.general.change_user') }}</button>
+                        <div id="{{baseId}}_choose_user" style="display:none;" class="choose-user" >
+                                <div
+                                        id="{{baseId}}_user_searchbox"
+                                        data-element-handler="DeskPRO.Agent.ElementHandler.PersonSearchBox"
+                                        data-search-url="{{ path('agent_peoplesearch_performquick', {'format': 'json', 'limit': 10, 'start_with': 'a'}) }}"
+                                        data-highlight-term="1"
+                                        data-touch-focus="1"
+                                        data-search-param="term"
+                                        data-position-bound="#{{baseId}}_userselect"
+                                >
+                                    {{ phrase('agent.general.person') }}:
+                                        <input type="text" id="{{baseId}}_userselect" class="select-user term" placeholder="{{ phrase('agent.general.choose_person_for_ticket') }}" />
+                                        <input type="hidden" name="newdeal[person][id]" value="{{ deal.person.id }}" class="person-id" id="{{baseId}}_person_id" />
+
+                                        <script type="text/x-deskpro-tmpl" class="user-row-tpl">
+                                                <li>
+                                                    <a>
+                                                        <span class="user-name"></span>
+                                                        <address>&lt;<span class="user-email"></span>&gt;</address>
+                                                        <div class="bound-fade"></div>
+                                                    </a>
+                                                </li>
+                                        </script>
+                                        <div class="person-search-box" style="display: none">
+                                                <section>
+                                                        <ul class="results-list">
+
+                                                        </ul>
+                                                        <footer>
+                                                                <span class="create-user">{{ phrase('agent.general.create_a_new_person') }}</span>
+                                                        </footer>
+                                                </section>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id="{{baseId}}_user_choice">
+
+                        </div>
+                        <br class="clear" />
+                </dd>
+            </dl>
+        </div>
+
+        <div class="meta-line">
+            <dl class="table-list">
+                <dt class="type-labels">{{ phrase('agent.general.organizations') }}</dt>
+                <dd>
+                    <ul class="controls" id="{{baseId}}_organizations_list">
+                        {% for organization in deal.organizations%}
+                            <li class="organization-row organization-{{ organization.id }}" data-organization-id="{{ organization.id }}">
+                                <span> {{organization.name}} </span>
+                                <span class="remove btn-small-remove remove-row-trigger"></span>
+                            </li>
+                        {% endfor%}
+                            <li class="neworgrow" id="{{baseId}}_org_assign_btn"><span class="btn-small-add"></span>{{ phrase('agent.deal.add_organization') }}</li>
+
+                    </ul>
+                </dd>
+                <dd>
+
+                    <div class="choose-org" style="display: none" id="{{baseId}}_org_edit_wrap">
+                            <div
+                                    class="org-input"
+                                    id="{{baseId}}_org_searchbox"
+                                    data-element-handler="DeskPRO.Agent.ElementHandler.OrgSearchBox"
+                                    data-search-url="{{ path('agent_orgsearch_quicknamesearch', {'format': 'json', 'limit': 10, 'start_with': 'a'}) }}"
+                                    data-highlight-term="1"
+                                    data-touch-focus="1"
+                                    data-search-param="term"
+                                    data-position-bound="@parent(.org-input)"
+                            >
+                                    {{ phrase('agent.general.organization') }}:
+                                    <input type="text" class="org-name" id="{{baseId}}_orgselect" placeholder="{{ phrase('agent.general.enter_organization_name') }}" value="{{ person.organization.name }}" />
+                                    <input type="hidden" class="org-id" name="newdeal[organizations][id]" value="{{ person.organization.id|default(0) }}" />
+                                    <script type="text/x-deskpro-tmpl" class="user-row-tpl">
+                                            <li>
+                                                    <a>
+                                                    <span class="org-name"></span>
+                                                    <div class="bound-fade"></div>
+                                            </a></li>
+                                    </script>
+                                    <div class="person-search-box org" style="display: none">
+                                            <section>
+                                                    <ul class="results-list">
+
+                                                    </ul>
+                                                    <footer>
+                                                            <span class="create-org">{{ phrase('agent.general.create_a_new_organization') }}</span>
+                                                    </footer>
+                                            </section>
+                                    </div>
+                            </div>
+                    </div>
+                    <div id="{{baseId}}_org_choice">
+
+                        </div>
+                        <br class="clear" />
+
+                </dd>
+
+            </dl>
+        </div>
+    </article>
+    </secion>
+
+</div>
+
+<div class="optionbox reply-agent-team-ob" id="{{baseId}}_agent_assign_ob">
+    	<header>
+			<h4>{{ phrase('agent.general.assignments') }}</h4>
+			<span class="close close-trigger"></span>
+		</header>
+    	<div class="col">
+		<section data-section-name="agents">
+			<header>
+				<h3>{{ phrase('agent.general.agent') }}s</h3>
+				<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+			</header>
+			<ul>
+				<li class="me last-me {% if deal.assigned_agent.id == deal.person.id or not deal.assigned_agent %}on{% endif %}">
+					<input type="radio" name="{{baseId}}_agent" value="{{ deal.person.id }}" {% if deal.assigned_agent.id == deal.person.id or not deal.assigned_agent.id %}checked="checked"{% endif %} />
+					<label><span class="agent-pic agent-label-{{ deal.person.id }}" style="background-image: url({{ deal.person.getPictureUrl(16) }})">{{ phrase('agent.general.me') }}</span></label>
+				</li>
+
+				<li>
+					<input type="radio" name="{{bsaeId}}_agent" value="0" />
+					<label><span class="agent-pic agent-label-0">{{ phrase('agent.general.unassigned') }}</span></label>
+				</li>
+
+				{% for agent in agents %}
+					{% if agent.id != deal.person.id %}
+						<li {% if deal.assigned_agent.id == agent.id %}class="on"{% endif %}>
+							<input type="radio" name="{{baseId}}_agent" value="{{ agent.id }}" {% if deal.assigned_agent.id == agent.id %}checked="checked"{% endif %} />
+							<label><span class="agent-pic agent-label-{{ agent.id }}" style="background-image: url({{ agent.getPictureUrl(16) }})">{{ agent.display_name }}</span></label>
+							<div class="bound-fade"></div>
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</section>
+	</div>
+
+    	<br class="clear" />
+    	<footer>
+           <button class="save-trigger">{{ phrase('agent.general.apply') }}</button>
+        </footer>
+</div>
+
+
+{#End People BOX#}
+
+{#Property Tab#}
+<div class="profile-box-container tabbed">
+    <header>
+            <nav>
+                <ul>
+                    <li data-tab-for="#{{baseId}}_property_tab" class="on">{{ phrase('agent.general.properties') }}</li>
+                    <li data-tab-for="#{{baseId}}_tasks_tab" >{{ phrase('agent.general.tasks') }} <span class="count" id="{{baseId}}_tasks_count">{{ assoceated_tasks|length }}</span></li>
+                    <li data-tab-for="#{{baseId}}_files_tab" >{{ phrase('agent.general.files') }} <span class="count" id="{{baseId}}_files_count">{{ deal_attachments|length }}</span></li>
+                </ul>
+            </nav>
+    </header>
+
+    <section>
+
+            {# Property Tab #}
+            <article id="{{baseId}}_property_tab" class="on">
+                <dl class="table-list">
+                    <dt class="type-labels">{{ phrase('agent.general.labels') }}</dt>
+                    <dd class="deal-tags tags-wrap">
+                        <input type="text" value="{% for label in deal.labels %}{{label.label}},{% endfor %}" />
+                    </dd>
+		</dl>
+
+                <div class="meta-line">
+                    <dl class="table-list">
+                        <dt class="type-labels">{{ phrase('agent.general.created') }}</dt>
+                        <dd>
+                            <span>{{deal.person.first_name}},
+                            <time class="timeago" title="{{deal.date_created|date('c', 'UTC')}}">{{deal.date_created|date('day')}}</time>
+                            </span>
+                        </dd>
+                    </dl>
+                </div>
+
+                {% if custom_fields|length %}
+                    <div class="meta-line">
+                        <dl class="info-list" id="{{baseId}}_custom_fields_rendered">
+                                {% include 'AgentBundle:deal:view-customfields-rendered-rows.html.twig' %}
+                        </dl>
+                        <dl class="info-list" id="{{baseId}}_custom_fields_editable" style="display: none">
+                                {% include 'AgentBundle:deal:view-customfields-edit-rows.html.twig' %}
+                        </dl>
+                     </div>
+
+
+                    <div class="controls" id="{{baseId}}_properties_controls">
+                            <div class="showing-editing-fields" style="display: none">
+                                    <button class="clean-white save-fields-trigger"><span>{{ phrase('agent.general.save') }}</span></button>
+                            </div>
+                        <div class="showing-rendered-fields" id="{{baseId}}_action_buttons">
+                                    <button class="clean-white edit-fields-trigger"><span>{{ phrase('agent.deal.edit_custome_fields') }}</span></button>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="meta-line">
+                    <dl class="table-list">
+                        <dt class="type-labels">{{ phrase('agent.deal.custom_field_a') }}</dt>
+                        <dd>
+                            <span>{{ phrase('agent.deal.value_x') }}</span>
+                        </dd>
+                    </dl>
+                </div>
+
+            </article>
+            {# /Property Tab #}
+
+            {# Task Tab #}
+            <article id="{{baseId}}_tasks_tab">
+                {% include 'AgentBundle:Deal:tab-tasks.html.twig' %}
+            </article>
+            {# /Task Tab #}
+
+            {# File Tab #}
+            <article id="{{baseId}}_files_tab">
+                {% include 'AgentBundle:Deal:tab-attachments.html.twig' %}
+            </article>
+            {# /File Tab #}
+
+
+    </section>
+</div>
+
+{#/Property Tab#}
+
+
+
+{# {{ phrase('agent.general.notes') }} Tabs #}
+<div class="profile-box-container tabbed">
+    <header>
+        <nav>
+            <ul>
+                <li data-tab-for="#{{baseId}}_notes_tab" class="on">{{ phrase('agent.general.notes') }} <span class="count" id="{{baseId}}_notes_count">{{ notes|length }}</span></li>
+            </ul>
+        </nav>
+    </header>
+    <section>
+
+    {# Notes Tab #}
+		<article id="{{baseId}}_notes_tab" class="on">
+			<div class="notes-wrap">
+				<ul>
+
+                                    {% for note in notes|reverse %}
+						{% include 'AgentBundle:Deal:note-li.html.twig' with {'note': note} %}
+				    {% endfor %}
+
+                                    <li class="new-note"
+						data-element-handler="DeskPRO.{{ phrase('agent.general.agent') }}.ElementHandler.Form{{ phrase('agent.general.saving') }}r"
+						data-form-list-selector="ul"
+						data-form-result-html-key="note_li_html"
+						data-form-save-url="{{ path('agent_deal_ajaxsave_note', {'deal_id': deal.id}) }}"
+						data-form-count-el="#{{baseId}}_notes_count"
+					>
+						<header>
+							<div class="controls">
+								<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+								<div class="saved" style="display: none">{{ phrase('agent.general.save') }}d</div>
+								<div class="save" style="display: none">{{ phrase('agent.general.save') }}</div>
+							</div>
+							<h3>{{ phrase('agent.general.new_note') }}</h3>
+						</header>
+						<div class="textarea-section"><textarea class="integrated" name="note" placeholder="{{ phrase('agent.deal.enter_note_') }}" data-not-blank="1"></textarea></div>
+					</li>
+				</ul>
+			</div>
+		</article>
+		{# /Notes Tab #}
+    </section>
+
+</div>
+{# /Notes Tab #}
+
+
+{# Related Tabs #}
+<div class="profile-box-container tabbed">
+    <header>
+        <nav>
+            <ul>
+                <li data-tab-for="#{{baseId}}_related_tab" class="on">{{ phrase('agent.general.related_content') }}</li>
+            </ul>
+        </nav>
+    </header>
+    {% include 'AgentBundle:Common:content-related-list.html.twig' %}
+
+</div>
+{# /Related Tab #}

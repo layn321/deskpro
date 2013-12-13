@@ -1,0 +1,479 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.NewTicket';
+pageMeta.title = '{{ phrase('agent.general.new_ticket') }}';
+pageMeta.ticket_id = 0;
+
+pageMeta.labelsAutocompleteUrl        = '{{ path('agent_ajax_labels_autocomplete', {'label_type': 'ticket'}) }}';
+pageMeta.uploadAttachUrl              = '{{ path('agent_accept_upload') }}';
+
+pageMeta.auto_start_bill = {% if app.getSetting('core_tickets.billing_auto_timer_new') %}true{% else %}false{% endif %};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{{ agentui.scroll_containers('page-new-ticket page-new-content') }}
+
+<a class="tab-anchor" href="#">&nbsp;</a>
+
+<form id="{{baseId}}_newticket" class="keybound-submit">
+
+<input type="hidden" name="for_comment_type" id="{{baseId}}_for_comment_type" value="" />
+<input type="hidden" name="for_comment_id" id="{{baseId}}_for_comment_id" value="" />
+<input type="hidden" name="for_chat_id" id="{{baseId}}_for_chat_id" value="" />
+<input type="hidden" name="parent_ticket_id" id="{{baseId}}_parent_ticket_id" value="{{ ticket.id|default('0') }}" />
+<input type="hidden" id="{{baseId}}_action" name="options[action]" value="" />
+
+<div class="pending-info comment" style="display: none;">
+	<i class="reset"></i>
+	<h3>{{ phrase('agent.tickets.creating_a_ticket_for') }}: <span id="{{baseId}}_comment_title"></span></h3>
+	<div class="pending-item pending-ticket">
+		<div class="about">{{ phrase('agent.tickets.commented_on') }}: <a data-route="" class="with-route ticket-link" id="{{baseId}}_comment_object_link"></a></div>
+		<div class="post-action">
+			<select name="comment_action" id="{{baseId}}_comment_action">
+				<option value="delete">{{ phrase('agent.general.delete') }}</option>
+				<option value="approve">{{ phrase('agent.general.approve') }}</option>
+			</select>
+			{{ phrase('agent.tickets.coment_after_ticket_created') }}
+		</div>
+	</div>
+</div>
+
+<div class="errors-section" id="{{baseId}}_error_section" style="display: none;">
+	<div style="display:none;" class="error-message subject">&bull; {{ phrase('agent.tickets.please_enter_subject') }}</div>
+	<div style="display:none;" class="error-message person_id person_no_user">&bull; {{ phrase('agent.tickets.please_choose_or_create_user') }}</div>
+	<div style="display:none;" class="error-message person_email_address">&bull; {{ phrase('agent.general.error_email_address') }}</div>
+	<div style="display:none;" class="error-message person_email_address_gateway">&bull; {{ phrase('agent.tickets.email_is_ticket_account') }}</div>
+	<div style="display:none;" class="error-message department_id">&bull; {{ phrase('agent.general.select_a_department') }}</div>
+	<div style="display:none;" class="error-message message">&bull; {{ phrase('agent.general.enter_a_message') }}</div>
+	<div style="display:none;" class="error-message person_disabled">&bull; {{ phrase('agent.tickets.user_is_disabled') }}</div>
+	<div style="display:none;" class="error-message free" id="{{ baseId }}_freemessage"></div>
+</div>
+
+<div class="pending-info chat" style="display: none; padding: 7px; background: #FFFEFE; border-bottom: 1px solid #9CA7B1; font-size: 11px;">
+	{{ phrase('agent.tickets.linking_with_chat') }} <span id="{{ baseId }}_chat_title"></span>
+</div>
+
+<div class="profile-box-container reply-box-wrap" style="position: relative">
+	<header>
+		<div class="controls">
+			<button class="switch-user" id="{{baseId}}_switch_user" style="display: none">{{ phrase('agent.general.change_user') }}</button>
+		</div>
+		<nav data-element-handler="DeskPRO.ElementHandler.SimpleTabs"><ul>
+			<li data-tab-for="#{{baseId}}_user_section">{{ phrase('agent.general.user') }}</li>
+			<li data-tab-for="#{{baseId}}_cc_section">{{ phrase('agent.general.ccs') }}</li>
+		</ul></nav>
+	</header>
+	<section id="{{baseId}}_user_section" class="user-section">
+		<div id="{{baseId}}_choose_user" style="padding: 10px">
+			<div
+				id="{{baseId}}_user_searchbox"
+				data-element-handler="DeskPRO.Agent.ElementHandler.PersonSearchBox"
+				data-search-url="{{ path('agent_peoplesearch_performquick', {'format': 'json', 'limit': 10, 'start_with': 'a', 'with_agents': 1}) }}"
+				data-highlight-term="1"
+				data-touch-focus="1"
+				data-search-param="term"
+				data-position-bound="#{{baseId}}_userselect"
+			>
+				<input type="text" name="newticket[person_input_choice]" id="{{baseId}}_userselect" class="select-user term" placeholder="{{ phrase('agent.general.choose_person_for_ticket') }}" />
+				<input type="hidden" name="newticket[person][id]" value="{{ person.id }}" class="person-id" id="{{baseId}}_person_id" />
+
+				<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+					<li>
+						<a>
+						<span class="user-name"></span>
+						<address>&lt;<span class="user-email"></span>&gt;</address>
+						<div class="bound-fade"></div>
+					</a></li>
+				</script>
+				<div class="person-search-box" style="display: none">
+					<section>
+						<ul class="results-list">
+
+						</ul>
+						<footer>
+							<span class="create-user">{{ phrase('agent.general.create_a_new_person') }}</span>
+						</footer>
+					</section>
+				</div>
+			</div>
+		</div>
+		<div id="{{baseId}}_user_choice">
+
+		</div>
+	</section>
+	<section id="{{baseId}}_cc_section" style="padding: 10px; display: none;">
+		<div class="cc-input">
+			<div
+				id="{{baseId}}_user_ccbox"
+				data-element-handler="DeskPRO.Agent.ElementHandler.PersonSearchBox"
+				data-search-url="{{ path('agent_peoplesearch_performquick', {'format': 'json', 'limit': 10, 'start_with': 'a'}) }}"
+				data-highlight-term="1"
+				data-touch-focus="1"
+				data-search-param="term"
+				data-position-bound="#{{baseId}}_userccselect"
+			>
+				<input type="text" id="{{baseId}}_userccselect" class="cc-user term" placeholder="{{ phrase('agent.tickets.search_for_people_to_add') }}" />
+
+				<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+					<li>
+						<a>
+						<span class="user-name"></span>
+						<address>&lt;<span class="user-email"></span>&gt;</address>
+						<div class="bound-fade"></div>
+					</a></li>
+				</script>
+				<div class="person-search-box" style="display: none">
+					<section>
+						<ul class="results-list">
+
+						</ul>
+						<footer>
+							<span class="create-user">{{ phrase('agent.general.create_a_new_person') }}</span>
+						</footer>
+					</section>
+				</div>
+			</div>
+		</div>
+		<ul id="{{baseId}}_cc_list" class="cc-list"></ul>
+	</section>
+</div>
+
+<div class="profile-box-container reply-box-wrap" style="position: relative">
+	<header>
+		<h4>{{ phrase('agent.general.properties') }}</h4>
+	</header>
+	<section class="ticketreply">
+		<article id="{{baseId}}_headerbox_box_props" class="headerbox">
+			<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table" id="{{baseId}}_fields_container">
+				<tbody>
+					<th width="80">{{ phrase('agent.general.department') }}</th>
+					<td>
+						{% include 'AgentBundle:Common:select-department.html.twig' with {
+							'name': "newticket[department_id]",
+							'id': baseId ~ '_dep',
+							'departments': app.departments.getPersonDepartments(app.user, 'tickets', [], 'assign'),
+							'selected': ticket.department_id,
+							with_blank: true
+						} %}
+					</td>
+				</tbody>
+
+				{% if app.getSetting('core.use_ticket_category') %}
+					<tbody class="col fieldprop ticket-field item-on ticket_category inline-field" style="display: none;">
+						<th>{{ phrase('agent.general.category') }}</th>
+						<td>
+							<div>
+								{% include 'AgentBundle:Common:select-category.html.twig' with {
+									'name': "newticket[category_id]",
+									'id': baseId ~ '_cat',
+									'categories': ticket_options.ticket_categories_hierarchy,
+									'selected': ticket.category_id,
+									'with_blank': true
+								} %}
+							</div>
+						</td>
+					</tbody>
+				{% endif %}
+
+				{% if app.getSetting('core.use_ticket_priority') %}
+					<tbody class="col fieldprop ticket-field item-on ticket_priority inline-field" style="display: none;">
+						<th>{{ phrase('agent.general.priority') }}</th>
+						<td>
+							{% include 'AgentBundle:Common:select-priority.html.twig' with {
+								'name': "newticket[priority_id]",
+								'id': baseId ~ '_pri',
+								'add_classname': 'ticket_priority',
+								'selected': ticket.priority_id,
+								'priorities': ticket_options.ticket_priorities,
+								'with_blank': true
+							} %}
+						</td>
+					</tbody>
+				{% endif %}
+
+				{% if app.getSetting('core.use_ticket_workflow') %}
+					<tbody class="col fieldprop ticket-field item-on ticket_workflow inline-field" style="clear:both;display: none;">
+						<th>{{ phrase('agent.general.workflow') }}</th>
+						<td>
+							{% include 'AgentBundle:Common:select-workflow.html.twig' with {
+								'name': "newticket[workflow_id]",
+								'id': baseId ~ '_work',
+								'add_classname': 'ticket_workflow',
+								'selected': ticket.workflow_id,
+								'workflows': ticket_options.ticket_workflows,
+								'with_blank': true
+							} %}
+						</td>
+					</tbody>
+				{% endif %}
+
+				{% if app.getSetting('core.use_product') %}
+					<tbody class="col fieldprop ticket-field item-on ticket_product inline-field" style="clear:both;display: none;">
+						<th>{{ phrase('agent.general.product') }}</th>
+						<td>
+							{% include 'AgentBundle:Common:select-product.html.twig' with {
+								'name': "newticket[product_id]",
+								'id': baseId ~ '_prod',
+								'add_classname': 'ticket_product',
+								'products': ticket_options.products_hierarchy,
+								'selected': ticket.product_id,
+								'with_blank': true
+							} %}
+						</td>
+					</tbody>
+				{% endif %}
+
+				{% if custom_fields %}
+					{% for f in custom_fields if f.field_def.getTypeName() != 'hidden' %}
+						<tbody class="col fieldprop ticket-field item-on ticket-field-{{f.field_def.id}} item-on-{{f.field_def.id}} inline-field" style="clear:both;display: none;">
+							<th>{{f.title}}</th>
+							<td>
+								{{ render_custom_field_form(f) }}
+							</td>
+						</tbody>
+					{% endfor %}
+				{% endif %}
+			</table>
+		</article>
+	</section>
+</div>
+
+{% if app.getSetting('core_tickets.enable_billing') and app.getSetting('core_tickets.billing_on_new') %}
+<div class="profile-box-container reply-box-wrap" style="position: relative">
+	<header>
+		<h4>{{ phrase('agent.tickets.billing') }}</h4>
+	</header>
+	<section class="ticketreply">
+		<article id="{{baseId}}_headerbox_box_billing" class="headerbox">
+			<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table billing-form" id="{{ baseId }}_billing_form">
+			<tr>
+				<th width="80">{{ phrase('agent.tickets.billing_charge') }}</th>
+				<td>
+					<ul class="billing-types">
+						<li>
+							<label><input type="radio" name="{{ baseId }}_billing_type" value="amount" />{{ phrase('agent.tickets.billing_amount') }}:</label>
+							<input type="text" id="{{ baseId }}_billing_amount" name="newticket[billing_amount]" size="7" placeholder="0.00" class="billing-form-amount" /> {{ app.getSetting('core_tickets.billing_currency') }}
+						</li>
+						<li>
+							<label><input type="radio" name="{{ baseId }}_billing_type" value="time" checked="checked" />{{ phrase('agent.tickets.billing_time') }}:</label>
+							<span id="{{ baseId }}_billing_inputs" class="billing-form-time">
+								<input type="text" id="{{ baseId }}_billing_hours" name="newticket[billing_hours]" size="2" placeholder="H" />:<input type="text" id="{{ baseId }}_billing_minutes" name="newticket[billing_minutes]" size="2" placeholder="M" maxlength="2" />:<input type="text" id="{{ baseId }}_billing_seconds" name="newticket[billing_seconds]" size="2" placeholder="S" maxlength="2" />
+							</span>
+							<span class="billing-form-buttons">
+								<button class="clean-white" id="{{ baseId }}_billing_start">{{ phrase('agent.general.start') }}</button>
+								<button class="clean-white" id="{{ baseId }}_billing_stop">{{ phrase('agent.general.pause') }}</button>
+								<button class="clean-white" id="{{ baseId }}_billing_reset">{{ phrase('agent.general.reset') }}</button>
+							</span>
+						</li>
+						<input type="hidden" id="{{ baseId }}_billing_type_hidden" name="newticket[billing_type]" value="time" />
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<th>{{ phrase('agent.general.comment') }}</th>
+				<td><input type="text" id="{{ baseId }}_billing_comment" name="newticket[billing_comment]" style="width: 98%" maxlength="255" /></td>
+			</tr>
+			</table>
+		</article>
+	</section>
+</div>
+{% endif %}
+
+<div class="profile-box-container reply-box-wrap" style="position: relative" id="{{baseId}}_message_box">
+	<div class="ticket-sending-overlay" style="display: none">
+		<strong>{{ phrase('agent.tickets.sending_your_message') }}</strong>
+	</div>
+	<header>
+		<h4>{{ phrase('agent.general.ticket') }}</h4>
+	</header>
+	<section class="ticketreply">
+		<article>
+			<section>
+				<div class="option-rows">
+					<ul id="{{baseId}}_option_rows">
+						<li class="with-select2">
+							<label>
+								<span class="expander" data-target="#{{baseId}}_cc_row">+/-</span>
+								{{ phrase('agent.general.agent') }}:
+							</label>
+							<div>
+								{% if ticket.agent.id == app.user.id or not ticket.agent %}{% set agent_id = app.user.id %}
+								{% else %}{% set agent_id = ticket.agent.id %}{% endif %}
+
+								<select name="newticket[agent_id]" class="dpe_select" data-style-type="icons" data-select-icon-size="22">
+									<option {% if not app.getSetting('core_tickets.new_assign') %}selected="selected"{% endif %} value="0">{{ phrase('agent.general.unassigned') }}</option>
+									{% for agent in agents %}
+										<option {% if agent.id == agent_id and app.getSetting('core_tickets.new_assign') == 'assign' %}selected="selected"{% endif %} data-icon="{{ agent.getPictureUrl(20) }}" value="{{ agent.id }}">{{ agent.display_name }}</option>
+									{% endfor %}
+								</select>
+
+								<select name="newticket[agent_team_id]" id="{{baseId}}_agent_team_sel" class="dpe_select x" data-select-nogrouptitle="1">
+									<option value="0" {% if not app.getSetting('core_tickets.new_assignteam') %}selected="selected"{% endif %}>{{ phrase('agent.general.none') }}</option>
+									{% if app.user.getAgent().getTeams()|length %}
+									<optgroup label="{{ phrase('agent.general.your_teams') }}">
+										{% for team in app.user.getAgent().getTeams() %}
+											<option value="{{ team.id }}" {% if app.getSetting('core_tickets.new_assignteam') == 'assign' and (app.user.getPref('agent.ticket_default_team_id') == team.id or not app.user.getPref('agent.ticket_default_team_id')) %}selected="selected"{% endif %}>{{ team.name }}</option>
+										{% endfor %}
+									</optgroup>
+									{% endif %}
+
+									{% for id,name in app.agent_teams.getTeamNames() %}
+										{% if id not in app.user.getAgent().getTeamIds() %}
+											<option value="{{ id }}">{{ name }}</option>
+										{% endif %}
+									{% endfor %}
+								</select>
+							</div>
+						</li>
+						<li id="{{baseId}}_cc_row" class="cc-row is-hidden" style="display: none;">
+							<label style="padding-top: 6px;">{{ phrase('agent.general.followers') }}:</label>
+							<div style="margin-left: 65px;">
+								<select name="add_followers[]" id="{{baseId}}_followers_sel" class="dpe_select dpe_select_noborder" multiple="multiple" data-style-type="icons" data-select-width="auto" data-select-icon-size="16" data-placeholder="{{ phrase('agent.tickets.add_follower') }}">
+									{% for agent in app.agents.getAgents() %}
+										{% if agent.id != app.user.id %}
+											<option data-icon="{{ agent.getPictureUrl(16) }}" value="{{ agent.id }}">{{ agent.display_name }}</option>
+										{% endif %}
+									{% endfor %}
+								</select>
+							</div>
+						</li>
+						<li id="{{baseId}}_actions_row" class="actions-row" style="display: none;">
+							<label><span>{{ phrase('agent.general.actions') }}</span></label>
+							<ul></ul>
+							<br class="clear"/>
+						</li>
+						{% if app.getDataService('TicketMessageTemplate').getTitles() %}
+						<li class="with-select2" id="{{ baseId }}_message_template_holder_row">
+							<label>{{ phrase('agent.general.template') }}:</label>
+							<div id="{{baseId}}_message_template_holder" style="visibility: hidden;">
+								<div style="display: none">
+									<select id="{{baseId}}_message_template_orig">
+										<option value="0">{{ phrase('agent.general.blank') }}</option>
+										{% for tpl in app.getDataService('TicketMessageTemplate').getAll() %}
+											<option value="{{ tpl.id }}" class="department_{{ tpl.department_id }}">{{ tpl.title|default('Untitled #' ~ tpl.id) }}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<select id="{{baseId}}_message_template" name="using_template">
+									<option value="0">{{ phrase('agent.general.blank') }}</option>
+									{% for tpl in app.getDataService('TicketMessageTemplate').getAll() %}
+										<option value="{{ tpl.id }}" class="department_{{ tpl.department_id }}">{{ tpl.title|default('Untitled #' ~ tpl.id) }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</li>
+						{% endif %}
+						<li class="subject-row">
+							<label>{{ phrase('agent.general.subject') }}:</label>
+							<div>
+								<input type="text" name="newticket[subject]" class="subject" id="{{baseId}}_subject" value="{% if ticket.id %}{{ ticket.subject }}{% endif %}" />
+							</div>
+						</li>
+						<li id="{{baseId}}_attach_row" class="attach-row is-hidden" style="display: none">
+							<label><span>{{ phrase('agent.general.attachments') }}</span></label>
+							<div>
+								<ul class="files"></ul>
+								<br class="clear"/>
+							</div>
+						</li>
+					</ul>
+					<div class="drop-file-zone"><h1>{{ phrase('agent.general.drop_here_to_attach') }}</h1></div>
+				</div>
+				<div class="input-wrap unreset">
+					<textarea id="{{baseId}}_message" name="newticket[message]">{{ message.getMessageHtml() }}</textarea>
+					<textarea id="{{baseId}}_signature_value" class="signature-value" style="display: none;">{{ agent_signature }}</textarea>
+					<textarea id="{{baseId}}_signature_value_html" class="signature-value-html" style="display: none;">{{ agent_signature_html }}</textarea>
+					<input type="hidden" id="{{baseId}}_is_html_reply" name="newticket[is_html_reply]" value="0" />
+					<div class="drop-file-zone drop-file-zone-rte"><h1>{{ phrase('agent.general.drop_here_to_insert_image') }}</h1></div>
+				</div>
+			</section>
+		</article>
+	</section>
+	<footer id="{{ baseId }}_message_footer">
+		<table cellpadding="0" cellspacing="0" border="0"><tr>
+			<td valign="middle" style="vertical-align: middle;">
+				<div id="{{ baseId }}_send_btn">
+					<div class="dp-btn-group dp-dropup" id="{{ baseId }}_reply_btn_group">
+						<a class="dp-btn dp-btn-primary submit-trigger">
+							<i class="icon-share-alt"></i>&nbsp;
+							{% if app.getSetting('core_tickets.new_status') == 'awaiting_user' %}
+								<span id="{{ baseId }}_reply_as_type" data-type="awaiting_user">{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_awaiting_user')}) }}</span>
+							{% elseif app.getSetting('core_tickets.new_status') == 'awaiting_agent' %}
+								<span id="{{ baseId }}_reply_as_type" data-type="awaiting_agent">{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_awaiting_agent')}) }}</span>
+							{% elseif app.getSetting('core_tickets.new_status') == 'resolved' %}
+								<span id="{{ baseId }}_reply_as_type" data-type="resolved">{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_resolved')}) }}</span>
+							{% else %}
+								<span id="{{ baseId }}_reply_as_type" data-type="awaiting_user">{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_awaiting_user')}) }}</span>
+							{% endif %}
+						</a>
+						<a class="dp-btn dp-btn-primary dp-dropdown-toggle status-menu-trigger"><span class="dp-caret dp-caret-up"></span></a>
+					</div>
+				</div>
+				<div id="{{ baseId }}_send_loading" style="display: none;">
+					<span class="flat-spinner"></span>
+				</div>
+			</td><td valign="middle" style="vertical-align: middle;">
+				<div style="padding-top: 1px; line-height: 100%; margin-left: 10px; float:left;">
+					<label class="hide-note">
+						<input type="checkbox" name="options[notify_user]" {% if app.getSetting('core_tickets.new_default_send_user_notify') or ticket.id %}checked="checked"{% endif %} />
+						<span class="opt-label-text">
+							{{ phrase('agent.general.email_user') }}
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.tickets.email_user_newticket_info') }}"></span>
+						</span>
+					</label>
+				</div>
+				<div style="padding-top: 1px; line-height: 100%; margin-left: 10px; float:left;">
+					<label>
+						<input type="checkbox" id="{{ baseId }}_opt_open_tab" name="options[open_tab]" checked="checked" />
+						<span class="opt-label-text">
+							{{ phrase('agent.general.open_tab') }}
+							<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.tickets.open_tab_info') }}"></span>
+						</span>
+					</label>
+				</div>
+			</td>
+		</tr></table>
+	</footer>
+</div>
+
+<div class="dp-menu replybox" id="{{ baseId }}_status_menu" style="min-width: 225px;">
+	<section>
+		<div class="dp-menu-area small">
+			<input type="text" class="label-input macro-filter" placeholder="{{ phrase('agent.tickets.apply_a_macro') }}" />
+			<ul class="macro-list">
+				{% for macro in app.user.getHelper('Agent').getMacros() %}
+					<li class="res-ticketmacro-{{ macro.id }}" data-type="macro:{{ macro.id }}" data-label="{{ phrase('agent.tickets.send_newticket_and_apply_x', {name: macro.title}) }}" data-get-macro-url="{{ path('agent_ticket_ajax_get_macro', {ticket_id: '0', macro_id: macro.id, macro_reply_context: 1 }) }}">
+						<div class="on-icon"><i class="icon-ok"></i></div>
+						<span class="macro-title">{{ macro.title }}</span>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</section>
+	<section>
+		<div class="dp-menu-area dp-menu-area-primary">
+			<label>{{ phrase('agent.tickets.newticket_and_set_status') }}</label>
+			<ul>
+				<li data-type="awaiting_user" data-label="{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_awaiting_user')}) }}">
+					<div class="on-icon"><i class="icon-ok"></i></div>
+					{{ phrase('agent.tickets.kbd_awaiting_user') }}
+				</li>
+				<li data-type="awaiting_agent" data-label="{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_awaiting_agent')}) }}">
+					<div class="on-icon"><i class="icon-ok"></i></div>
+					{{ phrase('agent.tickets.kbd_awaiting_agent') }}
+				</li>
+				<li data-type="resolved" data-label="{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_resolved')}) }}">
+					<div class="on-icon"><i class="icon-ok"></i></div>
+					{{ phrase('agent.tickets.kbd_resolved') }}
+				</li>
+			</ul>
+		</div>
+	</section>
+</div>
+
+{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'newticket[attach][]'} %}
+
+</form>
+
+{{ agentui.scroll_containers_end() }}

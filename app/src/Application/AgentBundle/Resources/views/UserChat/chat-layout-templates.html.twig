@@ -1,0 +1,53 @@
+{% raw %}
+<script type="text/x-jquery-tmpl" id="invite_chat_alert">
+	<section class="new-user-chat-alert" data-conversation-id="${conversation_id}" id="invite_chat_alert_${conversation_id}" data-play-sound="new-chat">
+		<header><h3>{% endraw %}{{ phrase('agent.chat.you_have_been_invited') }}{% raw %}</h3></header>
+		<div class="messages">
+			{{if author_name || author_email}}
+				<div class="meta">
+					{{if author_name || author_email}}
+						{% endraw %}{{ phrase('agent.general.by_name', {'name': '<em>${author_name} {{if author_email}}&lt;${author_email}&gt;</em>{{/if}}'}) }}{% raw %}
+					{{/if}}
+					{{if department_id}}
+						{% endraw %}{{ phrase('agent.chat.in_department', {'name': '<em>${department_name}</em>'}) }}{% raw %}
+					{{/if}}
+				</div>
+			{{else}}
+				<div class="meta">
+					{% endraw %}{{ phrase('agent.chat.x_by_anonymous', {'chat_id': '${conversation_id}'}) }}{% raw %}
+					{{if department_id}}
+						{% endraw %}{{ phrase('agent.chat.in_department', {'name': '<em>${department_name}</em>'}) }}{% raw %}
+					{{/if}}
+				</div>
+			{{/if}}
+			{{if subject_line}}<p>${subject_line}</p>{{/if}}
+		</div>
+		<footer>
+			<button class="clean-white small dismiss-trigger">{% endraw %}{{ phrase('agent.general.dismiss') }}{% raw %}</button>
+			<button class="clean-white small accept-trigger" data-route-notabreload="1">{% endraw %}{{ phrase('agent.chat.join_chat') }}{% raw %}</button>
+		</footer>
+	</section>
+</script>
+
+<script type="text/x-jquery-tmpl" id="added_part_user_chat_alert">
+	<section class="new-user-chat-alert" data-conversation-id="${conversation_id}" id="added_part_user_chat_alert_${conversation_id}" data-play-sound="new-chat">
+		<header><h3>{% endraw %}{{ phrase('agent.chat.added_as_participant') }}{% raw %}</h3></header>
+		<div class="messages"></div>
+		<footer>
+			<button class="clean-white small dismiss-trigger">{% endraw %}{{ phrase('agent.general.dismiss') }}{% raw %}</button>
+			<button class="clean-white small accept-trigger">{% endraw %}{{ phrase('agent.chat.open_chat') }}{% raw %}</button>
+		</footer>
+	</section>
+</script>
+
+<script type="text/x-jquery-tmpl" id="new_user_chat_alert_message">
+	<article>
+		<div class="author">${name}:</div>
+		<div class="message">${message}</div>
+	</article>
+</script>
+{% endraw %}
+
+<script type="text/x-jquery-tmpl" id="user_chat_newmsg_sound">
+	<div data-play-sound="pop" style="display:none" />
+</script>

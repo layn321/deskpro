@@ -1,0 +1,104 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('admin.general.apps') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="portal-toggle inline tickets">
+	<a class="toggle-btn tickets tipped" title="The tickets app is a core feature of DeskPRO and cannot be disabled." data-tipped-options="showOn: 'click'" style="cursor:default;"></a>
+	<h3>{{ phrase('admin.general.apps_tickets') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_tickets_explain') }}
+	</p>
+</div>
+
+<div class="portal-toggle inline crm">
+	<a class="toggle-btn crm tipped" title="The CRM app is a core feature of DeskPRO and cannot be disabled." data-tipped-options="showOn: 'click'" style="cursor:default;"></a>
+	<h3>{{ phrase('admin.general.apps_crm') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_crm_explain') }}
+	</p>
+</div>
+
+<div class="portal-toggle inline chat">
+	{% if app.getSetting('core.apps_chat') %}
+		<a class="toggle-btn" href="{{ path('admin_apps_toggle', {app: 'chat', enable: '0'}) }}"><em>{{ phrase('admin.portal.click_to_disable') }}</em></a>
+	{% else %}
+		<a class="toggle-btn disabled" href="{{ path('admin_apps_toggle', {app: 'chat', enable: '1'}) }}"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+	{% endif %}
+	<h3>{{ phrase('admin.general.apps_chat') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_chat_explain') }}
+	</p>
+</div>
+
+<div class="portal-toggle inline chat">
+	{% if app.getSetting('core.apps_feedback') %}
+		<a class="toggle-btn" href="{{ path('admin_apps_toggle', {app: 'feedback', enable: '0'}) }}"><em>{{ phrase('admin.portal.click_to_disable') }}</em></a>
+	{% else %}
+		<a class="toggle-btn disabled" href="{{ path('admin_apps_toggle', {app: 'feedback', enable: '1'}) }}"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+	{% endif %}
+	<h3>{{ phrase('admin.general.apps_feedback') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_feedback_explain') }}
+	</p>
+</div>
+
+<div class="portal-toggle inline chat">
+	{% if app.getSetting('core.apps_tasks') %}
+		<a class="toggle-btn" href="{{ path('admin_apps_toggle', {app: 'tasks', enable: '0'}) }}"><em>{{ phrase('admin.portal.click_to_disable') }}</em></a>
+	{% else %}
+		<a class="toggle-btn disabled" href="{{ path('admin_apps_toggle', {app: 'tasks', enable: '1'}) }}"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+	{% endif %}
+	<h3>{{ phrase('admin.general.apps_tasks') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_tasks_explain') }}
+	</p>
+</div>
+
+<div class="portal-toggle inline chat">
+	{% if app.getSetting('core.apps_news') %}
+		<a class="toggle-btn" href="{{ path('admin_apps_toggle', {app: 'news', enable: '0'}) }}"><em>{{ phrase('admin.portal.click_to_disable') }}</em></a>
+	{% else %}
+		<a class="toggle-btn disabled" href="{{ path('admin_apps_toggle', {app: 'news', enable: '1'}) }}"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+	{% endif %}
+	<h3>{{ phrase('admin.general.apps_news') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_news_explain') }}
+	</p>
+</div>
+
+<div class="portal-toggle inline chat">
+	{% if app.getSetting('core.apps_downloads') %}
+		<a class="toggle-btn" href="{{ path('admin_apps_toggle', {app: 'downloads', enable: '0'}) }}"><em>{{ phrase('admin.portal.click_to_disable') }}</em></a>
+	{% else %}
+		<a class="toggle-btn disabled" href="{{ path('admin_apps_toggle', {app: 'downloads', enable: '1'}) }}"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+	{% endif %}
+	<h3>{{ phrase('admin.general.apps_downloads') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_downloads_explain') }}
+	</p>
+</div>
+
+<div class="portal-toggle inline chat">
+	{% if app.getSetting('core.apps_kb') %}
+		<a class="toggle-btn" href="{{ path('admin_apps_toggle', {app: 'kb', enable: '0'}) }}"><em>{{ phrase('admin.portal.click_to_disable') }}</em></a>
+	{% else %}
+		<a class="toggle-btn disabled" href="{{ path('admin_apps_toggle', {app: 'kb', enable: '1'}) }}"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+	{% endif %}
+	<h3>{{ phrase('admin.general.apps_kb') }}</h3>
+	<p>
+		{{ phrase('admin.general.apps_kb_explain') }}
+	</p>
+</div>
+
+<script type="text/javascript">
+	$('.toggle-btn').on('click', function() {
+		if (!$(this).is('.tickets, .crm')) {
+			$('#please_wait_overlay').show();
+		}
+	});
+</script>
+{% endblock %}

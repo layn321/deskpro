@@ -1,0 +1,427 @@
+{% if app.getSetting('core.setup_initial') %}{% set is_post_install = false %}{% else %}{% set is_post_install = true %}{% endif %}
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+	<title>{{ phrase('admin.general.deskpro_admin_interface') }}</title>
+	<meta charset="utf-8" />
+	<meta name="robots" content="noindex,nofollow" />
+	<link rel="shortcut icon" id="favicon" href="{{ asset('images/admin/favicon-admin.ico') }}" />
+
+	<script type="text/javascript">
+		{% if constant('DP_DEBUG') %}
+			DP_DEBUG = true;
+		{% else %}
+			DP_DEBUG = false;
+		{% endif %}
+		{% if app.isCloud() %}DP_IS_CLOUD = true;{% else %}DP_IS_CLOUD = false;{% endif %}
+	</script>
+
+	<link rel="stylesheet" href="{{ asset('fonts/font-awesome.min.css') }}" type="text/css" />
+
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+	{{ dp_asset_html('admin_interface_css') }}
+
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+	{{ dp_asset_html('agent_deskpro_ui') }}
+    {{ dp_asset_html('admin_admin_ui') }}
+    {{ dp_asset_html('admin_admin_handlers') }}
+
+    <script type="text/javascript" charset="utf-8">
+
+		var DP_REQUEST_TOKEN = '{{ security_token('request_token', 10800) }}';
+
+		$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+			var url = options.url;
+			if (url.indexOf('?') == -1) {
+				url += '?';
+			} else {
+				url += '&';
+			}
+			url += '_rt=' + DP_REQUEST_TOKEN;
+
+			options.url = url;
+		});
+
+		$(document).ready(function() {
+			$('form').each(function() {
+				var form = $(this);
+				var method = (form.attr('method') || 'GET').toUpperCase();
+				var tok = null;
+
+				if (method == 'POST') {
+					tok = form.find('input.dp_request_token');
+					if (!tok[0]) {
+						tok = $('<input type="hidden" name="_rt" />');
+						tok.val(DP_REQUEST_TOKEN);
+						tok.addClass('dp_request_token');
+
+						form.append(tok);
+					}
+				}
+			}).on('submit', function() {
+				var form = $(this);
+				var method = (form.attr('method') || 'GET').toUpperCase();
+				var tok = null;
+
+				if (method == 'POST') {
+					tok = form.find('input.dp_request_token');
+					if (!tok[0]) {
+						tok = $('<input type="hidden" name="_rt" />');
+						tok.val(DP_REQUEST_TOKEN);
+						tok.addClass('dp_request_token');
+
+						form.append(tok);
+					} else {
+						tok.val(DP_REQUEST_TOKEN);
+					}
+				}
+			});
+		});
+
+		var DP_TINYMCE_URL = '{{ asset('javascripts/tiny_mce/tiny_mce.js') }}';
+		var BASE_URL = '{{ app.request.getBaseUrl() }}/';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		if (!window.DESKPRO_URL_REGISTRY) window.DESKPRO_URL_REGISTRY = {};
+
+		window.DeskPRO_Window = new DeskPRO.Admin.Window();
+
+		function _win_exec() {
+			window.DeskPRO_Window.initPage();
+
+			if (window._page_exec) {
+				_page_exec();
+			}
+
+			if (window.DeskPRO_Page) {
+				DeskPRO_Page.initPage();
+			}
+		}
+
+		{% block html_headjs_load %}{% endblock %}
+
+		$(document).ready(function() {
+			_win_exec();
+		});
+	</script>
+	{% block html_head %}{% endblock %}
+	{% block page_js_exec %}{% endblock %}
+
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+
+	{% if app.isDebug() %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?nocache=1&v={{ security_token('lang') }}"></script>
+	{% else %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?v={{ app.getSetting('core.deskpro_build') }}"></script>
+	{% endif %}
+</head>
+<body class="dp {% if is_demo %}is-demo{% endif %} {% if is_post_install %}post-install{% endif %} {{ body_class }}" {% if page_handler %}data-element-handler="{{ page_handler }}"{% endif %}>
+<div id="please_wait_overlay" style="display: none;">
+	<article>
+		Loading
+	</article>
+</div>
+
+{% if app.getSetting('core.setup_initial') %}
+	{% if not is_post_install and app.helpdesk_is_offline %}
+		<div class="helpdesk-disabled-notice alt">
+			<form action="{{ path('admin_settings_set', {'setting_name':'core.helpdesk_disabled', 'security_token': security_token('set_setting')}) }}" method="POST">
+				{{ phrase('admin.general.helpdesk_currently_disabled') }}
+				<button class="btn primary">{{ phrase('admin.general.click_to_reenable_helpdesk') }}</button>
+			</form>
+		</div>
+	{% elseif app.getVariable('cron_is_problem') %}
+		<div class="helpdesk-disabled-notice">
+			The scheduled tasks are either not running or the time between executions is too high.
+			<a class="btn primary" href="{{ path('admin_settings_cron') }}">Fix This</a>
+		</div>
+	{% endif %}
+{% endif %}
+
+{% block header %}
+<!-- BEGIN HEADER BAR -->
+<div id="dp_header">
+	{% if is_post_install %}
+		<div class="user-profile pull-left">
+			<img class="gravatar pull-left" src="{{ app.user.getPictureUrl(31) }}">
+			<div class="username">{{ phrase('agent.chrome.hello-user', {name: app.user.name}) }}</div>
+			<ul class="nav-profile">
+				<li><i class="icon-map-marker"></i> <a>Initial Setup</a></li>
+			</ul>
+		</div>
+	{% else %}{# else not post install #}
+		<div class="user-profile pull-left" {% if app.user.can_billing %}style="width:266px"{% endif %}>
+			<img class="gravatar pull-left" src="{{ app.user.getPictureUrl(31) }}">
+			<div class="username">{{ phrase('agent.chrome.hello-user', {name: app.user.name}) }}</div>
+			<ul class="nav-profile">
+				{% if app.user.can_reports %}<li><i class="icon-dashboard"></i> <a class="report" href="{{ app.request.getBaseUrl() }}/reports/login?dpsid-agent={{ app.getSession().getId() }}"><span>Reports</span></a></li>{% endif %}
+				{% if app.user.can_billing %}<li><i class="icon-credit-card"></i> <a class="billing" href="{{ app.request.getBaseUrl() }}/billing/"><span>Billing</span></a></li>{% endif %}
+				{% if app.user.can_agent %}<li><i class="icon-inbox"></i> <a class="agent" href="{{ app.request.getBaseUrl() }}/agent/"><span class="check">Agent</span></a></li>{% endif %}
+				<li onclick="window.location='{{ path('user_logout', {'auth': static_security_token('user_logout', 0)}) }}?to=agent'; return false;"><i class="icon-signout"></i> <a>{{ phrase('agent.chrome.link_logout') }}</a></li>
+			</ul>
+		</div>
+	{% endif %}{# /endif not post install #}
+</div>
+<!-- /BEGIN HEADER BAR -->
+
+<!-- BEGIN NAV BAR -->
+<div id="dp_admin_nav">
+	{% if is_post_install %}<div class="capture-click"></div>{% endif %}
+	<div id="dp_admin_nav_sections" class="deskproPane">
+		{% if false and not is_post_install %}
+			{% include 'AdminBundle:Main:layout-setupguide.html.twig' %}
+		{% endif %}
+
+		{% if is_quick_setup %}
+			<ul class="start-ul">
+				<li>
+					<a href="{{ path('admin_welcome') }}"><span class="start">{{ phrase('admin.general.start') }}</span></a>
+				</li>
+			</ul>
+			<div class="sep">-</div>
+		{% endif %}
+
+		<ul>
+			<li>
+				<a href="{{ path('admin') }}"><span class="home">{{ phrase('admin.general.home') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li>
+				<a href="{{ path('admin_settings') }}"><span class="setup">Settings</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li>
+				<a href="{{ path('admin_agents') }}"><span class="agents">{{ phrase('agent.general.agents') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#portal_menu">
+				<a href="{{ path('admin_portal') }}"><span class="publish">{{ phrase('admin.general.portal') }}</span></a>
+			</li>
+		</ul>
+		{% if not app.isCloud %}
+			<div class="sep">-</div>
+			<ul>
+				<li data-menu="#server_menu"><a><span class="server">{{ phrase('admin.general.server') }}</span></a></li>
+			</ul>
+		{% endif %}
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#integrate_menu">
+				<a href="#"><span class="apps">Integrate</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#tickets_menu">
+				<a><span class="tickets">{{ phrase('agent.general.tickets') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#users_menu">
+				<a><span class="users">{{ phrase('admin.menu.crm') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#kb_menu" {% if not app.getSetting('core.apps_kb') %}class="off"{% endif %}>
+				<a {% if not app.getSetting('core.apps_kb') %}href="{{ path('admin_apps') }}"{% endif %}><span class="kb">{{ phrase('agent.general.kb') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#feedback_menu" {% if not app.getSetting('core.apps_feedback') %}class="off"{% endif %}>
+				<a {% if not app.getSetting('core.apps_feedback') %}href="{{ path('admin_apps') }}"{% endif %}><span class="feedback">{{ phrase('agent.general.feedback') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#downloads_menu"{% if not app.getSetting('core.apps_downloads') %}class="off"{% endif %}>
+				<a {% if not app.getSetting('core.apps_downloads') %}href="{{ path('admin_apps') }}"{% endif %}><span class="downloads">{{ phrase('agent.general.downloads') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#news_menu"{% if not app.getSetting('core.apps_news') %}class="off"{% endif %}>
+				<a {% if not app.getSetting('core.apps_news') %}href="{{ path('admin_apps') }}"{% endif %}><span class="news">{{ phrase('agent.general.news') }}</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul>
+			<li data-menu="#chat_menu"{% if not app.getSetting('core.apps_chat') %}class="off"{% endif %}>
+				<a {% if not app.getSetting('core.apps_chat') %}href="{{ path('admin_apps') }}"{% endif %}><span class="chat">{{ phrase('agent.general.chat') }}</span></a>
+			</li>
+		</ul>
+		{% if app.getConfig('enable_twitter') and (not app.isCloud() or app.getConfig('twitter.agent_consumer_key')) %}
+			<div class="sep">-</div>
+			<ul>
+				<li data-menu="#twitter_menu">
+					<a><span class="twitter">Twitter</span></a>
+				</li>
+			</ul>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}
+
+<!-- /BEGIN NAV BAR -->
+<div id="dp_page_wrap">
+
+{% if app.getLicense().isDemo() and (this_page == 'dashboard' or app.getLicense().getExpireDays() <= 3) %}
+	<section class="demo-notice">
+		<article>
+			{% if app.isCloud() %}
+				Your DeskPRO demo expires
+				<em class="days">
+					{% if app.getLicense().getExpireDays() == 0 and app.getLicense().getExpireTime('hours') == 0 %}
+						in {{ app.getLicense().getExpireTime('mins') }} minutes
+					{% elseif app.getLicense().getExpireDays() < 3 %}
+						in {{ app.getLicense().getExpireTime('hours') }} hours
+					{% else %}
+						in {{ app.getLicense().getExpireDays() }} days
+					{% endif %}
+				</em>.
+
+				{% if app.getLicense().getExpireDays() >= 13 %}
+					<div style="font-size: 11px; padding-top: 10px;">
+						Ready to sign up? Go to the <a href="{{ app.request.getBaseUrl() }}/billing/">Billing Interface</a> to enter your billing information. You will not be billed until your trial ends.
+					</div>
+				{% else %}
+					To dismiss this notice and ensure uninterrupted access, please enter your billing information.
+
+					<div class="enter-wrap">
+						<a href="{{ app.request.getBaseUrl() }}/billing/" class="btn primary">Enter your billing information now &rarr;</a>
+					</div>
+				{% endif %}
+			{% else %}
+				Your DeskPRO demo expires
+				<em class="days">
+					{% if app.getLicense().getExpireDays() == 0 and app.getLicense().getExpireTime('hours') == 0 %}
+						in {{ app.getLicense().getExpireTime('mins') }} minutes
+					{% elseif app.getLicense().getExpireDays() < 3 %}
+						in {{ app.getLicense().getExpireTime('hours') }} hours
+					{% else %}
+						in {{ app.getLicense().getExpireDays() }} days
+					{% endif %}
+				</em>.
+				To dismiss this notice and keep your helpdesk operational, you need to purchase a license.
+
+				<div class="enter-wrap">
+					<a href="https://www.deskpro.com/members/buy" class="btn primary">Purchase a license now &rarr;</a>
+				</div>
+			{% endif %}
+		</article>
+	</section>
+{% endif %}
+
+{% if app.isCloud() and constant('DPC_BILL_OVERDUE') %}
+	<section class="demo-notice failed-bill">
+		<article>
+			We failed to charge your credit-card for another month of service. To ensure uninterupted service, please go to the billing interface
+			to settle the overdue bill.
+
+			<div class="enter-wrap">
+				<a href="{{ app.request.getBaseUrl() }}/billing/" class="btn primary warn">Enter your billing information now &rarr;</a>
+			</div>
+		</article>
+	</section>
+{% endif %}
+
+{% if is_post_install %}
+{% if not is_cron_page and app.getSetting('core.setup_initial') and not app.getSetting('core.last_cron_run') and app.getSetting('core.install_timestamp') and ( ('now'|date('U') - 600) > app.getSetting('core.install_timestamp')) %}
+	<div class="cron-warn">
+		<p>{{ phrase('admin.general.error_cron_inactive') }}</p>
+		<a class="clean-white" href="{{ path('admin_settings_cron') }}">{{ phrase('admin.general.error_cron_inactive_go') }} &rarr;</a>
+	</div>
+{% endif %}
+{% endif %}
+
+{% if app.session.hasFlash('success_message') %}
+	<div class="alert-message success">
+		{{ app.session.getFlash('success_message') }}
+	</div>
+{% endif %}
+{% if app.session.hasFlash('error_message') %}
+	<div class="alert-message error">
+		{{ app.session.getFlash('error_message') }}
+	</div>
+{% endif %}
+{% if app.session.hasFlash('saved') %}
+	<div class="alert-message success">
+		"{{ app.session.getFlash('saved') }}" was saved successfully
+	</div>
+{% endif %}
+{% if app.session.hasFlash('deleted') %}
+	<div class="alert-message success">
+		"{{ app.session.getFlash('deleted') }}" was deleted successfully
+	</div>
+{% endif %}
+
+{% set pagebar %}{% block pagebar %}{% endblock %}{% endset %}
+{% if pagebar|trim|length %}
+	<div id="dp_admin_pagebar" class="dp_admin_pagebar">{{ pagebar|raw }}</div>
+{% endif %}
+
+{% set pagetabs %}{% block pagetabs %}{% endblock %}{% endset %}
+{% if pagetabs|trim|length %}
+	<div id="dp_admin_pagetabs" class="dp_admin_pagetabs">{{ pagetabs|raw }}</div>
+{% endif %}
+
+{% block pagebar_after %}{% endblock %}
+
+{% set sidebar %}{% block sidebar %}{% endblock %}{% endset %}
+{% set sidebar_right %}{% block sidebar_right %}{% endblock %}{% endset %}
+{% block dp_full_page %}
+<div id="dp_admin_page" class="dp_admin_page {% if sidebar|trim|length %}with-sidebar{% endif %} {% if sidebar_right|trim|length %}with-sidebar-right{% endif %} {{ admin_page_class }} {% if pagetabs|trim|length %}with-pagetabs{% endif %}">
+	{% block prepage %}{% endblock %}
+	<div id="dp_admin_page_inner" class="dp_admin_page_inner">
+		{% if sidebar|trim|length %}
+			<div id="dp_admin_page_sidebar" class="dp_admin_page_sidebar dp-sidebar">{{ sidebar|raw }}</div>
+		{% endif %}
+		{% if sidebar_right|trim|length %}
+			<div id="dp_admin_page_sidebar_right" class="dp_admin_page_sidebar_right dp-sidebar">{{ sidebar_right|raw }}</div>
+		{% endif %}
+		{% block content %}
+			<div class="dp-page-box">
+				<div class="page-content">
+					{% block page %}{% endblock %}
+				</div>
+			</div>
+		{% endblock %}
+	</div>
+</div>
+{% endblock %}
+
+{% include 'AdminBundle:Main:layout-menus.html.twig' %}
+
+</div>
+
+{% set page_nav %}{% block page_nav %}{% endblock %}{% endset %}
+{% set page_nav_inner %}{% block page_nav_inner %}{% endblock %}{% endset %}
+{% if page_nav|trim|length or page_nav_inner|trim|length %}
+	<div id="dp_page_nav" {% if page_nav_fixed %}class="fixed"{% endif %}>
+		{% if page_nav_inner|trim|length %}
+			{{ page_nav_inner|raw }}
+		{% else %}
+			<div class="page-nav-block">
+				<div class="inner-shadow"></div>
+				{{ page_nav|raw }}
+			</div>
+		{% endif %}
+	</div>
+{% endif %}
+
+</body>
+</html>

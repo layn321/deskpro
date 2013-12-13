@@ -1,0 +1,190 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.Visitor';
+{% if visitor.person %}
+	pageMeta.title = {{ ("Visitor: " ~ visitor.person.display_name)|json_encode|raw }};
+{% else %}
+	pageMeta.title = 'Visitor {{ vis.visit_track.ip_address }}';
+{% endif %}
+pageMeta.visitor_id = {{visitor.id|default(0)}};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<div class="visitor-page">
+
+{######################################################################################################################}
+{# Header #}
+{######################################################################################################################}
+
+<header class="page-header">
+	{% if visitor.visit_track.geo_country %}
+		<span class="country" style="background-image: url({{ asset('images/flags/' ~ visitor.visit_track.geo_country|lower ~ '.png') }});" title="{{ visitor.visit_track.geo_country|country_name }}"></span>
+	{% endif %}
+	<span class="ip-address">{{ visitor.visit_track.ip_address }}</span>
+	<h4 class="id-number">#{{ visitor.id }}</h4>
+	<h1>
+		{% if visitor.person %}
+			<span class="user-link" data-route="page:{{ path('agent_people_view', {person_id:visitor.person.id}) }}" style="background-image: url('{{ visitor.person.getPictureUrl(30) }}');">
+				{{ visitor.person.display_name }}
+			</span>
+		{% else %}
+			{% if visitor.name or visitor.email %}
+				{{ phrase('agent.general.anonymous') }}: {{ visitor.name }} {% if visitor.email %}({{ visitor.email }}){% endif %}
+			{% endif %}
+		{% endif %}
+	</h1>
+	<br class="clear" />
+</header>
+
+{######################################################################################################################}
+{# Main Tabs #}
+{######################################################################################################################}
+
+<div class="profile-box-container main-box" id="{{ baseId }}_main_view">
+	<header>
+		<nav data-element-handler="DeskPRO.ElementHandler.SimpleTabs" id="{{ baseId }}_main_tabs_nav">
+			<ul>
+				<li data-tab-for="#{{baseId}}_tracks">{{ phrase('agent.usertrack.visited_pages') }}</li>
+				<li data-tab-for="#{{baseId}}_visits">{{ phrase('agent.usertrack.landing_pages') }}</li>
+				<li data-tab-for="#{{baseId}}_details">{{ phrase('agent.general.details') }}</li>
+			</ul>
+		</nav>
+	</header>
+	<section>
+		<article id="{{baseId}}_tracks" style="display: none;">
+			<table cellspacing="0" cellpadding="0" width="100%" class="data-display-table with-head">
+				<tbody>
+					<tr>
+						<th class="col-head">{{ phrase('agent.general.page') }}</th>
+						<th class="col-head" width="10">{{ phrase('agent.general.date') }}</th>
+					</tr>
+					{% for track in tracks %}
+						<tr>
+							<td>
+								{% if track.page_title %}
+									<div style="font-weight: bold; margin-bottom: 0px;">{{ track.page_title }}</div>
+								{% endif %}
+								<a href="{{ track.page_url }}" target="_blank">
+									{{ track.page_url|url_trim_scheme(true) }}
+								</a>
+								{% if track.ref_page_url %}
+								<div style="font-size: 10px;">
+									{{ phrase('agent.general.referrer') }}:
+									<a href="{{ track.ref_page_url }}" target="_blank">
+										{{ track.ref_page_url|url_trim_scheme(true) }}
+									</a>
+								</div>
+								{% endif %}
+							</td>
+							<td nowrap="nowrap" width="10"><span style="white-space: nowrap; display: block;">{{ track.date_created|date('fulltime') }}</span></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</article>
+		<article id="{{baseId}}_visits" style="display: none;">
+			<table cellspacing="0" cellpadding="0" width="100%" class="data-display-table with-head">
+				<tbody>
+					<tr>
+						<th class="col-head">{{ phrase('agent.usertrack.landing_pages') }}</th>
+						<th class="col-head">{{ phrase('agent.general.details') }}</th>
+						<th class="col-head" width="10">{{ phrase('agent.general.date') }}</th>
+					</tr>
+					{% for track in visit_tracks %}
+						<tr>
+							<td>
+								{% if track.page_title %}
+									<div style="font-weight: bold; margin-bottom: 0px;">{{ track.page_title }}</div>
+								{% endif %}
+								<a href="{{ track.page_url }}" target="_blank">
+									{{ track.page_url|url_trim_scheme(true) }}
+								</a>
+								{% if track.ref_page_url %}
+								<div style="font-size: 10px;">
+									{{ phrase('agent.general.referrer') }}:
+									<a href="{{ track.ref_page_url }}" target="_blank">
+										{{ track.ref_page_url|url_trim_scheme(true) }}
+									</a>
+								</div>
+								{% endif %}
+							</td>
+							<td>
+								{{ phrase('agent.general.ip_address') }}: {{ track.ip_address }}
+							</td>
+							<td nowrap="nowrap" width="10"><span style="white-space: nowrap; display: block;">{{ track.date_created|date('fulltime') }}</span></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</article>
+		<article id="{{baseId}}_details" style="display: none;">
+			<table cellspacing="0" cellpadding="0" width="100%" class="data-display-table with-head">
+				<tbody>
+					<tr>
+						<th width="150">{{ phrase('agent.usertrack.visitor_id') }}:</th>
+						<td>{{ visitor.id }}</td>
+					</tr>
+					<tr>
+						<th>{{ phrase('agent.general.user') }}:</th>
+						<td>
+							{% if visitor.person %}
+								<span class="user-link" data-route="page:{{ path('agent_people_view', {person_id:visitor.person.id}) }}" style="background-image: url('{{ visitor.person.getPictureUrl(24) }}');">
+									{{ visitor.person.display_name }}
+								</span>
+							{% else %}
+								{{ phrase('agent.general.anonymous') }}
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<th>{{ phrase('agent.usertrack.first_visit_date') }}:</th>
+						<td>{{ visitor.date_created|date('fulltime') }}</td>
+					</tr>
+					<tr>
+						<th>{{ phrase('agent.usertrack.number_of_pages') }}:</th>
+						<td>{{ tracks|length }}</td>
+					</tr>
+					<tr>
+						<th>{{ phrase('agent.usertrack.number_of_visits') }}:</th>
+						<td>{{ visit_tracks|length }}</td>
+					</tr>
+					{% if geo_countries %}
+						<tr>
+							<th>{{ phrase('agent.general.countries') }}:</th>
+							<td>
+								<ul>
+									{% for r in geo_countries %}
+										<li>&bull; {{ r }}</li>
+									{% endfor %}
+								</ul>
+							</td>
+						</tr>
+					{% endif %}
+					<tr>
+						<th>{{ phrase('agent.general.ip_addresses') }}:</th>
+						<td>
+							<ul>
+								{% for r in ip_addresses %}
+									<li>&bull; {{ r }}</li>
+								{% endfor %}
+							</ul>
+						</td>
+					</tr>
+					<tr>
+						<th>{{ phrase('agent.general.user_agents') }}:</th>
+						<td>
+							<ul>
+								{% for r in user_agents %}
+									<li>&bull; {{ r }}</li>
+								{% endfor %}
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</article>
+	</section>
+</div>
+
+</div>

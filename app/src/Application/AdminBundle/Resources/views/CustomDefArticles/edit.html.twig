@@ -1,0 +1,22 @@
+{% set layout_tpl = 'AdminBundle::layout.html.twig' %}
+{% set this_page = 'kb_fields' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle:CustomDefAbstract:edit.html.twig' %}
+{% block pagebar %}
+     <ul>
+		<li><a href="{{ path('admin_customdefarticles') }}">{{ phrase('admin.custom_fields.article_fields') }}</a></li>
+		{% if field.id %}
+			<li>{{ phrase('admin.general.edit_field') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.general.new_field') }}</li>
+		{% endif %}
+     </ul>
+
+	{% if field.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_customdefarticles_delete', {'field_id': field.id, 'security_token': security_token('delete_custom_field') }) }}" onclick="return confirm('Are you sure?');">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}

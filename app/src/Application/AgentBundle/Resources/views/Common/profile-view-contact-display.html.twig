@@ -1,0 +1,132 @@
+{% block pre_extra %}{% endblock %}
+{% set top_extra %}
+		{% block top_extra %}{% endblock %}
+		{{ top_extra }}
+	{% endset %}
+{% set bottom_extra %}
+	{% block bottom_extra %}{% endblock %}
+	{{ bottom_extra }}
+{% endset %}
+{% if top_extra|trim|length or bottom_extra|trim|length or contact_data.website or contact_data.twitter or contact_data.linked_in or contact_data.facebook or contact_data.mobile or contact_data.phone or contact_data.fax or contact_data.instant_message %}
+<ul class="contact-data-list">
+	{{ top_extra|raw }}
+
+	{% if not show_only or show_only.website %}
+	{% for contact in contact_data.website %}
+		<li class="website {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			<a href="{{ contact.url }}" target="_blank">{{ contact.display }}</a>
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{% set use_local_twitter = app.getConfig('enable_twitter') and app.user.getTwitterAccounts()|length %}
+
+	{% if not show_only or show_only.twitter %}
+	{% for contact in contact_data.twitter %}
+		<li class="twitter {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			{% if use_local_twitter %}
+				<a data-route="page:{{ path('agent_twitter_user_find', {'name': contact.username, 'tab': 1}) }}">{{ contact.username }}</a>
+			{% else %}
+				<a href="{{ contact.profile_url }}" target="_blank">{{ contact.username }}</a>
+			{% endif %}
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{% if not show_only or show_only.linked_in %}
+	{% for contact in contact_data.linked_in %}
+		<li class="linkedin {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			<a href="{{ contact.profile_url }}" target="_blank">{{ contact.display }}</a>
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{% if not show_only or show_only.facebook %}
+	{% for contact in contact_data.facebook %}
+		<li class="facebook {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			<a href="{{ contact.profile_url }}" target="_blank">{{ contact.display }}</a>
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{% if not show_only or show_only.mobile %}
+	{% for contact in contact_data.mobile %}
+		<li class="mobile {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			{% if contact.country_calling_code %}
+				<span class="country-code">+{{ contact.country_calling_code }}</span>
+			{% endif %}
+			<span class="number">{{ contact.number }}</span>
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{% if not show_only or show_only.phone %}
+	{% for contact in contact_data.phone %}
+		<li class="{{ contact.type }} {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			{% if contact.country_calling_code %}
+				<span class="country-code">+{{ contact.country_calling_code }}</span>
+			{% endif %}
+			<span class="number">{{ contact.number }}</span>
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{% if not show_only or show_only.fax %}
+	{% for contact in contact_data.fax %}
+		<li class="fax {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			{% if contact.country_calling_code %}
+				<span class="country-code">+{{ contact.country_calling_code }}</span>
+			{% endif %}
+			<span class="number">{{ contact.number }}</span>
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{% if not show_only or show_only.instant_message %}
+	{% for contact in contact_data.instant_message %}
+		<li class="im {{ contact.service }} {% if contact.rec.comment %}tipped{% endif %}" {% if contact.rec.comment %}title="{{ contact.rec.comment }}"{% endif %} data-tipped-options="hook: 'leftmiddle'">
+			{{ contact.username }}
+		</li>
+	{% endfor %}
+	{% endif %}
+
+	{{ bottom_extra|raw }}
+</ul>
+{% endif %}
+
+{% if contact_data.address %}
+	<div class="addresses">
+		<ul>
+			{% for contact in contact_data.address %}
+				<li class="address tipped" data-tipped='{% if contact.rec.comment %}{{ contact.rec.comment }}<br />{% endif %}<img src="{{ contact.map_url }}" width="200" height="200" />' data-tipped-options="hook: 'leftmiddle'">
+					{{ contact.address_html|raw }}
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endif %}
+
+{% block post_extra %}{% endblock %}
+
+<!--<div class="outside-display">
+	{% if not show_only or show_only.twitter %}
+	{% for contact in contact_data.twitter %}
+		{% if contact.display_feed %}
+		{# Box Contact #}
+		<div class="profile-box-container tweets" style="display: none;" data-element-handler="DeskPRO.Agent.ElementHandler.TwitterFeed" data-twitter-username="{{ contact.username }}">
+			<header>
+				<h4>@<a href="{{ contact.profile_url }}" target="_blank">{{ contact.username }}</a></h4>
+			</header>
+			<section>
+				<ul class="twitter-list"></ul>
+				<script type="text/x-deskpro-plain" class="twitter-list-item-tpl">
+					<li>
+						<span class="tweet"></span>
+					</li>
+				</script>
+			</section>
+		</div>
+		{% endif %}
+	{% endfor %}
+	{% endif %}
+</div>-->

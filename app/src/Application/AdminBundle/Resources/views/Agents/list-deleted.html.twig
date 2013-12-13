@@ -1,0 +1,44 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		<li>{{ phrase('admin.agents.deleted_agents') }}</li>
+	</ul>
+{% endblock %}
+{% block content %}
+<div class="dp-page-box">
+
+<div class="page-content agent-listing">
+
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th class="single-title">{{ phrase('agent.general.agent') }}</th>
+					<th class="r-col" width="30">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for person in all_agents %}
+					<tr>
+						<td class="title">
+							<img src="{{ person.getPictureUrl(28) }}" align="left" style="margin-right: 6px;" />
+							<h4><a href="{{ path('admin_agents_edit', {'person_id': person.id} )}}">{{person.display_name}}</a></h4>
+							<address>{{person.primary_email_address}}</address>
+						</td>
+						<td class="prop r-col">
+							<form action="{{ path('admin_agents_setdeleted', {person_id: person.id, set_to: '0'}) }}" method="post">
+								{{ form_token() }}
+								<button class="clean-white">{{ phrase('admin.agents.restore') }}</button>
+							</form>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+<div>
+
+</div>
+{% endblock %}

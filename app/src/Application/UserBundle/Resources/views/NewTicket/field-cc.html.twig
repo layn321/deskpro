@@ -1,0 +1,13 @@
+<div class="dp-control-group ticket_cc_emails {% if error_fields['ticket.cc_emails'] %}dp-error{% endif %}">
+	<div class="dp-control-label">
+		<label><strong>{{ phrase('user.tickets.label_cc_emails') }}</strong></label>
+	</div>
+	<div class="dp-controls dp-fill">
+		{{ form_widget(form.ticket.cc_emails, {
+
+		}) }}
+		<div class="dp-help-inline dp-error-explain">
+			{{ phrase('user.error.invalid_email') }}
+		</div>
+	</div>
+</div>

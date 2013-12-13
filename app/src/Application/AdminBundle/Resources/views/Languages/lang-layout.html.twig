@@ -1,0 +1,87 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% set page_nav_fixed = 1 %}
+{% block page_nav %}
+<div data-element-handler="DeskPRO.Admin.ElementHandler.PortalNav" id="portal_nav" class="fixed">
+	<section class="top">
+		<header>
+			<h4>{{ phrase('agent.general.language') }}</h4>
+		</header>
+		<article>
+			<ul>
+				<li class="{% if this_page == 'edit_lang' %}on{% endif %}"><a href="{{ path('admin_langs_editlang', {'language_id': language.id}) }}">{{ phrase('admin.languages.edit_details') }}</a></li>
+				<li class="{% if this_page == 'phrase_group_CUSTOM' %}on{% endif %}">
+					<a href="{{ path('admin_langs_editphrases', {'language_id': language.id, 'group': 'CUSTOM'}) }}">Custom Phrases</a>
+				</li>
+			</ul>
+		</article>
+	</section>
+
+	<section class="top">
+		<header>
+			<h4>Translate Resources</h4>
+		</header>
+		<article>
+			<ul>
+				<li class="{% if this_page == 'tickets_departments' %}on{% endif %}">
+					<a href="{{ path('admin_langs_departments', {'language_id': language.id, type: 'tickets'}) }}">Ticket Departments</a>
+				</li>
+				<li class="{% if this_page == 'chat_departments' %}on{% endif %}">
+					<a href="{{ path('admin_langs_departments', {'language_id': language.id, type: 'chat'}) }}">Chat Departments</a>
+				</li>
+				{% if app.getSetting('core.use_product') %}
+					<li class="{% if this_page == 'products' %}on{% endif %}">
+						<a href="{{ path('admin_langs_products', {'language_id': language.id}) }}">Products</a>
+					</li>
+				{% endif %}
+				{% if app.getSetting('core.use_ticket_category') %}
+					<li class="{% if this_page == 'ticketpriorities' %}on{% endif %}">
+						<a href="{{ path('admin_langs_ticketpriorities', {'language_id': language.id}) }}">Ticket Categories</a>
+					</li>
+				{% endif %}
+				{% if app.getSetting('core.use_ticket_priority') %}
+					<li class="{% if this_page == 'ticketpriorities' %}on{% endif %}">
+						<a href="{{ path('admin_langs_ticketpriorities', {'language_id': language.id}) }}">Ticket Priorities</a>
+					</li>
+				{% endif %}
+				{% if app.getSetting('core.use_ticket_workflow') %}
+					<li class="{% if this_page == 'ticketworkflows' %}on{% endif %}">
+						<a href="{{ path('admin_langs_ticketworkflows', {'language_id': language.id}) }}">Ticket Workflows</a>
+					</li>
+				{% endif %}
+				<li>
+					<a href="{{ path('admin_langs_feedback', {'language_id': language.id}) }}">Feedback</a>
+				</li>
+				<li>
+					<a href="{{ path('admin_langs_kbcats', {'language_id': language.id}) }}">Knowledgebase Categories</a>
+				</li>
+				<li>
+					<a href="{{ path('admin_langs_customfields', {'language_id': language.id, 'field_type': 'tickets'}) }}">Ticket Fields</a>
+				</li>
+				<li>
+					<a href="{{ path('admin_langs_customfields', {'language_id': language.id, 'field_type': 'people'}) }}">Person Fields</a>
+				</li>
+				<li>
+					<a href="{{ path('admin_langs_customfields', {'language_id': language.id, 'field_type': 'organizations'}) }}">Organization Fields</a>
+				</li>
+			</ul>
+		</article>
+	</section>
+
+	{% for group,subgroups in { 'user': phrase_groups['user'] } %}
+		<section class="top">
+			<header>
+				<h4>{{ phrase('admin.languages.phrasegroup_' ~ group) }}</h4>
+			</header>
+			<article>
+				<ul>
+					{% for subgroup in subgroups %}{% if subgroup != 'lang' %}
+					<li class="{% if this_page == 'phrase_group_' ~ group ~ '_' ~ subgroup %}on{% endif %}">
+						<a href="{{ path('admin_langs_editphrases', {'language_id': language.id, 'group': group ~'.'~ subgroup}) }}">{{ phrase('admin.languages.phrasegroup_' ~ group ~ '_' ~ subgroup) }}</a>
+					</li>
+					{% endif %}{% endfor %}
+				</ul>
+			</article>
+		</section>
+	{% endfor %}
+</div>
+{% endblock %}

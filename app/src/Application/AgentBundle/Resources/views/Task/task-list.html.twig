@@ -1,0 +1,142 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TaskList';
+		pageMeta.search_type = '{{ search_type }}';
+		pageMeta.search_category = '{{ search_category }}';
+		pageMeta.url_fragment = '{{ url_fragment('agent_task_list', {'search_type': search_type, 'search_category':search_category}) }}';
+		{% set baseId = el_uid() %}
+		pageMeta.baseId = '{{ tplvars.baseId }}';
+	</script>
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-task"></i> {{ phrase('agent.tasks.list_title', {count: tasks|length}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+	<div class="page-task-list">
+		{% include 'AgentBundle:Task:task-list-bar.html.twig' %}
+		{% set has_any = false %}
+		<div id="{{ tplvars.baseId }}_task_list">
+			{% for group in tasks_grouped %}
+				{% if group.tasks|length %}
+					{% set has_any = true %}
+					<div class="task-group">
+						<header>
+							<span class="expand-collapse"></span>
+							<h4>{{ group.title }}</h4>
+						</header>
+						<section>
+							{% for task in group.tasks %}
+								{% include 'AgentBundle:Task:task-list-row.html.twig' with {'task': task } %}
+							{% endfor %}
+						</section>
+					</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+
+		{% if completed_tasks|length %}
+		<div id="{{ tplvars.baseId }}_task_list">
+			<div class="task-group collapsed">
+				<header>
+					<span class="expand-collapse"></span>
+					<h4><span id="{{ tplvars.baseId }}_complete_count">{{ completed_tasks|length }}</span> {{ phrase('agent.tasks.completed_tasks') }}</h4>
+				</header>
+				<section>
+					{% for task in completed_tasks %}
+						{% include 'AgentBundle:Task:task-list-row.html.twig' with {'task': task } %}
+					{% endfor %}
+				</section>
+			</div>
+		</div>
+		{% endif %}
+
+		{% if not has_any and not completed_tasks|length %}
+		<section class="list-listing no-results" id="{{ tplvars.baseId }}_no_results" {% if ticket_ids|length %}style="display:none"{% endif %}>
+			<article class="row-item no-results">
+				<p style="padding: 15px;">{{ phrase('agent.general.there_are_no_results') }}</p>
+			</article>
+		</section>
+		{% endif %}
+
+		<ul id="{{ tplvars.baseId }}_menu_vis" style="display: none">
+			<li data-vis="0">{{ phrase('agent.general.private') }}</li>
+			<li data-vis="1">{{ phrase('agent.general.public') }}</li>
+		</ul>
+
+		<div class="optionbox reply-agent-team-ob" id="{{ tplvars.baseId }}_assign_ob" style="display: none">
+			<div class="col">
+				<section data-section-name="agents">
+					<header>
+						<h3>{{ phrase('agent.general.agents') }}</h3>
+						<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+					</header>
+					<ul>
+						<li class="me last-me">
+							<input type="radio" name="{{ tplvars.baseId }}_asignedto" value="{{ app.user.id }}" />
+							<label><span class="agent-pic agent-label-{{ app.user.id }}" style="background-image: url({{ app.user.getPictureUrl(16) }})">{{ phrase('agent.general.me') }}</span></label>
+						</li>
+
+						{% for agent in agents %}
+							{% if agent.id != app.user.id %}
+								<li>
+									<input type="radio" name="{{ tplvars.baseId }}_asignedto" value="{{ agent.id }}" />
+									<label><span class="agent-pic agent-label-{{ agent.id }}" style="background-image: url({{ agent.getPictureUrl(16) }})">{{ agent.display_name }}</span></label>
+									<div class="bound-fade"></div>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</section>
+			</div>
+			{% if app.getSetting('core.use_agent_team') %}
+			<div class="col">
+				<section data-section-name="teams">
+					<header>
+						<h3>{{ phrase('agent.general.teams') }}</h3>
+						<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+					</header>
+					<ul>
+						{% for team in app.user.getAgent().getTeams() %}
+							<li class="me {% if loop.last %}last-me{% endif %}">
+								<input type="radio" name="{{ tplvars.baseId }}_asignedto" value="{{ team.id }}" />
+								<label class="agent-team-label-{{ team.id }}">{{ team.name }}</label>
+								<div class="bound-fade"></div>
+							</li>
+						{% endfor %}
+
+						{% for team in agent_teams %}
+							{% if team.id not in app.user.getAgent().getTeamIds() %}
+								<li>
+									<input type="radio" name="{{ tplvars.baseId }}_asignedto_team" value="{{ team.id }}" />
+									<label class="agent-team-label-{{ team.id }}">{{ team.name }}</label>
+									<div class="bound-fade"></div>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</section>
+			</div>
+			{% endif %}
+			<br class="clear" />
+		</div>
+	</div>
+
+{% endblock pane_content %}

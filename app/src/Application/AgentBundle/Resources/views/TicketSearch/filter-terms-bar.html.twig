@@ -1,0 +1,10 @@
+{% if terms_summary %}
+<header class="terms-bar">
+	<ul>
+		{% for t in terms_summary %}
+			<li>{{ t }}</li>
+		{% endfor %}
+	</ul>
+	<br class="clear" />
+</header>
+{% endif %}

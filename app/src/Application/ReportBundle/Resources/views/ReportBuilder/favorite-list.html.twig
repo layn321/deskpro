@@ -1,0 +1,9 @@
+{% import 'ReportBundle:ReportBuilder:layout.html.twig' as layout %}
+<ul>
+{% for fav in favorites %}
+	{{ layout.report_list_item(fav.report_builder, 'printable', fav.params) }}
+{% endfor %}
+</ul>
+<script type="text/javascript">
+	window.DeskPRO_Page.updateFavorites({{ favoritesJs|json_encode|raw }});
+</script>

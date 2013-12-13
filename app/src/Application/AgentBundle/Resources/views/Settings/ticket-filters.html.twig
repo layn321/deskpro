@@ -1,0 +1,62 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.SettingsPage.Filters';
+</script>
+<div style="padding: 10px;">
+	<div style="text-align: right">
+		<a class="clean-white" data-route="poppage:{{ path('agent_settings_ticketfilters_new') }}" data-zindex="32050">{{ phrase('agent.settings.create_filter') }}</a>
+	</div>
+
+	<br />
+
+	<div class="check-grid item-list">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align:left;">{{ phrase('agent.general.filters') }}</th>
+					<th style="text-align:left;" width="100">{{ phrase('agent.general.hide') }} <span class="small-light-icon tipped" title="{{ phrase('agent.settings.hidden_filters_info') }}"></span></th>
+					<th style="text-align:left;" width="10">{{ phrase('agent.general.edit') }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for filter in filters %}
+					<tr>
+						<td>{{ filter.title }}</td>
+						<td nowrap="nowrap">
+							<label><input type="checkbox" name="filters_hidden[]" class="filter-hidden-check filter-{{ filter.id }}" value="{{ filter.id }}" {% if filter_show_options['agent.ui.filter-visibility.' ~ filter.id] == 'hidden' %}checked="checked"{% endif %} /> {{ phrase('agent.general.hide') }}</label>
+						</td>
+						<td><button class="clean-white" data-route="poppage:{{ path('agent_settings_ticketfilters_edit', { 'filter_id': filter.id }) }}" data-zindex="32050">{{ phrase('agent.general.edit') }}</button></td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="2">{{ phrase('agent.settings.no_filters') }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+	{% if filters_shared|length %}
+		<br/>
+
+		<div class="check-grid item-list">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th style="text-align:left;">{{ phrase('agent.settings.filters_shared_with_you') }} <span class="small-light-icon tipped" title="{{ phrase('agent.settings.admin_filters_info') }}"></span></th>
+						<th style="text-align:left;" width="100">{{ phrase('agent.general.hide') }} <span class="small-light-icon tipped" title="{{ phrase('agent.settings.hidden_filters_info') }}"></span></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for filter in filters_shared %}
+						<tr>
+							<td>{{ filter.title }}</td>
+							<td nowrap="nowrap">
+								<label><input type="checkbox" name="filters_hidden[]" class="filter-hidden-check filter-{{ filter.id }}" value="{{ filter.id }}" {% if filter_show_options['agent.ui.filter-visibility.' ~ filter.id] == 'hidden' %}checked="checked"{% endif %} /> {{ phrase('agent.general.hide') }}</label>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+</div>

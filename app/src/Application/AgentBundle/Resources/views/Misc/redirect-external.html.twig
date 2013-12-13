@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="robots" content="NOINDEX" />
+	<meta http-equiv="X-UA-Compatible" content="IE=100" />
+
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+    <link rel="stylesheet" href="{{ asset('stylesheets/admin/main.css') }}" type="text/css" media="screen" />
+
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+
+    <script type="text/javascript" charset="utf-8">
+		var DP_TINYMCE_URL = '{{ asset('javascripts/tiny_mce/tiny_mce.js') }}';
+		var BASE_URL = '{{ path('user') }}';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+
+		$(document).ready(function() {
+			$.ajax({
+				url: '{{ path('agent_redirect_out_info', {'url': url}) }}',
+				dataType: 'html',
+				success: function(html) {
+					$('#url_info').html(html).show();
+				}
+			});
+		});
+	</script>
+</head>
+<body class="redirect-screen">
+
+<div id="dp_page_wrap">
+
+<div id="dp_admin_page">
+	<div class="dp-page-box">
+		<div class="page-content">
+			<h1>{{ phrase('agent.general.redirect_title') }}</h1>
+			<p>
+				{{ phrase('agent.general.redirect_explain', {'host': urlinfo.host|e}) }}
+			</p>
+			<div class="url-go">
+				<a class="clean-white" href="{{ url }}">{{ phrase('agent.general.redirect_continue', {'url': url|e}) }}</a>
+			</div>
+			<div id="url_info" class="url-info" style="display: none"></div>
+		</div>
+	</div>
+</div>
+
+</div>
+</body>
+</html>

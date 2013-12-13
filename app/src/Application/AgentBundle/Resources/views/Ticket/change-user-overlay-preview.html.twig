@@ -1,0 +1,16 @@
+<table width="100%" style="margin-top: 1em">
+	<tr>
+		<td width="15" style="padding-right: 10px; vertical-align: middle;">
+			<img src="{{ new_person.getPictureUrl(80) }}" width="80" height="80" />
+		</td>
+		<td style="vertical-align: middle;">
+			<h3>{{ new_person.display_name }}</h3>
+			<div class="line">{{ new_person.primary_email_address }}</div>
+			{% if person.organization %}
+				<div class="line">
+					{{ new_person.organization.name }} {% if new_person.organization_position %}({{ new_person.organization_position }}){% endif %}
+				</div>
+			{% endif %}
+		</td>
+	</tr>
+</table>

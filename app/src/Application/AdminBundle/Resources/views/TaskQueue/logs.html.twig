@@ -1,0 +1,60 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li>Task Queue Logs</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+{% if show_task_status %}
+	<div class="alert-message block-message success">
+		There are currently tasks running in the background. These will run even if you are not connected to DeskPRO.<br />
+		<br />
+		The current background task status will be updated here periodically:
+		<span data-element-handler="DeskPRO.Admin.ElementHandler.TaskQueueStatus" data-task-group="data_import" style="font-weight: bold">Updating...</span>
+	</div>
+{% endif %}
+
+{% if tasks %}
+<div class="check-grid item-list">
+	<table width="100%">
+	<thead>
+		<tr>
+			<th style="text-align: left">Title</th>
+			<th style="text-align: left">Date Created</th>
+			<th style="text-align: left">Status</th>
+			<th style="text-align: left; width: 40%">Message</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for task in tasks %}
+		<tr>
+			<td>{{ task.title }}</td>
+			<td><time class="timeago" title="{{task.date_runnable|date('c', 'UTC')}}"></time></td>
+			<td>
+				{% if task.status == 'completed' %}
+					Completed (<time class="timeago" title="{{task.date_completed|date('c', 'UTC')}}"></time>)
+				{% elseif task.status == 'running' %}
+					Running (<time class="timeago" title="{{task.date_started|date('c', 'UTC')}}"></time>)
+				{% elseif task.status == 'errored' %}
+					Running (<time class="timeago" title="{{task.date_started|date('c', 'UTC')}}"></time>)
+				{% elseif task.status == 'queued' %}
+					Queued
+				{% endif %}
+			</td>
+			<td>
+				{% if task.status == 'errored' %}
+					{{ task.error_text }}
+				{% else %}
+					{{ task.run_status }}
+				{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+</div>
+{% else %}
+	<div class="note-box">No tasks have been logged. (Completed task logs are removed periodically.)</div>
+{% endif %}
+{% endblock %}

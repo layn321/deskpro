@@ -1,0 +1,51 @@
+<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table th-la billing-table" {% if ticket.charges is empty %}style="display:none"{% endif %}>
+<thead>
+	<th>{{ phrase('agent.tickets.billing_chargetime') }}</th>
+	<th>{{ phrase('agent.general.agent') }}</th>
+	<th>{{ phrase('agent.general.date') }}</th>
+	<th>{{ phrase('agent.general.comment') }}</th>
+	<th style="min-width: 20px">&nbsp;</th>
+</thead>
+<tbody id="{{ baseId }}_billing_rows" data-delete-confirm="{{ phrase('agent.tickets.billing_delete_confirm') }}">
+{% for charge in ticket.charges %}
+	{% include 'AgentBundle:Ticket:view-billing-row.html.twig' %}
+{% endfor %}
+</tbody>
+</table>
+
+<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table billing-form" id="{{ baseId }}_billing_form">
+<tr>
+	<th width="80">{{ phrase('agent.tickets.billing_charge') }}</th>
+	<td>
+		<ul class="billing-types">
+			<li>
+				<label><input type="radio" name="{{ baseId }}_billing_type" value="amount" />{{ phrase('agent.tickets.billing_amount') }}:</label>
+				<input type="text" id="{{ baseId }}_billing_amount" name="amount" size="7" placeholder="0.00" class="billing-form-amount" /> {{ app.getSetting('core_tickets.billing_currency') }}
+			</li>
+			<li>
+				<label><input type="radio" name="{{ baseId }}_billing_type" value="time" checked="checked" />{{ phrase('agent.tickets.billing_time') }}:</label>
+				<span id="{{ baseId }}_billing_inputs" class="billing-form-time">
+					<input type="text" id="{{ baseId }}_billing_hours" name="hours" size="2" placeholder="H" />:<input type="text" id="{{ baseId }}_billing_minutes" name="{{ phrase('agent.general.minutes') }}" size="2" placeholder="M" maxlength="2" />:<input type="text" id="{{ baseId }}_billing_seconds" name="{{ phrase('agent.general.seconds') }}" size="2" placeholder="S" maxlength="2" />
+				</span>
+				<span class="billing-form-buttons">
+					<button class="clean-white" id="{{ baseId }}_billing_start">{{ phrase('agent.general.start') }}</button>
+					<button class="clean-white" id="{{ baseId }}_billing_stop">{{ phrase('agent.general.pause') }}</button>
+					<button class="clean-white" id="{{ baseId }}_billing_reset">{{ phrase('agent.general.reset') }}</button>
+				</span>
+			</li>
+		</ul>
+		<input type="hidden" id="{{ baseId }}_billing_type_hidden" name="billing_type" value="time" />
+	</td>
+</tr>
+<tr>
+	<th>{{ phrase('agent.general.comment') }}</th>
+	<td><input type="text" id="{{ baseId }}_billing_comment" name="billing_comment" style="width: 98%" maxlength="255" /></td>
+</tr>
+<tr>
+	<th>&nbsp;</th>
+	<td>
+		<button class="clean-white" id="{{ baseId }}_billing_save" data-submit-url="{{ path('agent_ticket_addcharge', {ticket_id: ticket.id}) }}">{{ phrase('agent.tickets.billing_add_charge') }}</button>
+		<img src="{{ asset('images/spinners/loading-small.gif') }}" style="display: none" id="{{ baseId }}_billing_save_progress" />
+	</td>
+</tr>
+</table>

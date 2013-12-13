@@ -1,0 +1,35 @@
+<div class="optionbox reply-agent-team-ob" id="{{baseId}}_person_assign_ob">
+    	<header>
+			<h4>{{ phrase('agent.general.assignments') }}</h4>
+			<span class="close close-trigger"></span>
+		</header>
+    	<div class="col">
+		<section data-section-name="agents">
+			<header>
+				<h3>{{ phrase('agent.deal.persons') }}</h3>
+				<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+			</header>
+			<ul>
+				<li class="me last-me {% if person.id in participant_person_ids %}on{% endif %}">
+					<input type="radio" name="{{baseId}}_person" value="{{ deal.person.id }}" {% if deal.assigned_agent.id == deal.person.id or not deal.assigned_agent.id %}checked="checked"{% endif %} />
+					<label><span class="agent-pic agent-label-{{ deal.person.id }}" style="background-image: url({{ deal.person.getPictureUrl(16) }})">{{ phrase('agent.general.me') }}</span></label>
+				</li>
+
+				{% for agent in persons %}
+					{% if agent.id != person.id %}
+                                                <li {% if agent.id in participant_person_ids %}class="on"{% endif %}>
+                                                        <input type="radio" name="{{bsaeId}}_person" value="{{ agent.id }}" {% if agent.id in participant_ids %}checked="checked"{% endif %} />
+							<label><span class="agent-pic agent-label-{{ agent.id }}" style="background-image: url({{ agent.getPictureUrl(16) }})">{{ agent.display_name }}</span></label>
+							<div class="bound-fade"></div>
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</section>
+	</div>
+
+    	<br class="clear" />
+    	<footer>
+           <button class="save-trigger">{{ phrase('agent.general.apply') }}</button>
+        </footer>
+</div>

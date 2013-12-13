@@ -1,0 +1,79 @@
+{##
+ # The user controls portion of the comments box. For guests, this will be the name
+ # and email address fields and login options. For registered users, this will list their name.
+ ##}
+
+{% if not app.user.is_guest %}
+<div class="dp-form">
+	<table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 10px;">
+		<div class="dp-control-label">
+			<label><strong>{{ phrase('user.general.comments_logged_in_as') }}:</strong></label>
+		</div>
+		<div class="dp-controls">
+			<span class="logged-in-as {{ app.session.get('auth_usersource_type') }}">
+				{% if app.session.get('usersource_display_link') %}
+					<a href="{{ app.session.get('usersource_display_link') }}">
+						{{ app.session.get('usersource_display_name')|default(app.user.display_name_user) }}
+					</a>
+				{% else %}
+					{{ app.session.get('usersource_display_name')|default(app.user.display_name_user) }}
+				{% endif %}
+
+				&nbsp; (<a href="{{ path('user_logout', {'auth': static_security_token('user_logout', 0) }) }}">{{ phrase('user.general.log_out') }}</a>)
+			</span>
+		</div>
+	</td></tr></table>
+</div>
+{% else %}
+<div class="dp-form">
+	<div class="form-row">
+		<table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" width="50%" style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 10px;">
+			<div class="dp-control-group {% if error_fields['person.name'] %}dp-error{% endif %} dp-control-group-person_name">
+				<div class="dp-control-label">
+					<label><strong>{{ phrase('user.general.name') }} *</strong></label>
+				</div>
+				<div class="dp-controls">
+					<input
+						type="text"
+						name="new_comment[name]"
+						class="display-name-field"
+						value=""
+						data-field-validators="DeskPRO.Form.LengthValidator"
+						data-min-len="2"
+						/>
+					<div class="dp-help-inline dp-error-explain">
+						{{ phrase('user.general.please_enter_your_name') }}
+					</div>
+				</div>
+			</div>
+		</td><td valign="top" width="50%" style="padding-{% if is_rtl() %}right{% else %}left{% endif %}: 10px;">
+			<div class="dp-control-group dp-control-group-person_email" id="comment_login_wrap">
+				<div class="dp-control-label">
+					<label><strong>{{ phrase('user.general.email_address') }} *</strong></label>
+				</div>
+				<div class="dp-controls">
+					<input
+						type="text"
+						name="new_comment[email]"
+						class="display-name-field"
+						value=""
+						data-field-validators="DeskPRO.Form.LengthValidator"
+						data-min-len="2"
+						/>
+					{% if app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+					<div class="connect-with">
+						{{ phrase('user.profile.or_connect_with') }}
+						{% for usersource in app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+						{{ render_usersource(usersource, 'widget_overlay_btn') }}
+						{% endfor %}
+					</div>
+					{% endif %}
+					<div class="dp-error-explain">
+						{{ phrase('user.general.comments_please_enter_email') }}
+					</div>
+				</div>
+			</div>
+		</td></tr></table>
+	</div>
+</div>
+{% endif %}

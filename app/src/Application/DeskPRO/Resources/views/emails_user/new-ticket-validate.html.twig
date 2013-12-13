@@ -1,0 +1,10 @@
+<dp:subject>{{ phrase('user.email_subjects.email_new-confirm') }}</dp:subject>
+
+{{ phrase('user.emails.ticket_validate') }}
+
+<br /><br />
+
+{{ phrase('user.emails.profile_email_link-validate') }}:
+<a href="{{ url_full('user_validate_ticket', {'access_code': ticket.access_code}) }}">
+	{{ url_full('user_validate_ticket', {'access_code': ticket.access_code}) }}
+</a>

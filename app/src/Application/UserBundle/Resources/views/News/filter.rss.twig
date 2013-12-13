@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+	<channel>
+	{% if category %}
+		<title>{{ app.getSetting('core.deskpro_name') }} - {{ category.full_title }}</title>
+		<description>{{ app.getSetting('core.deskpro_name') }} - {{ category.full_title }}</description>
+		<link>{{ url('user_news', {'slug': category.url_slug}) }}</link>
+	{% else %}
+		<title>{{ app.getSetting('core.deskpro_name') }}</title>
+		<description>{{ phrase('user.news.title') }} - {{ app.getSetting('core.deskpro_name') }}</description>
+		<link>{{ url('user_news_home') }}</link>
+	{% endif %}
+	<lastBuildDate>{{ 'now'|date('r') }}</lastBuildDate>
+	<pubDate>{{ 'now'|date('r') }}</pubDate>
+	<ttl>1800</ttl>
+		{% for news in news_entries %}
+			<item>
+				<title>{{ news.title }}</title>
+				<description>{{ news.content }}</description>
+				<link>{{ news.link }}</link>
+				<guid>{{ news.getPermalink() }}</guid>
+				<pubDate>{{ news.date_published|date('r') }}</pubDate>
+			</item>
+		{% endfor %}
+	</channel>
+</rss>

@@ -1,0 +1,27 @@
+{##
+ # Used to draw the download category tree on the browse pages
+ ##}
+
+{% for cat in categories %}
+	<li class="dp-download-folder">
+		<div class="dp-fadeaway-container">
+			<i class="dp-icon-folder-close"></i>
+			<a class="dp-fadetitle" href="{{ path('user_downloads', {slug: cat.url_slug}) }}">{{ cat.title }}</a>
+			<div class="dp-fadeaway"></div>
+			<span class="dp-badge dp-small">{{ category_counts[cat.id ~ '_total']|default(0) }}</span>
+		</div>
+		{% if cat.children|length %}
+			{% for subcat in cat.children %}
+				<li class="dp-sub">
+					<i class="dp-sub-mark"></i>
+					<div class="dp-fadeaway-container">
+						<i class="dp-icon-folder-close"></i>
+						<a class="dp-fadetitle" href="{{ path('user_downloads', {slug: subcat.url_slug}) }}">{{ subcat.title }}</a>
+						<div class="dp-fadeaway"></div>
+						<span class="dp-badge dp-small">{{ category_counts[subcat.id ~ '_total']|default(0) }}</span>
+					</div>
+				</li>
+			{% endfor %}
+		{% endif %}
+	</li>
+{% endfor %}

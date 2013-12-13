@@ -1,0 +1,60 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.SettingsPage.TicketSlas';
+</script>
+<div style="padding: 10px;">
+	{% if slas|length %}
+
+		{{ phrase('agent.settings.sla_filter_results') }}: <select class="grouping-option" data-sla-id="{{ sla.id }}">
+			<option value="all" {% if sla_filter == 'all' %}selected="selected"{% endif %}>{{ phrase('agent.settings.sla_filter_all') }}</option>
+			<option value="agent" {% if sla_filter == 'agent' %}selected="selected"{% endif %}>{{ phrase('agent.settings.sla_filter_assigned') }}</option>
+			{% if app.user.getAgentTeamIds()|length %}
+				<option value="team" {% if sla_filter == 'team' %}selected="selected"{% endif %}>{{ phrase('agent.settings.sla_filter_team') }}</option>
+			{% endif %}
+		</select>
+		<span class="small-light-icon tipped" title="{{ phrase('agent.settings.sla_filter_results_info') }}"></span>
+
+		<br/>
+
+		<div class="check-grid item-list">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th style="text-align:left;">{{ phrase('agent.general.slas') }}</th>
+						<th style="text-align:left;">{{ phrase('agent.general.type') }}</th>
+						<th style="text-align:left;">{{ phrase('agent.general.warning') }}</th>
+						<th style="text-align:left;">{{ phrase('agent.general.failure') }}</th>
+						<th style="text-align:left;">{{ phrase('agent.general.hide') }} <span class="small-light-icon tipped" title="{{ phrase('agent.settings.hidden_filters_info') }}"></span></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for sla in slas %}
+						<tr>
+							<td>{{ sla.title }}</td>
+							<td>
+								{% if sla.sla_type == 'first_response' %}{{ phrase('agent.general.time_until_first_response') }}
+								{% elseif sla.sla_type == 'resolution' %}{{ phrase('agent.general.time_until_resolution') }}
+								{% elseif sla.sla_type == 'waiting_time' %}{{ phrase('agent.general.user_time_until_resolution') }}{% endif %}
+								{% if sla.active_time == 'default' %}({{ phrase('agent.general.default_working_hours') }})
+								{% elseif sla.active_time == 'all' %}({{ phrase('agent.general.24x7') }})
+								{% elseif sla.active_time == 'work_hours' %}({{ phrase('agent.general.working_hours') }}){% endif %}
+							</td>
+							<td>{{ sla.getWarningTimeText() }}</td>
+							<td>{{ sla.getFailTimeText() }}</td>
+							<td nowrap="nowrap">
+								<label><input type="checkbox" name="slas_hidden[]" class="sla-hidden-check filter-{{ sla.id }}" value="{{ sla.id }}" {% if filter_show_options['agent.ui.sla.filter-visibility.' ~ sla.id] == 'hidden' %}checked="checked"{% endif %} /> {{ phrase('agent.general.hide') }}</label>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% else %}
+		<p style="padding:10px;">
+			{% if app.user.can_admin %}
+				{{ phrase('agent.settings.no_slas_admin') }}
+			{% else %}
+				{{ phrase('agent.settings.no_slas') }}
+			{% endif %}
+		</p>
+	{% endif %}
+</div>

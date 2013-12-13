@@ -1,0 +1,17 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>
+	{{ phrase('agent.emails.task_assigned_to_you_by', {title: task.title, agent: performer.getDisplayName() }) }}
+</dp:subject>
+{% if task.assigned_agent %}
+
+{{ phrase('agent.emails.task_assigned_to_you_by', {title: task.title, agent: performer.getDisplayName() }) }}
+<br /><br />
+<a href="{{ url_full('agent') }}#app.tasks,tasks:own:total">{{ phrase('agent.emails.view_your_tasks') }}</a>
+
+{% elseif task.assigned_agent_team %}
+
+{{ phrase('agent.emails.task_assigned_to_your_team_by', {title: task.title, agent: performer.getDisplayName() }) }}
+<br /><br />
+<a href="{{ url_full('agent') }}#app.tasks,tasks:team:total">{{ phrase('agent.emails.view_your_teams_tasks') }}</a>
+
+{% endif %}

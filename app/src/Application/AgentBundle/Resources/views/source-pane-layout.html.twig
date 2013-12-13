@@ -1,0 +1,21 @@
+{% set _nothing %}{% block dp_declare %}{% endblock %}{% endset %}
+{% block top %}{% endblock %}
+<div class="source-pane-instance {{ add_classname }}">
+	<div class="source-pane-header">
+		{% block pane_header %}
+			<ul class="pane-tabs">
+				{% block pane_main_tab %}{% endblock %}
+				{% block pane_other_tabs %}<li class="tab" data-tab-id="pane-content-search"><i class="icon-search"></i> {{ phrase('agent.chrome.nav_search') }}</li>{% endblock %}
+			</ul>
+		{% endblock %}
+	</div>
+	<div class="source-pane-content">
+		<div class="layout-content with-scrollbar">
+		<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+		<div class="scroll-viewport"><div class="scroll-content">
+			{% block pane_content %}{% endblock %}
+		</div>
+		</div>
+		</div>
+	</div>
+</div>

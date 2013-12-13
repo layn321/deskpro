@@ -1,0 +1,53 @@
+<div class="overlay forward-overlay" style="width: 780px; height: 600px;">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.tickets.forward_message') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+		<form action="{{ path('agent_ticket_fwd_send', {ticket_id: ticket.id, message_id: message.id}) }}" method="post">
+			<div class="forward-wrapper">
+				<div class="header-line">
+					<div class="label">{{ phrase('agent.general.to') }}:</div>
+					<div class="input"><input type="text" name="to" value="" placeholder="{{ phrase('agent.general.email_address') }}" /></div>
+				</div>
+				<div class="header-line last">
+					<div class="label">{{ phrase('agent.general.subject') }}:</div>
+					<div class="input"><input type="text" name="subject" placeholder="{{ phrase('agent.general.subject') }}" value="FW: {{ ticket.subject }}" /></div>
+				</div>
+				<div class="message-area">
+					<div class="uneditable-message">
+						<p>
+							{% set phrase_part1 %}<a href="{{ app.getSetting('core.deskpro_url') }}">{{ app.getSetting('core.deskpro_name') }}</a>{% endset %}
+							{% set phrase_part2 %}{{ app.user.getDisplayName() }} &lt;<a href="mailto:{{ app.user.getPrimaryEmailAddress() }}">{{ app.user.getPrimaryEmailAddress() }}</a>&gt;{% endset %}
+							{{ phrase('agent.tickets.forward_header', {hd: phrase_part1, user: phrase_part2}, true) }}
+						</p>
+						<p>
+							{% set phrase_part1 %}{{ ticket.person.getDisplayName }} &lt;<a href="mailto:{{ ticket.person.getPrimaryEmailAddress() }}">{{ ticket.person.getPrimaryEmailAddress }}</a>&gt;{% endset %}
+							{{ phrase('agent.tickets.forward_noreply_header', {user: phrase_part1}, true) }}
+						</p>
+					</div>
+					<div class="real-textarea"><textarea placeholder="{{ phrase('agent.tickets.optionally_enter_message') }}" name="custom_message" class="note"></textarea></div>
+					<div class="fwd-headers">
+						--- {{ phrase('agent.tickets.forwarded_message') }} ---<br/>
+						{{ phrase('agent.general.from') }}: {{ ticket.person.getDisplayName() }} &lt;<a href="mailto:{{ ticket.person.getPrimaryEmailAddress() }}">{{ ticket.person.getPrimaryEmailAddress() }}</a>&gt;<br/>
+						{{ phrase('agent.general.to') }}: {{ ticket.getFromAddress().name }} &lt;<a href="mailto:{{ ticket.getFromAddress().email }}">{{ ticket.getFromAddress().email }}</a>&gt;<br/>
+						{{ phrase('agent.general.subject') }}: {{ ticket.subject }}<br/>
+						{{ phrase('agent.general.date') }}: {{ date_created|date('fulltime') }}
+					</div>
+					<div class="orig-message">
+						<iframe src="{{ path('agent_ticket_message_raw', {ticket_id: ticket.id, message_id: message.id, raw: security_token('view_raw', 10800), _rt: security_token('request_token', 10800)}) }}" frameborder="0" marginheight="0" marginwidth="0" width="100%" style="margin:0;border:0;"></iframe>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div class="overlay-footer">
+		<div class="is-not-loading">
+			<button class="save-trigger clean-white">{{ phrase('agent.general.send') }}</button>
+		</div>
+		<div class="is-loading">
+			<div class="loading-icon"></div>
+		</div>
+	</div>
+</div>

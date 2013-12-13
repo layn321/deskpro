@@ -1,0 +1,8 @@
+<li class="item-row trigger-row {% if app.getSetting('core_tickets.disable_agent_notifications') %}off{% endif %} agent-notfy-trigger-row">
+	<div class="dp-block-controls">
+		<ul>
+			<li class="dp-edit-fields" onclick="window.location='{{ path('admin_agents_notifications') }}';"><span>Edit Agent Notifications</span></li>
+		</ul>
+	</div>
+	Send agent notifications based on agent preferences
+</li>

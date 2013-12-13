@@ -1,0 +1,220 @@
+Delivered-To: test@example.com
+Received: by 10.76.3.111 with SMTP id b15csp119576oab;
+        Tue, 26 Jun 2012 10:02:48 -0700 (PDT)
+Received: by 10.216.218.200 with SMTP id k50mr9236472wep.212.1340730167152;
+        Tue, 26 Jun 2012 10:02:47 -0700 (PDT)
+Return-Path: <chris.nadeau@deskpro.com>
+Received: from mail-wg0-f52.google.com (mail-wg0-f52.google.com [74.125.82.52])
+        by mx.google.com with ESMTPS id t3si5269173wiy.46.2012.06.26.10.02.46
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Tue, 26 Jun 2012 10:02:47 -0700 (PDT)
+Received-SPF: pass (google.com: domain of chris.nadeau@deskpro.com designates 74.125.82.52 as permitted sender) client-ip=74.125.82.52;
+Authentication-Results: mx.google.com; spf=pass (google.com: domain of chris.nadeau@deskpro.com designates 74.125.82.52 as permitted sender) smtp.mail=chris.nadeau@deskpro.com; dkim=pass header.i=@gmail.com
+Received: by wgbgn7 with SMTP id gn7so107755wgb.33
+        for <test@example.com>; Tue, 26 Jun 2012 10:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=date:from:to:message-id:in-reply-to:references:subject:x-mailer
+         :mime-version:content-type;
+        bh=JET3OwImM4VCIhvsIggsJyL9hCyW4xQK6aXuyTOtssk=;
+        b=LjaNLcSUerq++lItDfywriVy+d/9v+pGQ5k+lMXLfknIhgcJWITrj2Zt8exBiB30aN
+         3d2YWykPvLRK5qp8+jLGVCh239ORWvK4H6CmrMVS/UBRBjqRfLp4m/t9fCUQjE+2P0VE
+         5xwufL5qlqkhxjcw+9/n9f46L2FiZxHs71kUwM63ECymdFiU+JkeWsVjJNqwN7QBidU1
+         VTrXM7ELO+0YoWzjesFhpypewAFK6w07r/teBDJek90680LKMG1dAi5m8n7EjWq0pbEz
+         r0JLl3E4vI7D27p74Fi9nHDucCXoakWNlDbfzOkqsOWVtgsxVKIuSkE8OWIQM4LescQ0
+         4qhQ==
+Received: by 10.180.96.3 with SMTP id do3mr21059470wib.5.1340730166481;
+        Tue, 26 Jun 2012 10:02:46 -0700 (PDT)
+Return-Path: <chris.nadeau@deskpro.com>
+Received: from [172.18.5.121] (iw-01.clients.vorboss.net. [194.8.255.114])
+        by mx.google.com with ESMTPS id q6sm5753668wiy.0.2012.06.26.10.02.45
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Tue, 26 Jun 2012 10:02:45 -0700 (PDT)
+Date: Tue, 26 Jun 2012 18:02:42 +0100
+From: Christopher Nadeau <chris.nadeau@deskpro.com>
+To: DeskPRO <test@example.com>
+Message-ID: <9DCD9642419C487FAD4C29AE6C788F99@gmail.com>
+In-Reply-To: <PTAC-LXW2YQRTPCDGS77M.4fe9eab9c8baf8.25660194-1@d41d8cd98f00b204e9800998ecf8427e>
+References: <PTAC-LXW2YQRTPCDGS77M.4fe9eab9c8baf8.25660194-1@d41d8cd98f00b204e9800998ecf8427e>
+Subject: Re: Test Subject - 20120626180023
+X-Mailer: sparrow 1.6.1 (build 1081.51)
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="4fe9eb32_39ee015c_10648"
+
+--4fe9eb32_39ee015c_10648
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Test Subject - 20120626180231
+
+-- Christopher
+
+
+On Tuesday, 26 June 2012 at 18:00, DeskPRO wrote:
+
+> _______________________.
+> Dear Christopher Nadeau,
+>
+> Your ticket has been received and our agents will reply to you as soon as they can.
+> On Tue, 26th Jun 2012 at 5:00 pm, Christopher Nadeau <chris.nadeau@deskpro.com (mailto:chris.nadeau@deskpro.com)> wrote:
+>
+> Test Subject - 20120626180025
+>
+> -- Christopher
+>
+>
+>
+>
+>
+> View and manage this ticket online: http://dp4.devput/ticket/LXW2YQRTPCDGS77M  (http://dp4.devput/ticket/LXW2YQRTPCDGS77M)
+>
+>
+> http://dp4.devput/
+>
+>
+>
+>
+>
+>
+>
+> (#LXW2YQRTPCDGS77M)
+
+
+--4fe9eb32_39ee015c_10648
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+
+                <div>Test Subject - 20120626180231
+                </div>
+                <div><div><br></div><div>-- Christopher</div><div><br></d=
+iv></div>
+                =20
+                <p style=3D=22color: =23A0A0A8;=22>On Tuesday, 26 June 20=
+12 at 18:00, DeskPRO wrote:</p>
+                <blockquote type=3D=22cite=22 style=3D=22border-left-styl=
+e:solid;border-width:1px;margin-left:0px;padding-left:10px;=22>
+                    <span><div><div><=21--DP=5FTOP=5FMARK-->
+
+
+<=21--DP=5FTOP=5FMARK--><div style=3D=22color:=23=46=46=46=46=46=46;font-=
+size:1px;line-height: =20
+1px;=22>=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=5F=
+=5F.</div><table width=3D=22100%=22 border=3D=220=22 cellpadding=3D=220=22=
+ cellspacing=3D=220=22 style=3D=22font-family:'Helvetica Neue', =20
+Helvetica, Arial, sans-serif;=22>
+		<tbody><tr>
+		<td valign=3D=22top=22 style=3D=22font-family:'Helvetica Neue', Helveti=
+ca, Arial, =20
+sans-serif; color:=23242424; background-color: =23=46=46=46=46=46=46; pad=
+ding: 0;=22 bgcolor=3D=22=23=46=46=46=46=46=46=22>			<table width=3D=2210=
+0%=22 border=3D=220=22 cellspacing=3D=220=22 cellpadding=3D=220=22 style=3D=
+=22padding:0;margin:0;=22>
+							<tbody><tr>
+				<td style=3D=22font-family:'Helvetica Neue', Helvetica, Arial, sans-s=
+erif; =20
+font-size:12px; line-height:125%; padding-bottom:0;=22>
+								Dear Christopher Nadeau,<br><br>
+
+		Your ticket has been received and our agents will reply to you as soon =
+as =20
+they can.
+	=09
+				</td>
+			</tr>
+			</tbody></table>
+
+
+	<br>
+						<table width=3D=22100%=22 border=3D=220=22 cellspacing=3D=220=22 ce=
+llpadding=3D=220=22>
+			<tbody><tr>
+		<td style=3D=22font-family:'Helvetica Neue', Helvetica, Arial, sans-ser=
+if; =20
+font-size:12px; line-height:125%;=22>
+																						<table width=3D=22620=22 border=3D=220=22 cellspaci=
+ng=3D=220=22 cellpadding=3D=223=22>
+		<tbody><tr><td style=3D=22font-family:'Helvetica Neue', Helvetica, Aria=
+l, sans-serif; =20
+font-size:12px; line-height:125%; color: =236D6D6D;=22>On Tue, 26th Jun 2=
+012 at =20
+5:00 pm, Christopher Nadeau &lt;<a href=3D=22mailto:chris=40nadeau.ws=22>=
+chris=40nadeau.ws</a>&gt; wrote:</td></tr>
+		<tr><td style=3D=22font-family:'Helvetica Neue', Helvetica, Arial, sans=
+-serif; =20
+font-size:12px; line-height:125%; padding-left: 6px;=22>
+			<table cellspacing=3D=220=22 cellpadding=3D=220=22 width=3D=22100%=22>=
+<tbody><tr><td style=3D=22font-family:'Helvetica Neue', Helvetica, Arial,=
+ sans-serif; =20
+border-left: 1px solid =2300174B; color: =2300174B; font-size:12px; =20
+line-height:125%; padding-left: 8px;=22>
+				<span title=3D=22dp=5Fmessage=5F44=5Fbegin=22 style=3D=22width:1px;fo=
+nt-size:1px;border:none;padding:0;margin:0;=22>&nbsp;</span>
+				<div>Test Subject - 20120626180025
+</div>
+<div><div><br></div><div>-- Christopher</div><div><br></div></div>
+				<span title=3D=22dp=5Fmessage=5F44=5Fend=22 style=3D=22width:1px;font=
+-size:1px;border:none;padding:0;margin:0;=22>&nbsp;</span>
+							</td></tr></tbody></table>
+		</td></tr>
+		<tr><td style=3D=22padding-bottom: 6px;=22><br></td></tr>
+	</tbody></table>
+
+														=09
+		</td>
+	</tr>
+	</tbody></table>
+
+	=09
+</td>
+	</tr>
+		<tr>
+	<td valign=3D=22top=22 style=3D=22color:=23949494; background-color: =23=
+=46=46=46=46=46=46=22>
+			<div style=3D=22font-size: 12px; line-height: 100%; padding: 0; margin=
+: 15px 0 =20
+0 0; border-top: 2px solid =23C5C5C5;=22>&nbsp;</div>
+
+					<p style=3D=22font-family:'Helvetica Neue', Helvetica, Arial, sans-s=
+erif; =20
+font-size: 12px; margin: 0; padding: 0;=22>        View and manage this t=
+icket =20
+online:
+		<a href=3D=22http://dp4.devput/ticket/LXW2YQRTPCDGS77M=22 style=3D=22co=
+lor: =20
+=23949494;text-decoration: underline;=22>
+			http://dp4.devput/ticket/LXW2YQRTPCDGS77M
+		</a>
+	</p>
+
+
+		<p style=3D=22margin: 6px 0 0 0; padding: 0; font-family:'Helvetica Neu=
+e', =20
+Helvetica, Arial, sans-serif; font-size: 12px;=22>
+							<a href=3D=22http://dp4.devput/=22 style=3D=22color: =23949494;tex=
+t-decoration: =20
+underline; font-size: 12px;=22>http://dp4.devput/</a>
+					</p>
+	</td>
+</tr>
+</tbody></table>
+	<br><br>
+		<span style=3D=22color:=23ffffff;text-size:8px;=22>(=23LXW2YQRTPCDGS77M=
+)</span>
+
+
+</div></div></span>
+                =20
+                =20
+                =20
+                =20
+                </blockquote>
+                =20
+                <div>
+                    <br>
+                </div>
+
+--4fe9eb32_39ee015c_10648--
+

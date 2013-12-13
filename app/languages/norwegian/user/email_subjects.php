@@ -1,0 +1,18 @@
+<?php return array(
+	'user.email_subjects.chat_transcript'                                  => 'Samtale referat',
+	'user.email_subjects.comment-approved'                                 => 'Din kommentar har blitt godkjent',
+	'user.email_subjects.comment-confirmation'                             => 'Takk for din kommentar',
+	'user.email_subjects.comment-deleted'                                  => 'Din kommentar ble lest av våre medarbeidere',
+	'user.email_subjects.email_new-confirm'                                => 'Bekreft epost addressen din',
+	'user.email_subjects.feedback_new'                                     => 'Takk for at du sendte tilbakemelding',
+	'user.email_subjects.feedback_new-approved'                            => 'Din tilbakemelding har blitt godkjent',
+	'user.email_subjects.feedback_new-comment'                             => 'Det er en ny kommentar på "{{title}}"',
+	'user.email_subjects.feedback_new-confirm'                             => 'Takk for at du sendte tilbakemelding (må bekreftes)',
+	'user.email_subjects.feedback_new-disapproved'                         => 'Din tilbakemelding har blitt avvist',
+	'user.email_subjects.feedback_updated'                                 => 'Din tilbakemelding har blitt oppdatert: {{title}}',
+	'user.email_subjects.password_agent-reset'                             => 'Ditt passord har blitt nullstillt',
+	'user.email_subjects.password_reset'                                   => 'Nullstill passord',
+	'user.email_subjects.re'                                               => 'RE: {{subject}}',
+	'user.email_subjects.ticket_new-participant'                           => 'En ny person har blitt lagt til din sak',
+	'user.email_subjects.validate-email'                                   => 'Bekreft epostaddressen din',
+);

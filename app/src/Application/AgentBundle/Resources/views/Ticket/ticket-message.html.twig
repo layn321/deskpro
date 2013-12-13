@@ -1,0 +1,203 @@
+<article
+	class="content-message message message-{{message.id}} {% if not message.is_agent_note %}public-message{% endif %} {% if message.is_agent_note %}note-message{% elseif message.person.is_agent %}agent-message{% else %}user-message{% endif %} {% if ticket_message_attachments[message.id] %}with-attach{% endif %} {% if all_feedback[message.id] %}with-feedback{% endif %}"
+	data-message-id="{{message.id}}"
+>
+	<div class="avatar"><img
+			src="{{ message.person.getPictureUrl(40) }}"
+			alt=""
+			width="40"
+			height="40"
+			{% if message.person.is_agent %}class="agent-link" data-agent-id="{{ message.person.id }}"
+			{% else %}class="person-overview" data-route="person:{{ path('agent_people_view', {'person_id': message.person.id}) }}"
+			{% endif %}
+		/>{% if message.person.is_disabled %}<span class="person-disabled"></span>{% endif %}</div>
+	<div class="content">
+		<header>
+			<span class="edit-gear ticket-message-edit-btn" data-message-id="{{ message.id }}"><i class="icon-cog"></i></span>
+			<div class="message-header-extra-controls">
+				<div class="message-translate-controls">
+					<div class="translate-controls-off">
+						<span>{{ phrase('agent.general.translation') }}</span>
+						<i class="icon-globe"></i>
+					</div>
+					<div class="translate-controls-on">
+						{% if app.isPluginInstalled('MicrosoftTranslator') %}
+							<div class="dp-is-loading">
+								<i class="flat-spinner"></i>
+							</div>
+							<div class="dp-btn-group dp-dropdown dp-not-loading">
+								<a class="dp-btn trans-trigger">
+									{% set phrase_part1 %}
+										<span class="translate-from-lang" data-locale="{{ ticket.language.locale|default(app.languages.getDefault().locale) }}">
+											{% if ticket.language %}{{ phrase_object(ticket.language) }}{% else %}{{ phrase_object(app.languages.getDefault()) }}{% endif %}
+										</span>
+									{% endset %}
+									{% set phrase_part2 %}
+										<span class="translate-to-lang" data-locale="{{ app.user.language.locale }}">
+											{{ phrase_object(app.user.language) }}
+										</span>
+									{% endset %}
+									{{ phrase('agent.general.translate_from_x_to_y', {x: phrase_part1, y: phrase_part2}, true) }}
+								</a>
+								<a class="dp-btn dp-dropdown-toggle">
+									<span class="dp-caret dp-caret-down"></span>
+									<div class="dp-lang-choose dp-popover" style="display: none;">
+										<div style="padding: 6px;">
+											<select name="from">
+												<option value="{{ ticket.language.locale|default(app.languages.getDefault().locale) }}">{% if ticket.language %}{{ phrase_object(ticket.language) }}{% else %}{{ phrase_object(app.languages.getDefault()) }}{% endif %}</option>
+												<option value="{{ ticket.language.locale|default(app.languages.getDefault().locale) }}"></option>
+												{% for code in app.getPluginService('MicrosoftTranslator.tr_api').getLanguagesForTranslate() %}
+													{% set name = app.getPluginService('MicrosoftTranslator.tr_api').getSingleLanguageName(code) %}
+													<option value="{{ code }}">{{ name }}</option>
+												{% endfor %}
+											</select>
+											to <select name="to">
+												<option value="{{ app.user.language.locale }}">{{ phrase_object(app.user.language) }}</option>
+												<option value="{{ app.user.language.locale }}"></option>
+												{% for code in app.getPluginService('MicrosoftTranslator.tr_api').getLanguagesForTranslate() %}
+													{% set name = app.getPluginService('MicrosoftTranslator.tr_api').getSingleLanguageName(code) %}
+													<option value="{{ code }}">{{ name }}</option>
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+								</a>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<span class="message-counter message-counter-{{ message.id }}" data-message-id="{{ message.id }}">#{{ message_num }}</span>
+			{% if message.getGeoCountry() %}
+				<span class="dp-flag-{{ message.getGeoCountry()|lower }} with-stickytip" data-stickytip-target="#{{ elid }}"></span>
+			{% endif %}
+			{% if message.person.is_agent %}<h4	class="agent-link" data-agent-id="{{ message.person.id }}">{{message.person.display_name}} <span class="email-part">&lt;{{ message.person.getPrimaryEmailAddress() }}&gt;</span></h4>
+			{% else %}<h4 class="as-popover" data-route="person:{{ path('agent_people_view', {'person_id': message.person.id}) }}">{{message.person.getNameWithTitle()}} <span class="email-part">&lt;{{ message.person.getPrimaryEmailAddress() }}&gt;</span></h4>
+			{% endif %}
+			<time class="full-time">{{message.date_created|date('fulltime')}}</time>
+			{% set elid = el_uid() %}
+			<time class="timeago with-stickytip" datetime="{{message.date_created|date('c', 'UTC')}}" data-stickytip-target="#{{ elid }}">{{message.date_created|date('fulltime')}}</time>
+			<div class="dp-stickytip" id="{{ elid }}" style="width: 325px; display: none;">
+				<table cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						<th>{{ phrase('agent.general.date_created') }}:</th>
+						<td>{{ message.date_created|date('fulltime') }}</td>
+					</tr>
+					<tr>
+						<th>{{ phrase('agent.general.via') }}:</th>
+						<td>
+							{% if message.creation_system == 'web.agent.portal' %}
+								{{ phrase('agent.general.agent_interface') }}
+							{% elseif message.creation_system == 'web.person.portal' %}
+								{{ phrase('agent.general.user_interface') }}
+							{% elseif message.creation_system == 'web.person.widget' %}
+								{{ phrase('agent.general.website_widget') }}
+							{% elseif message.creation_system == 'web.person.embed' %}
+								{{ phrase('agent.general.website_embed') }}
+							{% elseif message.creation_system == 'gateway.person' %}
+								{{ phrase('agent.general.email') }}
+							{% elseif message.creation_system == 'gateway.agent' %}
+								{{ phrase('agent.general.email') }} ({{ phrase('agent.general.agent') }})
+							{% elseif message.creation_system == 'web.api' %}
+								{{ phrase('agent.tickets.api') }}
+							{% elseif message.creation_system == 'web.api.mobile.agent' %}
+								{{ phrase('agent.general.mobile') }} ({{ phrase('agent.general.agent') }})
+							{% elseif message.creation_system == 'web.api.mobile.person' %}
+								{{ phrase('agent.general.mobile') }}
+							{% else %}
+								{{ message.creation_system }}
+							{% endif %}
+						</td>
+					</tr>
+					{% if message.email %}
+						<tr>
+							<th>{{ phrase('agent.general.from') }}:</th>
+							<td>
+								{{ message.email }}
+							</td>
+						</tr>
+					{% endif %}
+					{% if message.ip_address %}
+						<tr>
+							<th>{{ phrase('agent.general.ip_address') }}:</th>
+							<td>
+								<a data-route="listpane:{{ path('agent_ticketsearch_runcustomfilter') }}?terms[0][type]=ip_address&amp;terms[0][op]=is&amp;terms[0][ip_address]={{message.ip_address|url_encode}}"><i class="icon-search" title="{{ phrase('agent.tickets.find_other_ip_addy') }}"></i></a>
+								{{ message.ip_address }}
+								{% if message.getGeoCountry() %}
+									<span class="dp-flag-{{ message.getGeoCountry()|lower }}"></span>
+								{% endif %}
+							</td>
+						</tr>
+					{% endif %}
+				</table>
+			</div>
+		</header>
+		{% set message_translated = ticket_messages_translated[message.id] %}
+		<div class="body-text {% if message_translated %}with-translated{% endif %}">
+			<div class="body-message-translated" {% if not message_translated %}style="display: none;"{% endif %} data-from-lang-code="{{ message_translated.from_lang_code }}" data-to-lang-code="{{ message_translated.lang_code }}">
+				{% if message_translated %}{{ message_translated.message|raw }}{% endif %}
+			</div>
+			<div class="body-message-translate-original">
+				<div class="body-message-translate-original-caption">
+					{{ phrase('agent.tickets.original_message') }}
+				</div>
+				<div class="body-text-message unreset" {% if ticket.language and ticket.language.is_rtl %}dir="rtl"{% endif %} {% if message.show_full_hint %}style="display: none"{% endif %}>
+					{% if message.getMessageLength() > 1100000 %}
+						{{message.getMessageHtmlClipped(1100000)|raw }}
+						<br/><br/><br/>
+						<div style="text-align: center;">
+							{{ phrase('agent.tickets.long_message_clipped') }} <a class="clean-white" href="{{ path('agent_ticket_message_window', {ticket_id: ticket.id, message_id: message.id, _rt: security_token('request_token', 10800)}) }}" target="_blank">{{ phrase('agent.tickets.view_entire_in_new_win') }} &rarr;</a>
+						</div>
+					{% else %}
+						{{message.message_html|safe_link_urls_html }}
+						{% if message.message_full %}<div class="message-toggle-btn"><em class="tipped" title="{{ phrase('agent.tickets.view_full_quoted_message') }}">&bull; &bull; &bull;</em></div>{% endif %}
+					{% endif %}
+				</div>
+				{% if message.message_full %}
+					<div class="body-text-full-message {% if message.show_full_hint %}loaded{% endif %}" {% if not message.show_full_hint %}style="display: none;"{% endif %}>
+						<div class="full-message-content">{% if message.show_full_hint %}{{message.message_full|raw }}{% else %}<span class="flat-spinner"></span>{% endif %}</div>
+						<div class="message-toggle-btn"><em>&bull; &bull; &bull;</em></div>
+					</div>
+				{% endif %}
+				<div class="fade-bar-longmsg">
+					<em>
+						<strong>
+							<i></i>
+							{{ phrase('agent.tickets.view_full_message') }}
+							<i class="last"></i>
+						</strong>
+					</em>
+				</div>
+			</div>
+		</div>
+		{% if ticket_message_attachments[message.id] %}
+			<ul class="attachment-list">
+				{% for attach_id in ticket_message_attachments[message.id] %}
+					{% set ticket_attach = ticket_attachments[attach_id] %}
+					<li class="{% if ticket_attach.blob.isImage() %}is-image{% else %}icon icon-attachment icon-filetype-{{ticket_attach.blob.extension|default('none')}}{% endif %}" rel="message-{{message.id}}">
+						{% if ticket_attach.blob.isImage() %}
+							<a href="{{ ticket_attach.blob.download_url }}" data-deskpro-url="{{ ticket_attach.blob.getDownloadUrl(false, false) }}" target="_blank"><img src="{{ path('serve_blob', {'blob_auth_id': ticket_attach.blob.auth_id, 'filename': ticket_attach.blob.filename_safe, 's': 50, 'size-fit': '1'}) }}" alt="" class="preview" /></a>
+						{% endif %}
+						<a href="{{ ticket_attach.blob.download_url }}" target="_blank">{{ticket_attach.blob.filename}}</a>
+						<span class="size">({{ ticket_attach.blob.readable_filesize }})</span>
+					</li>
+				{% endfor %}
+			</ul>
+		{%endif%}
+		{% if app.getSetting('core.tickets.enable_feedback') and app.getSetting('core.tickets.feedback_agents_read') and all_feedback[message.id] %}
+			{% set feedback = all_feedback[message.id] %}
+			<div class="feedback">
+				{{ phrase('agent.tickets.x_rated_this_message_as', {name: feedback.person.display_name}) }}
+				{% if feedback.rating == 1 %}
+					<em class="helpful">{{ phrase('agent.tickets.helpful') }}</em>
+				{% elseif feedback.rating == -1 %}
+					<em class="unhelpful">{{ phrase('agent.tickets.unhelpful') }}</em>
+				{% else %}
+					<em class="neutral">{{ phrase('agent.tickets.neutral') }}</em>
+				{% endif %}
+				{% if feedback.message %}<p>{{ feedback.message }}</p>{% endif %}
+			</div>
+		{% endif %}
+	</div>
+	<textarea class="message-quote-{{message.id}}" style="display: none">{{ message.message_quote }}</textarea>
+</article>

@@ -1,0 +1,47 @@
+<span class="status-value-outer"><span class="status-value"></span> <i class="icon-caret-down"></i></span>
+<input type="hidden" class="date1-input" name="date1" value="" />
+<input type="hidden" class="date2-input" name="date2" value="" />
+<input type="hidden" class="date1-relative-input" name="date1_relative" value="" />
+<input type="hidden" class="date1-relative-type" name="date1_relative_type" value="" />
+<input type="hidden" class="date2-relative-input" name="date2_relative" value="" />
+<input type="hidden" class="date2-relative-type" name="date2_relative_type" value="" />
+<div class="date-wrap two" style="display: none">
+	<div class="date1">
+		<div class="date">
+			<span class="switcher">{{ phrase('agent.general.relative_time') }}</span>
+			<input type="text" class="date1-display" />
+			<div class="widget"></div>
+		</div>
+		<div class="relative relative1" style="display: none;">
+			<span class="switcher">{{ phrase('agent.general.calendar') }}</span>
+			<input type="text" class="relative1-input" /><br />
+			<select class="relative1-type">
+				<option value="minutes">{{ phrase('agent.general.minutes') }}</option>
+				<option value="hours">{{ phrase('agent.general.hours') }}</option>
+				<option value="days">{{ phrase('agent.general.days') }}</option>
+				<option value="weeks">{{ phrase('agent.general.weeks') }}</option>
+				<option value="months">{{ phrase('agent.general.months') }}</option>
+				<option value="years">{{ phrase('agent.general.years') }}</option>
+			</select> {{ phrase('agent.general.ago') }}
+		</div>
+	</div>
+	<div class="date2">
+		<div class="date">
+			<span class="switcher">{{ phrase('agent.general.relative_time') }}</span>
+			<input type="text" class="date2-display" />
+			<div class="widget"></div>
+		</div>
+		<div class="relative relative2" style="display: none;">
+			<span class="switcher">{{ phrase('agent.general.calendar') }}</span>
+			<input type="text" class="relative2-input" /><br />
+			<select class="relative2-type">
+				<option value="minutes">{{ phrase('agent.general.minutes') }}</option>
+				<option value="hours">{{ phrase('agent.general.hours') }}</option>
+				<option value="days">{{ phrase('agent.general.days') }}</option>
+				<option value="weeks">{{ phrase('agent.general.weeks') }}</option>
+				<option value="months">{{ phrase('agent.general.months') }}</option>
+				<option value="years">{{ phrase('agent.general.years') }}</option>
+			</select> {{ phrase('agent.general.ago') }}
+		</div>
+	</div>
+</div>

@@ -1,0 +1,292 @@
+{##
+ # The user profile page lets them edit their name and timezone, manage email addresses and reset their password.
+ ##}
+{% extends 'UserBundle::layout.html.twig' %}
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_profile') }}">{{ phrase('user.profile.profile') }}</a></li>
+{% endblock %}
+{% block page_title %}{{ phrase('user.profile.your_profile') }}{% endblock %}
+{% block content %}
+
+<form accept="{{ path('user_profile') }}" method="POST" enctype="multipart/form-data">
+	{{ form_token() }}
+
+	<section class="dp-portal-section">
+		<header>
+			<h1>{{ phrase('user.profile.profile') }}</h1>
+		</header>
+		<div class="dp-content-block dp-profile-block">
+			{% if invalid_name %}
+				<div class="dp-alert dp-alert-error">
+					{{ phrase('user.profile.invalid_name') }}
+				</div>
+			{% endif %}
+			{% if profile_saved %}
+				<div class="dp-alert dp-alert-success">
+					{{ phrase('user.profile.profile_saved') }}
+				</div>
+			{% endif %}
+			<div class="dp-control-group">
+				<div class="dp-control-label">
+					<label>{{ phrase('user.general.first_name') }}</label>
+				</div>
+				<div class="dp-controls dp-fill">
+					{{ form_widget(form.first_name) }}
+				</div>
+			</div>
+			<div class="dp-control-group">
+				<div class="dp-control-label">
+					<label>{{ phrase('user.general.last_name') }}</label>
+				</div>
+				<div class="dp-controls dp-fill">
+					{{ form_widget(form.last_name) }}
+				</div>
+			</div>
+			{% if app.user.getPermissionsManager().get('GeneralChecker').canSetPicture() %}
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>{{ phrase('user.general.picture') }}</label>
+					</div>
+					<div class="dp-controls dp-fill dp-picture-editor">
+						<img src="{{ app.user.getPictureUrl(60) }}" alt="{{ phrase('user.profile.current_picture') }}" title=alt="{{ phrase('user.profile.current_picture') }}" />
+						<div>
+							{{ phrase('user.profile.upload_new_picture') }}<br />
+							<input type="file" name="new_picture" />
+						</div>
+						{% if app.user.picture_blob %}
+							<div><label><input type="checkbox" name="remove_picture" value="1" /> {{ phrase('user.profile.remove_your_current_picture') }}</label></div>
+						{% endif %}
+					</div>
+					{% if new_blob_key %}
+						<input type="hidden" name="new_blob_key" value="{{ new_blob_key }}" />
+					{% endif %}
+				</div>
+			{% endif %}
+			<div class="dp-control-group">
+				<div class="dp-control-label">
+					<label>{{ phrase('user.profile.timezone') }}</label>
+				</div>
+				<div class="dp-controls dp-fill">
+					{{ form_widget(form.timezone) }}
+				</div>
+			</div>
+
+			{% if form.language_id %}
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>{{ phrase('user.profile.language') }}</label>
+					</div>
+					<div class="dp-controls dp-fill">
+						{{ form_widget(form.language_id) }}
+					</div>
+				</div>
+			{% endif %}
+
+			{% for f in custom_fields %}
+				{% if f.field_def.getTypeName() == 'hidden' %}
+					<div style="display: none;">{{ render_custom_field_form(f) }}</div>
+				{% else %}
+					<div class="dp-control-group {% if invalid_custom_fields['field_' ~ f.field_def.id] %}dp-error{% endif %}">
+						<div class="dp-control-label">
+							<label>{{ f.field_def.title }}</label>
+						</div>
+						<div class="dp-controls dp-fill">
+							{{ render_custom_field_form(f) }}
+						</div>
+						{% if invalid_custom_fields['field_' ~ f.field_def.id] %}<div class="dp-help-inline dp-error-explain">{{ formmacro.custom_field_errors(invalid_custom_fields, f.field_def, 'field_' ~ f.field_def.id) }}</div>{% endif %}
+					</div>
+				{% endif %}
+			{% endfor %}
+
+			{% if is_org_manager %}
+				<div class="dp-control-group">
+					<div class="dp-controls dp-fill">
+						<label><input type="checkbox" name="org_manager_auto_add" style="display:inline; position: relative; top: -2px" value="1" {% if org_manager_auto_add %}checked="checked"{% endif %} /> {{ phrase('user.profile.automatically_join_xs_tickets', {organization: app.user.organization.name }) }}</label>
+					</div>
+				</div>
+			{% endif %}
+
+			<button class="dp-btn dp-btn-primary">{{ phrase('user.general.save') }}</button>
+		</div>
+	</section>
+</form>
+
+<section class="dp-portal-section">
+	<header>
+		<h1>{{ phrase('user.general.email_addresses') }}</h1>
+	</header>
+	<div class="dp-content-block dp-profile-block">
+
+		<div class="dp-content-wrapper">
+			{% if app.session.hasFlash('resent_validation_email') %}
+				<div class="dp-alert">
+					{{ phrase('user.profile.validation_resent_to', {'email':app.session.flash('resent_validation_email')}) }}
+				</div>
+			{% endif %}
+			{% if app.session.hasFlash('removed_email') %}
+				<div class="dp-alert">
+					{{ phrase('user.profile.email_was_removed', {'email':app.session.flash('removed_email')}) }}
+				</div>
+			{% endif %}
+			{% if app.session.hasFlash('new_email') %}
+				<div class="dp-alert">
+					{{ phrase('user.profile.email_was_added', {'email':app.session.flash('removed_email')}) }}
+				</div>
+			{% endif %}
+			{% if app.session.hasFlash('new_email_validating') %}
+				<div class="dp-alert">
+					{{ phrase('user.profile.email_was_added_validate_it', {'email':app.session.flash('removed_email')}) }}
+				</div>
+			{% endif %}
+			{% if app.getSession().getFlash('invalid_email') %}
+				<div class="dp-alert dp-alert-error">
+					{{ phrase('user.profile.trying_to_add_invalid_email') }}
+				</div>
+			{% endif %}
+			{% if app.getSession().getFlash('email_exists') %}
+				<div class="dp-alert dp-alert-error">
+					{{ phrase('user.profile.email_validate_exists') }}
+				</div>
+			{% endif %}
+
+			<table class="dp-emails-table dp-table dp-table-bordered dp-table-striped">
+				<tbody>
+					{% for email in app.user.emails %}
+						<tr>
+							<td>
+								<div class="dp-controls">
+									{% if email.id == app.user.primary_email.id %}
+										{{ phrase('user.profile.primary_address') }}
+									{% else %}
+										<a href="{{ path('user_profile_emails_setdefault', {'email_id': email.id}) }}">{{ phrase('user.profile.set_as_primary_address') }}</a>
+										&bull;
+										<a class="remove" title="{{ phrase('user.profile.remove_email_address') }}" href="{{ path('user_profile_emails_remove', {'email_id': email.id}) }}">{{ phrase('user.profile.ucfirst_delete') }}</a>
+									{% endif %}
+								</div>
+								{{ email.email }}
+							</td>
+						</tr>
+					{% endfor %}
+					{% for email in validating_emails %}
+						<tr class="validating">
+							<td>
+								<div class="dp-controls">
+									<a href="{{ path('user_profile_emails_validate_sendlink', {'email_id': email.id}) }}">{{ phrase('user.profile.resend_validation_email') }}</a>
+									&bull;
+									<a class="remove" title="{{ phrase('user.profile.remove_email_address') }}" href="{{ path('user_profile_emails_validate_remove', {'email_id': email.id}) }}">{{ phrase('user.profile.ucfirst_delete') }}</a>
+								</div>
+								{{ email.email }} <em>{{ phrase('user.profile.awaiting_validation') }}</em>
+							</td>
+						</tr>
+					{% endfor %}
+					<tr class="dp-new-email">
+						<td>
+							<form action="{{ path('user_profile_emails_new') }}" method="post">
+								{{ form_token() }}
+								<input type="text" name="new_email" value="" size="50" style="width: 350px;" placeholder="{{ phrase('user.profile.add_email_address') }}" />
+								<br />
+								<button class="dp-btn dp-btn-primary">{{ phrase('user.general.add') }}</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+
+{% if enable_twitter %}
+	<section class="dp-portal-section">
+		<header>
+			<h1>{{ phrase('user.profile.twitter_accounts') }}</h1>
+		</header>
+		<div class="dp-content-block dp-profile-block">
+
+			<div class="dp-content-wrapper">
+				<table class="dp-twitter-table dp-table dp-table-bordered dp-table-striped">
+					<tbody>
+						{% for account in app.user.twitter_users %}
+						{% if account.is_verified %}
+							<tr>
+								<td>
+									<div class="dp-controls">
+										<a class="remove" href="{{ path('user_profile_twitter_remove', {'account_id': account.id}) }}">{{ phrase('user.profile.ucfirst_delete') }}</a>
+									</div>
+									@{{ account.screen_name }}
+								</td>
+							</tr>
+						{% endif %}
+						{% endfor %}
+						<tr>
+							<td>
+								<a href="{{ path('user_profile_associate_twitter', {'start': 1}) }}" class="dp-btn dp-btn-primary">{{ phrase('user.general.add') }}</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+{% endif %}
+
+{% if app.getSetting('core.deskpro_source_enabled') %}
+<section class="dp-portal-section">
+	<header>
+		<h1>{{ phrase('user.profile.change_password') }}</h1>
+	</header>
+	<div class="dp-content-block dp-profile-block">
+		{% if app.session.hasFlash('invalid_repeat_password') %}
+			<div class="dp-alert dp-alert-error">
+				{{ phrase('user.profile.password_mismatch') }}
+			</div>
+		{% endif %}
+		{% if app.session.hasFlash('invalid_current_password') %}
+			<div class="dp-alert dp-alert-error">
+				{{ phrase('user.profile.current_password_incorrect') }}
+			</div>
+		{% endif %}
+		{% if app.session.hasFlash('invalid_password_length') %}
+			<div class="dp-alert dp-alert-error">
+				{{ phrase('user.profile.invalid_password_length') }}
+			</div>
+		{% endif %}
+
+		<form action="{{ path('user_profile_changepassword') }}" method="post">
+			{{ form_token() }}
+			<div class="dp-box-content dp-form">
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>
+							{{ phrase('user.profile.current_password') }}
+							<em style="padding-{% if is_rtl() %}right{% else %}left{% endif %}:8px;"><a href="{{ path('user_login_resetpass') }}">{{ phrase('user.profile.lost_qm') }}</a></em>
+						</label>
+					</div>
+					<div class="dp-controls dp-fill">
+						<input type="password" autocomplete="off" name="current_password" value="" />
+					</div>
+				</div>
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>{{ phrase('user.profile.new_password') }}</label>
+					</div>
+					<div class="dp-controls dp-fill">
+						<input type="password" autocomplete="off" name="password" value="" />
+					</div>
+				</div>
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>{{ phrase('user.profile.repeat_password') }}</label>
+					</div>
+					<div class="dp-controls dp-fill">
+						<input type="password" autocomplete="off" name="password2" value="" />
+					</div>
+				</div>
+
+				<button class="dp-btn dp-btn-primary">{{ phrase('user.profile.change_password') }}</button>
+			</div>
+		</form>
+	</div>
+</section>
+{% endif %}
+{% endblock %}

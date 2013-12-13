@@ -1,0 +1,16 @@
+{##
+ # The light-weight view page used when viewing news from the website widget
+ ##}
+
+{% set content_link = news.getLink() %}
+{% extends 'UserBundle:Widget:layout-content-overlay.html.twig' %}
+{% block content %}
+<section class="dp-content-post dp-content-page">
+	<header>
+		<h3 style="margin-bottom: 0"><a href="{{ path('user_news_view', {'slug': news.url_slug}) }}">{{ news.title }}</a></h3>
+	</header>
+	<article>
+		{{ news.content_html|raw }}
+	</article>
+</section>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% if id or classname %}
+	{# if given an id or classname then we want a wrapper #}
+	<div {% if id %}id="{{ id }}"{% endif %} class="{{ classname }}" style="display:none">
+	<div class="row">
+		<div class="term">
+			<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+				<td style="vertical-align: middle; text-align: center;" width="11"><div class="builder-remove">-</div></td>
+				<td class="builder-controls" style="vertical-align: middle;">
+					<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+						<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+						<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+						<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+					</tr></tbody></table>
+				</td>
+			</tr></tbody></table>
+		</div>
+	</div>
+	<div class="builder-type-choice" title="{{ phrase('agent.general.choose_criteria') }}" data-rule-type="">
+	</div>
+{% endif %}
+<div class="builder-type" title="{{ phrase('agent.general.category') }}" data-rule-type="category">
+	<div class="builder-op">
+		<select name="op" class="op">
+			<option value="is">{{ phrase('agent.general.is') }}</option>
+			<option value="not">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<select name="category">
+			{% for cat in term_options.categories %}
+				<option value="{{cat.id}}">{% if cat.depth %}{{ '--'|repeat(cat.depth) }} {%endif %}{{cat.title}}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="builder-type" title="{{ phrase('agent.general.is_published') }}" data-rule-type="is_published">
+	<div class="builder-op">
+		<input type="hidden" name="op" value="is" />
+	</div>
+	<div class="builder-options">
+		<input type="hidden" name="is_published" value="1" />
+	</div>
+</div>
+<div class="builder-type" title="{{ phrase('agent.general.is_not_published') }}" data-rule-type="is_not_published">
+	<div class="builder-op">
+		<input type="hidden" name="op" value="is" />
+	</div>
+	<div class="builder-options">
+		<input type="hidden" name="is_not_published" value="1" />
+	</div>
+</div>
+<div class="builder-type" title="{{ phrase('agent.general.date_created') }}" data-rule-type="date_created" data-rule-handler="DeskPRO.Agent.RuleBuilder.DateTerm">
+	<div class="builder-op">
+		<select name="op" class="op">
+			<option value="lte">{{ phrase('agent.general.before') }}</option>
+			<option value="gte">{{ phrase('agent.general.after') }}</option>
+			<option value="between">{{ phrase('agent.general.between') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		{% include 'DeskPRO:Common:rulebuilder-date-options.html.twig' %}
+	</div>
+</div>
+<div class="builder-type" title="{{ phrase('agent.general.labels') }}" data-rule-type="label">
+	<div class="builder-op">
+		<select name="op" class="op">
+			<option value="is">{{ phrase('agent.general.include') }}</option>
+			<option value="not">{{ phrase('agent.general.does_not_include') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="label" value="" />
+	</div>
+</div>
+{% if id or classname %}
+</div>
+{% endif %}

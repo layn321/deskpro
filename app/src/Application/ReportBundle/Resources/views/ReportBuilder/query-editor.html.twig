@@ -1,0 +1,61 @@
+{% set readOnlyHtml = readOnly ? ' readonly="readonly"' : '' %}
+<div class="query-editor-container {{ readOnly ? 'query-read-only' : '' }}">
+<ul class="tabs"
+	data-element-handler="DeskPRO.Report.ElementHandler.Builder.BuilderTabs"
+	data-trigger-elements="> li"
+	data-input-type-input="#input-type-input"
+	data-query-switch-url="{{ path('report_builder_parse')}}"
+	data-query-error-container="#query-error-container"
+	data-query-error-message="#query-error-message"
+>
+	<li data-tab-for="#query-builder" data-query-type="builder" class="{{ inputType == 'builder' ? 'current' : '' }}"><a>Builder</a></li>
+	<li data-tab-for="#query-text" data-query-type="query" class="{{ inputType == 'query' ? 'current' : '' }}"><a>Query</a></li>
+</ul>
+
+<div id="query-builder" class="query-editor-builder" style="display: none">
+	<dl><dt class="no-pad">DISPLAY</dt> <dd>
+		<select name="parts[display][0]" class="{{readOnly ? 'readonly' : ''}}">
+			<option value="BAR"{{ parts.display.0 == 'BAR' ? ' selected="selected"' : ''}}>BAR</option>
+			<option value="LINE"{{ parts.display.0 == 'LINE' ? ' selected="selected"' : ''}}>LINE</option>
+			<option value="AREA"{{ parts.display.0 == 'AREA' ? ' selected="selected"' : ''}}>AREA</option>
+			<option value="PIE"{{ parts.display.0 == 'PIE' ? ' selected="selected"' : ''}}>PIE</option>
+			<option value="TABLE"{{ parts.display.0 == 'TABLE' or parts.display is empty ? ' selected="selected"' : ''}}>TABLE</option>
+		</select>
+		<select name="parts[display][1]" class="{{readOnly ? 'readonly' : ''}}">
+			<option value="">&nbsp;</option>
+			<option value="BAR"{{ parts.display.1 == 'BAR' ? ' selected="selected"' : ''}}>BAR</option>
+			<option value="LINE"{{ parts.display.1 == 'LINE' ? ' selected="selected"' : ''}}>LINE</option>
+			<option value="AREA"{{ parts.display.1 == 'AREA' ? ' selected="selected"' : ''}}>AREA</option>
+			<option value="PIE"{{ parts.display.1 == 'PIE' ? ' selected="selected"' : ''}}>PIE</option>
+			<option value="TABLE"{{ parts.display.1 == 'TABLE' ? ' selected="selected"' : ''}}>TABLE</option>
+		</select>
+	</dd></dl>
+	<dl><dt>SELECT</dt> <dd><textarea name="parts[select]" class="expander"{{readOnlyHtml|raw}}>{{parts.select}}</textarea></dd></dl>
+	<dl><dt>FROM</dt> <dd><input name="parts[from]" type="text" value="{{parts.from}}"{{readOnlyHtml|raw}} /></dd></dl>
+	<dl><dt>WHERE</dt> <dd><textarea name="parts[where]" class="expander"{{readOnlyHtml|raw}}>{{parts.where}}</textarea></dd></dl>
+	<dl><dt>SPLIT BY</dt> <dd><input name="parts[splitBy]" type="text" value="{{parts.splitBy}}"{{readOnlyHtml|raw}} /></dd></dl>
+	<dl><dt>GROUP BY</dt> <dd><input name="parts[groupBy]" type="text" value="{{parts.groupBy}}"{{readOnlyHtml|raw}} /></dd></dl>
+	<dl><dt>ORDER BY</dt> <dd><input name="parts[orderBy]" type="text" value="{{parts.orderBy}}"{{readOnlyHtml|raw}} /></dd></dl>
+	<dl class="limit">
+		<dt>LIMIT</dt>
+		<dd>
+			<input name="parts[limit]" type="text" value="{{parts.limit}}" {{readOnlyHtml|raw}} />
+			<span>OFFSET</span>
+			<input name="parts[offset]" type="text" value="{{parts.offset}}" {{readOnlyHtml|raw}} />
+		</dd>
+	</dl>
+</div>
+<div class="query-editor-text" id="query-text" style="display: none">
+	<textarea name="query" class="expander" data-expander-min-height="100"{{readOnlyHtml|raw}}>{{ query }}</textarea>
+</div>
+
+<div id="query-error-container" class="query-error" style="display: none">
+	The following error occurred: <span id="query-error-message"></span>
+</div>
+
+{% if readOnly %}
+	<div class="query-read-only-notice">This is a built-in query and cannot be modified. To modify this query, please clone it.</div>
+{% endif %}
+
+<input type="hidden" name="inputType" id="input-type-input" value="{{ inputType }}" />
+</div>

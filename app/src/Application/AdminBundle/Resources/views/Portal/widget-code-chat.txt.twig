@@ -1,0 +1,63 @@
+<!-- DeskPRO Chat -->
+<script type="text/javascript">
+	var DpChatWidget_Options = DpChatWidget_Options || {};
+
+	/**
+	 * Uncomment this line to enable the button to display
+	 * when chat is offline. If the user clicks, they go to the URL specified.
+	 */
+	//DpChatWidget_Options.offlineUrl = '{{ url('user_tickets_new') }}';
+
+	/**
+	 * Override the default phrases for the chat button
+	 */
+	//DpChatWidget_Options.startPhrase = 'Click here to chat with us';
+	//DpChatWidget_Options.resumePhrase = 'Open your chat';
+	//DpChatWidget_Options.offlinePhrase = 'Click here to contact us';
+	//DpChatWidget_Options.openInWindowPhrase = 'Open this chat in a new window';
+
+	/**
+	 * The location of the chat button: 'left' or 'right'
+	 */
+	DpChatWidget_Options.tabLocation = 'right';
+
+	/**
+	 * Style for the chat button
+	 */
+	DpChatWidget_Options.btnStyle = {
+		bgColor: '#3F3F3F',
+		border: '2px solid #727272',
+		textColor: '#FFFFFF',
+		textShadow: '0px 1px 2px #000000',
+		font: 'bold 12px Arial, sans-serif'
+	},
+
+	/**
+	 * Style for the chat border/frame that goes
+	 * around the chat window.
+	 */
+	DpChatWidget_Options.frameStyle = {
+		bgColor: '#2A69A9',
+		textColor: '#FFFFFF'
+	};
+
+	/**
+	 * The Language ID to load when the user opens the chat
+	 */
+	DpChatWidget_Options.languageId = 0;
+
+	DpChatWidget_Options.protocol = ('https:' == document.location.protocol ? 'https' : 'http');
+	DpChatWidget_Options.deskproUrl = DpChatWidget_Options.protocol + '://{{ url('user')|url_trim_scheme }}';
+	DpChatWidget_Options.currentPageUrl = window.location;
+	DpChatWidget_Options.referrerPageUrl = document.referrer;
+	if (document.getElementsByTagName) {
+		(function() {
+			var scr   = document.createElement('script');
+			scr.type  = 'text/javascript';
+			scr.async = true;
+			scr.src   = DpChatWidget_Options.protocol + '://{{ asset_url('javascripts/DeskPRO/User/ChatWidget/ChatWidget.js')|url_trim_scheme|replace({('/web'~constant('DPC_SITE_BUILD_NUM')~'/'):'/web/'}) }}';
+			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(scr);
+		})();
+	}
+</script>
+<!-- /DeskPRO Chat -->

@@ -1,0 +1,32 @@
+<table class="prop-table" cellpadding="0" cellspacing="0" width="100%">
+{% for f in custom_fields %}
+	<tr>
+		<th>{{ f.title }}</th>
+		<td>{{ render_custom_field_form(f) }}</td>
+	</tr>
+{% endfor %}
+	<tr>
+		<th>{{ phrase('agent.general.timezone') }}</th>
+		<td>
+			<select name="timezone">
+				<option value=""></option>
+				{% for tz in timezone_options %}
+				<option value="{{tz}}" {% if person.timezone == tz %}selected="selected"{% endif %}>{{ tz }}</option>
+				{% endfor %}
+			</select>
+		</td>
+	</tr>
+	{% if app.languages.isMultiLang() %}
+		<tr>
+			<th>{{ phrase('agent.general.language') }}</th>
+			<td>
+				<select name="language">
+					<option value=""></option>
+					{% for l in app.languages.getAll() %}
+						<option value="{{ l.id }}">{{ l.title }}</option>
+					{% endfor %}
+				</select>
+			</td>
+		</tr>
+	{% endif %}
+</table>

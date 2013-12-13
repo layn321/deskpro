@@ -1,0 +1,56 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.KbGlossary';
+pageMeta.title = '{{ phrase('agent.publish.glossary') }}';
+</script>
+<div class="content">
+	<div class="add-dlg dp-overlay" style="display: none; width: 400px;">
+		{{ phrase('agent.publish.add_new_glossary') }}: <input type="text" class="word" value="" style="width: 150px;" /><br />
+		<textarea class="content" rows="2" cols="50" style="width: 98%;"></textarea><br />
+		<div style="text-align: right">
+			<button class="dp-button x-small save-trigger">{{ phrase('agent.general.add') }}</button>
+		</div>
+	</div>
+
+	<div class="edit-dlg dp-overlay" style="display: none; width: 400px;">
+		<div class="form">
+			<strong class="word"></strong><br />
+			<input type="hidden" class="word_id" value="" />
+			<textarea class="content" rows="2" cols="50" style="width: 98%;"></textarea><br />
+			<div style="text-align: right">
+				<button class="dp-button x-small save-trigger">{{ phrase('agent.general.save') }}</button>
+			</div>
+		</div>
+		<div class="loading">{{ phrase('agent.general.loading') }}</div>
+	</div>
+
+	<div class="inner-box-tab-content top-box">
+		<ul>
+			<li>
+				<label>{{ phrase('agent.publish.words') }}</label>
+				<span class="counter counter-words">{{word_count|default('0')}}</span>
+			</li>
+			<li class="total on">
+				<label class="new-word-trigger" style="cursor: pointer">{{ phrase('agent.general.add') }}</label>
+			</li>
+		</ul>
+	</div>
+
+	<div class="pad">
+		<dl>
+			{% for letter,words in words %}
+				<dt data-letter="{{letter}}" {% if not words|length %}style="display:none"{% endif %}>{{letter}}</dt>
+				<dd data-letter="{{letter}}" {% if not words|length %}style="display:none"{% endif %}>
+					<ul class="comma-list">
+						{% for id,word in words %}
+							<li>
+								<a class="edit-word-trigger" data-word-id="{{id}}">
+								{{word}}
+								</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</dd>
+			{% endfor %}
+		</dl>
+	</div>
+</div>

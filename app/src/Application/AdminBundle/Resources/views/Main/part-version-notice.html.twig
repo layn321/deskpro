@@ -1,0 +1,16 @@
+{% for version_notice in version_notices %}
+	<div class="dp-page-box version-notice {{ version_notice.notice_class }}">
+		<div class="resource-item-list">
+			<header>
+				<h4>NOTICE</h4>
+			</header>
+			<article>
+				{{ version_notice.message }}
+				{% if version_notice.link %}
+					<br/><br/>
+					<a href="{{ version_notice.link }}">Read More</a>
+				{% endif %}
+			</article>
+		</div>
+	</div>
+{% endfor %}

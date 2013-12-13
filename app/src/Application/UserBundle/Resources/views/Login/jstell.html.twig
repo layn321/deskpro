@@ -1,0 +1,28 @@
+{##
+ # A system template used to handle when a user logs in via a popup window with remote services
+ # such as twitter or facebook.
+ ##}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="{% if is_rtl() %}rtl{% endif %}" {{ language_html_attr() }}>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<script type="text/javascript">
+		function go() {
+			if (window.opener && window.opener.DP_LOGIN_NOTIFY) {
+				window.opener.DP_LOGIN_NOTIFY({
+					person_id: {{ app.person.id|default(0) }}
+				});
+				window.close();
+			} else {
+				if (window.console) {
+					console.log("No DP_LOGIN_NOTIFY in parent window ready to accept my message");
+				}
+			}
+		}
+	</script>
+</head>
+<body onload="go()">
+
+</body>
+</html>

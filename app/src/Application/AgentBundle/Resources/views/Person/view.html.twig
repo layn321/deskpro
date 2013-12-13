@@ -1,0 +1,182 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.Person';
+pageMeta.title = {{ person.getDisplayName()|json_encode|raw }};
+pageMeta.person_id = {{person.id}};
+pageMeta.url_fragment  = '{{ url_fragment('agent_people_view', {'person_id': person.id}) }}';
+pageMeta.pageIdentity = 'person:{{person.id}}';
+pageMeta.labelsAutocompleteUrl = '{{ path('agent_ajax_labels_autocomplete', { 'label_type': 'people'}) }}';
+pageMeta.labelsSaveUrl = '{{ path('agent_person_ajax_labels_save', {'person_id': person.id}) }}';
+pageMeta.saveFieldsUrl = '{{ path('agent_person_ajaxsavecustomfields', {'person_id': person.id }) }}';
+pageMeta.org_id = {{ person.organization.id|default(0) }};
+
+{% if person.picture_blob %}
+pageMeta.personPicIcon = '{{ person.picture_blob.getThumbnailUrl(13) }}';
+{% elseif app.getSetting('core.use_gravatar') and person.primary_email %}
+pageMeta.personGravatarIcon = '{{ person.primary_email.getGravatarUrl() }}&s=13';
+{% endif %}
+
+pageMeta.person = {{ person_api|json_encode|raw }};
+
+pageMeta.perms = {{ perms|json_encode|raw }};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+
+{% if person.is_agent %}pageMeta.isAgent = true;{% endif %}
+</script>
+{# Page Containers #}
+<div class="profile layout-content with-scrollbar {% if not perms.edit %}perm-no-edit{% endif %} {% if not perms.delete %}perm-no-delete{% endif %}">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /Page Containers #}
+
+{% if (not person.is_confirmed or not person.is_agent_confirmed) or (person.is_confirmed and person.is_agent_confirmed and has_email_validating) %}
+<div class="validating-bar">
+	<div class="options">
+		<div style="float:right; position:relative;top: -3px;">
+			<button class="clean-white x-small" id="{{ baseId }}_approve_user">{{ phrase('agent.general.approve') }}</button>
+			{%  if app.user.hasPerm('agent_people.delete') %}<button class="clean-white x-small" id="{{ baseId }}_delete_user">{{ phrase('agent.general.delete') }}</button>{% endif %}
+		</div>
+		{{ phrase('agent.people.user_awaiting_validation') }}
+	</div>
+</div>
+{% endif %}
+
+<header class="page-header">
+	<table cellspacing="0" cellpadding="0" width="100%"><tr><td width="60">
+		<div class="person-picture-box tipped" style="cursor:pointer" title="{{ phrase('agent.general.click_to_upload_picture') }}" id="{{baseId}}_change_user_picture">
+			<img src="{{ person.getPictureUrl(60) }}" id="{{baseId}}_picture_display" />
+			{% if person.is_disabled %}<span class="person-disabled"></span>{% endif %}
+		</div>
+	</td><td>
+		<div class="titlewrap">
+			<h4 class="id-number">#{{ person.id }}</h4>
+			<h1>
+				<span id="{{baseId}}_showname">{{ person.getNameWithTitle() }}</span>
+				<span id="{{baseId}}_editname" style="display: none">
+					<input type="text" name="title_prefix" id="{{baseId}}_edittitle" value="{{ person.title_prefix }}" data-choices="Mr., Miss, Mrs., Ms., Dr., Hon., Prof., Rev." style="width: 90px" />
+					<input type="text" placeholder="{{ phrase('agent.people.enter_name_here') }}" name="name" value="{{ person.getDisplayName() }}" />
+				</span>
+				{% if perms.edit %}<span id="{{baseId}}_editname_start" class="edit-name-gear {% if person.getDisplayName() is empty %}auto-click{% endif %}"></span>{% endif %}
+				<a id="{{baseId}}_editname_end" class="edit-name-save clean-white" style="display: none">{{ phrase('agent.general.done') }}</a>
+			</h1>
+			<div class="labels-line">
+				{% if person.labels|length or perms.edit %}
+					<input
+						type="hidden"
+						id="{{baseId}}_labels_input"
+						class="dpe_select dpe_select_noborder"
+						data-select-width="auto"
+						data-placeholder="Add a label"
+						value="{% for label in person.labels %}{{ label.label }},{% endfor %}"
+					/>
+				{% endif %}
+			</div>
+		</div>
+	</td></tr></table>
+
+	<br class="clear" />
+	<div class="meta-line">
+		<nav class="actions" id="{{baseId}}_action_buttons">
+			<ul>
+				{% if app.user.hasPerm('agent_tickets.create') %}
+					<li class="create-ticket"><a class="clean-white large">{{ phrase('agent.general.create_ticket') }}</a></li>
+				{% endif %}
+				{% if perms.merge %}
+					<li class="merge menu-fitted" data-menu-button="> a"><a class="clean-white large arrow">{{ phrase('agent.general.merge') }} <em></em></a></li>
+				{% endif %}
+				{% if perms.login_as %}
+					<li><a class="clean-white large" href="{{ path('agent_people_login_as', {'person_id': person.id, '_rt': security_token('request_token', 10800)}) }}" target="_blank">{{ phrase('agent.people.login_as_user') }}</a></li>
+				{% endif %}
+				{% if not person.is_agent and (perms.reset_password or perms.delete or perms.edit) %}
+					<li class="more menu-fitted" data-menu-button="> a"><a class="clean-white large arrow">{{ phrase('agent.general.more') }} <em></em></a></li>
+				{% endif %}
+			</ul>
+		</nav>
+	</div>
+	<br class="clear" />
+
+	<ul id="{{baseId}}_more_actions_menu" style="display: none;">
+		{% if perms.disable %}
+			{% if person.is_disabled %}
+				<li data-action="enable-user" data-flip="{{ phrase('agent.people.disable_account') }}">{{ phrase('agent.people.enable_account') }}</li>
+			{% else %}
+				<li data-action="disable-user" data-flip="{{ phrase('agent.people.enable_account') }}">{{ phrase('agent.people.disable_account') }}</li>
+			{% endif %}
+		{% endif %}
+		{% if perms.reset_password %}<li data-action="reset-password" class="reset-password">{{ phrase('agent.general.reset_password') }}</li>{% endif %}
+		{% if perms.delete %}
+			<li
+				data-action="ban"
+				data-delete-url="{{ path('agent_people_delete', {'person_id': person.id, 'security_token': security_token('delete_person'), ban: 1 }) }}"
+			>
+				{{ phrase('agent.people.delete_user_and_ban_email') }}
+			</li>
+			<li
+				data-action="delete"
+				data-delete-url="{{ path('agent_people_delete', {'person_id': person.id, 'security_token': security_token('delete_person') }) }}"
+				class="delete-trigger"
+			>
+				{{ phrase('agent.people.delete_user') }}
+			</li>
+		{% endif %}
+	</ul>
+
+	<ul id="{{baseId}}_merge_menu" style="display: none;">
+		<li>{{ phrase('agent.people.find_person') }}</li>
+	</ul>
+</header>
+
+{{ dp_widgets(baseId, 'profile', 'header', 'below', person_api) }}
+
+<table class="layout-table" cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" width="60%">
+	<section class="content-col">
+		{% include 'AgentBundle:Person:view-content-col.html.twig' %}
+	</section>
+</td><td valign="top">
+	<section class="property-col">
+		{% include 'AgentBundle:Person:view-property-col.html.twig' %}
+	</section>
+</td></tr></table>
+
+{{ dp_widgets(baseId, 'profile', 'footer', 'above', person_api) }}
+
+{% include 'AgentBundle:Person:contact-overlay.html.twig' %}
+
+{{ dp_widgets(baseId, 'profile', '', '', person_api) }}
+
+<div style="display: none">
+	<div id="{{ baseId }}_delete_confirm">
+		{{ phrase('agent.people.person_delete_confirm') }} <strong class="warning">{{ phrase('agent.people.user_will_be_perm_deleted') }}</strong>
+		{% if person_object_counts.tickets or person_object_counts.chats %}
+			<br/><br/>{{ phrase('agent.people.other_user_content_being_deleted') }}<br/>
+			{% if person_object_counts.tickets %}&bull; {{ phrase('agent.general.count_tickets', {count: person_object_counts.tickets}) }}<br/>{% endif %}
+			{% if person_object_counts.chats %}&bull; {{ phrase('agent.general.count_chat', {count: person_object_counts.chats}) }}<br/>{% endif %}
+		{% endif %}
+	</div>
+
+	<div id="{{ baseId }}_ban_confirm">
+		{{ phrase('agent.people.person_ban_confirm') }} <strong class="warning">{{ phrase('agent.people.user_will_be_perm_deleted_banned') }}</strong>
+		{% if person_object_counts.tickets or person_object_counts.chats %}
+			<br/><br/>{{ phrase('agent.people.other_user_content_being_deleted') }}<br/>
+			{% if person_object_counts.tickets %}&bull; {{ phrase('agent.general.count_tickets', {count: person_object_counts.tickets}) }}<br/>{% endif %}
+			{% if person_object_counts.chats %}&bull; {{ phrase('agent.general.count_chat', {count: person_object_counts.chats}) }}<br/>{% endif %}
+		{% endif %}
+	</div>
+</div>
+
+{# Page Containers #}
+</div>
+{% if with_warn_for_email %}
+<div class="full-tab-warn">
+	<div class="message">
+		{{ phrase('agent.people.warn_email_address', {'email': with_warn_for_email}) }}
+		<div class="controls">
+			<button class="clean-white dismiss-trigger">{{ phrase('agent.general.okay') }}</button>
+		</div>
+	</div>
+</div>
+{% endif %}
+</div>
+</div>
+{# /Page Containers #}

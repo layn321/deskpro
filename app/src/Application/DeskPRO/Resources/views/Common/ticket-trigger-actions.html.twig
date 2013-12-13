@@ -1,0 +1,331 @@
+<div {% if id %}id="{{ id }}"{% endif %} class="{{ classname|default('actions-tpl') }}" style="display:none">
+<div class="row">
+	<div class="term">
+		<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+			<td style="vertical-align: middle; text-align: center;" width="11"><div class="builder-remove">-</div></td>
+			<td class="builder-controls" style="vertical-align: middle;">
+				<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+					<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+					<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+					<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+				</tr></tbody></table>
+			</td>
+		</tr></tbody></table>
+	</div>
+</div>
+
+{##################################################################################################################}
+{# Ticket Properties #}
+{##################################################################################################################}
+
+<div class="builder-type" title="{{ phrase('agent.general.set_agent') }}" data-rule-type="agent" data-rule-group="Ticket">
+	<div class="builder-options">
+		<select name="agent">
+			<option value="-1">Me</option>
+			<optgroup label="Agents">
+				{% for agent in app.agents.getAgents() %}
+					<option value="{{ agent.id }}">{{ agent.display_name }}</option>
+				{% endfor %}
+			</optgroup>
+		</select>
+	</div>
+</div>
+
+<div class="builder-type" title="Add agent followers" data-rule-type="add_participants" data-rule-group="Ticket">
+	<div class="builder-options">
+		<select name="add_participants[]" multiple="multiple">
+			{% for agent in app.agents.getAgents() %}
+				<option value="{{ agent.id }}">{{ agent.display_name }}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+
+<div class="builder-type" title="CC users" data-rule-type="add_cc" data-rule-group="Ticket">
+	<div class="builder-options">
+		<input type="text" name="add_emails" placeholder="Enter email addresses separated by a comma" />
+	</div>
+</div>
+
+{% if app.agent_teams.getTeamNames()|length %}
+	<div class="builder-type" title="{{ phrase('agent.general.set_agent_team') }}" data-rule-type="agent_team" data-rule-group="Ticket">
+		<div class="builder-options">
+			<select name="agent_team">
+				<option value="-1">My Team</option>
+				<optgroup label="Teams">
+					{% for id,title in app.agent_teams.getTeamNames() %}
+						<option value="{{id}}">{{title}}</option>
+					{% endfor %}
+				</optgroup>
+			</select>
+		</div>
+	</div>
+{% endif %}
+
+<div class="builder-type" title="{{ phrase('agent.general.set_status') }}" data-rule-type="status" data-rule-group="Ticket">
+	<div class="builder-options">
+		<select name="status">
+			<option value="awaiting_agent">{{ phrase('agent.tickets.status_awaiting_agent') }}</option>
+			<option value="awaiting_user">{{ phrase('agent.tickets.status_awaiting_user') }}</option>
+			<option value="resolved">{{ phrase('agent.tickets.status_resolved') }}</option>
+		</select>
+	</div>
+</div>
+
+<div class="builder-type" title="Ticket hold status" data-rule-type="hold" data-rule-group="Ticket">
+	<div class="builder-options">
+		<select name="is_hold">
+			<option value="1">Put ticket on hold</option>
+			<option value="0">Remove ticket from hold</option>
+		</select>
+	</div>
+</div>
+
+{% if not app.user.getHelper('PermissionsManager').get('TicketChecker') or app.user.getHelper('PermissionsManager').get('TicketChecker').canDeleteAny() %}
+	<div class="builder-type" title="{{ phrase('agent.general.delete_ticket') }}" data-rule-type="delete" data-rule-group="Ticket">
+		<div class="builder-options">
+			<input type="hidden" name="delete_ticket" value="1" />
+		</div>
+	</div>
+{% endif %}
+
+<div class="builder-type" title="{{ phrase('agent.general.set_department') }}" data-rule-type="department" data-rule-group="Ticket">
+	<div class="builder-options">
+		<select name="department">
+			<option value="email_account">Linked department for email account</option>
+			{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+				{% if dep.children|length %}
+					<optgroup label="{{ dep.title }}">
+						{% for subdep in dep.children %}
+							<option data-full-title="{{ dep.title }} &gt; {{ subdep.title }}" value="{{subdep.id}}">{{subdep.title}}</option>
+						{% endfor %}
+					</optgroup>
+				{% else %}
+					<option value="{{dep.id}}">{{dep.title}}</option>
+				{% endif %}
+			{% endfor %}
+		</select>
+	</div>
+</div>
+
+{% if app.getDataService('Language').isLangSystemEnabled() %}
+	<div class="builder-type" title="Set Language" data-rule-type="language" data-rule-group="Ticket">
+		<div class="builder-options">
+			<select name="language">
+				{% for lang in app.getDataService('Language').getAll() %}
+					<option value="{{lang.id}}">{{ phrase_object(lang, 'title') }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+{% endif %}
+
+{% if app.getSetting('core.use_ticket_category') %}
+	<div class="builder-type" title="{{ phrase('agent.general.set_category') }}" data-rule-type="category" data-rule-group="Ticket">
+		<div class="builder-options">
+			<select name="category">
+				<option value="0">None</option>
+				{% for cat in app.getDataService('TicketCategory').getRootNodes() %}
+					{% if cat.children|length %}
+						<optgroup label="{{ cat.title }}">
+							{% for subcat in cat.children %}
+								<option data-full-title="{{ cat.title }} &gt; {{ subcat.title }}" value="{{ subcat.id }}">{{ subcat.title }}</option>
+							{% endfor %}
+						</optgroup>
+					{% else %}
+						<option value="{{ cat.id }}">{{ cat.title }}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+{% endif %}
+
+{% if app.getSetting('core.use_product') %}
+	<div class="builder-type" title="{{ phrase('agent.general.set_product') }}" data-rule-type="product" data-rule-group="Ticket">
+		<div class="builder-options">
+			<select name="product">
+				<option value="0">None</option>
+				{% for id,title in app.products.getNames() %}
+					<option value="{{ id }}">{{ title }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+{% endif %}
+
+{% if app.getSetting('core.use_ticket_priority') %}
+	<div class="builder-type" title="{{ phrase('agent.general.set_priority') }}" data-rule-type="priority" data-rule-group="Ticket">
+		<div class="builder-options">
+			<select name="priority">
+				<option value="0">None</option>
+				{% for id,name in app.getDataService('TicketPriority').getNames() %}
+					<option value="{{ id }}">{{ name }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+{% endif %}
+
+{% if app.getSetting('core.use_ticket_workflow') %}
+	<div class="builder-type" title="{{ phrase('agent.general.set_workflow') }}" data-rule-type="workflow" data-rule-group="Ticket">
+		<div class="builder-options">
+			<select name="workflow">
+				<option value="0">None</option>
+				{% for work in app.getDataService('TicketWorkflow').getAll() %}
+					<option value="{{ work.id }}">{{ work.title }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+{% endif %}
+
+<div class="builder-type" title="{{ phrase('agent.general.add_labels') }}" data-rule-type="add_labels" data-rule-handler="DeskPRO.Agent.RuleBuilder.LabelsTerm" data-rule-group="Ticket">
+	<div class="builder-options">
+		{% include 'DeskPRO:Common:rulebuilder-labels-options.html.twig' %}
+	</div>
+</div>
+
+<div class="builder-type" title="{{ phrase('agent.general.remove_labels') }}" data-rule-type="remove_labels" data-rule-handler="DeskPRO.Agent.RuleBuilder.LabelsTerm" data-rule-group="Ticket">
+	<div class="builder-options">
+		{% include 'DeskPRO:Common:rulebuilder-labels-options.html.twig' %}
+	</div>
+</div>
+
+<div class="builder-type" title="Add organization managers to ticket" data-rule-type="add_org_managers" data-rule-group="Ticket">
+	<div class="builder-options" style="display:block">
+		<input type="hidden" name="x" value="DP_ALLOW_BLANK" />
+	</div>
+</div>
+
+<div class="builder-type" title="{{ phrase('agent.general.set_flag') }}" data-rule-type="flag" data-rule-group="Ticket">
+	<div class="builder-options">
+		<select name="flag">
+			<option value="none">{{ phrase('agent.general.none') }}</option>
+			<option value="blue">{{ phrase('agent.general.flag_blue') }}</option>
+			<option value="green">{{ phrase('agent.general.flag_green') }}</option>
+			<option value="orange">{{ phrase('agent.general.flag_orange') }}</option>
+			<option value="pink">{{ phrase('agent.general.flag_pink') }}</option>
+			<option value="purple">{{ phrase('agent.general.flag_purple') }}</option>
+			<option value="red">{{ phrase('agent.general.flag_red') }}</option>
+			<option value="yellow">{{ phrase('agent.general.flag_yellow') }}</option>
+		</select>
+	</div>
+</div>
+
+<div class="builder-type" title="{{ phrase('agent.general.increase_decrease_urgency') }}" data-rule-type="urgency" data-rule-group="Ticket">
+	<div class="builder-options">
+		<input type="text" name="num" /><small>{{ phrase('agent.general.urgency_enter_negative_number') }}</small>
+	</div>
+</div>
+
+<div class="builder-type" title="{{ phrase('agent.general.set_urgency') }}" data-rule-type="urgency_set" data-rule-group="Ticket">
+	<div class="builder-options">
+		<input type="text" name="num" style="width: 50px" />
+		{% if event_trigger != 'new_ticket' %}
+		<select name="allow_lower">
+			<option value="0">{{ phrase('agent.general.notice_only_when_urgency_lower') }}</option>
+			<option value="1">{{ phrase('agent.general.always_set_this_urgency') }}</option>
+		</select>
+		{% endif %}
+	</div>
+</div>
+
+<div class="builder-type" title="Set Subject" data-rule-type="subject" data-rule-group="Ticket">
+	<div class="builder-options">
+		<input type="text" name="subject" />
+	</div>
+</div>
+
+<div class="builder-type" title="{{ phrase('agent.general.add_ticket_reply') }}" data-rule-type="reply" data-rule-group="Ticket">
+	<div class="builder-options">
+		<textarea name="reply_text" cols="80" rows="4" style="width: 90%;"></textarea>
+		<div style="padding-top: 3px;">
+			<select name="reply_pos">
+				<option value="append">Append to existing reply text</option>
+				<option value="prepend">Prepend to existing reply text</option>
+				<option value="overwrite">Overwrite existing reply text</option>
+			</select>
+			<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="This defines where the above message is set if this macro is used during a reply and you have already entered text into the reply box"></span>
+		</div>
+	</div>
+</div>
+
+{% if app.user.Agent.getGroupedSnippets()|length %}
+	<div class="builder-type" title="Add reply from snippet" data-rule-type="reply_snippet" data-rule-group="Ticket">
+		<div class="builder-options">
+			<select name="snippet_id" class="select2">
+				{% for info in app.user.Agent.getGroupedSnippets() if info.snippets %}
+					<optgroup label="{{ info.category.title }}">
+						{% for snippet in info.snippets %}
+							<option value="{{ snippet.id }}">{{ snippet.title }}</option>
+						{% endfor %}
+					</optgroup>
+				{% endfor %}
+			</select>
+			<div style="padding-top: 3px;">
+				<select name="reply_pos">
+					<option value="append">Append to existing reply text</option>
+					<option value="prepend">Prepend to existing reply text</option>
+					<option value="overwrite">Overwrite existing reply text</option>
+				</select>
+				<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="This defines where the above message is set if this macro is used during a reply and you have already entered text into the reply box"></span>
+			</div>
+		</div>
+	</div>
+{% endif %}
+
+{% for field in app.getTicketFieldManager().getDisplayArray() %}
+	{% if field.field_def.isFormField() %}
+		<div class="builder-type" title="{{ phrase('agent.general.set_field_name', {'field':field.field_def.title}) }}" data-rule-group="Ticket" data-rule-type="ticket_field[{{field.field_def.id}}]">
+			<div class="builder-options">
+				{{ form_widget(field.formView) }}
+			</div>
+		</div>
+	{% endif %}
+{% endfor %}
+
+{##################################################################################################################}
+{# Person Properties #}
+{##################################################################################################################}
+
+{% for field in app.getPersonFieldManager().getDisplayArray() %}
+	{% if field.field_def.isFormField() %}
+		<div class="builder-type" title="{{ phrase('agent.general.set_user_field_name', {'field':field.field_def.title}) }}" data-rule-group="Person"  data-rule-type="people_field[{{field.field_def.id}}]">
+			<div class="builder-options">
+				{{ form_widget(field.formView) }}
+			</div>
+		</div>
+	{% endif %}
+{% endfor %}
+
+{##################################################################################################################}
+{# Integrations #}
+{##################################################################################################################}
+
+{% if term_options.web_hooks %}
+	<div class="builder-type" title="Call Web Hook" data-rule-type="call_webhook" data-rule-group="Integrations">
+		<div class="builder-options">
+			<select name="webhook_id">
+			{% for id,title in term_options.web_hooks %}
+				<option value="{{id}}">{{title}}</option>
+			{% endfor %}
+			</select>
+		</div>
+	</div>
+{% endif %}
+
+{% if term_options.plugin_actions is not empty %}
+	{% for plugin_event_type, object in term_options.plugin_actions %}
+		{% include object.getActionTemplate() %}
+	{% endfor %}
+{% endif %}
+
+<div class="builder-type" title="Close ticket tab" data-rule-type="close_ticket_tab">
+	<div class="builder-options">
+		<input type="hidden" name="do" value="1" />
+		Close the ticket tab after applying macro
+	</div>
+</div>
+
+</div>

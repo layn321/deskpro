@@ -1,0 +1,27 @@
+<header class="list-control-bar">
+	<ul class="btn-controls">
+		<li class="display-options display-options-trigger"><a></a></li>
+		<li class="right"><span class="sep"></span></li>
+	</ul>
+	<ul>
+		<li>{{ phrase('agent.general.ordered_by') }}  </li>
+		<li class="order-by-menu-trigger menu-fitted" data-menu-button=".button"><a class="button">
+			<span class="label">
+				{% if 'popularity' in cache.criteria.order_by %}
+					{{ phrase('agent.general.popularity') }}
+				{% elseif 'num_ratings' in cache.criteria.order_by %}
+					{{ phrase('agent.general.votes') }}
+				{% else %}
+					{{ phrase('agent.general.date_created') }}
+				{% endif %}
+			</span>
+			<em></em>
+		</a></li>
+		<li ><span class="sep"></span></li>
+	</ul>
+	<ul class="order-by-menu" style="display: none">
+		<li data-order-by="popularity">{{ phrase('agent.general.popularity') }}</li>
+		<li data-order-by="votes">{{ phrase('agent.general.votes') }}</li>
+		<li data-order-by="date">{{ phrase('agent.general.date_created') }}</li>
+	</ul>
+</header>

@@ -1,0 +1,8 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>{{ phrase('agent.emails.user_replied_to_tweet', {name: '@' ~ account_status.status.user.screen_name}) }}</dp:subject>
+
+{{ phrase('agent.emails.user_replied_to_tweet_you_wrote', {name: '@'~account_status.status.user.screen_name, account: '@'~account_status.account.user.screen_name}) }}
+
+<blockquote>{{ account_status.status.parsed_text|raw }}</blockquote>
+
+<a href="{{ url_full('agent') }}#app.twitter,tw-all:{{ account_status.account.id }}::">{{ phrase('agent.emails.view_account_tweets', {account: '@' ~ account_status.account.user.screen_name}) }}</a>

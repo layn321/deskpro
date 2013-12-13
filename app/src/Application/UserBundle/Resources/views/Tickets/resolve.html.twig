@@ -1,0 +1,34 @@
+{##
+ # The confirmation and feedback page displayed when a user wants to resolve their ticket.
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}">{{ ticket.subject }}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ ticket.subject }} - {{ phrase('user.tickets.your_tickets') }}
+{% endblock %}
+{% block content %}
+
+<section class="dp-ticket dp-content-page dp-content-post">
+	<header>
+		<h3>{{ phrase('user.tickets.resolve_ticket', {subject: ticket.subject}) }}</h3>
+	</header>
+	<article class="dp-ticket-info">
+		<form action="{{ path('user_tickets_resolve', {'ticket_ref': ticket.ref}) }}" method="post">
+			{{ form_token() }}
+			<input type="hidden" name="process" value="1" />
+			<div class="dp-box-section">
+				<p>
+					{{ phrase('user.tickets.resolve_ticket_explain') }}
+				</p>
+
+				<center><button class="dp-btn dp-btn-primary">{{ phrase('user.tickets.resolve_my_ticket_btn') }}</button></center>
+			</div>
+		</form>
+	</article>
+</section>
+
+{% endblock %}

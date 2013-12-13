@@ -1,0 +1,232 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('vendor/jquery/jquery.textarea-expander.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/CsvImportConfigure.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+	function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.CsvImportConfigure([
+			'secondary_email', 'phone', 'website', 'im', 'twitter', 'linkedin', 'facebook',
+			'address1', 'address2', 'city', 'state', 'post_code', 'country', 'new_custom'
+			{% for field in custom_fields %}{% if field.isChoiceType() and field.getOption('multiple') %}, 'custom_{{ field.id }}' {% endif %}{% endfor %}
+		]);
+	}
+</script>
+{% endblock %}
+{% block pagebar %}
+<ul>
+	<li>Import Users from CSV File</li>
+</ul>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_import_csv_import') }}" method="post" class="dp-form" id="import-form">
+
+	<div class="check-grid item-list" style="margin-bottom: 10px;">
+	<table width="100%">
+	<thead>
+		<tr>
+			<th style="text-align: left; width: 20%">Column Name</th>
+			<th style="text-align: left; width: 40%">Example Data</th>
+			<th style="text-align: left; width: 40%">Mapping Field</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for column_id,column_title in columns %}
+		<tr>
+			<td>{{ column_title }}</a></td>
+			<td>{{ examples[column_id] is not empty ? examples[column_id] : '' }}</td>
+			<td><select name="field_maps[{{ column_id }}][map]" class="import-map-select">
+				<option value="">Do Not Map</option>
+				<optgroup label="Basic Information">
+					<option value="first_name">First Name</option>
+					<option value="last_name">Last Name</option>
+					<option value="name">Name</option>
+					<option value="title_prefix">Title (Mr., Mrs., etc.)</option>
+					<option value="primary_email">Primary Email</option>
+					<option value="secondary_email">Secondary Email</option>
+					<option value="password">Password</option>
+					<option value="organization">Organization</option>
+					<option value="organization_position">Organization Position</option>
+				</optgroup>
+				<optgroup label="Contact Details">
+					<option value="phone">Phone Number</option>
+					<option value="website">Website URL</option>
+					<option value="im">IM</option>
+					<option value="twitter">Twitter</option>
+					<option value="linkedin">LinkedIn</option>
+					<option value="facebook">Facebook</option>
+					<option value="address1">Address Line 1</option>
+					<option value="address2">Address Line 2</option>
+					<option value="city">City</option>
+					<option value="state">State</option>
+					<option value="post_code">Post Code</option>
+					<option value="country">Country</option>
+				</optgroup>
+				<optgroup label="Custom Fields">
+				{% for field in custom_fields %}
+					<option value="custom_{{ field.id }}">{{ field.title }}</option>
+				{% endfor %}
+					<option value="new_custom">New Custom Field</option>
+				</optgroup>
+			</select></td>
+		</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+	</div>
+
+	<div class="dp-form-row-group"
+		 data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group"
+	>
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>First Row Handling</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group on">
+					<label><input type="radio" class="option-trigger" name="skip_first" value="1" checked="checked" />
+						Skip the first row</label>
+					<p>This should be selected if the "column name" values above contain labels rather than actual data.</p>
+				</div>
+				<div class="dp-input-group">
+					<label><input type="radio" class="option-trigger" name="skip_first" value="0" />
+						Import the first row</label>
+					<p>This should be selected if the "column name" values above contain actual data.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% if show_welcome_email %}
+	<div class="dp-form-row-group"
+		 data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander"
+		 data-group-class="dp-input-group" data-expand-class="dp-group-options"
+	>
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Welcome Email</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group on">
+					<label><input type="radio" class="option-trigger" name="welcome_email" value="0" checked="checked" />
+						Do not send a welcome email</label>
+				</div>
+				<div class="dp-input-group">
+					<label><input type="radio" class="option-trigger" name="welcome_email" value="1" />
+						Send a welcome email</label>
+					<div class="dp-group-options" id="welcome-email-inputs" style="display: none">
+						<table width="100%" cellpadding="2">
+						<col style="width: 100px" />
+						<tr>
+							<td>From Name:</td>
+							<td><input type="text" name="from_name" value="{{ app.getSetting('core.deskpro_name') }}" /></td>
+						</tr>
+						<tr>
+							<td>From Email:</td>
+							<td><input type="text" name="from_email" value="{{ app.getSetting('core.default_from_email') }}" /></td>
+						</tr>
+						<tr>
+							<td>Subject:</td>
+							<td><input type="text" name="subject" value="Your {{ app.getSetting('core.deskpro_name') }} account has been created" /></td>
+						</tr>
+						<tr>
+							<td>Message:</td>
+							<td>
+								<textarea name="message" id="welcome-email-textarea" style="height: 100px"></textarea>
+								{% raw %}<div>You may use {{name}}, {{email}}, and {{password}}, and they will be replaced with user-specific values.</div>{% endraw %}
+							</td>
+						</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+
+	<div class="alert-message block-message error" id="primary-email-error" style="display:none">You must select a field that maps to the primary email.</div>
+
+	<div class="alert-message block-message error" id="welcome-email-error" style="display:none">You must complete all welcome email fields.</div>
+
+	<footer class="controls">
+		<button class="clean-white">Start Import</button>
+	</footer>
+
+	<ul style="display:none" id="import-map-extras">
+		<li data-map-type="organization">
+			<label><input type="checkbox" name="%prefix%[create_auto]" value="1" checked="checked" /> Create if does not exist</label>
+		</li>
+		<li data-map-type="phone">
+			<select name="%prefix%[type]">
+				<option value="phone">Phone</option>
+				<option value="mobile">Mobile</option>
+				<option value="fax">Fax</option>
+			</select>
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="website">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="im">
+			<select name="%prefix%[type]">
+				<option value="aim">AIM</option>
+				<option value="msn">MSN</option>
+				<option value="yim">YIM</option>
+				<option value="icq">ICQ</option>
+				<option value="skype">Skype</option>
+				<option value="gtalk">GTalk</option>
+				<option value="other">Other</option>
+			</select>
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="twitter">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="linkedin">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="facebook">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="address1">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="address2">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="city">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="state">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="post_code">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="country">
+			<input type="text" name="%prefix%[label]" placeholder="Label" style="width: 80px" />
+		</li>
+		<li data-map-type="new_custom">
+			<input type="text" name="%prefix%[title]" placeholder="Title" style="width: 80px" />
+			<select name="%prefix%[handler_class]">
+				<option value="Application\DeskPRO\CustomFields\Handler\Text">Text</option>
+				<option value="Application\DeskPRO\CustomFields\Handler\Textarea">Textarea</option>
+				<option value="Application\DeskPRO\CustomFields\Handler\Choice">Choice</option>
+				<option value="Application\DeskPRO\CustomFields\Handler\Date">Date</option>
+			</select>
+		</li>
+		{% for field in custom_fields %}
+		{% if field.isChoiceType() %}
+			<li data-map-type="custom_{{ field.id }}">
+				<label><input type="checkbox" name="%prefix%[new_on_unknown]" value="1" checked="checked" /> Add new choice if unknown</label>
+			</li>
+		{% endif %}
+		{% endfor %}
+	</ul>
+
+	<input type="hidden" name="filename" value="{{ filename }}" />
+	<input type="hidden" name="user_filename" value="{{ user_filename }}" />
+	{{ form_token() }}
+</form>
+{% endblock %}

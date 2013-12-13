@@ -1,0 +1,15 @@
+{% if not app.user.id %}
+	<div class="dp-control-group">
+		<div class="dp-control-label">
+			<label>{{ phrase('user.chat.name') }}</label>
+		</div>
+		<div class="dp-controls">
+			{% if not app.user.name %}
+				<input type="text" name="name" placeholder="{{ phrase('user.chat.name') }}" value="{{ initial_name }}" /><br />
+			{% else %}
+				<strong style="font-size: 110%;">{{ app.user.name }}</strong>
+				<input type="hidden" name="name" value="{{ app.user.name }}" /><br />
+			{% endif %}
+		</div>
+	</div>
+{% endif %}

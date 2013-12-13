@@ -1,0 +1,62 @@
+<div class="change-picture-overlay {% if org.picture_blob %}with-existing{% endif %} mass-actions-overlay">
+	<div class="overlay-title">
+		<span class="close close-trigger">{{ phrase('agent.general.close_lc') }}</span>
+		<h4>{{ phrase('agent.general.change_pic_for', {'name': org.name}) }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div class="drop-file-zone"><h1>{{ phrase('agent.general.drop_here_to_upload') }}</h1></div>
+		{% if org.hasPicture() %}
+		<div class="existing-picture">
+			<header><h3>{{ phrase('agent.general.existing_picture') }}</h3></header>
+			<section>
+				<img src="{{ org.getPictureUrl(60) }}" />
+			</section>
+		</div>
+		{% endif %}
+		<form class="new-picture">
+			<header><h3>{{ phrase('agent.people.update_picture') }}</h3></header>
+			<ul>
+				<li><label><input type="radio" name="set_pic_opt" value="nochange" checked="checked" /> {{ phrase('agent.general.leave_unchanged') }}</label></li>
+				{% if org.hasPicture() %}
+					<li>
+						<label><input type="radio" name="set_pic_opt" value="remove" /> {{ phrase('agent.people.remove_picture') }}</label>
+						<div><img src="{{ path('serve_default_picture', {'s': 60, 'size-fit': 1}) }}" alt="" class="pic-default" style="display:none" /></div>
+					</li>
+				{% endif %}
+				<li style="margin-top: -4px">
+					<label><input type="radio" name="set_pic_opt" value="newpic" /> {{ phrase('agent.people.upload_new_picture') }}</label>
+					<div class="upload-control">
+						<input type="file" name="file-upload" />
+						<button class="clean-white small">{{ phrase('agent.general.upload') }}</button>
+					</div>
+					<div class="files">
+					</div>
+				</li>
+			</ul>
+
+			<div class="save-row">
+				<button class="clean-white save-trigger small">{{ phrase('agent.general.save') }}</button>
+			</div>
+
+			<script class="template-upload" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				<p>{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</p>
+				{{ '{% } %}' }}
+			</script>
+			<script class="template-download" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				{{ '{% if (file.error) { %}'}}
+				<div class="error">
+					{{ '{%=file.error%}' }}
+				</div>
+				{{ '{% } else { %}'}}
+				<div>
+					<input type="hidden" name="new_blob_id" class="new_blob_id" value="{{ '{%=file.blob_id%}' }}" />
+					<img src="{{ '{%=file.download_url%}' }}?s=150" class="pic-new" data-setted-size="{{ '{%=file.download_url%}' }}?s=60&amp;size-fit=1" />
+				</div>
+				{{ '{% } %}' }}
+				{{ '{% } %}' }}
+			</script>
+		</form>
+	</div>
+</div>

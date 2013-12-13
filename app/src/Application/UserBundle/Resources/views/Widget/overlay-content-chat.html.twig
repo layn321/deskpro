@@ -1,0 +1,79 @@
+{##
+ # The chat tab of the website widget overlay
+ ##}
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+<div id="newchat" class="tab" style="display: none; min-height: 300px;">
+	<form method="POST" id="dp_newchat_form" class="with-form-validator">
+		{{ form_token() }}
+		{% if app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+		<div class="socials">
+			<div>
+				<span>{{ phrase('user.widget.login-connect') }}</span>
+				<ul>
+					{% for usersource in app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+					<li>{{ render_usersource(usersource, 'widget_overlay_btn') }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		{% endif %}
+
+		<table class="form-table" cellspacing="0" cellpadding="0" width="100%">
+			<tbody>
+				<tr>
+					<th width="120">
+						{{ phrase('user.widget.name') }}
+					</th>
+					<td>
+						<div class="txt dp-form-row-person_name">
+							<input type="text" class="name-field" id="dp_newchat_name" name="name" value="" data-field-validators="DeskPRO.Form.LengthValidator" data-min-len="4" />
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th>
+						{{ phrase('user.widget.email') }}
+					</th>
+					<td>
+						<div class="txt dp-form-row-person_email">
+							<input type="text" class="email-field" id="dp_newchat_email" name="email" value="" data-field-validators="DeskPRO.Form.LengthValidator" data-min-len="4" />
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th>
+						{{ phrase('user.widget.ticket_form_department') }}
+					</th>
+					<td>
+						<div class="fields-row dp-form-row-ticket_department_id">
+							<select name="department_id">
+								<option value=""></option>
+								{% for cat in app.departments.getPersonDepartments(app.user, 'chat') %}
+									{{ formmacro.select_options_hierarchy(cat, newticket.ticket.department_id) }}
+								{% endfor %}
+							</select>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.chat_form_error_department') }}</span>
+							</span>
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th>&nbsp;</th>
+					<td>
+						<button type="submit" class="btn-activity">{{ phrase('user.widget.chat_form_submit') }}</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</form>
+
+	<div class="thank-you" id="dp_newchat_done" style="display: none">
+		<h2>{{ phrase('user.widget.chat_form_wait_title') }}</h2>
+		<p>{{ phrase('user.widget.chat_form_wait') }}</p>
+	</div>
+</div>

@@ -1,0 +1,168 @@
+{##
+ # The new ticket form
+ ##}
+
+{% set this_section = 'tickets' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+<script type="text/javascript">
+var ticketReader = {
+	getCategoryId: function() {
+		var cat = $('select.category_id');
+		var catId = cat.val();
+
+		return parseInt(catId) || 0;
+	},
+	getPriorityVal: function() {
+		var id = this.getPriorityId();
+		if (!id) {
+			return -999999999;
+		}
+
+		if (!window.DESKPRO_TICKET_PRI_MAP || !window.DESKPRO_TICKET_PRI_MAP[id]) {
+			return 0;
+		}
+
+		return parseInt(window.DESKPRO_TICKET_PRI_MAP[id]);
+	},
+	getPriorityId: function() {
+		var cat = $('select.priority_id');
+		var catId = cat.val();
+
+		return parseInt(catId) || 0;
+	},
+	getProductId: function() {
+		var cat = $('select.product_id');
+		var catId = cat.val();
+
+		return parseInt(catId) || 0;
+	},
+	getOrganizationId: function() {
+		return {{ app.user.organization.id|default(0) }};
+	},
+	getWorkflow: function() {
+		return 0;
+	}
+};
+</script>
+<script type="text/javascript">
+{{ ticket_display_js|raw }}
+</script>
+<link rel="stylesheet" type="text/css" href="{{ asset('stylesheets/vendor/jquery-ui/portal-theme/jquery-ui.css') }}" />
+{% endblock %}
+{% block page_title %}{{ phrase('user.tickets.new_ticket') }}{% endblock %}
+{% block breadcrumb %}
+	{% if is_user_loggedin() %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_new') }}">{{ phrase('user.tickets.new_ticket') }}</a></li>
+	{% else %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_new') }}">{{ phrase('user.tickets.new_ticket') }}</a></li>
+	{% endif %}
+{% endblock %}
+{% block content %}
+<div
+	class="dp-newticket-page with-handler {% if not set_dep_id %}require-js{% endif %}"
+	data-element-handler="DeskPRO.User.ElementHandler.NewTicket"
+	{% if app.user.hasPerm('articles.use') and app.getSetting('core.show_ticket_suggestions') %}
+		data-suggestions-url="{{ path('user_search_similarto', {'content_type': 'article'}) }}"
+	{% endif %}
+>
+<section class="dp-portal-section dp-title-section">
+	<header>
+		<h1>{{ phrase('user.tickets.new_form_title') }}</h1>
+	</header>
+	<article>
+		<p>
+			{{ phrase('user.tickets.contact_us_explain') }}
+		</p>
+	</article>
+</section>
+
+<section class="dp-portal-section dp-new-ticket-section">
+	<article>
+		<form action="{{ path('user_tickets_new') }}{% if app.getRequest().query.has('_debug') %}?_debug{% endif %}" method="post" id="dp_newticket_form" enctype="multipart/form-data" class="with-form-validator">
+			{{ form_token('newticket') }}
+			<!-- DP_WEBSITE_URL_FIELD -->
+			<input type="hidden" name="preticket_status_id" id="dp_newticket_preticket_status_id" value="" />
+			<input type="hidden" name="process" value="1" />
+
+			{###############
+			 # Email
+			 ###############}
+
+			{% include 'UserBundle:Common:form-email-login-row.html.twig' with { 'email_form_name': 'newticket[person][email]', 'form_key_prefix': 'person.', 'initial_value': newticket.person.email, 'mode': 'advanced', context: 'newticket' } %}
+
+			{#--- FIELDS CONTAINER ---#}
+			<div id="fields_container">
+				{# First time outputs items in order and visible depending on the page data #}
+				{% include 'UserBundle:NewTicket:field-list-loop.html.twig' with {'page_data': default_page_data, 'mode': 'default', 'page_data_field_ids': page_data_field_ids }%}
+			</div>
+			{#--- FIELDS CONTAINER ---#}
+
+			<div class="dp-related-search dp-well" id="dp_newticket_related_container" style="display: none">
+				<h4>{{ phrase('user.tickets.we_found_helpful_content') }}</h4>
+				<div class="subline">{{ phrase('user.tickets.title_links_safe') }}</div>
+				<div class="dp-list results">
+				</div>
+				<div class="more-link" style="display: none;">
+					{% set phrase_part %}
+					<span class="count">0</span>
+					{% endset %}
+					<a>{{ phrase('user.tickets.view_more_results', {'part':phrase_part}, true) }}</a>
+				</div>
+			</div>
+
+			<div class="dp-its-a-trap">
+				{# Spam trap: If these fields contain values when submitted, the system knows a bot submitted the form #}
+				<input type="text" name="first_name" value="" />
+				<input type="text" name="last_name" value="" />
+				<input type="text" name="email" value="" />
+			</div>
+
+			<div class="dp-alert-error attach-is-loading-warn dp-alert" style="display: none;">
+				{{ phrase('user.general.wait_attach_loading') }}
+			</div>
+
+			<input class="dp-btn dp-btn-primary" type="submit" value="{{ phrase('user.tickets.submit') }}" />
+		</form>
+	</article>
+</section>
+
+<script type="text/x-deskpro-plain" class="related-content-overlay-tpl">
+	<div class="dp-overlay-outer dp-post-overlay">
+	<div class="dp-overlay">
+		<div class="dp-overlay-inner">
+			<span class="dp-close-btn">{{ phrase('user.tickets.close_window') }}</span>
+			<div class="dp-content">
+				<span class="dp-open-full"><a>{{ phrase('user.tickets.widget_open_full_page') }}</a></span>
+				<div class="dp-content-holder">
+					<div class="dp-loading-msg">
+						{{ phrase('user.general.loading') }}
+					</div>
+				</div>
+				<div class="dp-controls">
+					<div class="dp-default dp-control-section">
+						<button class="dp-btn dp-btn-success dp-section-toggle primary dp-set-answered" data-toggle-section=".dp-confirm-answered">{{ phrase('user.tickets.this_answered_my_question') }}</button>
+						<button class="dp-btn dp-not-answered">{{ phrase('user.tickets.this_did_not_answer_my_question') }}</button>
+					</div>
+					<div class="dp-confirm-answered dp-control-section" style="display:none">
+						<p>{{ phrase('user.tickets.content-suggestions_answered') }}</p>
+						<button class="dp-btn dp-success dp-answererd" data-type="close">{{ phrase('user.tickets.i_dont_need_to_email') }}</button>
+						<button class="dp-btn dp-answererd" data-type="ticket">{{ phrase('user.tickets.i_still_want_to_email') }}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</script>
+
+</div>
+
+{% if app.getRequest().query.has('_debug') %}
+	<textarea style="width: 400px; height: 400px;" id="debug_box">
+	{{ var_dump(errors) }}
+	{{ var_dump(error_fields) }}
+	</textarea>
+{% endif %}
+{% endblock %}

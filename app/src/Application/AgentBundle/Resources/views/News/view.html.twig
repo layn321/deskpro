@@ -1,0 +1,243 @@
+{% import 'AgentBundle:Common:optionbox-macros.html.twig' as optionbox %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.NewsView';
+pageMeta.title = {{news.title|json_encode|raw}};
+pageMeta.news_id = {{news.id}};
+pageMeta.url_fragment  = '{{ url_fragment('agent_news_view', {'news_id': news.id}) }}';
+pageMeta.permalink = '{{news.permalink}}';
+pageMeta.labelsSaveUrl = '{{ path('agent_news_ajax_labels_save', {'news_id': news.id}) }}';
+pageMeta.obj_code = 'news_{{ news.id }}';
+
+{% if news.hidden_status == 'validating' %}
+pageMeta.isValidating = true;
+{% endif %}
+
+pageMeta.canEdit   = {% if not perms.can_edit %}false{% else %}true{% endif %};
+pageMeta.canDelete = {% if not perms.can_delete %}false{% else %}true{% endif %};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{# scroll containers #}
+<div class="layout-content with-scrollbar page-listing page-news-view {% if not perms.can_edit %}perm-no-edit{% endif %} {% if not perms.can_delete %}perm-no-delete{% endif %}">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /scroll containers #}
+
+<div class="delete-notice" {% if news.status_code != "hidden.deleted" %}style="display: none;"{% endif %}>
+	{{ phrase('agent.general.record_deleted') }} <button class="clean-gray xxx-small undelete">{{ phrase('agent.general.category') }}</button>
+</div>
+
+{% if news.status_code == "hidden.validating" %}
+	{% include 'AgentBundle:Publish:view-approve-header.html.twig' %}
+{% endif %}
+
+<header class="page-header">
+	<h4 class="id-number">#{{ news.id }}</h4>
+	<div style="float:left; padding-left: 8px;">
+		<select id="{{ baseId }}_status">
+			<option {% if news.status == 'published' %}selected="selected"{% endif %} value="published">{{ phrase('agent.publish.status_published') }}</option>
+			<option {% if news.getStatusCode == 'hidden.unpublished' %}selected="selected"{% endif %} value="hidden.unpublished">{{ phrase('agent.publish.status_hidden_unpublished') }}</option>
+			<option {% if news.status == 'archived' %}selected="selected"{% endif %} value="archived">{{ phrase('agent.publish.status_archived') }}</option>
+			{% if news.person.id == app.user.id %}
+				<option value="hidden.draft">{{ phrase('agent.publish.status_hidden_draft') }}</option>
+			{% endif %}
+		</select>
+	</div>
+	<h1>
+		<span id="{{baseId}}_showname">{{ news.title }}</span>
+		<span id="{{baseId}}_editname" style="display: none"><input type="text" name="name" value="{{ news.title }}" /></span>
+		<span id="{{baseId}}_editname_start" class="edit-name-gear"></span>
+		<a id="{{baseId}}_editname_end" class="edit-name-save clean-white" style="display: none">{{ phrase('agent.general.done') }}</a>
+	</h1>
+	<br class="clear" />
+	<table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 2px;">
+		<tr>
+			<td valign="middle" style="vertical-align: middle;">
+				{% include 'AgentBundle:Common:select-standard.html.twig' with {
+					'name': 'category_id',
+					'add_classname': 'category_id',
+					'add_attr': '',
+					'with_blank': 0,
+					'blank_title': '',
+					'categories': news_categories,
+					'selected': news.category.id,
+					'allow_parent_sel': true,
+					'id': baseId ~ '_cat'
+				} %}
+			</td>
+			<td width="100%">
+				<div class="labels-line">
+					<input
+						type="hidden"
+						id="{{baseId}}_labels_input"
+						class="dpe_select dpe_select_noborder"
+						data-select-width="auto"
+						data-placeholder="Add a label"
+						value="{% for label in news.labels %}{{ label.label }},{% endfor %}"
+					/>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<br class="clear" />
+</header>
+
+
+<div class="profile-box-container-outer">
+	<div class="profile-box-container">
+		<header>
+			<h4>{{ phrase('agent.general.properties') }}</h4>
+		</header>
+		<section class="description-area">
+			<dl class="info-list">
+				<dt>{{ phrase('agent.general.rating') }}</dt>
+				<dd>
+                    {% set phrase_part %}
+                    <span class="link-look who-voted-trigger">{{ phrase('agent.general.count_votecount_votes', {'count': news.num_ratings}) }}</span>
+                    {% endset %}
+                    {{ phrase('agent.general.percent_helpful_subphrase', {'percent':news.rating_percent,'subphrase':phrase_part}, true) }}<br />
+                    <small>{{ phrase('agent.general.found_article_helpful_or_not', {'up_votes':news.up_votes,'down_votes':news.down_votes}) }}</small>
+				</dd>
+
+				<dt></dt>
+				<dd>
+					{{ phrase('agent.general.created_timeago_by_x_on_y', {
+						'timeago': '<time class="timeago" datetime="' ~ news.date_created|date('c', 'UTC') ~'"></time>',
+						'name': news.person.display_name,
+						'date': '<time>' ~ news.date_created|date('fulltime') ~ '</time>'
+					}, true) }}
+				</dd>
+			</dl>
+
+			<div class="controls" id="{{baseId}}_action_buttons">
+				<button class="clean-white delete nodelete-hide" {% if news.status_code == "hidden.deleted" %}style="display:none"{% endif %}>{{ phrase('agent.general.delete') }}</button>
+				<button class="clean-white permalink">{{ phrase('agent.general.copy_permalink') }}</button>
+				<button class="clean-white view-user-interface">{{ phrase('agent.general.view_in_user_interface') }}</button>
+				<br class="clear" />
+			</div>
+		</section>
+	</div>
+</div>
+
+<div class="profile-box-container reply-box-wrap">
+	<header>
+		<nav  id="{{baseId}}_bodytabs">
+			<ul>
+				<li class="on" data-tab-for="#{{baseId}}_tab_contents .news-content"><span>{{ phrase('agent.general.page') }}</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .comments-tab"><span>{{ phrase('agent.general.comments') }} (<span id="{{baseId}}_count_comments">{{news_comments|length|default(0)}}</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .revisions-tab"><span>{{ phrase('agent.general.label_revisions') }} (<span id="{{baseId}}_count_revs">{{news.revisions|length|default(0)}}</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .related-content-tab"><span>{{ phrase('agent.general.related_content') }} (<span id="{{baseId}}_count_related">0</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .search-tab"><span>{{ phrase('agent.general.search') }}</span></li>
+			</ul>
+		</nav>
+	</header>
+	<section>
+
+		{# Tab Contents #}
+		<div id="{{baseId}}_tab_contents">
+			{# Tab: Content #}
+			<div class="deskpro-tab-item news-content on">
+				{# Content #}
+				<nav class="sub-box-nav noedit-hide">
+					<ul class="option-buttons right" id="{{baseId}}_content_edit_btns">
+						<li class="kb-editor-edit edit" id="{{baseId}}_edit_btn"><span>{{ phrase('agent.general.ucfirst_edit') }}</span></li>
+						<li class="editor-save-trigger save" id="{{baseId}}_save_btn"><span>{{ phrase('agent.general.save') }}</span></li>
+						<li class="editor-cancel-trigger cancel" id="{{baseId}}_cancel_btn"><span>{{ phrase('agent.general.cancel') }}</span></li>
+					</ul>
+				</nav>
+				<div id="{{baseId}}_content_ed" class="news-content content-tab-item">
+				{% include 'AgentBundle:News:view-content-tab.html.twig' %}
+				</div>
+				{# /Content #}
+			</div>
+
+			{# Tab: Comments #}
+			<div class="deskpro-tab-item content-tab-item comments-tab">
+				<div class="news-comments">
+					<div class="full-tab-content">
+						<div class="messages-wrap" id="{{baseId}}_comments_wrap">
+							{% for comment in news_comments %}
+								{% set comment_num = loop.index %}
+								{% include 'AgentBundle:News:view-comment.html.twig' %}
+							{% endfor %}
+						</div>
+					</div>
+
+					<div class="messages-wrap new-note">
+						<article
+							class="content-message agent-message"
+							data-comment-id="{{comment.id}}"
+							data-content-type="{{ comment.object_content_type }}"
+						>
+							<div class="avatar">
+								<img src="{{ app.user.getPictureUrl(40) }}" alt="" width="40" height="40" />
+							</div>
+							<div class="content">
+								<header>
+									<h4>{{ phrase('agent.general.new_comment') }}</h4>
+								</header>
+								<div class="body-text">
+									<textarea style="width:99%; height: 80px;"></textarea>
+								</div>
+								<div class="footer-text">
+									<div class="loading-off">
+										<button class="clean-white">{{ phrase('agent.general.add_comment') }}</button>
+									</div>
+									<div class="loading-on" style="display:none">
+										{{ phrase('agent.general.saving') }}
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+				</div>
+			</div>
+			{# /Tab: Comments #}
+
+			{# Tab: Revisions #}
+			<div id="{{baseId}}_revs" class="deskpro-tab-item content-tab-item revisions-tab">
+				{% include 'AgentBundle:News:view-revisions-tab.html.twig' %}
+			</div>
+			{# /Tab: Revisions #}
+
+			{# Tab: Related #}
+			<div id="{{baseId}}_related_content" class="deskpro-tab-item content-tab-item related-content-tab">
+				{% include 'AgentBundle:Common:content-related-list.html.twig' %}
+			</div>
+			{# /Tab: Related #}
+
+			{# Tab: Search #}
+			<div id="{{baseId}}_searchtab" class="deskpro-tab-item search-tab">
+				<section class="description-area sticky-search-words">
+					<dl class="info-list">
+						<dt class="type-labels">{{ phrase('agent.publish.sticky_words_title') }}</dt>
+						<dd class="noedit-tags">
+							<input type="text" value="{% for label in sticky_search_words %}{{label}},{% endfor %}" id="{{baseId}}_stickysearch_input" />
+							<div class="explain">
+								{{ phrase('agent.publish.search_sticky_words_explain') }}
+							</div>
+						</dd>
+					</dl>
+				</section>
+
+				<br />
+
+				{% include 'AgentBundle:Publish:rated-searches.html.twig' %}
+			</div>
+			{# /Tab: Search #}
+		</div>
+		{# /Main Tabs #}
+</section>
+</div>
+
+<div class="inline-editable" style="display:none">
+	<div class="title">
+		<input type="text" name="title" value="{{ news.title }}"/>
+		<input type="hidden" name="action" value="title" />
+	</div>
+</div>
+
+{# scroll containers #}
+</div></div></div>
+{# /scroll containers #}

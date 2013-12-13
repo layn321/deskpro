@@ -1,0 +1,97 @@
+{##
+ # Shows a list of content labelled with a certain label
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><a href="{{ path('user_search_labels') }}">{{ phrase('user.portal.search_labels_title') }}</a></li>
+{% endblock %}
+{% block content %}
+
+<section class="dp-portal-section dp-labels-search">
+	<div class="dp-content-block dp-search-block">
+		<div class="dp-search-bar">
+			<form action="{{ path('user_search_labels') }}" method="get">
+			<table class="dp-layout" width="100%"><tr>
+				<td style="vertical-align: top; white-space: nowrap;" width="100%" class="{% if error_fields['title'] %}dp-error{% endif %}">
+					<div class="dp-input-prepend">
+						<table cellspacing="0" cellpadding="0" width="100%"><tr>
+							<td width="10" class="dp-msg">
+								<span style="white-space: nowrap;">{{ phrase('user.portal.search_label-search_show') }}</span>
+							</td>
+							<td width="10" class="dp-cat dp-cat2">
+								<div style="position: relative;" class="dp-inplace-drop">
+									<em><span class="dp-opt-label">&nbsp;</span> <i></i></em>
+									<select name="type">
+										<option {% if type == 'all' %}selected="selected"{% endif %} value="all">{{ phrase('user.portal.search-everything')}}</option>
+										<option {% if type == 'articles' %}selected="selected"{% endif %} value="articles">{{ phrase('user.knowledgebase.title') }}</option>
+										<option {% if type == 'feedback' %}selected="selected"{% endif %} value="feedback">{{ phrase('user.feedback.title') }}</option>
+										<option {% if type == 'news' %}selected="selected"{% endif %} value="news">{{ phrase('user.news.title') }}</option>
+										<option {% if type == 'downloads' %}selected="selected"{% endif %} value="downloads">{{ phrase('user.downloads.title') }}</option>
+									</select>
+								</div>
+							</td>
+							<td width="10" class="dp-msg dp-msg2">
+								<span style="white-space: nowrap;">{{ phrase('user.portal.search_label-search_with') }}</span>
+							</td>
+							<td class="dp-title">
+								<input type="text" class="dp-suggest-title" name="label" value="{{ label }}" />
+							</td>
+						</tr></table>
+					</div>
+				</td>
+				<td class="dp-go"><button class="dp-btn dp-go-btn dp-btn-success">{{ phrase('user.general.go') }}</button></td>
+			</tr></table>
+			</form>
+		</div>
+		<div class="dp-tag-cloud dp-well dp-well-small dp-well-light">
+			<h4>{{ phrase('user.portal.more_labels') }}</h4>
+			<ul>
+				{% for c_label,css_class in cloud %}
+					<li class="dp-{{css_class}}"><a href="{{ path('user_search_labels', {'label': c_label}) }}">{{ c_label }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</section>
+
+{% if label %}
+	<section class="dp-portal-section">
+		<header>
+			<h1>{{ phrase('user.portal.search_result-count', {count: num_results}) }}</h1>
+		</header>
+		<div class="dp-content-block dp-search-block">
+			<div class="dp-content-wrapper">
+				{% if not results and not sticky_results %}
+					<p>{{ phrase('user.portal.no_results_help') }}</p>
+				{% else %}
+					<ul class="dp-content-list">
+						{% if sticky_results %}
+							{% for res in sticky_results %}
+								{% include 'UserBundle:Search:search-result-item.html.twig' with {'is_sticky': true}%}
+							{% endfor %}
+						{% endif %}
+						{% for res in results %}
+							{% include 'UserBundle:Search:search-result-item.html.twig' %}
+						{% endfor %}
+					</ul>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+
+	{% if pageinfo.last != 1 %}
+		{% set page_url = path('user_search', {'q': query}) ~ '&p=' %}
+		<div class="dp-pagination">
+			<ul>
+				{% if pageinfo.prev %}<li><a href="{{ page_url|raw ~ pageinfo.prev }}">{{ language_arrow('left') }} {{ phrase('user.general.page_prev') }}</a></li>{% endif %}
+				{% for p in pageinfo.pages %}
+					<li class="{% if pageinfo.cursor == p %}dp-active{% endif %}"><a href="{{ page_url|raw ~ p }}">{{ p }}</a>
+				{% endfor %}
+				{% if pageinfo.next %}<li><a href="{{ page_url|raw ~ pageinfo.next }}">{{ phrase('user.general.next') }} {{ language_arrow('right') }}</a></li>{% endif %}
+			</ul>
+		</div>
+	{% endif %}
+{% endif %}
+
+{% endblock %}

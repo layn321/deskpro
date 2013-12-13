@@ -1,0 +1,46 @@
+{% set bid = el_uid() %}
+<div style="padding: 15px;">
+	<div class="dp-optiongrouper trans-input-form">
+		{% for lang in app.languages.getAll() if lang.id != article.language.id %}
+			<div class="dp-group {% if trans_langs[lang.id] %}is-status-pos{% else %}is-status-neg{% endif %} with-activation">
+				<header>
+					<div class="dp-group-status">
+						<div class="dp-status-pos">
+							<i class="icon-ok"></i>
+						</div>
+						<div class="dp-status-neg">
+							{{ phrase('agent.publish.missing_translation') }}
+						</div>
+					</div>
+					<label>
+						<input type="radio" name="{{ bid }}_trans_id" class="language_id_switcher" value="{{ lang.id }}" />
+						<strong>
+							{{ lang.title }}
+							<span class="dp-group-hideoff">
+								&middot;
+								<span class="faux-link copy-trigger">{{ phrase('agent.publish.set_contents_from_article') }}</span>
+							</span>
+						</strong>
+					</label>
+					<br class="clear" />
+				</header>
+				<article class="article-form">
+					<div class="title-row">
+						<input type="text" name="title[{{ lang.id }}]" value="{{ trans_data.title[lang.id].value }}" placeholder="Title" />
+					</div>
+					<div class="editor-row">
+						<textarea name="content[{{ lang.id }}]">{{ trans_data.content[lang.id].value }}</textarea>
+					</div>
+					<div class="save-row">
+						<div class="dp-not-loading">
+							<button class="dp-btn dp-btn-primary save-trigger">{{ phrase('agent.general.save') }}</button>
+						</div>
+						<div class="dp-is-loading">
+							<img src="{{ asset('images/spinners/loading-small-flat.gif') }}" />
+						</div>
+					</div>
+				</article>
+			</div>
+		{% endfor %}
+	</div>
+</div>

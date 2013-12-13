@@ -1,0 +1,75 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_sendmail_queue_index') }}">Queued Outgoing Mail</a></li>
+		<li>Message #{{ sendmail.id }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<tdead>
+			<tr>
+				<th colspan="10" style="text-align: left; padding-left: 8px;">
+					Message #{{ sendmail.id }}
+				</th>
+			</tr>
+		</tdead>
+		<tbody>
+			<tr>
+				<td width="100">ID</td>
+				<td>{{ sendmail.id }}</td>
+			</tr>
+			<tr>
+				<td>Date Created</td>
+				<td>{{ sendmail.date_created|date('fulltime') }}</td>
+			</tr>
+			<tr>
+				<td>Send Attempts</td>
+				<td>
+					{{ sendmail.attempts }}
+					&mdash;
+					{% if not sendmail.date_next_attempt %}
+						Failed
+					{% else %}
+						Next attempt at {{ sendmail.date_next_attempt|date('fulltime') }}
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>Subject</td>
+				<td>{{ sendmail.subject }}</td>
+			</tr>
+			<tr>
+				<td>To Address</td>
+				<td>{{ sendmail.to_address }}</td>
+			</tr>
+			<tr>
+				<td>From Address</td>
+				<td>{{ sendmail.from_address }}</td>
+			</tr>
+			<tr>
+				<td>
+					Log<br/>
+					<a class="dp-btn dp-btn-small" href="{{ path('admin_sendmail_queue_view', {id: sendmail.id, download_log: 1}) }}">Download</a>
+				</td>
+				<td>
+					<textarea style="width:98%; height:200px; font-size: 11px; font-family:Monaco, 'Courier New', courier, monospace;">{{ sendmail.log }}</textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Raw Source<br/>
+					<a class="dp-btn dp-btn-small" href="{{ path('admin_sendmail_queue_view', {id: sendmail.id, download: 1}) }}">Download</a>
+				</td>
+				<td>
+					<textarea style="width:98%; height:200px; font-size: 11px; font-family:Monaco, 'Courier New', courier, monospace;">{{ raw_source }}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

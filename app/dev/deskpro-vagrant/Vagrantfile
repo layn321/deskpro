@@ -1,0 +1,89 @@
+require 'json'
+require 'uri'
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config_info = JSON.parse(IO.read('config.json'))
+  config_info['repos_auth'] = config_info['repos'].sub(/^(https?):\/\//i, "\\1://#{config_info['username']}:#{URI.escape(config_info['password'])}@\\2")
+
+  # Update checkout script with repos/creds
+  script = IO.read('vm_local/init/checkout_deskpro.sh')
+  script = script.sub(/###DP_CONFIG_BEGIN###(.*?)###DP_CONFIG_END###/m, "###DP_CONFIG_BEGIN###\nREPOS_URL='#{config_info['repos_auth']}'\n###DP_CONFIG_END###")
+  IO.write('vm_local/init/checkout_deskpro.sh', script)
+
+  # Update deskpro config with email address
+  script = IO.read('vm_local/init/conf/deskpro_config.php')
+  script = script.sub(/###DP_CONFIG_BEGIN###(.*?)###DP_CONFIG_END###/m, "###DP_CONFIG_BEGIN###\ndefine('DP_TECHNICAL_EMAIL', '#{config_info['email']}');\n###DP_CONFIG_END###")
+  IO.write('vm_local/init/conf/deskpro_config.php', script)
+
+  script = IO.read('vm_local/init/conf/deskpro_config.testing.php')
+  script = script.sub(/###DP_CONFIG_BEGIN###(.*?)###DP_CONFIG_END###/m, "###DP_CONFIG_BEGIN###\ndefine('DP_TECHNICAL_EMAIL', '#{config_info['email']}');\n###DP_CONFIG_END###")
+  IO.write('vm_local/init/conf/deskpro_config.testing.php', script)
+
+  if config_info['username'] == 'your_username' || config_info['password'] == 'your_password' || config_info['email'] == 'your_email@deskpro.com'
+    puts "!!!!!!!!!!\n"
+    puts "You need to edit config.json with your GitHub account credentials.\n"
+    puts "!!!!!!!!!!\n\n"
+    exit
+  end
+
+  config.vm.box = "precise64"
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  config.vm.network :forwarded_port, guest: 8888, host: 8888
+  config.vm.network :forwarded_port, guest: 28778, host: 28778
+  config.vm.network :forwarded_port, guest: 3306, host: 3307
+  config.vm.guest = :ubuntu
+
+  if config_info['private_ip']
+    config.vm.synced_folder "deskpro", "/deskpro", :nfs => true
+    config.vm.network :private_network, ip: config_info['private_ip']
+  else
+    config.vm.synced_folder "deskpro", "/deskpro", :mount_options => ['dmode=777', 'fmode=777']
+  end
+
+  config.vm.synced_folder ".", "/vagrant", :disabled => true
+  config.vm.synced_folder "vm_local", "/vm_local"
+
+  config.vm.provider :virtualbox do |vb|
+    #vb.gui = true
+    vb.name = "DeskPRO Dev"
+
+    vb.customize ["modifyvm", :id, "--memory", config_info['memory']]
+    vb.customize ["modifyvm", :id, "--cpus", "2"]
+
+    vb.customize ["modifyvm", :id, "--acpi", "on"]
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
+    vb.customize ["modifyvm", :id, "--vram", "16"]
+
+    vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", '--port', '0', '--nonrotational', 'on']
+  end
+
+  config.vm.provider "vmware_fusion" do |vmware, override|
+  	#vmware.gui = true
+    override.vm.box = "precise64_fusion"
+    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
+
+    vmware.vmx["memsize"] = config_info['memory']
+    vmware.vmx["numvcpus"] = "2"
+  end
+
+  config.vm.provider "vmware_workstation" do |vmware, override|
+  	#vmware.gui = true
+    override.vm.box = "precise64_fusion"
+    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
+
+    vmware.vmx["memsize"] = config_info['memory']
+    vmware.vmx["numvcpus"] = "2"
+  end
+
+  config.vm.provision :puppet do |puppet|
+    puppet.manifests_path = "vm_local/init/puppet/manifests"
+    puppet.module_path    = "vm_local/init/puppet/modules"
+    puppet.options        = ['--verbose']
+    puppet.manifest_file  = "default.pp"
+  end
+
+  config.vm.provision "shell", inline: "fromdos /vm_local/init/post.sh && /bin/bash /vm_local/init/post.sh"
+end

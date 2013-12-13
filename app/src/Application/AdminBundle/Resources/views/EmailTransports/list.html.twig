@@ -1,0 +1,60 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a href="{{ path('admin_emailtrans_newaccount') }}">{{ phrase('admin.gateway.add_account') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li><a href="{{ path('admin_emailtrans_list') }}">{{ phrase('admin.gateway.outgoing_email') }}</a></li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{{ design.helpbox() }}
+	<p>{{ phrase('admin.gateway.notice_mail_server_per_from') }}</p>
+{{ design.helpbox_end() }}
+
+<div class="top-option">
+	<h3>{{ phrase('admin.gateway.default_from_address') }}</h3>
+	<form action="{{ path('admin_emailtrans_set_default_from') }}" method="post">
+		{{ form_token('admin_update_from') }}
+		<input type="text" name="default_from" value="{{ app.getSetting('core.default_from_email') }}" /> <button class="clean-white">{{ phrase('agent.general.update') }}</button>
+	</form>
+</div>
+
+<h1 style="font-size: 13px">{{ phrase('admin.general.outgoing_email_accounts') }}</h1>
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left">&nbsp; {{ phrase('admin.gateway.use_criteria') }}</th>
+				<th style="text-align:left">{{ phrase('admin.general.account') }}</th>
+				<th style="text-align:left" width="10">&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for transport in transports %}
+				<tr {% if transport.match_type == 'all' %}class="highlight"{% endif %}>
+					<td>
+						{% if transport.match_type == 'exact' %}{{ phrase('admin.gateway.from_pattern', {'pattern':transport.match_pattern}) }}
+						{% elseif transport.match_type == 'domain' %}{{ phrase('admin.gateway.from_domain', {'pattern':transport.match_pattern}) }}
+						{% elseif transport.match_type == 'regex' %}{{ phrase('admin.gateway.from_pattern', {'pattern':transport.match_pattern}) }}
+						{% elseif transport.match_type == 'all' %}{{ phrase('agent.general.default') }}{% endif %}
+					</td>
+					<td>{{ transport.title }}</td>
+					<td style="padding: 3px 3px 0 0">
+						{% if transport.match_type == 'all' %}
+							<a href="{{ path('admin_emailtrans_setup') }}"><span class="btn-edit-gear"></span></a>
+						{% else %}
+							<a href="{{ path('admin_emailtrans_editaccount', { 'id': transport.id }) }}"><span class="btn-edit-gear"></span></a>
+						{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

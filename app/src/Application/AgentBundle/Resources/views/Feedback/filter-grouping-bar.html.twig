@@ -1,0 +1,23 @@
+{% if grouped and grouped.items[-1].total %}
+	<header class="list-grouping-bar">
+		<ul>
+			<li class="{% if not subgroup %}on{% endif %}">
+				<a data-route="listpane:{{ tplvars.subgroup_url|replace({'SUBGROUP_ID': ''}) }}">
+					{{ phrase('agent.general.all') }}
+					<span class="count">{{ grouped.items[-1].total }}</span>
+				</a>
+			</li>
+			{% for cat in grouped.items %}
+				{% if cat.id != '-1' %}
+					<li class="{% if subgroup == cat.id %}on{% endif %}">
+						<a data-route="listpane:{{ tplvars.subgroup_url|replace({'SUBGROUP_ID': cat.id}) }}">
+							{{ cat.title }}
+							<span class="count">{{ cat.total }}</span>
+						</a>
+					</li>
+				{% endif %}
+			{% endfor %}
+		</ul>
+		<br class="clear" />
+	</header>
+{% endif %}

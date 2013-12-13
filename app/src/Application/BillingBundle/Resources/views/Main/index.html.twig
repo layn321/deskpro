@@ -1,0 +1,186 @@
+{% extends 'BillingBundle::layout.html.twig' %}
+{% block page_js_exec %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#show_editlic_trigger').on('click', function(ev) {
+				ev.preventDefault();
+				$('#lic_show').hide();
+				$('#lic_edit').show();
+			});
+			$('#editlic_cancel_trigger').on('click', function(ev) {
+				ev.preventDefault();
+				$('#lic_edit').hide();
+				$('#lic_show').show();
+			});
+
+			$('#editlic_save_trigger').on('click', function() {
+
+				var formData = [];
+				formData.push({
+					name: 'license_code',
+					value: $('#editlic_code').val()
+				});
+
+				$('#editlic_showsave').hide();
+				$('#editlic_showloading').show();
+				$('#editlic_err').hide();
+				$.ajax({
+					url: '{{ path('billing_license_input_save') }}',
+					type: 'POST',
+					data: formData,
+					dataTyoe: 'json',
+					error: function() {
+						$('#editlic_showloading').hide();
+						$('#editlic_showsave').show();
+					},
+					success: function(data) {
+						if (data.success) {
+							$.ajax({
+								url: '{{ lic_set_callback }}',
+								data: {
+									license_id: data.license_id,
+									install_key: data.install_key,
+									install_token: data.install_token
+								},
+								dataType: 'jsonp',
+								timeout: 10000,
+								complete: function() {
+									window.location.reload(false);
+								}
+							});
+						} else {
+							$('#editlic_err').show().find('.lic-err-code').text(data.error_code);
+							$('#editlic_showloading').hide();
+							$('#editlic_showsave').show();
+						}
+					}
+				});
+			});
+		});
+	</script>
+{% endblock %}
+{% block page %}
+
+	<div class="alert-message block-message">
+		The {% if app.isCloud() %}billing{% else %}licensing{% endif %} interface is used to manage the licensing of your DeskPRO installation.
+		If you are an existing customer you can manage your account in the DeskPRO Members Area: <a href="http://www.deskpro.com/members/">http://www.deskpro.com/members/</a>
+	</div>
+
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+			<tr>
+				<th class="single-title" colspan="2">
+					Your License
+				</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td class="title" width="100">License ID</td>
+				<td class="prop">{{ lic.getLicenseId() }}</td>
+			</tr>
+			{% if lic.get('org') %}
+				<tr>
+					<td class="title">Licensor</td>
+					<td class="prop">{{ lic.get('org') }}</td>
+				</tr>
+			{% endif %}
+			{% if lic.isDemo() %}
+				<tr>
+					<td class="title">Demo License</td>
+					<td class="prop">
+						{% if not is_expired %}
+							Your demo period expires {% if expire_in_days %}in {{ expire_in_days }} days{% endif %} on {{ lic.getExpireDate()|date('day', 'UTC') }}
+						{% else %}
+							Your demo period expired on {{ lic.getExpireDate()|date('day', 'UTC') }}
+						{% endif %}
+						&nbsp;&nbsp;
+						<a target="_blank" class="clean-white" href="http://www.deskpro.com/pricing/?download">Purchase your License Now</a>
+					</td>
+				</tr>
+				<tr>
+					<td class="title">Agents</td>
+					<td class="prop">You can use unlimited agents during the demo period</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td class="title">Expires</td>
+					<td class="prop">
+						{% if not is_expired %}
+							Your license expires {% if expire_in_days and expire_in_days < 30 %}in {{ expire_in_days }} days{% endif %} on {{ lic.getExpireDate()|date('day', 'UTC') }}
+						{% else %}
+							Your license has expired
+						{% endif %}
+						&nbsp;&nbsp;
+						<a target="_blank" class="clean-white go-ma-trigger" href="http://www.deskpro.com/members/">{% if not is_expired %}Renew{% else %}Extend{% endif %}</a>
+					</td>
+				</tr>
+				<tr>
+					<td class="title">Agents</td>
+					<td class="prop">
+						{% if not lic.getMaxAgents() or lic.getMaxAgents() > 100 %}
+							{{ lic.getMaxAgents()|default('Unlimited') }}
+						{% else %}
+							{{ lic.getMaxAgents() }}
+							&nbsp;&nbsp;
+							<a target="_blank" class="clean-white go-ma-trigger" href="http://www.deskpro.com/members/">Add more agents</a>
+						{% endif %}
+					</td>
+				</tr>
+			{% endif %}
+
+				<tr>
+					<td class="title" width="100">License Code</td>
+					<td class="prop">
+						<div id="lic_show">
+							<textarea readonly="readonly">{{ lic.getLicenseCode() }}</textarea>
+							<br />
+							<button class="clean-white" id="show_editlic_trigger">Update</button>
+						</div>
+						<div id="lic_edit" style="display: none;">
+							<div class="alert-message block-message error errors-box" id="editlic_err" style="display: none">
+								<strong>{{ phrase('admin.license.error_encountered') }}:</strong>
+								<ul>
+									<li>{{ phrase('admin.license.notice_invalid_license', {'invalid':'<span class="lic-err-code"></span>'}, true) }}</li>
+								</ul>
+							</div>
+							<textarea id="editlic_code">{{ lic.getLicenseCode() }}</textarea>
+							<br />
+							<div id="editlic_showsave">
+								<button class="clean-white" id="editlic_save_trigger">Save</button>
+								or <a href="#" id="editlic_cancel_trigger">cancel</a>
+							</div>
+							<div id="editlic_showloading" style="display: none;">
+								<i class="flat-spinner"></i>
+							</div>
+						</div>
+						<div style="margin: 40px 0 0 0; background-color: #EDEDED; padding: 10px;">
+								If your server is not connected to the internet or there is a problem setting your license automatically,
+								then our agents may ask you to email a keyfile to <a href="mailto:support@deskpro.com">{{ phrase('agent.general.supportdeskprocom') }}</a>
+								so your license code can be manually generated.
+								<br /><br />
+
+								<a class="btn" href="{{ path('billing_license_keyfile') }}">Download: deskpro-license-sign.key (500 bytes)</a>
+							</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+	<div style="display: none;">
+		<form action="{{ ma_login_url }}" method="POST" id="go_ma_form">
+			<input type="hidden" name="callback_url" value="{{ url_full('billing_login_ma_login', {code: ma_token.getCode(), license_id: lic.getLicenseId() }) }}" />
+			<input type="hidden" name="license_code" value="{{ lic.getLicenseCode() }}" />
+			<input type="hidden" name="license_id" value="{{ lic.getLicenseId() }}" />
+		</form>
+	</div>
+	<script type="text/javascript">
+	$('.go-ma-trigger').on('click', function(ev) {
+		ev.preventDefault();
+		$('#go_ma_form').submit();
+	});
+	</script>
+{% endblock %}

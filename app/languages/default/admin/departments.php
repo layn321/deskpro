@@ -1,0 +1,18 @@
+<?php return array(
+	'admin.departments.add_new_department'                         => 'Add New Department',
+	'admin.departments.choose_destination_dept'                    => 'Please choose a sub-department to move them into',
+	'admin.departments.confirm_delete_dept'                        => 'Yes, delete this department',
+	'admin.departments.confirm_delete_dept_and_all_subdepartments' => 'Yes, delete this department and all sub-departments',
+	'admin.departments.count_agents'                               => '{{count}} agent|{{count}} agents',
+	'admin.departments.count_chats'                                => '{0} 0 chats|{1} 1 chat|]1,1000] {{count}} chats|[1001,Inf] over 1000 chats',
+	'admin.departments.count_tickets'                              => '{0} are 0 tickets|{1} is 1 ticket|]1,1000] are {{count}} tickets|[1001,Inf] are over 1000 tickets',
+	'admin.departments.delete_department'                          => 'Delete Department',
+	'admin.departments.edit_department_title'                      => 'Edit Department Title',
+	'admin.departments.new_custom_field'                           => 'New custom field',
+	'admin.departments.new_department'                             => 'New Department',
+	'admin.departments.new_widget'                                 => 'New widget',
+	'admin.departments.no_agents'                                  => 'No agents',
+	'admin.departments.notice_dept_default_grouping'               => 'The department field is the primary grouping field for tickets and chats. For many helpdesks, this will be the only field configured. A typical set of departments would include "Sales", "Support" and "Billing".',
+	'admin.departments.tickets_chats_using_dept'                   => 'There {{tickets}} and {{chats}} using this department.',
+	'admin.departments.widgets'                                    => 'Widgets',
+);

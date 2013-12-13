@@ -1,0 +1,44 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>Test Email</li>
+	</ul>
+{% endblock %}
+{% block page %}
+	<div class="check-grid item-list">
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td>Result</td>
+					<td>
+						{% if failed %}
+							Email test reported <strong style="color: #f00;">FAILURE</strong>
+						{% else %}
+							Email test reported <strong style="color: #139300;">SUCCESS</strong>.
+							<hr />
+							{% if send_when == 'queued' %}
+								This email was queued for sending during the next task run. Check your email in a few minutes.
+								<br/>
+								&middot; <a href="{{ path('admin_sendmail_queue_index', {show_queued: 1}) }}">View all queued emails &rarr;</a><br/>
+								&middot; <a href="{{ path('admin_server_cron') }}">View scheduled tasks &rarr;</a>
+							{% else %}
+								<div style="font-size: 11px;">
+									Note that some transports may report success even if the message failed to send.
+									You should still confirm the message arrived in your email inbox.
+								</div>
+							{% endif %}
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td>Log</td>
+					<td>
+						<textarea style="width: 98%; height: 200px; font-family: Monaco, Consolas, 'Courier New', monospace; font-size: 11px;">
+{{ log }}
+						</textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

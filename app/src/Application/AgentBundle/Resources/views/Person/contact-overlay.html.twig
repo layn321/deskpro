@@ -1,0 +1,46 @@
+{% extends 'AgentBundle:Common:profile-contact-overlay.html.twig' %}
+{% block list_extra %}
+	<div class="row-type email {% if person.emails|length %}with-values{% endif %}">
+		<h4>{{ phrase('agent.general.email_address') }}</h4>
+		<div class="contact-info">
+			<ul>
+				{% for email in person.emails %}
+					<li data-remove-name="remove_emails[]" data-remove-value="{{ email.id }}" data-confirm="{{ phrase('agent.people.confirm_remove_email') }}">
+						<div class="controls">
+							{% if perms.manage_emails %}
+								<span class="remove">x</span>
+							{% endif %}
+						</div>
+						<div class="input">
+							<span>{{ email.email }}</span>
+						</div>
+						{% if email.comment|length or perms.manage_emails %}
+						<div class="label">
+							<input type="text" size="10" name="emails_comment[{{ email.id }}]" value="{{ email.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" {% if perms.manage_emails %}onkeydown="return false;"{% endif %} />
+						</div>
+						{% endif %}
+					<br class="clear" /></li>
+				{% endfor %}
+			</ul>
+			{% if perms.manage_emails %}
+			<a class="add-trigger">
+				<em class="with-none">{{ phrase('agent.people.add_an_email_address') }}</em>
+				<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+			</a>
+			{% endif %}
+		</div>
+		<script type="text/x-deskpro-plain" class="tpl-new-row">
+			<li>
+				<div class="controls">
+					<span class="remove">x</span>
+				</div>
+				<div class="input">
+					<input type="text" class="single-input" name="new_emails[]" value="" placeholder="{{ phrase('agent.general.email_address') }}" />
+				</div>
+				<div class="label">
+					<input type="text" size="8" name="new_emails_comment[]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+				</div>
+			<br class="clear" /></li>
+		</script>
+	</div>
+{% endblock %}

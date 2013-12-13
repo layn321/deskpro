@@ -1,0 +1,25 @@
+{##
+ # Confirmation message shown after a user has submitted feedback on a message popup.
+ # The window is meant to self-close with Javascript but depending on the browser the user may
+ # have to manually close the window so there needs to be some kind of message.
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}">{{ ticket.subject }}</a></li>
+{% endblock %}
+{% block content %}
+<section class="dp-portal-section dp-new-feedback-section">
+	<article>
+		<p>
+			{{ phrase('user.tickets.ticket_was_closed') }}
+		</p>
+		{% if app.user.id %}
+			<p>
+				<a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}" class="dp-btn dp-btn-primary">{{ phrase('user.general.go_back') }}</a>
+			</p>
+		{% endif %}
+	</article>
+</section>
+{% endblock %}

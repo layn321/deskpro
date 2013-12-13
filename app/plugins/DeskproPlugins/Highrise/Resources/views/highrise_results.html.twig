@@ -1,0 +1,18 @@
+<div class="section">
+	<h4>Person</h4>
+	{% for v,k in highrise_person %}
+		<div>
+			<strong>{{k}}:</strong> {{v}}
+		</div>
+	{% endfor %}
+</div>
+
+<div class="section">
+	<h4>Notes</h4>
+	{% for note in highrise_notes %}
+		<div>
+			<strong>{{note['subject-name']}}</strong><br />
+			{{note['body']}}
+		</div>
+	{% endfor %}
+</div>

@@ -1,0 +1,80 @@
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/WelcomeBox.js') }}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	DeskPRO.ElementHandler_Exec(document.getElementById('welcome_box_wrap'));
+});
+</script>
+<div id="welcome_box_wrap" data-element-handler="DeskPRO.Admin.ElementHandler.WelcomeBox">
+<div class="welcome-box">
+	<article class="top">
+		<div class="picture tipped" title="Click to change your picture" style="cursor:pointer">
+			<img src="{{ app.user.getPictureUrl(50) }}" />
+		</div>
+		<div class="content">
+			{% if last_login %}
+				Welcome back, {{ app.user.first_name|default(app.user.display_name) }}.
+				<span class="tipped" title="{{ last_login.date_created|date('fulltime') }} from {{ last_login.ip_address }}{% if last_login.hostname %} ({{ last_login.hostname }})">
+					You last logged in <time class="timeago" datetime="{{ last_login.date_created|date('c', 'UTC') }}"></time>{% endif %}.
+				</span>
+			{% else %}
+				Welcome to DeskPRO, {{ app.user.first_name|default(app.user.display_name) }}.
+			{% endif %}
+		</div>
+		<div style="clear:left; height:1px;overflow: hidden">&nbsp;</div>
+	</article>
+	<article id="admin_contact_form" data-submit-url="{{ path('admin_submit_deskpro_feedback') }}">
+		<div class="form-input">
+			<h3>Need help?</h3>
+			<p>
+				If you need help setting up DeskPRO, have a problem or just want to submit feedback, simply fill in this form below.
+			</p>
+			<div class="form">
+				<div style="font-size: 11px;">
+					<strong style="display: inline-block;">To:</strong> <a href="mailto:support@deskpro.com">support@deskpro.com</a><br/>
+					<strong style="display: inline-block;">From:</strong> <span class="default-addy">
+						{{ app.user.primary_email_address }} (<span style="text-decoration: underline; cursor:pointer;">change</span>)
+					</span>
+					<span class="input-addy" style="display: none;">
+						<input type="text" class="email_address" value="{{ app.user.primary_email_address }}" style="padding: 0; font-size: 11px; margin: 0; width: 230px;" />
+					</span>
+				</div>
+				<textarea class="message" style="width: 450px; height: 27px;" placeholder="Enter your message"></textarea>
+				<button class="btn send-mock" style="display: inline-block; vertical-align: text-bottom; position:relative;">Send your message</button>
+				<button class="btn send-trigger" style="display: none;">Send your message</button>
+				<i class="flat-spinner send-loading" style="display: none;"></i>
+			</div>
+		</div>
+		<div class="form-success" style="display: none">
+			<h3>Your message has been sent</h3>
+			<p>
+				Thank you for contacting DeskPRO. Your message was sent successfully. Our agents will reply to you as soon as they can.
+			</p>
+		</div>
+	</article>
+	<article id="admin_live_support" style="display: none;">
+		<div style="background: url({{ asset('images/agent/chat/agent-chat.png') }}) no-repeat 0 50%; padding: 0px 0 0px 28px;">
+			Live support is currently available.
+			<a class="btn" style="padding: 6px; line-height: 100%;" href="https://support.deskpro.com/new-ticket" onclick="window.open('http://support.deskpro.com/widget/chat.html?is_window_mode=1', null, 'height=350, width=540, toolbar=0, location=0, status=1, scrollbars=0, resizable=1'); return false;">
+				Chat with one of our agents now &rarr;
+			</a>
+		</div>
+	</article>
+	<script type="text/javascript">
+		DpChatWidget = {
+			initWidget: function() {
+				$('#admin_live_support').show();
+			},
+			setNotAvailable: function() {
+
+			}
+		}
+		$(document).ready(function() {
+			var script_tag = document.createElement('script');
+			script_tag.setAttribute("type", "text/javascript");
+			script_tag.setAttribute("src", 'https://support.deskpro.com/dp.php/chat/is-available.js?notrack=1');
+			script_tag.setAttribute("async", 'true');
+			(document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
+		});
+	</script>
+</div>
+</div>

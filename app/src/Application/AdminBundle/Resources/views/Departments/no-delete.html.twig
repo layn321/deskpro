@@ -1,0 +1,27 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		{% if department.is_tickets_enabled %}
+			<li><a href="{{ path('admin_departments', {type:'tickets'}) }}">Ticket Departments</a></li>
+		{% else %}
+			<li><a href="{{ path('admin_departments', {type:'chat'}) }}">Chat Departments</a></li>
+		{% endif %}
+		<li>{{ phrase('admin.departments.delete_department') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+	<p>
+		Sorry, you cannot delete the last department. Departments are used to apply permissions and are a standard organizational
+		field used by the system.
+	</p>
+	<p>
+		Note that users will not see the department field if there is only
+		one to choose from.
+	</p>
+	{% if department.is_tickets_enabled %}
+		<a class="btn" href="{{ path('admin_departments', {type:'tickets'}) }}">&larr; Go Back</a>
+	{% else %}
+		<a class="btn" href="{{ path('admin_departments', {type:'chat'}) }}">&larr; Go Back</a>
+	{% endif %}
+{% endblock %}

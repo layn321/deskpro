@@ -1,0 +1,42 @@
+{% extends 'UserBundle::layout-simple-iframe.html.twig' %}
+{% block head %}
+<script type="text/javascript">
+var DpFrameController = {
+	init: function() {
+		this.sendMessage('ready');
+		window.setInterval(this.checkHeight.bind(this), 200);
+	},
+	checkHeight: function() {
+		var h = $('#deskpro').outerHeight();
+		if (!this.lastH || this.lastH != h) {
+			this.lastH = h;
+			this.sendMessage('height', h);
+		}
+	},
+	sendMessage: function(id,data) {
+		if (window.parent && window.parent != window && window.parent.DpNewTicket_Controller) {
+			window.parent.DpNewTicket_Controller.acceptMessage(id, data);
+		}
+	},
+	getHeight: function() {
+		return $(document).height();
+	}
+};
+$(document).ready(function() {
+	DpFrameController.init();
+});
+</script>
+{% endblock %}
+{% block content %}
+
+		<h1 style="font-size: 18px">{{ phrase('user.tickets.thank_you') }}</h1>
+		<p>
+			{{ phrase('user.tickets.thank_you_please_wait') }}
+		</p>
+
+		{% if ticket.hidden_status == 'validating' %}
+			<p>
+				{{ phrase('user.tickets.validate_to_be_seen') }}
+			</p>
+		{% endif %}
+{% endblock %}

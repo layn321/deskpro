@@ -1,0 +1,40 @@
+{% macro perm_col(title, usergroup_values, permgroup, name, depends_on, class) %}
+	{% set perm_fname_flat = permgroup ~ '_' ~ name %}
+	<tr
+		class="permrow perm-{{ permgroup }}_{{ name }} {{class}}"
+		data-permgroup="{{ permgroup }}"
+		data-permname="{{ name }}"
+		{% if depends_on %}data-depends-on="{{ depends_on }}"{% endif %}
+	>
+		<td width="37" class="prop effective highlight no-border" id="effective_lbl_{{ perm_fname_flat }}">
+			<span class="on">{{ phrase('agent.general.on') }}</span>
+			<span class="off">{{ phrase('admin.general.off') }}</span>
+		</td>
+		<td class="title">{{ title|raw }}</td>
+		<td class="prop">
+			{% set is_ug_perm = false %}
+			{% for id, ug in usergroup_values %}{% if id and id != 'override' %}{% if ug[permgroup ~ '.' ~ name] %}{% set is_ug_perm = true %}{% endif %}{% endif %}{% endfor %}
+			<input
+				class="onoff-slider override-perm"
+				type="checkbox"
+				name="permissions[{{ permgroup }}][override][{{ name }}]"
+				id="perm_val_override_{{ perm_fname_flat }}"
+				value="1"
+				{% if not is_ug_perm and usergroup_values['override'][permgroup ~ '.' ~ name] %}checked="checked"{% endif %}
+			/>
+			{# Other permission values #}
+			{% for id, ug in usergroup_values %}
+				{% if id and id != 'override' %}
+					<input
+						type="hidden"
+						class="ug-perm-val"
+						data-ug-id="{{ id }}"
+						id="perm_val_{{ id }}_{{ perm_fname_flat }}"
+						data-name="{{permgroup ~ '.' ~ name}}"
+						value="{% if ug[permgroup ~ '.' ~ name] %}1{% else %}0{% endif %}"
+					/>
+				{% endif %}
+			{% endfor %}
+		</td>
+	</tr>
+{% endmacro %}

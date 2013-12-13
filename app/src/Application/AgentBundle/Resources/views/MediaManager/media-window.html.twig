@@ -1,0 +1,26 @@
+<div class="dp-overlay-container" id="mediawin" data-element-handler="DeskPRO.Agent.ElementHandler.MediaManagerWindow">
+	<section class="dp-overlay no-footer">
+		<header>
+			<span class="close close-trigger">{{ phrase('agent.general.close_lc') }}</span>
+			<nav>
+				<ul id="mediawin_nav">
+					<li class="tab-upload" id="mediaswin_upload_trigger" data-tab-for="#mediaswin_upload">{{ phrase('agent.media.upload_file') }}</li>
+					<li class="tab-browse" data-tab-for="#mediawin_browse">{{ phrase('agent.media.previously_uploaded') }}</li>
+				</ul>
+			</nav>
+		</header>
+		<article id="mediawin_pages">
+			<section
+				id="mediaswin_upload"
+				data-page-url="{{ path('agent_mediamanager_upload') }}"
+			><div class="page-loading"></div></section>
+			<section
+				id="mediawin_browse"
+				data-page-url="{{ path('agent_mediamanager_browse') }}"
+			><div class="page-loading"></div></section>
+		</article>
+		<section id="mediawin_saved_overlay" style="display:none">
+			<h3>{{ phrase('agent.general.saved') }}</h3>
+		</section>
+	</section>
+</div>

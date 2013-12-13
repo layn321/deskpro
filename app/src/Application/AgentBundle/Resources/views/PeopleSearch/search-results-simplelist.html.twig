@@ -1,0 +1,11 @@
+{% for person in people_list %}
+	<li data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}">
+		{% if person.primary_email_address %}<span>&lt;{{person.primary_email_address}}&gt;</span>{% endif %}
+		<a>{{person.display_name}}</a>
+	</li>
+{% endfor %}
+{% if people_list|length %}
+	<li>
+		<a data-route="person:{{ path('agent_peoplesearch_findpane') }}">{{ phrase('agent.search.view_all_results') }}</a>
+	</li>
+{% endif %}

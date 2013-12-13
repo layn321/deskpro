@@ -1,0 +1,155 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('vendor/jquery/jquery.textarea-expander.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/WidgetEdit.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+	function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.WidgetEdit();
+	}
+</script>
+{% endblock %}
+{% block pagebar %}
+<ul>
+	<li>{% if widget.id %}Edit Widget{% else %}New Widget{% endif %}</li>
+</ul>
+{% endblock %}
+{% block prepage %}
+<div style="padding: 10px 10px 0 10px;">
+	{{ design.helpbox() }}
+	<p>
+		Refer to the <a href="https://support.deskpro.com/kb/articles/84">widget documentation</a> for more information about widgets and how they work.
+	</p>
+	{{ design.helpbox_end() }}
+</div>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_widgets_edit', {'widget_id': widget.id|default(0)}) }}" method="post" class="dp-form">
+
+	{% if errors %}
+	<ul id="errors_container">
+		{% for error in errors %}
+		<li>{{ error }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Description</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="description" value="{{widget.description}}" maxlength="255" />
+		</div>
+	</div>
+
+	{% if canEditPlugin %}
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Plugin</label>
+		</div>
+		<div class="dp-form-input">
+			<select name="plugin_id">
+				<option value="">&nbsp;</option>
+				{% for plugin in plugins %}
+				<option value="{{plugin.id}}"{{ widget.plugin == plugin ? ' selected="selected"' : ''}}>{{plugin.title}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Unique Key</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="unique_key" value="{{widget.unique_key}}" maxlength="50" />
+			<p>This must be specified if a plugin is selected.</p>
+		</div>
+	</div>
+	{% endif %}
+
+	<div id="widget-type-input" class="dp-form-row-group"
+		 data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group"
+	>
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Widget Type</label>
+			</div>
+			<div class="dp-form-input">
+				{% set full = widgetType == 'full' %}
+				<div class="dp-input-group {% if full %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="widget_type" value="full" {% if full %}checked="checked"{%endif%} />
+						Standard</label>
+					<p>The standard widget type automatically inserts a block of HTML at the specified location on the selected page.</p>
+				</div>
+				<div class="dp-input-group {% if not full %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="widget_type" value="js" {% if not full %}checked="checked"{%endif%} />
+						JavaScript only</label>
+					<p>An advanced type of widget that does not insert any HTML into the page. All manipulations must be done via JavaScript.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Location</label>
+		</div>
+		<div class="dp-form-input">
+			<select name="page" id="page-select">
+				<option value="">&nbsp;</option>
+				{% for key, text in pages %}
+					<option value="{{key}}"{{ widget.page == key ? ' selected="selected"' : ''}}>{{text}}</option>
+				{% endfor %}
+			</select>
+			<select name="insert_position" id="page-insert-position-select">
+				<option value="above"{{ widget.insert_position == 'above' ? ' selected="selected"' : ''}}>Above</option>
+				<option value="below"{{ widget.insert_position == 'below' ? ' selected="selected"' : ''}}>Below</option>
+				<option value="tab"{{ widget.insert_position == 'tab' ? ' selected="selected"' : ''}}>New Tab Within</option>
+			</select>
+			<select name="page_location" id="page-location-select">
+				<option value="" data-page="">&nbsp;</option>
+				{% for page, pageLocations in locations %}
+					{% for key, location in pageLocations %}
+						<option value="{{key}}" data-page="{{page}}" data-positions="{{location.1}}"{{ widget.page == page and widget.page_location == key ? ' selected="selected"' : ''}}>{{location.0}}</option>
+					{% endfor %}
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	<div class="dp-form-row" id="widget-block-title">
+		<div class="dp-form-label">
+			<label>Block Title</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="title" value="{{widget.title}}" maxlength="100" />
+		</div>
+	</div>
+
+	<ul class="tabs" id="widget-tabs" style="width: 75%">
+		<li data-tab-for="#widget-html" id="widget-tab-header-html"><a>HTML</a></li>
+		<li data-tab-for="#widget-js" id="widget-tab-header-js"><a>JS</a></li>
+		<li data-tab-for="#widget-css" id="widget-tab-header-css"><a>CSS</a></li>
+	</ul>
+	<div id="widget-html" style="display: none">
+		<textarea name="html" class="expander" data-expander-min-height="150">{{widget.html}}</textarea>
+	</div>
+	<div id="widget-js" style="display: none">
+		<textarea name="js" class="expander" data-expander-min-height="150">{{widget.js}}</textarea>
+	</div>
+	<div id="widget-css" style="display: none">
+		<textarea name="css" class="expander" data-expander-min-height="150">{{widget.css}}</textarea>
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Save Widget</button>
+	</footer>
+
+	{{ form_token() }}
+	<input type="hidden" name="process" value="1" />
+</form>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_userreg_options') }}">{{ phrase('admin.user_registration.registration_options') }}</a></li>
+	<li>{{ phrase('admin.user_registration.new_usersource') }}</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_userreg_usersource_edit') }}" class="form" method="post">
+	{{ design.block_sections() }}
+
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="active_directory" /> {{ phrase('admin.user_registration.active_directory') }}</label></h3></header>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="ldap" /> LDAP</label></h3></header>
+	{{ design.block_sections_item_end() }}
+
+	{% if not app.getSetting('core.usersource_db_table_disabled') %}
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="db_table_php_password_check" /> {{ phrase('admin.user_registration.custom_database') }}</label></h3></header>
+	{{ design.block_sections_item_end() }}
+	{% endif %}
+
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="vbulletin" /> {{ phrase('admin.user_registration.vbulletin_versions') }}</label></h3></header>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="xenforo" /> XenForo v1.x</label></h3></header>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="php_bb_2" /> {{ phrase('admin.user_registration.phpbb2') }}</label></h3></header>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="php_bb_3" /> {{ phrase('admin.user_registration.phpbb3') }}</label></h3></header>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+	<header><h3><label><input type="radio" name="usersource[source_type]" value="ez_publish" /> {{ phrase('admin.user_registration.ez_publish') }}</label></h3></header>
+	{{ design.block_sections_item_end() }}
+
+	{% for source in plugin_sources %}
+		{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="usersource[source_type]" value="{{ source.unique_key }}" /> {{ source.title }}</label></h3></header>
+		{{ design.block_sections_item_end() }}
+	{% endfor %}
+
+	<li class="alert-message block-message success">
+		Additional user sources (such as Magento) can be enabled in <a href="{{ path('admin_plugins') }}">the plugins section</a>.
+	</li>
+
+	<li class="footer">
+		<button class="clean-white">{{ phrase('agent.general.continue') }}</button>
+	</li>
+
+	{{ design.block_sections_end() }}
+
+</form>
+{% endblock %}

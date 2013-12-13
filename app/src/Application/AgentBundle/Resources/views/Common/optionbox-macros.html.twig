@@ -1,0 +1,62 @@
+{% macro start(title, options) %}
+<div class="optionbox {{ options.classname }}" {% if options.id %}id="{{ options.id }}"{% endif %}>
+	{% if title %}
+		<header>
+			<h4><span class="header-title-label">{{ title }}</span></h4>
+			<span class="close close-trigger"></span>
+		</header>
+	{% endif %}
+{% endmacro %}
+
+{% macro section_start(title, name) %}
+<div class="col">
+	<section data-section-name="{{ name }}">
+		<header>
+			<h3><span class="col-title-label">{% if title %}{{ title }}{% else %}&nbsp;{% endif %}</span></h3>
+			<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+		</header>
+		<ul>
+{% endmacro %}
+
+{% macro section_end() %}
+		</ul>
+	</section>
+</div>
+{% endmacro %}
+
+{% macro end(apply_label) %}
+	<br class="clear" />
+	{% if apply_label %}
+		<footer>
+			<button class="save-trigger"><span class="save-trigger-label">{{ apply_label }}</span></button>
+		</footer>
+	{% endif %}
+</div>
+{% endmacro %}
+
+{% macro category_ob(categories, box_title, button_title, options) %}
+	{{ _self.start(box_title, options) }}
+		{{ _self.section_start('', 'category') }}
+			{% for cat in categories %}
+				{{ _self.__category_ob_row(cat, 0) }}
+			{% endfor %}
+		{{ _self.section_end() }}
+	{{ _self.end(button_title) }}
+{% endmacro %}
+{% macro __category_ob_row(cat, depth) %}
+	<li
+		class="{% if not depth %}top{% else %}child{% endif %} {% if cat.children %}parent-option{% endif %} item-{{ cat.id }} depth-{{ depth }}"
+		{% if cat.parent_id %}data-parent-id="{{ cat.parent_id }}"{% endif %}
+		data-item-id="{{ cat.id }}"
+		data-full-title="{{ cat.title }}"
+	>
+		{% if depth %}<span class="elbow-end"></span>{% endif %}
+		<input type="radio" name="category_id" value="{{ cat.id }}" />
+		<label>{{ cat.title }}</label>
+	</li>
+	{% if cat.children|length %}
+		{% for subcat in cat.children %}
+			{{ _self.__category_ob_row(subcat, depth+1) }}
+		{% endfor %}
+	{% endif %}
+{% endmacro %}

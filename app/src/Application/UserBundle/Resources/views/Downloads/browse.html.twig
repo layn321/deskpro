@@ -1,0 +1,129 @@
+{##
+ # The main downloads page that lists categories and results. This page is used both for the
+ # downloads homepage, and viewing specific categories.
+ ##}
+
+{% set this_section = 'downloads' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_downloads') }}">{{ phrase('user.downloads.title') }}</a></li>
+	{% if category %}
+		{% for cat in category_path %}
+			<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_downloads', {'slug': cat.url_slug}) }}">{{cat.title}}</a></li>
+		{% endfor %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_downloads', {'slug': category.url_slug}) }}">{{category.title}}</a></li>
+	{% endif %}
+{% endblock %}
+{% block page_title %}
+	{{ phrase('user.downloads.title') }}
+	{% if category %}
+		/
+		{% for cat in category_path %}
+			{{cat.title}} /
+		{% endfor %}
+		{{category.title}}
+	{% endif %}
+{% endblock %}
+{% block content %}
+
+{% if app.admin_portal_controls %}
+	{% set tpl_res %}{% include 'UserBundle:Downloads:section-header.html.twig' %}{% endset %}
+	<div id="dp_custom_header_wrap" class="dp-portal-block" {% if not tpl_res|trim %}style="display: none"{% endif %}>
+		<div id="dp_page_custom_header" class="dp-portal-block-content">
+			{{ tpl_res|raw }}
+		</div>
+	</div>
+	<div id="dp_custom_header_placeholder" class="dp-portal-placeholder dp-portal-placeholder-header" data-portal-block="downloads_header" data-portal-for="#dp_page_custom_header" {% if tpl_res|trim %}style="display: none"{% endif %}>
+		<em>{{ phrase('admin.designer.edit_header_section') }}</em>
+	</div>
+{% else %}
+	{% include 'UserBundle:Downloads:section-header.html.twig' %}
+{% endif %}
+
+{% if category_children|length %}
+	<div style="overflow: hidden;">
+		<section class="dp-portal-section">
+			{% if category %}
+				<header>
+					<h3>{{ phrase('user.downloads.title-categories', {'count': category_children|length}) }}</h3>
+				</header>
+			{% endif %}
+			<div class="dp-content-block dp-news-block">
+				<div class="dp-content-wrapper">
+					<ul class="dp-cat-list">
+						{% include 'UserBundle:Downloads:browse-cat-list.html.twig' with {'categories': category_children} %}
+					</ul>
+				</div>
+			</div>
+		</section>
+		<br style="clear: both; height: 1px; overflow: hidden" />
+	</div>
+{% endif %}
+
+{% if downloads|length %}
+	<section class="dp-portal-section">
+		{% if category %}
+			<header>
+				{% if category and downloads|length %}
+				<h3>{{ phrase('user.downloads.title-downloads', {'count': downloads|length}) }}</h3>
+				{% endif %}
+			</header>
+		{% endif %}
+		<div class="dp-content-block dp-articles-block">
+			<div class="dp-content-wrapper">
+				<ul class="dp-content-list">
+					{% for download in downloads %}
+					<li>
+						<section class="dp-article-post dp-content-post dp-download-post">
+							<header>
+								<h3 style="margin-bottom: 0">
+									<a href="{{ path('user_downloads_file_download', {'slug': download.url_slug}) }}">
+										<span class="icon"></span>
+										{{ download.title }}
+										<em>{{ download.blob.getReadableFilesize() }}</em>
+									</a>
+								</h3>
+								<ul class="dp-post-info">
+									<li class="dp-date"><i class="dp-icon-calendar"></i> {{ download.date_created|date('full') }}</li>
+									{% if app.getSetting('user.publish_comments') %}<li class="dp-comments"><i class="dp-icon-comment"></i> <a href="{{ path('user_downloads_file', {'slug': download.url_slug}) }}#comments">{{ phrase('user.general.count_comments', {'count': comment_counts[download.id]|default(0)}) }}</a></li>{% endif %}
+								</ul>
+							</header>
+							{% if download.content %}
+								<div class="short-desc">
+									{{ download.content_desc }}
+									<a href="{{ path('user_downloads_file', {'slug': download.url_slug}) }}">{{ phrase('user.general.read_more') }}</a>
+								</div>
+							{% endif %}
+						</section>
+					</li>
+					{% endfor %}
+				</ul>
+
+				{% if pageinfo.last != 1 %}
+					{% set page_url = path('user_downloads', {'slug': category.url_slug|default('') }) ~ '?p=' %}
+					<div class="dp-pagination">
+						<ul>
+							{% if pageinfo.prev %}<li><a href="{{ page_url ~ pageinfo.prev }}">{{ language_arrow('left') }} {{ phrase('user.general.page_prev') }}</a></li>{% endif %}
+							{% for p in pageinfo.pages %}
+							<li class="{% if pageinfo.cursor == p %}dp-active{% endif %}"><a href="{{ page_url ~ p }}">{{ p }}</a>
+								{% endfor %}
+							{% if pageinfo.next %}<li><a href="{{ page_url ~ pageinfo.next }}">{{ phrase('user.general.next') }} {{ language_arrow('right') }}</a></li>{% endif %}
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+{% elseif category %}
+	<section class="dp-portal-section">
+		<div class="dp-content-block dp-articles-block">
+			<div class="dp-content-wrapper">
+				<p>{{ phrase('user.downloads.message_no-files') }}</p>
+			</div>
+		</div>
+	</section>
+{% endif %}
+
+<br style="clear: both; height: 1px; overflow: hidden" />
+
+{% endblock %}

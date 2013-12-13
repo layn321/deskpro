@@ -1,0 +1,21 @@
+{###############
+ # Name
+ ###############}
+<div class="dp-control-group {% if error_fields['person.name'] %}dp-error{% endif %}" {% if hide_email_field and not error_fields['person.name'] %}style="display:none;"{% endif %}>
+	<div class="dp-control-label">
+		<label>
+			<strong>{{ phrase('user.general.your_name') }} *</strong>
+		</label>
+	</div>
+	<div class="dp-controls dp-fill-half">
+		{{ form_widget(form.person.name, {
+			'attr': {
+				'data-field-validators': 'DeskPRO.Form.LengthValidator',
+				'data-min-len': 2
+			}
+		}) }}
+		<div class="dp-help-inline dp-help-inline dp-error-explain">
+			{{ phrase('user.general.please_enter_your_name') }}
+		</div>
+	</div>
+</div>

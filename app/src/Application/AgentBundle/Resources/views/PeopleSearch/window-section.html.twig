@@ -1,0 +1,166 @@
+{% extends 'AgentBundle::source-pane-layout.html.twig' %}
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+{% block pane_main_tab %}
+	<li class="tab active" data-tab-id="pane-content-main"><i class="icon-dp-person"></i> {{ phrase('agent.chrome.nav_people') }}</li>
+{% endblock %}
+{% block pane_content %}
+
+	<div class="pane-content pane-content-main">
+
+		<section class="pane-section" id="people_pending_section" {% if not validating_count_agent and not validating_count %}style="display: none;"{% endif %}>
+			<header>
+				<h1>{{ phrase('agent.general.pending') }}</h1>
+			</header>
+			<article>
+				<ul class="nav-list" id="people_outline_people_list">
+					<li class="is-nav-item" id="people_nav_awaiting_agent_validation">
+						<div class="item" data-route="listpane:{{ path('agent_people_validate_list') }}">
+							<h3>{{ phrase('agent.general.awaiting_agent_validation') }}</h3>
+							<em class="counter list-counter">{{ validating_count_agent|default(0) }}</em>
+						</div>
+					</li>
+
+					<li class="is-nav-item" id="people_nav_awaiting_validation">
+						<div class="item" data-route="listpane:{{ path('agent_people_validate_list', {email_validating:1}) }}">
+							<h3>{{ phrase('agent.general.awaiting_email_validation') }}</h3>
+							<em class="counter list-counter">{{ validating_count|default(0) }}</em>
+						</div>
+					</li>
+				</ul>
+			</article>
+		</section>
+
+		{##################################}
+		{# People #}
+		{##################################}
+
+		<section class="pane-section">
+			<header>
+				<h1>{{ phrase('agent.general.people') }}</h1>
+			</header>
+			<article>
+				<ul class="nav-list" id="people_outline_people_list">
+					<li class="people nav-people is-nav-item" id="people_nav_all">
+						<div class="item" data-route="listpane:{{ path('agent_peoplesearch_customfilter') }}">
+							<h3>{{ phrase('agent.general.registered') }}</h3>
+							<em class="counter list-counter">{% if people_count > 10000 %}10000+{% else %}{{ people_count }}{% endif %}</em>
+						</div>
+					</li>
+
+					{% for id,title in usergroup_names %}
+						<li
+							class="usergroup-{{id}} nav-usergroup-{{id}} is-nav-item"
+							id="people_nav_ug_{{id}}"
+							data-usergroup-id="{{id}}"
+							{% if not usergroup_counts[id] %}style="display: none"{% endif %}
+						>
+							<div class="item" data-route="listpane:{{ path('agent_peoplesearch_usergroup', {id: id}) }}">
+								<h3>{{title}}</h3>
+								<em class="counter list-counter">{% if usergroup_counts[id] > 10000 %}10000+{% else %}{{ usergroup_counts[id]|default(0) }}{% endif %}</em>
+							</div>
+						</li>
+					{% endfor %}
+				</ul>
+			</article>
+		</section>
+
+		<section class="pane-section with-tabs">
+			<nav class="pane-section-tabs">
+				<ul>
+					<li class="on"><span>{{ phrase('agent.general.labels') }}</span></li>
+					<li class="invis-last"></li>
+				</ul>
+			</nav>
+
+			<nav id="people_outline_tabstrip" class="pill-two-switcher" {% if not people_tag_cloud|length %}style="display: none"{% endif %} data-element-handler="DeskPRO.ElementHandler.SimpleTabs">
+				<ul>
+					<li data-tab-for="#people_outline_tagcloud" class="cloud on">{{ phrase('agent.general.labels_cloud') }}</li>
+					<li data-tab-for="#people_outline_taglist" class="list">{{ phrase('agent.general.labels_list') }}</li>
+				</ul>
+			</nav>
+
+			<section class="deskpro-tab-item on labels-cloud" id="people_outline_tagcloud">
+				{% include 'AgentBundle:PeopleSearch:window-people-label-cloud.html.twig' %}
+			</section>
+
+			<section class="deskpro-tab-item labels-list" id="people_outline_taglist">
+				{% include 'AgentBundle:PeopleSearch:window-people-label-list.html.twig' %}
+			</section>
+		</section>
+
+		{##################################}
+		{# Organizations #}
+		{##################################}
+
+		<section class="pane-section border-top">
+			<header>
+				<h1>{{ phrase('agent.general.organizations') }}</h1>
+			</header>
+			<article>
+				<ul class="nav-list">
+					<li class="is-nav-item" id="people_outline_org_list">
+						<div class="item" data-route="listpane:{{ path('agent_orgsearch_customfilter') }}">
+							<h3>{{ phrase('agent.general.organizations') }}</h3>
+							<em class="counter list-counter">{{ org_count|default('0') }}</em>
+						</div>
+					</li>
+				</ul>
+			</article>
+		</section>
+
+		<section class="pane-section with-tabs">
+			<nav class="pane-section-tabs">
+				<ul>
+					<li class="on"><span>{{ phrase('agent.general.labels') }}</span></li>
+					<li class="invis-last"></li>
+				</ul>
+			</nav>
+
+			<nav id="people_outline_org_tabstrip" class="pill-two-switcher" {% if not org_tag_cloud|length %}style="display: none"{% endif %} data-element-handler="DeskPRO.ElementHandler.SimpleTabs">
+				<ul>
+					<li data-tab-for="#people_outline_org_tagcloud" id="people_outline_org_tagcloud_tr" class="cloud on">{{ phrase('agent.general.labels_cloud') }}</li>
+					<li data-tab-for="#people_outline_org_taglist" id="people_outline_org_taglist_tr" class="list">{{ phrase('agent.general.labels_list') }}</li>
+				</ul>
+			</nav>
+			<section class="deskpro-tab-item on labels-cloud" id="people_outline_org_tagcloud">
+				{% include 'AgentBundle:PeopleSearch:window-org-label-cloud.html.twig' %}
+			</section>
+
+			<section class="deskpro-tab-item labels-list" id="people_outline_org_taglist">
+				{% include 'AgentBundle:PeopleSearch:window-org-label-list.html.twig' %}
+			</section>
+		</section>
+
+		{##################################}
+		{# AGENTS #}
+		{##################################}
+
+		<section class="pane-section border-top last">
+			<header>
+				<h1>{{ phrase('agent.general.agents') }}</h1>
+			</header>
+			<article id="system_filters_wrap">
+				<ul class="nav-list nav-list-small">
+					<li class="is-nav-item" id="people_outline_agent_list">
+						<div class="item"  data-route="listpane:{{ path('agent_peoplesearch_customfilter') }}?terms[0][type]=agent_mode&amp;terms[0][op]=is&amp;terms[0][agent_mode]=1">
+							<h3>{{ phrase('agent.general.agents') }}</h3>
+							<em class="counter list-counter">{{ agent_count|default('0') }}</em>
+						</div>
+					</li>
+					{% for id,title in team_names %}
+						<li class="people nav-people is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_peoplesearch_customfilter') }}?terms[0][type]=person_agent_team&amp;terms[0][op]=is&amp;terms[0][team_id]={{ id }}">
+								<h3>{{ title }}</h3>
+								<em class="counter list-counter">{{ team_counts[id]|default(0) }}</em>
+							</div>
+						</li>
+					{% endfor %}
+				</ul>
+			</article>
+		</section>
+	</div>
+
+	<div class="pane-content pane-content-search" style="display: none;">
+		{% include 'AgentBundle:PeopleSearch:window-search.html.twig' %}
+	</div>
+{% endblock %}

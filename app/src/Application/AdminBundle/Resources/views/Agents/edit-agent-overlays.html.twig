@@ -1,0 +1,37 @@
+<div id="vacation_overlay" style="width: 400px; height: 200px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.agents.vacation_mode') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<p>{{ phrase('admin.agents.explain_agent_vacation') }}</p>
+	</div>
+	<div class="overlay-footer">
+		<form action="{{ path('admin_agents_setvacation', {person_id: agent.id|default('00000'), set_to: '1'}) }}" method="post">
+			{{ form_token() }}
+			<button class="clean-white">
+				{% set phrase_part %}<span class="agent-name">{{ agent.display_name }}</span>{% endset %}
+                {{ phrase('admin.agents.enable_vacation_mode_name', {'name':phrase_part}, true) }}
+			</button>
+		</form>
+	</div>
+</div>
+
+<div id="delete_overlay" style="width: 400px; height: 150px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.agents.delete_agent') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<p>{{ phrase('admin.agents.explain_agent_deleted') }}</p>
+	</div>
+	<div class="overlay-footer">
+		<form action="{{ path('admin_agents_setdeleted', {person_id: agent.id|default('00000'), set_to: '1'}) }}" method="post">
+			{{ form_token() }}
+			<button class="clean-white">
+				{% set phrase_part %}<span class="agent-name">{{ agent.display_name }}</span>{% endset %}
+                {{ phrase('admin.agents.delete_name', {'name':phrase_part}, true) }}
+			</button>
+		</form>
+	</div>
+</div>

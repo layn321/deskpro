@@ -1,0 +1,140 @@
+{% extends 'AgentBundle:Login:layout.html.twig' %}
+{% block head %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			//$('<iframe id="preload_iframe" src="{{ path('agent_login_preload_sources') }}" frameborder="0"></iframe>').appendTo('body');
+
+			$('#lost_link').on('click', function(ev) {
+				ev.preventDefault();
+
+				$('#normal_view').show();
+				$('#lost_message_view').hide();
+				$('#loading_view').hide();
+
+				$('#login_title').hide();
+				$('#login_fields').hide();
+				$('#lost_password_title').show();
+				$('#lost_fields').show();
+			});
+
+			$('#login_link').on('click', function(ev) {
+				ev.preventDefault();
+
+				$('#normal_view').show();
+				$('#lost_message_view').hide();
+				$('#loading_view').hide();
+
+				$('#lost_password_title').hide();
+				$('#lost_fields').hide();
+				$('#login_title').show();
+				$('#login_fields').show();
+			});
+
+			$('#do_send_lost').on('click', function(ev) {
+				ev.preventDefault();
+				$('#normal_view').hide();
+				$('#lost_message_view').hide();
+				$('#loading_view').show();
+
+				var postData = {
+					email: $('#email').val().trim()
+				};
+
+				if (!postData.email.length || postData.email.indexOf('@') === -1) {
+					$('#normal_view').show();
+					$('#lost_message_view').hide();
+					$('#loading_view').hide();
+					$('#lost_password_title').hide();
+					$('#lost_fields').hide();
+					$('#login_title').show();
+					$('#login_fields').show();
+					return;
+				}
+
+				$.ajax({
+					url: '{{ path('agent_send_lost') }}',
+					data: postData,
+					complete: function() {
+						$('#loading_view').hide();
+						$('#lost_message_view').show();
+					}
+				});
+			});
+
+			{% if app.getRequest().query.has('lost') %}
+				$('#lost_link').trigger('click');
+			{% endif %}
+		});
+	</script>
+{% endblock %}
+{% block content %}
+<form action="{{ path('billing_login_authenticate_local') }}" method="post">
+	<input type="hidden" name="agent_login" value="1" />
+	{% if return %}<input type="hidden" name="return" value="{{return}}" />{% endif %}
+
+	<h1 id="login_title">{{ phrase('agent.general.log_in') }}</h1>
+	<h1 id="lost_password_title" style="display: none;">{{ phrase('agent.general.lost_password') }}</h1>
+	{% if failed_login_name %}<p class="error">{{ phrase('agent.login.login_failed') }}</p>{% endif %}
+	{% if has_done_reset %}<p class="okay">{{ phrase('agent.login.password_was_reset') }}</p>{% endif %}
+	{% if has_logged_out %}<p class="okay">{{ phrase('agent.login.has_logged_out') }}</p>{% endif %}
+
+	<div id="normal_view">
+		<dl>
+			<dt>
+                {{ phrase('agent.general.email') }}
+				{% if app.usersourceManager.getWithCapability('form_login') %}/ Username{% endif %}
+			</dt>
+			<dd><input type="text" class="text" value="{{ failed_login_name }}" name="email" id="email" size="40" tabindex="1" /></dd>
+		</dl>
+
+		<div id="login_fields">
+			<dl>
+				<dt>{{ phrase('agent.general.password') }}</dt>
+				<dd class="password">
+					<a href="{{ path('user_login_resetpass') }}" id="lost_link">{{ phrase('agent.general.lost_qm') }}</a>
+					<input type="password" class="text" value="" name="password" id="password" size="40"  tabindex="2" />
+					<div style="text-align: left">
+						<label style="margin: 0; padding: 0; font-weight: normal; font-size: 12px;">
+							<input type="checkbox" name="remember_me" value="1" tabindex="3" /> Remember Me
+						</label>
+					</div>
+				</dd>
+			</dl>
+
+			<dl>
+				<dt></dt>
+				<dd class="btn"><button tabindex="4">{{ phrase('agent.general.log_in') }}</button></dd>
+			</dl>
+		</div>
+
+		<div id="lost_fields" style="display: none">
+			<dl>
+				<dt></dt>
+				<dd class="password-reset">
+					Enter your email address and then click the button below to receieve instructions
+					on how to reset your password.
+				</dd>
+			</dl>
+
+			<dl>
+				<dt></dt>
+				<dd class="btn lost">
+					<button id="do_send_lost">{{ phrase('agent.login.email_instructions') }}</button>
+					<a href="{{ path('agent_login') }}" id="login_link">{{ phrase('agent.login.back_to_login') }}</a>
+				</dd>
+			</dl>
+		</div>
+	</div>
+	<div id="lost_message_view" style="display: none">
+		{{ phrase('agent.login.sent_pw_reset_instructions') }}
+	</div>
+	<div id="loading_view" style="display: none">
+		<i>{{ phrase('agent.general.loading') }}</i>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+	document.getElementById('email').focus();
+</script>
+{% endblock %}

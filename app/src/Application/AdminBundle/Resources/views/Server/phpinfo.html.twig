@@ -1,0 +1,227 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li><a href="{{ path('admin_server_phpinfo_download') }}">Download Report File</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.general.php_info') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th width="33%" style="text-align:left">&nbsp; {{ phrase('admin.general.setting') }}</th>
+				<th width="33%" style="text-align:left">Web PHP Value</th>
+				<th width="33%" style="text-align:left">Command-line PHP Value</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>{{ phrase('admin.server.php_version') }}</td>
+				<td>{{ web_php.php_config.version }}</td>
+				<td>{% if cli_php.php_config %}{{ cli_php.php_config.php_version }}{% else %}n/a{% endif %}</td>
+			</tr>
+			<tr>
+				<td>{{ phrase('admin.server.memory_limit') }}</td>
+				<td>
+					{% if web_php.php_config.memory_limit_real == -1 %}No limit
+					{% else %}{{ web_php.php_config.memory_limit_real|filesize_display }}
+					{% endif %}
+					(<a href="{{ app.request.getBaseUrl() }}?_sys=memtest&amp;_={{ static_security_token_secret(config_hash ~ 'memtest', 86400) }}">{{ phrase('admin.server.test_this_value') }}</a>)
+					{% if web_php.php_config.memory_limit and web_php.php_config.memory_limit != web_php.php_config.memory_limit_real %}
+						<div style="font-size: 11px;">Successfully changed at runtime: {{ web_php.php_config.memory_limit|filesize_display }}</div>
+					{% endif %}
+				</td>
+				<td>
+					{% if cli_php.php_config %}
+						{% if cli_php.php_config.memory_limit_real or not cli_php.php_config.memory_limit_real %}No limit
+						{% else %}{{ cli_php.php_config.memory_limit_real|filesize_display }}
+						{% endif %}
+						{% if cli_php.php_config.memory_limit and cli_php.php_config.memory_limit != cli_php.php_config.memory_limit_real %}
+							<div style="font-size: 11px;">Successfully changed at runtime: {{ cli_php.php_config.memory_limit|filesize_display }}</div>
+						{% endif %}
+					{% else %}
+						n/a
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>Effective max attachment size</td>
+				<td>
+					Approximately {{ web_php.effective_max_upload|filesize_display }}
+					<div style="font-size: 11px; line-height: 110%;">
+						Web-uploaded files are limited by a number of settings. <a href="{{ path('admin_server_attach') }}">Read more about configuring this limit</a>.
+					</div>
+				</td>
+				<td>
+					<div style="font-size: 11px; line-height: 110%;">
+						File operations on the command-line (e.g. reading email attachments) are limited by your memory limit. If you have problems
+						accepting large file attachments, try raising the memory limit.
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>{{ phrase('admin.server.error_log') }}</td>
+				<td>
+					{{ web_php.php_config.error_log_real|default('None') }}
+					{% if web_php.php_config.error_log and web_php.php_config.error_log != web_php.php_config.error_log_real %}
+						<div style="font-size: 11px; line-height: 110%;">Successfully changed at runtime:<br />{{ web_php.php_config.error_log }}</div>
+					{% endif %}
+				</td>
+				<td>
+					{{ cli_php.php_config.error_log_real|default('None') }}
+					{% if cli_php.php_config.error_log and cli_php.php_config.error_log != cli_php.php_config.error_log_real %}
+						<div style="font-size: 11px; line-height: 110%;">Successfully changed at runtime:<br />{{ cli_php.php_config.error_log }}</div>
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>Path to PHP.ini</td>
+				<td>{{ web_php.ini_path|default('n/a') }}</td>
+				<td>{{ cli_php.ini_path|default('n/a') }}</td>
+			</tr>
+			<tr>
+				<td>Link to PHP Info</td>
+				<td>
+					<a href="{{ app.getSetting('core.deskpro_url') }}?_sys=phpinfo&_={{ static_security_token_secret(config_hash ~ 'phpinfo', 86400) }}" onclick="prompt('If a support agent asks for it, provide this link to your PHP info:', $(this).attr('href')); return false;">Copy link Web PHP Info</a>
+				</td>
+				<td>
+					<a href="{{ app.getSetting('core.deskpro_url') }}?_sys=phpinfo&_={{ static_security_token_secret(config_hash ~ 'phpinfo', 86400) }}&cli=1" onclick="prompt('If a support agent asks for it, provide this link to your PHP info:', $(this).attr('href')); return false;">Copy link to Command-line PHP Info</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% if debug_settings %}
+	<br />
+
+	<div class="check-grid item-list">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th colspan="2" style="text-align: left">&nbsp; Config Settings</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for k,v in debug_settings %}
+					<tr>
+						<td>{{ k }}</td>
+						<td>{{ v }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endif %}
+
+{% if has_apc %}
+	<br />
+
+	<div class="check-grid item-list">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left">&nbsp; APC</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>APC is installed and is enabled. Click the link below to view statistics and cache-controls for APC.</td>
+				</tr>
+				<tr>
+					<td>
+						{% set link %}{{ app.getSetting('core.deskpro_url') }}?_sys=apc&amp;_={{ static_security_token_secret(config_hash ~ 'apc', 86400) }}{% endset %}
+						<a href="{{ link }}" target="_blank">{{ link }}</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+{% endif %}
+
+{% if has_wincache %}
+	<br />
+
+	<div class="check-grid item-list">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left">&nbsp; WinCache</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>WinCache is installed and is enabled. Click the link below to view statistics and cache-controls for WinCache.</td>
+				</tr>
+				<tr>
+					<td>
+						{% set link %}{{ app.getSetting('core.deskpro_url') }}?_sys=wincache&amp;_={{ static_security_token_secret(config_hash ~ 'wincache', 86400) }}{% endset %}
+						<a href="{{ link }}" target="_blank">{{ link }}</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+{% endif %}
+
+<br />
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th colspan="2" style="text-align:left">&nbsp; Binary Paths</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>PHP CLI</td>
+				<td>{{ binary_paths.php|default('No path is set. DeskPRO will attempt to find it automatically.') }}</td>
+			</tr>
+			<tr>
+				<td>MySQL Binary</td>
+				<td>{{ binary_paths.mysql|default('No path is set. DeskPRO will attempt to find it automatically.') }}</td>
+			</tr>
+			<tr>
+				<td>MySQL Dump Binary</td>
+				<td>{{ binary_paths.mysqldump|default('No path is set. DeskPRO will attempt to find it automatically.') }}</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="font-size:11px;">
+					DeskPRO requires the paths to these system binaries for some features like the automatic upgrader.
+					<br />To specify the path to these binaries, edit your config.php file.
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<br />
+<br />
+
+<nav class="check-grid-tabs">
+	<ul data-element-handler="DeskPRO.ElementHandler.SimpleTabs" data-trigger-elements="> li">
+		<li class="on" data-tab-for="#web_php_info"><span>Web PHP Info</span></li>
+		<li data-tab-for="#cli_php_info"><span>Command-line PHP Info</span></li>
+	</ul>
+</nav>
+
+<div id="web_php_info">
+	<div class="check-grid" style="padding: 25px;">
+		{{ web_php.phpinfo|raw }}
+	</div>
+</div>
+
+<div id="cli_php_info" style="display: none">
+	<div class="check-grid" style="padding: 25px;">
+		{{ cli_php.phpinfo|raw }}
+	</div>
+</div>
+
+{% endblock %}

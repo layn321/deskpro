@@ -1,0 +1,119 @@
+{% set this_page = 'dashboard' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+<ul>
+	<li>{{ phrase('admin.menu.admin_dashboard') }}</li>
+</ul>
+{% endblock %}
+{% block sidebar_right %}
+	{% include 'AdminBundle:Main:agents-box.html.twig' %}
+
+	<div class="dp-page-box">
+		<div class="resource-item-list">
+			<header>
+				<h4>Quick Stats</h4>
+			</header>
+			<article>
+				<ul>
+					<li>
+						Tickets Created Today: {{ stats.created_today }}
+					</li>
+					<li>
+						Tickets Resolved Today: {{ stats.resolved_today }}
+					</li>
+					<li>
+						Tickets Awaiting Agent: {{ stats.awaiting_agent }}
+					</li>
+				</ul>
+			</article>
+			<div style="text-align: center; padding-top: 4px;">
+				<a class="btn" href="{{ app.request.getBaseUrl() }}/reports">View more reports</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block page %}
+
+{% include 'AdminBundle:Main:welcome-box.html.twig' %}
+
+{% if sendmail_error_count %}
+<div class="content-table" style="border: 1px solid #A31612;">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th class="single-title" colspan="2">
+					<div style="background: url({{ asset('images/agent/icons/flag-red.png') }}) no-repeat 0 50%; line-height: 18px; padding-left: 18px;">Problems</div>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if sendmail_error_count %}
+				<tr>
+					<td>
+						There are <a href="{{ path('admin_sendmail_queue_index') }}">{{ sendmail_error_count }} logged sendmail errors</a>. These are outgoing email messages that failed to send. You should check these
+						to ensure your SMTP connections are working.
+					</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+
+<br />
+{% endif %}
+
+<div class="content-table">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th class="single-title" colspan="2">
+					Your License
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if lic.isDemo() %}
+				<tr>
+					<td class="title">Demo License</td>
+					<td class="prop">
+						Expires {{ lic.getExpireDate()|date('day', 'UTC') }}
+					</td>
+				</tr>
+			{% endif %}
+			<tr>
+				<td class="title">Plan</td>
+				<td class="prop">
+					<span class="label success" style="font-size: 10pt;">{{ lic.getMaxAgents()|default('Unlimited') }} agents</span> &middot; <a href="{{ app.request.getBaseUrl() }}/billing/">Add or remove agents from your plan</a>
+
+					<ul style="margin-top: 8px;">
+						{% for agent in app.getDataService('Person').getAgents() %}
+							<li style="background: url('{{ agent.getPictureUrl(25) }}') no-repeat 0 50%; padding-left: 31px; margin-top: 4px; line-height: 29px;">
+								<a href="{{ path('admin_agents_edit', {person_id: agent.id}) }}">{{ agent.displayName }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+
+					{% if lic.getMaxAgents() < 100 and app.getDataService('Person').getAgents()|length < lic.getMaxAgents() %}
+						<br />
+						Your current plan allows you to create {{ lic.getMaxAgents() - app.getDataService('Person').getAgents()|length }} more agent(s). <a href="{{ path('admin_agents_new') }}">Click here to add a new agent</a>.
+					{% endif %}
+				</td>
+			</tr>
+			{% if not lic.isDemo() %}
+				<tr>
+					<td class="" colspan="2" style="text-align: center">
+						<a href="{{ app.request.getBaseUrl() }}/billing/" class="btn">Manage Billing</a>
+					</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+
+<br />
+{% include 'CloudAdminBundle:Main:onboarding.html.twig' %}
+
+<br /><br /><br /><br /><br /><br /><br /><br /><br />
+
+{% endblock %}

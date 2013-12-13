@@ -1,0 +1,6 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>
+	{{ phrase('agent.people.new_registration_name', {name: person.getDisplayContact()}) }} {% if not person.is_agent_confirmed %}({{ phrase('agent.general.requires_validation') }}){% endif %}
+</dp:subject>
+<dp:body>
+{{ phrase('agent.people.new_registration_name', {name: person.getDisplayContact()}) }} {% if not person.is_agent_confirmed %}({{ phrase('agent.general.requires_validation') }}){% endif %}

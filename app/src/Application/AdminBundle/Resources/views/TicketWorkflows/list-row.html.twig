@@ -1,0 +1,12 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{{ design.dpgrid_content({class: 'top category-row ' ~ ' category-' ~ workflow.id, extra: "data-category-id='#{workflow.id}'"}) }}
+{{ design.dpgrid_col({ class: 'l r', style: "width: 890px; cursor: move;"}) }}
+	<span class="field-id" style="float:right">ID: {{ workflow.id }}</span>
+	<h2><a class="edit-trigger">{{workflow.title}}</a></h2>
+{{ design.dpgrid_col_end() }}
+
+{{ design.dpgrid_col({ class: 'l r l-margin with-icon-only', style: "width: 16px;"}) }}
+	<a href="{{ path('admin_ticketworks_del', {'workflow_id': workflow.id}) }}" class="delete"></a>
+{{ design.dpgrid_col_end() }}
+
+{{ design.dpgrid_content_end() }}

@@ -1,0 +1,23 @@
+<li
+	class="twitter inside"
+	data-type="twitter"
+	data-related="tweet:{{ account_status.id }}"
+	{% if account_status.agent %}
+		data-route="listpane:{{ path('agent_twitter_mine_list', {'account_id': account_status.account.id}) }}"
+	{% elseif account_status.agent_team %}
+		data-route="listpane:{{ path('agent_twitter_team_list', {'account_id': account_status.account.id}) }}"
+	{% endif %}
+	data-route-notabreload="1"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time></time>
+	<big>{{ phrase('agent.twitter.tweet') }}</big>
+	<small>
+		{% if account_status.agent %}
+			{{ phrase('agent.twitter.assigned_to_by', {name: performer.display_name}) }}
+		{% elseif account_status.agent_team %}
+			{{ phrase('agent.twitter.team_assigned_by', {name: performer.display_name}) }}
+		{% endif %}
+		<div>{{ account_status.status.text|raw }}</div>
+	</small>
+</li>

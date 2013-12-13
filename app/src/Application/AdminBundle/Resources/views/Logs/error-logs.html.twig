@@ -1,0 +1,49 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block content %}
+
+<div class="table-list-wrap">
+	<a class="create-link" href="{{ path('admin_logs_errors_clear') }}">{{ phrase('admin.logs.clear_all_errors') }}</a>
+	<h2>{{ phrase('admin.logs.error_logs_count', {'count':logs_count}) }}</h2>
+	<table class="table-list" cellspacing="0" cellpadding="0" width="100%">
+		<thead>
+			<tr>
+				<th width="50">{{ phrase('agent.general.id') }}</th>
+				<th width="50">{{ phrase('admin.general.pri') }}</th>
+				<th>{{ phrase('agent.general.message') }}</th>
+				<th width="180">{{ phrase('agent.general.date') }}</th>
+				<th>{{ phrase('admin.logs.details') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for log in logs %}
+				<tr>
+					<td>{{log.id}}</td>
+					<td>{{log.priority_name}}</td>
+					<td>{{log.message}}</td>
+					<td>{{log.date_created|date('fulltime')}}</td>
+					<td><a href="{{ path('admin_logs_view', {'log_id': log.id}) }}">{{ phrase('admin.general.view') }}</a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div class="page_nav">
+	<ul>
+		{% if pagination.curpage != pagination.first %}
+			<li><a href="{{ path('admin_logs_errors_page', {'page': pagination.first}) }}">{{ phrase('admin.general.first') }}</a></li>
+			<li><a href="{{ path('admin_logs_errors_page', {'page': pagination.prev}) }}">{{ phrase('agent.general.prev') }}</a></li>
+		{% endif %}
+
+		{% for i in pagination.pages %}
+			<li><a href="{{ path('admin_logs_errors_page', {'page': i}) }}" {% if i == pagination.curpage %}class="cur_page"{% endif %}>{{i}}</a></li>
+		{% endfor %}
+
+		{% if pagination.curpage != pagination.last %}
+			<li><a href="{{ path('admin_logs_errors_page', {'page': pagination.next}) }}">{{ phrase('admin.general.next') }}</a></li>
+			<li><a href="{{ path('admin_logs_errors_page', {'page': pagination.last}) }}">{{ phrase('admin.general.last') }}</a></li>
+		{% endif %}
+	</ul>
+</div>
+
+{% endblock %}

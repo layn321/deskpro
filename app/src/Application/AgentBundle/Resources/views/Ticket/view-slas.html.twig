@@ -1,0 +1,35 @@
+<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table th-la sla-table" {% if ticket.ticket_slas is empty %}style="display:none"{% endif %}>
+<thead>
+	<th width="28%" style="padding-left: 25px">{{ phrase('agent.general.sla') }}</th>
+	<th width="36%">{{ phrase('agent.tickets.sla_warn_date') }}</th>
+	<th width="36%">{{ phrase('agent.tickets.sla_fail_date') }}</th>
+	<th style="min-width: 20px">&nbsp;</th>
+</thead>
+<tbody id="{{ baseId }}_sla_rows" data-delete-confirm="{{ phrase('agent.tickets.sla_remove_confirm') }}">
+{% for ticket_sla in ticket.ticket_slas %}
+	{% include 'AgentBundle:Ticket:view-sla-row.html.twig' %}
+{% endfor %}
+</tbody>
+</table>
+
+{% if addable_slas is not empty and ticket_perms.modify_slas %}
+	<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table th-la sla-apply-table" id="{{ baseId }}_sla_form"
+		data-submit-url="{{ path('agent_ticket_addsla', {ticket_id: ticket.id}) }}"
+	>
+	<tr>
+		<th width="80">{{ phrase('agent.general.apply_sla') }}</th>
+		<td>
+			<span style="display: inline-block; width: 200px; margin-right: 5px;">
+				<select name="sla_id" data-select-width="auto">
+					<option value="0">&nbsp;</option>
+					{% for sla in addable_slas %}
+						<option value="{{ sla.id }}" {% if ticket.hasSla(sla) %}style="display:none"{% endif %}>{{ sla.title }}</option>
+					{% endfor %}
+				</select>
+			</span>
+			<button class="clean-white">{{ phrase('agent.general.apply') }}</button>
+			<img src="{{ asset('images/spinners/loading-small.gif') }}" style="display: none" id="{{ baseId }}_sla_save_progress" />
+		</td>
+	</tr>
+	</table>
+{% endif %}

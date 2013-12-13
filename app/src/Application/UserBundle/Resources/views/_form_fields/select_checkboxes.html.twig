@@ -1,0 +1,10 @@
+<div class="input-select-check-wrapall">
+	{% for choice in choices %}
+		<div class="input-select-check-wrap">
+			<label for="{{choice.attributes.id}}">
+				<input type="checkbox" name="{{choice.attributes.name}}" id="{{choice.attributes.id}}" value="{{choice.attributes.value}}" />
+				{{choice.label}}
+			</label>
+		</div>
+	{% endfor %}
+</div>

@@ -1,0 +1,123 @@
+{##
+ # The knowledgebase main page lists categories and articles. This template is used for the KB homepage
+ # as well as viewing specific categories, they are both the same page.
+ ##}
+{% set this_section = 'articles' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+<li xmlns="http://www.w3.org/1999/html"><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_articles') }}">{{ phrase('user.knowledgebase.knowledgebase') }}</a>{% if category %}{% endif %}</li>
+	{% if category %}
+		{% for cat in category_path %}
+			<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_articles', {'slug': cat.url_slug}) }}">{{cat.title}}</a></li>
+		{% endfor %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_articles', {'slug': category.url_slug}) }}">{{category.title}}</a></li>
+	{% endif %}
+{% endblock %}
+{% block page_title %}
+	{{ phrase('user.knowledgebase.knowledgebase') }}
+	{% if category %}
+		/
+		{% for cat in category_path %}
+			{{ phrase_object(cat) }} /
+		{% endfor %}
+		{{ phrase_object(category) }}
+	{% endif %}
+{% endblock %}
+{% block content %}
+
+{% if app.admin_portal_controls %}
+	{% set tpl_res %}{% include 'UserBundle:Articles:section-header.html.twig' %}{% endset %}
+	<div id="dp_custom_header_wrap" class="dp-portal-block" {% if not tpl_res|trim %}style="display: none"{% endif %}>
+		<div id="dp_page_custom_header" class="dp-portal-block-content">
+			{{ tpl_res|raw }}
+		</div>
+	</div>
+	<div id="dp_custom_header_placeholder" class="dp-portal-placeholder dp-portal-placeholder-header" data-portal-block="articles_header" data-portal-for="#dp_page_custom_header" {% if tpl_res|trim %}style="display: none"{% endif %}>
+		<em>{{ phrase('admin.designer.edit_header_section') }}</em>
+	</div>
+{% else %}
+	{% include 'UserBundle:Articles:section-header.html.twig' %}
+{% endif %}
+
+{% if category_children|length %}
+	<div style="overflow: hidden;">
+		<section class="dp-portal-section">
+			{% if category %}
+			<header>
+				<h3>{{ phrase('user.knowledgebase.title-categories', {'count': category_children|length}) }}</h3>
+			</header>
+			{% endif %}
+			<div class="dp-content-block dp-news-block">
+				<div class="dp-content-wrapper">
+					{% include 'UserBundle:Articles:browse-cat-list.html.twig' with {'categories': category_children, 'category_articles': category_children_articles} %}
+				</div>
+			</div>
+		</section>
+		<br style="clear: both; height: 1px; overflow: hidden" />
+	</div>
+{% endif %}
+
+{% if articles %}
+	<section class="dp-portal-section">
+		{% if category %}
+			<header>
+				{% if category and articles|length %}
+					{% if pageinfo.total_results > articles|length %}
+						<h3>{{ phrase('user.knowledgebase.title-articles-paged', {'total': pageinfo.total_results, 'first': pageinfo.first_result, 'last': pageinfo.last_result}) }}</h3>
+					{% else %}
+						<h3>{{ phrase('user.knowledgebase.title-articles', {'count': pageinfo.total_results}) }}</h3>
+					{% endif %}
+				{% endif %}
+			</header>
+		{% endif %}
+		<div class="dp-content-block dp-articles-block">
+			<div class="dp-content-wrapper">
+				<ul class="dp-content-list">
+					{% for article in articles %}
+					<li>
+						<section class="dp-article-post dp-content-post">
+							<header>
+								<h3 style="margin-bottom: 0" class="dp-fadeaway-container"><a class="dp-fadeaway-title" href="{{ path('user_articles_article', {'slug': article.url_slug}) }}">{{ article.title }}</a><div class="dp-fadeaway"></div></h3>
+								<ul class="dp-post-info">
+									<li class="dp-author"><i class="dp-icon-user"></i> {{ article.person.display_name_user }}</li>
+									<li class="dp-date"><i class="dp-icon-calendar"></i> {{ article.date_created|date('full') }}</li>
+									{% if app.getSetting('user.publish_comments') %}<li class="dp-comments"><i class="dp-icon-comment"></i> <a href="{{ path('user_articles_article', {'slug': article.url_slug}) }}#comments">{{ phrase('user.general.count_comments', {'count': comment_counts[article.id]|default(0)}) }}</li></a>{% endif %}
+								</ul>
+							</header>
+						</section>
+					</li>
+					{% endfor %}
+				</ul>
+
+				{% if pageinfo.last != 1 %}
+					{% set page_url = path('user_articles', {'slug': category.url_slug|default('all-categories') }) ~ '?p=' %}
+					<div class="dp-pagination">
+						<ul>
+							{% if pageinfo.prev %}<li><a href="{{ page_url ~ pageinfo.prev }}">{{ language_arrow('left') }} {{ phrase('user.general.page_prev') }}</a></li>{% endif %}
+							{% for p in pageinfo.pages %}
+							<li class="{% if pageinfo.cursor == p %}dp-active{% endif %}"><a href="{{ page_url ~ p }}">{{ p }}</a>
+								{% endfor %}
+							{% if pageinfo.next %}<li><a href="{{ page_url ~ pageinfo.next }}">{{ phrase('user.general.next') }} {{ language_arrow('right') }}</a></li>{% endif %}
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+{% endif %}
+
+{% if category %}
+	{% if app.getSetting('user.kb_subscriptions') %}
+			<div class="dp-subscribe dp-subscribe-category {% if is_subscribed %}dp-subscribe-on{% endif %}" id="dp_sb">
+				{% if is_subscribed %}
+					{{ phrase('user.knowledgebase.unsubscribe-category', {link: path('user_articles_cat_togglesub', {category_id: category.id, auth: security_token('subscribe_category')})}) }}
+				{% else %}
+					{{ phrase('user.knowledgebase.subscribe-category', {link: path('user_articles_cat_togglesub', {category_id: category.id, auth: security_token('subscribe_category')})}) }}
+				{% endif %}
+			</div>
+		{% endif %}
+{% endif %}
+
+<br style="clear: both; height: 1px; overflow: hidden" />
+
+{% endblock %}

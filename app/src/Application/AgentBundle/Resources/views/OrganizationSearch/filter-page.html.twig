@@ -1,0 +1,58 @@
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for org in organizations %}
+		<article
+			class="row-item org org-{{org.id}} downloads-{{org.id}}"
+			data-route="page:{{ path('agent_org_view', {'organization_id': org.id}) }}"
+			data-route-title="@selector(a.row-title)"
+			data-route-openclass="open"
+		>
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="row-title click-through">
+							<span class="person-name-picture" style="background-image: url({{ org.getPictureUrl(15) }})">{{ org.name }}</span>
+						</a>
+					</h3>
+				</div>
+			</div>
+			<hr class="clear-top" />
+			{% if display_fields|length %}
+				<div class="extra-fields">
+					<ul>
+						{% for field in display_fields %}
+							{% if field == 'members_count' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.members') }}</span>
+									<span class="prop-val"><a class="with-route" data-route="listpane:{{ path('agent_peoplesearch_customfilter') }}?terms[0][type]=person_organization&amp;terms[0][op]=is&amp;terms[0][organization]={{org.id}}&amp;terms[1][type]=any_mode&amp;terms[1][op]=is&amp;terms[1][any_mode]=1">
+											{{ result_display.getOrgMemberCount(org) }}
+									</a></span>
+								</li>
+							{% elseif field == 'labels' and result_display.hasOrgLabels(org) %}
+								<li class="{{field}}">
+									<span class="prop-title">{{ phrase('agent.general.labels') }}:</span>
+									<span class="prop-val labels">
+										{% for label in result_display.getOrgLabels(org) %}
+											<span class="listing-tag">{{ label }}</span>
+										{% endfor %}
+									</span>
+								</li>
+							{% else %}
+								{% for f in org_field_defs %}
+									{% if field == 'org_fields['~f.id~']' and org.hasCustomField(f.id) %}
+									<li>
+										<span class="prop-title">{{ f.title }}</span>
+										<span class="prop-val">{{ org.renderCustomField(f.id) }}</span>
+									</li>
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						{% endfor %}
+					</ul>
+					<br class="clear" />
+				</div>
+			{% else %}
+				<br class="clear" />
+			{% endif %}
+		</article>
+	{% endfor %}
+</section>

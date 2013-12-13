@@ -1,0 +1,12 @@
+<section class="dp-sidebar-block">
+	{% if title %}
+		<header>
+			<h3>
+				{{ title|raw }}
+			</h3>
+		</header>
+	{% endif %}
+	<article class="dp-written">
+		{{ content|raw }}
+	</article>
+</section>

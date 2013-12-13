@@ -1,0 +1,56 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_usergroups_new') }}">{{ phrase('admin.user_rules.user_rules') }}</a></li>
+		{% if rule.id %}
+			<li><a href="{{ path('admin_userrules_edit', {rule_id:rule.id}) }}">{{ phrase('admin.user_rules.edit_rule') }}</a></li>
+		{% else %}
+			<li>{{ phrase('admin.user_rules.new_rule') }}</li>
+		{% endif %}
+	</ul>
+	{% if rule.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_userrules_delete', {'rule_id': rule.id, _dp_security_token: security_token('delete_userrule') }) }}">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_userrules_edit', {'rule_id': rule.id|default(0)}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+{{ form_token('edit_userrule') }}
+
+<div class="dp-form">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_rules.email_address_pattern') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<textarea name="rule[patterns_string]" placeholder="{{ phrase('admin.user_rules.enter_pattern') }}" rows="6" style="height: 115px">{{ rule.patterns_string }}</textarea>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_rules.choice_add_match_usergroup') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<select name="rule[add_usergroup]">
+				{% for id,name in usergroups %}
+					<option value="{{ id }}" {% if rule.add_usergroup.id == id %}checked="checked"{% endif %}>{{ name }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+</div>
+
+<button class="btn primary save-trigger">{{ phrase('agent.general.save') }}</button>
+</form>
+
+<div style="padding-top: 10px; margin-top: 20px; border-top: 1px solid #ccc;">
+	<a href="{{ path('admin_userrules_apply', {rule_id:rule.id}) }}">Click here to apply this rule to all existing users &rarr;</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends layout_tpl ? layout_tpl : 'AdminBundle::layout.html.twig' %}
+{% block content %}
+<div
+	class="dp-page-box"
+	data-element-handler="DeskPRO.Admin.ElementHandler.CustomFieldList"
+	data-set-field-url="{{ path(route_basename~'setenabled', {'field_id': '00000'})|replace({'00000': '_FIELD_ID_'}) }}"
+>
+
+<ul class="field-dual-list">
+	{% for field in fields %}
+		<li class="short">
+			<header>
+				<span class="field-id">ID: {{ field.id }}</span>
+				<h3><a href="{{ path(route_basename~'edit', {'field_id': field.id}) }}">{{field.title}}</a></h3>
+				<div class="check-control">
+					<input type="checkbox" {% if field.is_enabled %}checked="checked"{% endif %} class="onoff-slider" data-field-id="{{ field.id }}" />
+				</div>
+				<br class="clear" />
+			</header>
+			<p>
+				{{ phrase('admin.custom_fields.field_type') }}: {{ phrase(field.getHandlerClassPhrase()) }}
+			</p>
+		</li>
+	{% else %}
+		<li>
+			<p>
+				{{ phrase('admin.custom_fields.no_fields_yet') }}
+			</p>
+		</li>
+	{% endfor %}
+</ul>
+
+<br class="clear" />
+</div>
+{% endblock %}

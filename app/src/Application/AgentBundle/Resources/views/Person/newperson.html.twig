@@ -1,0 +1,160 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.NewPerson';
+pageMeta.title = '{{ phrase('agent.general.new_person') }}';
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{{ agentui.scroll_containers('page-new-news page-new-content') }}
+{{ start_counter('steps') }}
+
+<a class="tab-anchor" href="#">&nbsp;</a>
+
+<form id="{{baseId}}_newperson" class="keybound-submit">
+<div class="drop-file-zone"><h1>{{ phrase('agent.people.drop_your_vcard_here') }}</h1></div>
+<script class="template-upload" type="text/x-tmpl">
+    {{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+    <p>{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</p>
+    {{ '{% } %}' }}
+</script>
+<script class="template-download" type="text/x-tmpl"><div style="display:none"></div></script>
+<div class="first section cat-section" id="{{baseId}}_email_section">
+	<div class="content">
+		<h4>{{ phrase('agent.general.email') }}</h4>
+		<input type="text" name="newperson[email]" id="{{baseId}}_email" value="" class="fill" />
+	</div>
+</div>
+
+<div class="section cat-section" id="{{baseId}}_name_section">
+	<div class="content">
+		<h4>{{ phrase('agent.general.name') }}</h4>
+		<input type="text" name="newperson[name]" id="{{baseId}}_name" value="" class="fill" />
+	</div>
+</div>
+
+
+<div class="section title-section" id="{{baseId}}_org_section">
+	<div class="content">
+		<h4>{{ phrase('agent.general.organization') }}</h4>
+		<div
+			class="org-input"
+			id="{{baseId}}_org_searchbox"
+			data-element-handler="DeskPRO.Agent.ElementHandler.OrgSearchBox"
+			data-search-url="{{ path('agent_orgsearch_quicknamesearch', {'format': 'json', 'limit': 10, 'start_with': 'a'}) }}"
+			data-highlight-term="1"
+			data-touch-focus="1"
+			data-search-param="term"
+			data-position-bound=".org-name"
+			data-super-container=".page-new-content"
+		>
+			<input type="text" class="org-name fill" id="{{baseId}}_org_name" name="newperson[new_organization]" placeholder="{{ phrase('agent.general.enter_organization_name') }}" value="" />
+			<input type="hidden" class="org-id" id="{{baseId}}_org_id" name="newperson[organization_id]" value="" />
+			<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+				<li>
+					<a>
+					<span class="org-name"></span>
+					<div class="bound-fade"></div>
+				</a></li>
+			</script>
+			<div class="person-search-box org" style="display: none">
+				<section>
+					<ul class="results-list">
+
+					</ul>
+					<footer>
+						<span class="create-org">{{ phrase('agent.general.create_a_new_organization') }}</span>
+					</footer>
+				</section>
+			</div>
+
+			<div id="{{baseId}}_org_pos" style="display: none; margin-top: 10px">
+				<h4>{{ phrase('agent.general.position') }}</h4>
+				<input type="text" name="newperson[organization_position]" value="" size="40" />
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if custom_fields|length %}
+<div class="section title-section" id="{{baseId}}_fields_section">
+	<div class="content">
+        {% for f in custom_fields %}
+        	<h4>{{ f.title }}</h4>
+        	{{ render_custom_field_form(f) }}
+        	<br />
+        {% endfor %}
+	</div>
+</div>
+{% endif %}
+
+<div class="section other-section" id="{{baseId}}_other_section">
+	<div class="content">
+		{# Tab Container #}
+		<div class="tab-container">
+			<nav id="{{baseId}}_other_props_tabs_wrap">
+				<ul id="{{baseId}}_other_props_tabs">
+					<li data-tab-for="> .tab-properties">{{ phrase('agent.general.properties') }}</li>
+				</ul>
+			</nav>
+			<div class="content-wrapper" id="{{baseId}}_other_props_tabs_content" style="display: none;padding: 0;">
+				<div class="tab-properties content-table" style="border: none;">
+					<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table">
+						<tr>
+							<th width="150">{{ phrase('agent.general.labels') }}</th>
+							<td>
+								<input
+									type="hidden"
+									id="{{baseId}}_labels_input"
+									class="labels-input dpe_select dpe_select_noborder"
+									data-select-width="auto"
+									data-placeholder="Add a label"
+									value="{% for label in state.newperson.labels %}{{label}},{% endfor %}"
+								/>
+							</td>
+						</tr>
+						{% if usergroup_names|length %}
+							<tr>
+								<th>{{ phrase('agent.general.usergroups') }}</th>
+								<td>
+									<div id="{{baseId}}_ug_container">
+										<select name="newperson[usergroups][]" class="dpe_select">
+											{% for id,name in usergroup_names %}
+												<option value="{{ id }}">{{ name }}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</td>
+							</tr>
+						{% endif %}
+						<tr class="last">
+							<th class="prop">{{ phrase('agent.general.timezone') }}</th>
+							<td class="prop">
+								<select id="{{baseId}}_timezone" name="newperson[timezone]" data-placeholder="{{ phrase('agent.general.timezone') }}" style="width: 200px" class="dpe_select">
+									<option></option>
+									{% for tz in timezone_options %}
+										<option value="{{tz}}" {% if tz == app.getSetting('core.default_timezone') %}selected="selected"{% endif %}>{{ tz }}</option>
+									{% endfor %}
+								</select>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		{# /Tab Container #}
+	</div>
+</div>
+
+<footer class="pop-footer">
+	<div class="is-not-loading">
+		<button class="submit-trigger clean-white">{{ phrase('agent.people.create_person') }} <kbd>{{ phrase('agent.general.altc') }}</kbd></button>
+	</div>
+	<div class="is-loading" style="padding-top: 9px;">
+		<img src="{{ asset('images/spinners/loading-small.gif') }}" />
+	</div>
+</footer>
+
+</form>
+
+{{ agentui.scroll_containers_end() }}

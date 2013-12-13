@@ -1,0 +1,25 @@
+{% if raw_info %}
+We found this user record:
+<br />
+<br />
+
+<ul>
+	<li>&bull; Identity: {{ raw_info.identity }}</li>
+	<li>&bull; DN: {{ raw_info.dn }}</li>
+	<li>&bull; First Name: {{ raw_info.first_name }}</li>
+	<li>&bull; Last Name: {{ raw_info.last_name }}</li>
+	<li>&bull; Full Name: {{ raw_info.name }}</li>
+	<li>&bull; Email Address: {{ raw_info.email_address }}</li>
+</ul>
+
+<br />
+<br />
+
+<form action="{{ path('admin_agents_new_fromusersource_make', {'usersource_id': usersource.id}) }}" method="post">
+	{{ form_token() }}
+	<input type="hidden" name="search_term" value="{{search_term}}" />
+	<button class="clean-white make-trigger">Make this user into an agent &rarr;</button>
+</form>
+{% else %}
+	No user was found
+{% endif %}

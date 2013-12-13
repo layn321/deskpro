@@ -1,0 +1,15 @@
+<li data-note-id="{{note.id}}" class="note twitter-note-{{ note.id }}">
+	<div class="message">
+		<div class="message-avatar">
+			<img src="{{ note.person.getPictureUrl(24) }}" alt="" width="24" height="24" />
+		</div>
+		<div class="message-body">
+			<div class="message-meta">
+				<h5>{{ phrase('agent.general.note_by', {name: note.person.name}) }} (<time class="timeago" title="{{note.date_created|date('c', 'UTC')}}">{{note.date_created|date('day')}}</time>)</h5>
+			</div>
+			<div class="message-text">
+				{{note.text|nl2br}}
+			</div>
+		</div>
+	</div>
+</li>

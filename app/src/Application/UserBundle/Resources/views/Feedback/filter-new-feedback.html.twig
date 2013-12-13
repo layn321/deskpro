@@ -1,0 +1,193 @@
+{##
+ # The new feedback form
+ ##}
+
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+<article
+	class="dp-new-feedback with-handler"
+	data-suggest-url="{{ path('user_search_similarto', {content_type: 'feedback'}) }}"
+	data-element-handler="DeskPRO.User.ElementHandler.FeedbackInlineNew"
+>
+	<form
+		{% if just_form %}
+			action="{{ path('user_feedback', {'status': status, 'slug': category.url_slug|default('all-categories'), 'order_by': search_options.order_by }) }}"
+		{% else %}
+			action="{{ path('user_feedback_new') }}"
+		{% endif %}
+		method="post"
+		class="with-form-validator"
+		id="new_suggest_form"
+	>
+	{{ form_token() }}
+
+	<div class="dp-its-a-trap">
+		{# Spam trap: If these fields contain values when submitted, the system knows a bot submitted the form #}
+		<input type="text" name="first_name" value="" />
+		<input type="text" name="last_name" value="" />
+		<input type="text" name="email" value="" />
+	</div>
+
+	<div class="dp-search-bar">
+		<table class="dp-layout" width="100%"><tr>
+			<td style="vertical-align: top; white-space: nowrap;" width="100%" class="{% if error_fields['title'] %}dp-error{% endif %}">
+				<div class="dp-input-prepend">
+					<table cellspacing="0" cellpadding="0" width="100%"><tr>
+						<td width="10" class="dp-msg">
+							<span style="white-space: nowrap;">{{ phrase('user.feedback.form_new_prefix') }}</span>
+						</td>
+						<td width="10" class="dp-cat dp-cat2">
+							<div style="position: relative;" class="dp-inplace-drop">
+								<em><span class="dp-opt-label">&nbsp;</span> <i></i></em>
+								<select name="feedback[category_id]" data-field-validators="DeskPRO.Form.LengthValidator" data-min-len="1" data-exclude-blank="1" data-bind-to=".dp-cat-title-place">
+									{% for cat in feedback_cats %}
+										{{ formmacro.select_options_hierarchy(cat, newfeedback.category_id) }}
+									{% endfor %}
+								</select>
+							</div>
+						</td>
+						<td class="dp-title">
+							<input type="text" class="dp-suggest-title" id="new_suggest_title" value="{{ newfeedback.title }}" />
+						</td>
+					</tr></table>
+				</div>
+			</td>
+			<td class="dp-go"><button class="dp-btn dp-go-btn dp-btn-success">{{ phrase('user.general.go') }}</button></td>
+		</tr></table>
+			<input type="hidden" name="process_new" value="1" />
+			<div class="dp-feedback-form dp-well dp-well-light dp-form-vertical" {% if not just_form and not is_submitted %}style="display: none"{% endif %}>
+				<fieldset>
+					<div class="dp-control-group {% if error_fields['title'] %}dp-error{% endif %}">
+						<label class="dp-control-label"><strong>{{ phrase('user.general.title') }}</strong></label>
+						<div class="dp-controls dp-fill">
+							{{ form_widget(form.title, {
+								'attr': {
+									'data-field-validators': 'DeskPRO.Form.LengthValidator',
+									'data-min-len': 1
+								}
+							}) }}
+							<div class="dp-help-inline dp-error-explain">
+								{{ phrase('user.feedback.form_new_error_title') }}
+							</div>
+						</div>
+					</div>
+
+					{% if newfeedback_cat_field %}
+						<div class="dp-control-group dp-error-static {% if error_fields['usercat'] %}dp-error{% endif %}">
+							<label class="dp-control-label"><strong>{{ phrase('user.feedback.category') }}</strong></label>
+							<div class="dp-controls dp-fill">
+								{{ render_custom_field_form(newfeedback_cat_field, {field_group: 'feedback[custom_fields]'}) }}
+								<div class="dp-help-inline dp-error-explain">
+									{{ phrase('user.feedback.form_new_error_category') }}
+								</div>
+							</div>
+						</div>
+					{% endif %}
+
+					<div class="dp-control-group {% if error_fields['content'] %}dp-error{% endif %}">
+						<label class="dp-control-label"><strong>{{ phrase('user.feedback.form_title') }}</strong></label>
+						<div class="dp-controls dp-fill">
+							{{ form_widget(form.content, {
+								'attr': {
+									'data-field-validators': 'DeskPRO.Form.LengthValidator',
+									'data-min-len': 5,
+									'rows': 7
+								}
+							}) }}
+							<div class="dp-help-inline dp-error-explain">
+								{{ phrase('user.feedback.form_new_error_message') }}
+							</div>
+							{% include 'UserBundle:Common:form-upload-input.html.twig' %}
+						</div>
+					</div>
+
+					{% if not app.user.is_guest %}
+						<div class="dp-control-group">
+							<table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" width="50%" style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 10px;">
+								<div class="dp-control-group {% if error_fields['person.name'] %}dp-error{% endif %} dp-control-group-person_name">
+									<div class="dp-control-label">
+										<label>
+											<strong>{{ phrase('user.general.comments_logged_in_as') }}:</strong>
+										</label>
+									</div>
+									<div class="dp-controls">
+										<span class="logged-in-as {{ app.session.get('auth_usersource_type') }}">
+											{% if app.session.get('usersource_display_link') %}
+												<a href="{{ app.session.get('usersource_display_link') }}">
+													{{ app.session.get('usersource_display_name')|default(app.user.display_name_user) }}
+												</a>
+											{% else %}
+												{{ app.session.get('usersource_display_name')|default(app.user.display_name_user) }}
+											{% endif %}
+
+											&nbsp; (<a href="{{ path('user_logout', {'auth': static_security_token('user_logout', 0) }) }}">{{ phrase('user.general.log_out') }}</a>)
+										</span>
+									</div>
+								</div>
+							</td><td valign="top" width="50%" style="padding-{% if is_rtl() %}right{% else %}left{% endif %}: 10px;">
+								{% if not app.user.name %}
+									<div class="dp-control-group {% if error_fields['person_name'] %}dp-error{% endif %}">
+										<label class="dp-control-label"><strong>{{ phrase('user.general.your_name') }}</strong></label>
+										<div class="dp-controls dp-fill">
+											{{ form_widget(form.person_name, {
+												'attr': {
+													'data-field-validators': 'DeskPRO.Form.LengthValidator',
+													'data-min-len': 2
+												}
+											}) }}
+											<div class="dp-help-inline dp-error-explain">
+												{{ phrase('user.general.please_enter_your_name') }}
+											</div>
+										</div>
+									</div>
+								{% else %}
+									&nbsp;
+								{% endif %}
+							</td></tr></table>
+						</div>
+					{% else %}
+						<div class="dp-control-group">
+							<table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" width="50%" style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 10px;">
+								{% include 'UserBundle:Common:form-email-login-row.html.twig' with { 'email_form_name': 'feedback[person_email]', 'mode': 'identity' } %}
+							</td><td valign="top" width="50%" style="padding-{% if is_rtl() %}right{% else %}left{% endif %}: 10px;">
+								<div class="dp-control-group {% if error_fields['person_name'] %}dp-error{% endif %}">
+									<label class="dp-control-label"><strong>{{ phrase('user.general.your_name') }}</strong></label>
+									<div class="dp-controls dp-fill">
+										{{ form_widget(form.person_name, {
+											'attr': {
+												'data-field-validators': 'DeskPRO.Form.LengthValidator',
+												'data-min-len': 2
+											}
+										}) }}
+										<div class="dp-help-inline dp-error-explain">
+											{{ phrase('user.general.please_enter_your_name') }}
+										</div>
+									</div>
+								</div>
+							</td></tr></table>
+						</div>
+					{% endif %}
+
+					{% if captcha_html %}
+						<div class="dp-control-group {% if error_fields['captcha'] %}dp-error dp-error-static{% endif %}">
+							<div class="dp-control-label">
+								<label><strong>{{ phrase('user.tickets.form_error_captcha') }}</strong></label>
+							</div>
+							<div class="dp-controls dp-fill">
+								{{ captcha_html|raw }}
+								{% if error_fields['captcha'] %}
+									<div class="dp-help-inline dp-error-explain">
+										{{ phrase('user.tickets.form_error_captcha_invalid') }}
+									</div>
+								{% endif %}
+							</div>
+						</div>
+					{% endif %}
+
+
+					<br />
+					<input class="dp-btn dp-btn-primary" type="submit" value="{{ phrase('user.feedback.form_new_button-submit') }}" />
+				</fieldset>
+			</div>
+	</div>
+	</form>
+</article>

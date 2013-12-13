@@ -1,0 +1,291 @@
+{% import 'AgentBundle:Common:optionbox-macros.html.twig' as optionbox %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.DownloadsView';
+pageMeta.title = {{download.title|json_encode|raw}};
+pageMeta.download_id = {{download.id}};
+pageMeta.url_fragment  = '{{ url_fragment('agent_downloads_view', {'download_id': download.id}) }}';
+pageMeta.permalink = '{{ url('user_downloads_file', {'slug': download.url_slug }) }}';
+pageMeta.labelsAutocompleteUrl        = '{{ path('agent_ajax_labels_autocomplete', {'label_type': 'downloads'}) }}';
+pageMeta.labelsSaveUrl                = '{{ path('agent_downloads_ajax_labels_save', {'download_id': download.id}) }}';
+pageMeta.obj_code = 'download_{{ download.id }}';
+
+{% if download.hidden_status == 'validating' %}
+pageMeta.isValidating = true;
+{% endif %}
+
+pageMeta.canEdit   = {% if not perms.can_edit %}false{% else %}true{% endif %};
+pageMeta.canDelete = {% if not perms.can_delete %}false{% else %}true{% endif %};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{# scroll containers #}
+<div class="layout-content with-scrollbar page-listing page-download-view {% if not perms.can_edit %}perm-no-edit{% endif %} {% if not perms.can_delete %}perm-no-delete{% endif %}">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /scroll containers #}
+
+<div class="delete-notice" {% if download.status_code != "hidden.deleted" %}style="display: none;"{% endif %}>
+	{{ phrase('agent.general.record_deleted') }} <button class="clean-gray xxx-small undelete">{{ phrase('agent.general.category') }}</button>
+</div>
+
+{% if download.status_code == "hidden.validating" %}
+	{% include 'AgentBundle:Publish:view-approve-header.html.twig' %}
+{% endif %}
+
+<header class="page-header">
+	<h4 class="id-number">#{{ download.id }}</h4>
+	<h1 class="editable hover-edit" data-editable-for=".inline-editable .title">{{ download.title }}</h1>
+	<div class="labels-line">
+		<input
+			type="hidden"
+			id="{{baseId}}_labels_input"
+			class="dpe_select dpe_select_noborder"
+			data-select-width="auto"
+			data-placeholder="Add a label"
+			value="{% for label in download.labels %}{{ label.label }},{% endfor %}"
+		/>
+	</div>
+	<br class="clear" />
+	<div class="meta-line flat">
+		<div class="status the-status download-status"><span>{{ phrase('agent.publish.status_' ~ download.status_code|replace({'.':'_'})) }}</span></div>
+		<div class="category" id="{{baseId}}_cat_trigger"><span>{{ phrase('agent.general.category') }}: <span id="{{baseId}}_cat_label">{{ download.category.full_title }}</span></span></div>
+	</div>
+	<br class="clear" />
+</header>
+
+<div class="profile-box-container-outer">
+	<div class="profile-box-container">
+		<header>
+			<div class="controls" id="{{baseId}}_editfile_controls">
+				<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+				<button class="edit-trigger">{{ phrase('user.downloads.change_file') }}</button>
+				<button class="cancel-trigger" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+				<button class="save-trigger" id="{{baseId}}_org_edit_save" style="display: none">{{ phrase('agent.general.save') }}</button>
+			</div>
+			<h4>{{ phrase('agent.general.file') }}</h4>
+		</header>
+		<section class="description-area">
+			<div id="{{baseId}}_showfile">{% include 'AgentBundle:Downloads:view-fileinfo.html.twig' %}</div>
+			<div id="{{baseId}}_editfile" style="display: none;">
+				{% if download.blob %}
+					<dl class="info-list">
+						<dt>{{ phrase('agent.general.file') }}:</dt>
+						<dd>
+							<input type="file" name="file-upload" multiple="multiple" />
+							{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'download[attach]', noremove: true} %}
+							<ul class="files file-list"></ul>
+						</dd>
+						<dt>{{ phrase('agent.general.filename') }}:</dt>
+						<dd>
+							<input type="text" name="download[title]" value="{{ download.title }}" /><br />
+							<small style="font-size: 11px;">{{ phrase('agent.publish.download_specify_filename') }}</small>
+						</dd>
+					</dl>
+				{% else %}
+					<dl class="info-list">
+						<dt>{{ phrase('agent.general.fileurl') }}:</dt>
+						<dd>
+							<input type="text" name="download[fileurl]" value="{{ download.fileurl }}" /><br />
+						</dd>
+						<dt>{{ phrase('agent.general.filesize') }}:</dt>
+						<dd>
+							<input type="text" name="download[filesize]" value="{{ download.getReadableFileSize() }}" /><br />
+						</dd>
+						<dt>{{ phrase('agent.general.filename') }}:</dt>
+						<dd>
+							<input type="text" name="download[filename]" value="{{ download.filename }}" /><br />
+						</dd>
+					</dl>
+				{% endif %}
+			</div>
+		</section>
+	</div>
+</div>
+
+<div class="profile-box-container-outer">
+	<div class="profile-box-container">
+		<header>
+			<h4>{{ phrase('agent.general.properties') }}</h4>
+		</header>
+		<section class="description-area">
+			<dl class="info-list">
+				<dt>{{ phrase('agent.general.rating') }}</dt>
+				<dd>
+                    {% set phrase_part %}
+                    <span class="link-look who-voted-trigger">{{ phrase('agent.general.count_votecount_votes', {'count':download.num_ratings}) }}</span>
+                    {% endset %}
+                    {{ phrase('agent.general.percent_helpful_subphrase', {'subphrase':phrase_part,'percent':download.rating_percent}, true) }}
+					<small>{{ phrase('agent.publish.n_helpful_n_unhelpful', {'up_votes':download.up_votes, 'down_votes':download.down_votes}) }}</small>
+				</dd>
+
+				<dt></dt>
+				<dd>
+					{{ phrase('agent.general.created_timeago_by_x_on_y', {
+					'timeago': '<time class="timeago" datetime="' ~ download.date_created|date('c', 'UTC') ~'"></time>',
+					'name': download.person.display_name,
+					'date': '<time>' ~ download.date_created|date('fulltime') ~ '</time>'
+				}, true) }}
+				</dd>
+
+				{% if user_view_count %}
+					<dt></dt>
+					<dd>
+						{{ phrase('agent.general.registered_views') }}: <a href="{{ path('agent_publish_whoviewed', {object_type: 2, object_id: download.id}) }}" class="open-who-viewed">{{ user_view_count }}</a>
+					</dd>
+				{% endif %}
+
+				{% if user_download_count %}
+					<dt></dt>
+					<dd>
+						{{ phrase('agent.general.registered_downloads') }}: <a href="{{ path('agent_publish_whoviewed', {object_type: 2, object_id: download.id, view_action: 2}) }}" class="open-who-downloaded">{{ user_download_count }}</a>
+					</dd>
+				{% endif %}
+			</dl>
+
+			<div class="controls" id="{{baseId}}_action_buttons">
+				<button class="clean-white delete nodelete-hide" {% if download.status_code == "hidden.deleted" %}style="display:none"{% endif %}>{{ phrase('agent.general.delete') }}</button>
+				<button class="clean-white permalink">{{ phrase('agent.general.copy_permalink') }}</button>
+				<button class="clean-white view-user-interface">{{ phrase('agent.general.view_in_user_interface') }}</button>
+				<br class="clear" />
+			</div>
+		</section>
+	</div>
+</div>
+
+<div class="profile-box-container reply-box-wrap">
+	<header>
+		<nav id="{{baseId}}_bodytabs">
+			<ul>
+				<li class="on" data-tab-for="#{{baseId}}_tab_contents .dl-content"><span>{{ phrase('agent.general.page') }}</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .comments-tab"><span>{{ phrase('agent.general.comments') }} (<span id="{{baseId}}_count_comments">{{download_comments|length|default(0)}}</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .revisions-tab"><span>{{ phrase('agent.general.label_revisions') }} (<span id="{{baseId}}_count_revs">{{download.revisions|length|default(0)}}</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .related-content-tab"><span>{{ phrase('agent.general.related_content') }} (<span id="{{baseId}}_count_related">0</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .search-tab"><span>{{ phrase('agent.general.search') }}</span></li>
+			</ul>
+		</nav>
+	</header>
+	<section>
+
+		{# Tab Contents #}
+		<div id="{{baseId}}_tab_contents">
+			{# Tab: Content #}
+			<div class="deskpro-tab-item dl-content on">
+				<nav class="sub-box-nav noedit-hide">
+					<ul class="option-buttons right" id="{{baseId}}_content_edit_btns">
+						<li class="kb-editor-edit edit" id="{{baseId}}_edit_btn"><span>{{ phrase('agent.general.ucfirst_edit') }}</span></li>
+						<li class="editor-save-trigger save" id="{{baseId}}_save_btn"><span>{{ phrase('agent.general.save') }}</span></li>
+						<li class="editor-cancel-trigger cancel" id="{{baseId}}_cancel_btn"><span>{{ phrase('agent.general.cancel') }}</span></li>
+					</ul>
+				</nav>
+
+				{# Content #}
+				<div class="download-content content-tab-item" id="{{baseId}}_content_ed">
+				{% include 'AgentBundle:Downloads:view-content-tab.html.twig' %}
+				</div>
+				{# /Content #}
+
+				<br class="clear" />
+			</div>
+			{# /Content #}
+
+			{# Tab: Comments #}
+			<div class="deskpro-tab-item content-tab-item comments-tab">
+				<div class="download-comments">
+					<div class="full-tab-content">
+						<div class="messages-wrap" id="{{baseId}}_comments_wrap">
+							{% for comment in download_comments %}
+								{% set comment_num = loop.index %}
+								{% include 'AgentBundle:Downloads:view-comment.html.twig' %}
+							{% endfor %}
+						</div>
+					</div>
+
+					<div class="messages-wrap new-note">
+						<article
+							class="content-message agent-message"
+							data-comment-id="{{comment.id}}"
+							data-content-type="{{ comment.object_content_type }}"
+						>
+							<div class="avatar">
+								<img src="{{ app.user.getPictureUrl(40) }}" alt="" width="40" height="40" />
+							</div>
+							<div class="content">
+								<header>
+									<h4>{{ phrase('agent.general.new_comment') }}</h4>
+								</header>
+								<div class="body-text">
+									<textarea style="width:99%; height: 80px;"></textarea>
+								</div>
+								<div class="footer-text">
+									<div class="loading-off">
+										<button class="clean-white">{{ phrase('agent.general.add_comment') }}</button>
+									</div>
+									<div class="loading-on" style="display:none">
+										{{ phrase('agent.general.saving') }}
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+				</div>
+			</div>
+			{# /Tab: Comments #}
+
+			{# Tab: Revisions #}
+			<div id="{{baseId}}_revs" class="loaded deskpro-tab-item content-tab-item revisions-tab">
+				{% include 'AgentBundle:Downloads:view-revisions-tab.html.twig' %}
+			</div>
+			{# /Tab: Revisions #}
+
+			{# Tab: Related #}
+			<div id="{{baseId}}_related_content" class="deskpro-tab-item content-tab-item related-content-tab">
+				{% include 'AgentBundle:Common:content-related-list.html.twig' %}
+			</div>
+			{# /Tab: Related #}
+
+			{# Tab: Search #}
+			<div id="{{baseId}}_searchtab" class="deskpro-tab-item search-tab">
+				<section class="description-area sticky-search-words">
+					<dl class="info-list">
+						<dt>{{ phrase('agent.publish.sticky_words_title') }}</dt>
+						<dd class="ticket-tags tags-wrap noedit-tags">
+							<input type="text" id="{{baseId}}_stickysearch_input" value="{% for label in sticky_search_words %}{{label}},{% endfor %}" />
+							<br class="clear" />
+							<div class="explain">
+								{{ phrase('agent.publish.search_sticky_words_explain') }}
+							</div>
+						</dd>
+					</dl>
+				</section>
+
+				<br />
+
+				{% include 'AgentBundle:Publish:rated-searches.html.twig' %}
+			</div>
+			{# /Tab: Search #}
+		</div>
+		{# /Tab Contents #}
+	</section>
+</div>
+
+<div class="inline-editable" style="display:none">
+	<div class="title">
+		<input type="text" name="title" value="{{ download.title }}"/>
+		<input type="hidden" name="action" value="title" />
+	</div>
+</div>
+
+<ul class="status-menu" data-option-name="status" style="display:none">
+	<li data-option-value="published">{{ phrase('agent.publish.status_published') }}</li>
+	<li data-option-value="hidden.unpublished">{{ phrase('agent.publish.status_hidden_unpublished') }}</li>
+	<li data-option-value="archived">{{ phrase('agent.publish.status_archived') }}</li>
+	{% if download.person.id == app.user.id %}
+		<li data-option-value="hidden.draft">{{ phrase('agent.publish.status_hidden_draft') }}</li>
+	{% endif %}
+</ul>
+
+{{ optionbox.category_ob(download_categories, phrase('agent.publish.download_category'), phrase('agent.general.apply'), {'id': baseId ~ '_cat_ob'}) }}
+
+</div></div> {# scrollbar divs #}
+</div> {# main layout div #}

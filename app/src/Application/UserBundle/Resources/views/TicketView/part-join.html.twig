@@ -1,0 +1,34 @@
+{##
+ # Displayed when a user clicks on a ticket link when they do not belong to the ticket.
+ # They're asked if they want to join.
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_view', {'ticket_ref': request_ref}) }}">{{ ticket.subject }}</a></li>
+{% endblock %}
+{% block content %}
+<section class="dp-portal-section dp-new-feedback-section">
+	<header>
+		<h1>{{ phrase('user.tickets.join_ticket') }}</h1>
+	</header>
+	<article>
+		<form action="{{ path('user_tickets_view', {'ticket_ref': request_ref}) }}" method="post">
+			{{ form_token() }}
+			<div class="dp-control-group">
+				<div class="dp-controls">
+					<p>
+						{{ phrase('user.tickets.join_explain', {subject: ticket.subject, name: ticket.person.display_name_user }) }}
+					</p>
+				</div>
+
+				<p>
+					<br />
+					<button class="dp-btn dp-btn-success" type="submit" name="join" value="1">{{ phrase('user.tickets.add_me_to_ticket') }}</button>
+					<a class="dp-btn" href="{{ path('user') }}">{{ phrase('user.tickets.dont_add_me_to_ticket') }}</a>
+				</p>
+			</div>
+		</form>
+	</article>
+</section>
+{% endblock %}

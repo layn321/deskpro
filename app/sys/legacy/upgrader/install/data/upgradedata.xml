@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--  $Id: upgradedata.xml 2476 2006-10-02 22:25:52Z chris $ -->
+<!--  This is data that is loaded during a v2-v3 upgrade but never gain -->
+<data>
+
+	<!-- Some default ticket workflows -->
+	<query table="ticket_workflow">
+		<name>In Process</name>
+		<displayorder>1</displayorder>
+	</query>
+	<query table="ticket_workflow">
+		<name>Awaiting Consultation</name>
+		<displayorder>2</displayorder>
+	</query>
+	<query table="ticket_workflow">
+		<name>On Hold</name>
+		<displayorder>3</displayorder>
+	</query>
+
+</data>

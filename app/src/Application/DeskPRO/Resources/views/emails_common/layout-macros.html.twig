@@ -1,0 +1,90 @@
+{##
+# Styling applied to ticket log actiontext
+##}
+{% macro actiontext_style(type) %}{% spaceless %}
+	{% if type == 'row' %}padding: 5px 0 5px 0;
+	{% elseif type == 'type' %}font-weight: bold;
+	{% elseif type == 'old-val' %}
+	{% elseif type == 'new-val' %}
+	{% endif %}
+{% endspaceless %}{% endmacro %}
+
+{##
+# Invisible code tracking that is appended to the bottom of emails
+##}
+{% macro replycode(code) %}
+	<span class="dp-replycode">(#{{ code }})</span>
+{% endmacro %}
+
+{##
+# Shows the first message of the messages array (a new reply)
+##}
+{% macro show_first_message(context) %}
+	{% set message = context.messages|first %}
+	{% if message.person.is_agent %}
+		{% include 'DeskPRO:emails_common:ticket-message-agent.html.twig' with {message: message} %}
+	{% else %}
+		{% include 'DeskPRO:emails_common:ticket-message.html.twig' with {message: message} %}
+	{% endif %}
+{% endmacro %}
+
+{##
+# Shows the first message of the messages array (a new reply) in quoted style
+##}
+{% macro show_latest_message(context) %}
+	{% include 'DeskPRO:emails_common:ticket-message-row.html.twig' with {message: context.messages|first} %}
+{% endmacro %}
+
+{##
+# Shows all messages
+##}
+{% macro show_all_messages(context) %}
+	{% for message in context.messages %}
+		{% include 'DeskPRO:emails_common:ticket-message-row.html.twig' with {
+			message: message
+		} %}
+	{% endfor %}
+{% endmacro %}
+
+{##
+# Shows the rest of the mssages array other than the first (eg the rest of the thread)
+##}
+{% macro show_rest_message(context) %}
+	{% for message in context.messages|slice(1) %}
+		{% include 'DeskPRO:emails_common:ticket-message-row.html.twig' with {
+			message: message
+		} %}
+	{% endfor %}
+{% endmacro %}
+
+{% macro show_rest_message_agent(context) %}
+	{% if context.is_new_user_reply or context.is_new_agent_reply %}
+		{% set messages = context.messages|slice(1) %}
+	{% else %}
+		{% set messages = context.messages %}
+	{% endif %}
+	{% for message in messages %}
+		{% include 'DeskPRO:emails_common:ticket-message-row.html.twig' with {
+			message: message,
+			show_author_email: true,
+			is_to_agent: true
+		} %}
+	{% endfor %}
+{% endmacro %}
+
+{##
+# Shows ratings links for the current reply
+##}
+{% macro show_rating_links(context) %}
+	{% set message = context.messages|first %}
+	{% include 'DeskPRO:emails_common:ticket-rating-links.html.twig' with {message: message, ticket: context.ticket} %}
+{% endmacro %}
+
+{##
+# Shows tikcet logs
+##}
+{% macro show_ticket_logs(context) %}
+	{% for log in context.ticket_logs %}
+		{% include 'DeskPRO:emails_common:ticket-log-actiontext.html.twig' %}
+	{% endfor %}
+{% endmacro %}

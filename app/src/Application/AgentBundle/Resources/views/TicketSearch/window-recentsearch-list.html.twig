@@ -1,0 +1,28 @@
+{% for search in recent_searches %}
+	<li
+		class="with-route tipped nav-recent-search-{{search.id}}"
+		data-route="listpane:{{ path('agent_ticketsearch_runcustomfilter') }}?recent_search_id={{search.id}}"
+		data-tipped="{{search.id}}_tip"
+		data-tipped-options="inline:true, hook: 'rightmiddle'"
+	>
+		<div id="{{search.id}}_tip" style="display: none">
+			<ul>
+				{% for line in search.summary %}
+					<li>{{line}}</li>
+				{% else %}
+					<li>{{ phrase('agent.tickets.no_criteria') }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="recent-search">
+			<div class="bound-faded"></div>
+			{% for line in search.summary %}
+				{{line}}{% if not loop.last %},{% endif %}
+			{% else %}
+				{{ phrase('agent.tickets.no_criteria') }}
+			{% endfor %}
+		</div>
+	</li>
+{% else %}
+	<li>{{ phrase('agent.tickets.no_recent_searches') }}</li>
+{% endfor %}

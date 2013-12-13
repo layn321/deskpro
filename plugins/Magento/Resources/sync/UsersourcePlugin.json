@@ -1,0 +1,3 @@
+{
+"magento":{"adapter_class":"Magento\\Usersource\\Adapter\\Magento","form_model_class":"Magento\\Usersource\\Form\\MagentoModel","form_template":"Magento:Admin:usersource-edit-magento.html.twig","form_type_class":"Magento\\Usersource\\Form\\MagentoType","title":"Magento"}
+}

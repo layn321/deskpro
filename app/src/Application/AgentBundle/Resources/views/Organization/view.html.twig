@@ -1,0 +1,98 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.Organization';
+pageMeta.title = {{ org.name|json_encode|raw }};
+pageMeta.org_id = {{org.id}};
+pageMeta.labelsAutocompleteUrl = '{{ path('agent_ajax_labels_autocomplete', { 'label_type': 'organizations'}) }}';
+pageMeta.labelsSaveUrl = '{{ path('agent_org_ajax_labels_save', {'organization_id': org.id}) }}';
+pageMeta.url_fragment  = '{{ url_fragment('agent_org_view', {'organization_id': org.id}) }}';
+
+{% if org.picture_blob %}
+pageMeta.orgPicIcon = '{{ org.picture_blob.getThumbnailUrl(13) }}';
+{% endif %}
+
+pageMeta.organization = {{ org_api|json_encode|raw }};
+
+pageMeta.perms = {
+	edit: {% if app.user.hasPerm('agent_org.edit') %}true{% else %}false{% endif %}
+};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{# Page Containers #}
+<div class="profile org-profile profile layout-content with-scrollbar {% if not app.user.hasPerm('agent_org.edit') %}perm-no-edit{% endif %}">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /Page Containers #}
+
+<header class="page-header">
+	<table cellspacing="0" cellpadding="0" width="100%"><tr><td width="60">
+		<div class="person-picture-box tipped" style="cursor:pointer" title="{{ phrase('agent.general.click_to_upload_picture') }}" id="{{baseId}}_change_user_picture">
+			<img src="{{ org.getPictureUrl(60) }}" id="{{baseId}}_picture_display" />
+		</div>
+	</td><td>
+		<div class="titlewrap">
+			<h4 class="id-number">#{{ org.id }}</h4>
+			<h1>
+				<span class="editable person-name-editable" data-editable-for="#{{baseId}}_editname">{{ org.name|default(phrase('agent.people.double_click_set_name')) }}</span>
+				{% if app.user.hasPerm('agent_org.edit') %}<span class="edit-name-gear"></span>{% endif %}
+				<div id="{{baseId}}_editname" style="display: none">
+					<input type="hidden" name="action" value="name" />
+					<input type="text" size="20" name="name" value="{{ org.name }}" />
+				</div>
+			</h1>
+			<div class="labels-line">
+				{% if org.labels|length or app.user.hasPerm('agent_org.edit') %}
+					<input
+						type="hidden"
+						id="{{baseId}}_labels_input"
+						class="dpe_select dpe_select_noborder"
+						data-select-width="auto"
+						data-placeholder="Add a label"
+						value="{% for label in org.labels %}{{ label.label }},{% endfor %}"
+					/>
+				{% endif %}
+			</div>
+		</div>
+	</td></tr></table>
+	<br class="clear" />
+	<div class="meta-line">
+		<nav class="actions" id="{{baseId}}_action_buttons">
+			<ul>
+				<li>
+					{% if app.user.hasPerm('agent_org.delete') %}
+					<button
+						id="{{baseId}}_delete_btn"
+						class="clean-white delete-trigger"
+						data-delete-url="{{ path('agent_org_delete', {'organization_id': org.id, 'security_token': security_token('delete_org') }) }}"
+					>{{ phrase('agent.general.delete') }}</button>
+					{% endif %}
+				</li>
+			</ul>
+		</nav>
+	</div>
+	<br class="clear" />
+</header>
+
+{{ dp_widgets(baseId, 'organization', 'header', 'below', org_api) }}
+
+<table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" width="60%">
+	<section class="content-col">
+		{% include 'AgentBundle:Organization:view-content-col.html.twig' %}
+	</section>
+</td><td valign="top">
+	<section class="property-col">
+		{% include 'AgentBundle:Organization:view-property-col.html.twig' %}
+	</section>
+</td></tr></table>
+
+{{ dp_widgets(baseId, 'organization', 'footer', 'above', org_api) }}
+
+{% include 'AgentBundle:Organization:contact-overlay.html.twig' %}
+
+{{ dp_widgets(baseId, 'organization', '', '', org_api) }}
+
+{# Page Containers #}
+</div></div>
+</div>
+{# /Page Containers #}

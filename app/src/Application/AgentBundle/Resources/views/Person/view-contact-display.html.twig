@@ -1,0 +1,34 @@
+{% extends 'AgentBundle:Common:profile-view-contact-display.html.twig' %}
+{% block top_extra %}
+	{% for email in person.emails %}
+		<li
+			class="email {% if email.id == person.primary_email.id %}is-primary{% endif %} email-{{email.id}} {% if email.comment %}tipped{% endif %}"
+			{% if email.comment %}title="{{ email.comment }}"{% endif %}
+			data-tipped-options="hook: 'leftmiddle'"
+			data-email-id="{{ email.id }}"
+			data-email-address="{{ email.email }}"
+			style="position: relative;"
+		>
+			<span class="copy-btn-outer"><span class="copy-btn" data-clipboard-text="{{ email.email }}" title="Copy to clipboard"><i class="icon-paste"></i></span></span>
+			<a href="mailto:{{ email.email }}">{{ email.email }}</a>
+
+			{% if person.emails|length > 1 %}
+				<span class="primary">{{ phrase('agent.people.primary_email') }}</span>
+				<span class="set-primary" data-email-id="{{ email.id }}">{{ phrase('agent.people.make_primary_email') }}</span>
+			{% endif %}
+			{% if banned_emails[email.email] %}
+				<span class="banned" data-email-id="{{ email.id }}" data-unban-url="{{ path('agent_people_unban_email', {person_id: person.id, email_id: email.id}) }}">{{ phrase('agent.general.banned') }}</span>
+			{% endif %}
+		</li>
+	{% endfor %}
+{% endblock %}
+
+{% block post_extra %}
+    <div class="addresses">
+        <ul>
+            <li class="address">
+                <a target="_blank" href="{{ path('agent_people_view', {'person_id': person.id, 'vcf': 1, '_rt': security_token('request_token', 10800)}) }}">{{ phrase('agent.people.download_vcard') }}</a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

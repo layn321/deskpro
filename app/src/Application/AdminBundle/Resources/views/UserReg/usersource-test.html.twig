@@ -1,0 +1,47 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_userreg_options') }}">{{ phrase('admin.user_registration.registration_options') }}</a></li>
+	<li><a href="{{ path('admin_userreg_usersource_edit', {id: usersource.id}) }}">{{ usersource.title }}</a></li>
+	<li>Test</li>
+</ul>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_userreg_usersource_test', {id: usersource.id}) }}" method="post">
+
+	<div class="alert-message block-message info">
+		This will allow you to test a real user login against the usersource.
+		You will see information returned from the usersource (if any), and a transaction
+		log that can be helpful in diagnosing problems.
+	</div>
+
+	<div class="dp-form">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>
+					Username or Email Address
+				</label>
+			</div>
+			<div class="dp-form-input">
+				<input type="text" name="email_address" value="" />
+			</div>
+		</div>
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>
+					Password
+				</label>
+			</div>
+			<div class="dp-form-input">
+				<input type="password" name="password" value="" />
+			</div>
+		</div>
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Test Login</button>
+	</footer>
+
+</form>
+{% endblock %}

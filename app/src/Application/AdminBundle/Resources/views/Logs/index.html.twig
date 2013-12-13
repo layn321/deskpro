@@ -1,0 +1,29 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block content %}
+
+<div class="table-list-wrap">
+	<h2>{{ phrase('admin.general.logs') }}</h2>
+	<table class="table-list" cellspacing="0" cellpadding="0" width="100%">
+		<tbody>
+			<tr>
+				<td width="200">
+					<strong><a href="{{ path('admin_logs_errors') }}">{{ phrase('admin.general.error_logs') }}</a></strong>
+				</td>
+				<td>{{ phrase('admin.logs.notice_error_logs') }}</td>
+			</tr>
+
+			<tr>
+				<td>
+					<strong>{{ phrase('admin.logs.look_up_sn') }}</strong>
+				</td>
+				<td>
+					{{ phrase('admin.logs.notice_can_use_sn_code') }}
+					<hr />
+					{{ phrase('admin.general.sn_code') }}: <input type="text" id="sn_code" /> <button class="dp-button x-small" onclick="window.location=BASE_URL+'admin/logs/sn/' + $('#sn_code').val()">{{ phrase('admin.general.view') }}</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

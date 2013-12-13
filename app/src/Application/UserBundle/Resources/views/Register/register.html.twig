@@ -1,0 +1,271 @@
+{% extends 'UserBundle::layout.html.twig' %}
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+{% block breadcrumb %}
+	{% if this_page == 'register' %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_register') }}">{{ phrase('user.profile.register') }}</a></li>
+	{% else %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_register') }}">{{ phrase('user.general.log_in') }}</a></li>
+	{% endif %}
+{% endblock %}
+{% block head %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#user_type_exist').on('click', function() {
+			$('#user_type_new_form').hide();
+			$('#user_type_exist_pass_form').hide();
+			$('#user_type_exist_form').show();
+		});
+		$('#user_type_new').on('click', function() {
+			$('#user_type_exist_form').hide();
+			$('#user_type_exist_pass_form').hide();
+			$('#user_type_new_form').show();
+		});
+		$('#user_type_exist_pass').on('click', function() {
+			$('#user_type_exist_form').hide();
+			$('#user_type_exist_pass_form').show();
+			$('#user_type_new_form').hide();
+		});
+	});
+</script>
+{% endblock %}
+{% block content %}
+
+<div class="dp-register-page">
+
+	{% if from_ticket.id %}
+		<div class="dp-alert dp-alert-success">
+			<p>
+				{{ phrase('user.profile.explain_register_for_online_tickets') }}
+			<p>
+		</div>
+	{% endif %}
+
+	{% if app.getSession().get('submitted_feedback')|length %}
+		<div class="dp-alert dp-alert-success">
+			<p>
+				{{ phrase('user.profile.explain_login_feedback') }}
+			<p>
+		</div>
+	{% endif %}
+
+	{% if app.getSession().get('login_validate_comments') %}
+		<div class="dp-alert dp-alert-error">
+			{{ phrase('user.profile.explain_login_comment') }}
+		</div>
+	{% endif %}
+
+	{#####################################################################}
+
+	<section class="dp-well">
+		<header>
+			{% if app.usersourceManager.getWithCapability('tpl_login_pull_btn') %}
+				<div class="dp-connect-with">
+					{{ phrase('user.profile.or_connect_with') }}
+					{% for usersource in app.usersourceManager.getWithCapability('tpl_login_pull_btn') %}
+						{{ render_usersource(usersource, 'login_pull_btn') }}
+					{% endfor %}
+				</div>
+			{% endif %}
+			<label>
+				<h3><input type="radio" name="user_type" id="user_type_exist" {% if this_page == 'login' %}checked="checked"{% endif %} /> {{ phrase('user.profile.im_already_registered') }}</h3>
+			</label>
+		</header>
+		<article id="user_type_exist_form" class="dp-well dp-well-light" {% if this_page != 'login' %}style="display:none"{% endif %}>
+			{% if app.session.hasFlash('password_reset') %}
+				<div class="dp-alert dp-alert-success">
+					{{ phrase('user.profile.password_updated') }}
+				</div>
+			{% endif %}
+			{% if failed_login_name %}
+				<div class="dp-alert dp-alert-error">
+					{{ phrase('user.profile.login_error') }}
+				</div>
+			{% elseif account_disabled %}
+				<div class="dp-alert dp-alert-error">
+					{{ phrase('user.profile.account_disabled_message') }}
+				</div>
+			{% endif %}
+			<form action="{{ path('user_login_authenticate_local') }}" class="dp-layout" method="post">
+				{{ form_token('user_login') }}
+
+				{% if return %}
+					<input type="hidden" name="return" value="{{return}}" />
+				{% else %}
+					<input type="hidden" name="return" value="{{ app.getReturnUrl() }}" />
+				{% endif %}
+				<table cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						<td>
+							<div style="padding-bottom: 5px;">
+								{{ phrase('user.general.email_address') }}
+							</div>
+							<div>
+								<input type="text" name="email" size="20" value="{{ failed_login_name|default(app.getVariable('login_with_email')) }}" />
+							</div>
+						</td>
+						<td>
+							<div style="padding-bottom: 5px;">
+								{{ phrase('user.profile.password') }}
+								{% if app.getSetting('core.user_mode') != 'closed' %}<a style="margin-{% if is_rtl() %}right{% else %}left{% endif %}: 9px;" href="{{ path('user_login_resetpass') }}">{{ phrase('user.profile.lost_qm') }}</a>{% endif %}
+							</div>
+							<div>
+								<input type="password" value="" name="password" size="20" />
+							</div>
+						</td>
+						<td style="text-align: center; vertical-align: middle;" valign="middle">
+							<input class="dp-btn dp-btn-primary" type="submit" value="{{ phrase('user.general.log_in') }}" />
+							<label style="margin: 5px 0 0"><input type="checkbox" name="remember_me" value="1" style="display:inline; position: relative; top: -2px;" /> {{ phrase('user.general.remember_me') }}</label>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</article>
+	</section>
+
+	{#####################################################################}
+	{% if app.getSetting('core.deskpro_source_enabled') %}
+		<section class="dp-well">
+			<header>
+				<label>
+					<h3><input type="radio" name="user_type" id="user_type_exist_pass" {% if this_page == 'reset' %}checked="checked"{% endif %} /> {{ phrase('user.profile.ive_lost_password') }}</h3>
+				</label>
+			</header>
+			<article id="user_type_exist_pass_form" class="dp-well dp-well-light" {% if this_page != 'reset' %}style="display:none"{% endif %}>
+				<form action="{{ path('user_login_resetpass_send') }}" class="form login" method="post" class="with-form-validator">
+					{{ form_token() }}
+					<table cellspacing="0" cellpadding="0">
+						<tr>
+							<td width="40%">
+								<div class="dp-control-group {% if invalid %}dp-error{% endif %}">
+									<div style="padding-bottom: 5px;">
+										{{ phrase('user.general.email_address') }}
+									</div>
+									<div class="dp-controls">
+										<input type="text" value="{{ app.getVariable('login_with_email') }}" name="email" id="email" size="40" data-field-validators="DeskPRO.Form.EmailValidator" />
+										<div class="dp-help-inline dp-error-explain">
+											{{ phrase('user.general.form_fix_email') }}
+										</div>
+									</div>
+								</div>
+							</td>
+							<td style="text-align: center; vertical-align: middle;" valign="middle">
+								<input class="dp-btn dp-btn-primary" type="submit" value="{{ phrase('user.profile.continue') }}" />
+							</td>
+						</tr>
+					</table>
+					{% if app.user.id %}
+						<p style="font-size: 90%">{{ phrase('user.profile.reset_password_current_logged_in', {email: app.user.getEmailAddress()}) }}</p>
+					{% endif %}
+				</form>
+			</article>
+		</section>
+	{% endif %}
+
+	{#####################################################################}
+	{% if app.getSetting('core.user_mode') != 'closed' %}
+		<section class="dp-well">
+			<header>
+				<label>
+					<h3><input type="radio" name="user_type" id="user_type_new" {% if this_page == 'register' %}checked="checked"{% endif %} /> {{ phrase('user.profile.im_new_user') }}</h3>
+				</label>
+			</header>
+			<article id="user_type_new_form" class="dp-well dp-well-light" {% if this_page != 'register' %}style="display:none"{% endif %}>
+				<form action="{{ path('user_register') }}" method="post">
+					{{ form_token() }}
+					<input type="hidden" name="process" value="1" />
+
+					<div class="dp-control-group {% if error_fields['name'] %}dp-error{% endif %}">
+						<div class="dp-control-label">
+							<label>{{ phrase('user.general.your_name') }} *</label>
+						</div>
+						<div class="dp-controls dp-fill">
+							{{ form_widget(form.name) }}
+							<div class="dp-help-inline dp-error-explain">
+								{{ phrase('user.general.please_enter_your_name') }}
+							</div>
+						</div>
+					</div>
+
+					<div class="dp-control-group {% if error_fields['email'] %}dp-error{% endif %}">
+						<div class="dp-control-label">
+							<label>{{ phrase('user.general.your_email_address') }} *</label>
+						</div>
+						<div class="dp-controls dp-fill">
+							{{ form_widget(form.email) }}
+							{% if errors['email.invalid'] %}<div class="dp-help-inline dp-error-explain">{{ phrase('user.general.please_enter_your_email') }}</div>{% endif %}
+							{% if errors['email.in_use'] %}<div class="dp-help-inline dp-error-explain">{{ phrase('user.profile.register_email_exists') }}</div>{% endif %}
+						</div>
+					</div>
+
+					<div class="dp-control-group {% if error_fields['password'] %}dp-error{% endif %}">
+						<div class="dp-control-label">
+							<label>{{ phrase('user.profile.password') }} *</label>
+						</div>
+						<div class="dp-controls dp-fill">
+							{{ form_widget(form.password) }}
+						</div>
+						{% if errors['password.short'] %}<div class="dp-help-inline dp-error-explain">{{ phrase('user.profile.register_password_min_length') }}</div>{% endif %}
+						{% if errors['password.mismatch'] %}<div class="dp-help-inline dp-error-explain">{{ phrase('user.profile.register_password_mismatch') }}</div>{% endif %}
+					</div>
+
+					<div class="dp-control-group">
+						<div class="dp-control-label">
+							<label>{{ phrase('user.profile.label_repeat_password') }} *</label>
+						</div>
+						<div class="dp-controls dp-fill">
+							{{ form_widget(form.password2) }}
+						</div>
+					</div>
+
+					{% if form.language_id %}
+					<div class="dp-control-group">
+						<div class="dp-control-label">
+							<label>{{ phrase('user.profile.language') }}</label>
+						</div>
+						<div class="dp-controls dp-fill">
+							{{ form_widget(form.language_id) }}
+						</div>
+					</div>
+					{% endif %}
+
+					{% if not custom_fields %}{% set custom_fields = app.getPersonFieldManager().getDisplayArray() %}{% endif %}
+					{% for f in custom_fields %}
+						{% if f.field_def.getTypeName() == 'hidden' %}
+							<div style="display: none;">{{ render_custom_field_form(f) }}</div>
+						{% else %}
+							<div class="dp-control-group {% if error_fields['field_' ~ f.field_def.id] %}dp-error{% endif %}">
+								<div class="dp-control-label">
+									<label>{{ f.field_def.title }}</label>
+								</div>
+								<div class="dp-controls dp-fill">
+									{{ render_custom_field_form(f) }}
+								</div>
+								{% if error_fields['field_' ~ f.field_def.id] %}<div class="dp-help-inline dp-error-explain">{{ formmacro.custom_field_errors(errors, f.field_def, 'field_' ~ f.field_def.id) }}</div>{% endif %}
+							</div>
+						{% endif %}
+					{% endfor %}
+
+					{% if captcha %}
+						<div class="dp-control-group {% if error_fields['captcha'] %}dp-error dp-error-static{% endif %}">
+							<div class="dp-control-label">
+								<label>{{ phrase('user.general.label_captcha') }} *</label>
+							</div>
+							<div class="dp-controls dp-fill">
+								{{ captcha.getHtml()|raw }}
+								{% if error_fields['captcha'] %}
+									<div class="dp-help-inline dp-error-explain">
+										{{ phrase('user.tickets.form_error_captcha_invalid') }}
+									</div>
+								{% endif %}
+							</div>
+						</div>
+					{% endif %}
+
+					<input class="dp-btn dp-btn-primary" type="submit" value="{{ phrase('user.tickets.submit') }}" />
+				</form>
+			</article>
+		</section>
+	{% endif %}
+</div>
+
+{% endblock %}

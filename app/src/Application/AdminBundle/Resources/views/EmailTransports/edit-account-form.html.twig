@@ -1,0 +1,234 @@
+<div data-element-handler="DeskPRO.Admin.ElementHandler.EditEmailTransportPage">
+
+<form id="transport_form" action="{{ path('admin_emailtrans_editaccount', {'id': transport.id|default(0)}) }}" method="post">
+{{ form_token('edit_transport') }}
+
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form">
+
+	{% block email_transports_form_top %}
+		{% if partial == 'setup' or transport.match_type == 'all' %}
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>Outgoing Email Address</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="default_from_email" id="default_from_email" value="{{ app.getSetting('core.default_from_email') }}" onkeypress="$(this).parent().find('.dp-error').hide();" /><br />
+					<div class="dp-error" style="display: none;">Please enter an email address</div>
+				</div>
+			</div>
+		{% endif %}
+	{% endblock %}
+
+	{% if partial == 'setup' or transport.match_type == 'all' %}
+		<input type="hidden" name="transport[match_type]" value="all" />
+	{% endif %}
+	{% if partial != 'setup' and transport.match_type != 'all' %}
+		<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('admin.gateway.ask_use_account_when') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<div class="dp-input-group">
+						<label>
+							<input type="radio" class="option-trigger email-address-type" name="transport[match_type]" value="exact" {% if not edittrans.match_type or edittrans.match_type == 'exact' %}checked="checked"{% endif %} />
+							{{ phrase('admin.gateway.exact_address') }}
+						</label>
+						<div class="dp-group-options" style="display: none">
+							{{ phrase('agent.general.email_address') }}: {{ form_widget(form.match_email, { 'attr': { 'class': 'small email-address-pattern', 'style': 'width:400px' }}) }}
+						</div>
+					</div>
+
+					<div class="dp-input-group">
+						<label>
+							<input type="radio" class="option-trigger email-address-type" name="transport[match_type]" value="domain" {% if edittrans.match_type == 'domain' %}checked="checked"{% endif %} />
+							{{ phrase('admin.gateway.match_domain') }}
+						</label>
+						<div class="dp-group-options" style="display: none">
+							{{ phrase('admin.gateway.domain') }}: *@{{ form_widget(form.match_domain, { 'attr': { 'class': 'small email-domain-pattern', 'style': 'width:400px' }}) }}
+						</div>
+					</div>
+
+					<div class="dp-input-group">
+						<label>
+							<input type="radio" class="option-trigger" name="transport[match_type]" value="regex" {% if edittrans.match_type == 'regex' %}checked="checked"{% endif %} />
+							{{ phrase('admin.gateway.addresses_matching_regex') }}
+						</label>
+						<div class="dp-group-options" style="display: none">
+							{{ phrase('admin.general.pattern') }}: {{ form_widget(form.match_regex, { 'attr': { 'class': 'small', 'style': 'width:400px' }}) }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('admin.gateway.mail_server') }}</label>
+			</div>
+			<div class="dp-form-input">
+				{% if not no_php %}
+					<div class="dp-input-group">
+						<label>
+							<input type="radio" class="option-trigger" name="transport[transport_type]" value="mail" {% if transport.transport_type == 'mail' or (not transport.transport_type and default_php_mail) %}checked="checked"{% endif %} />
+							{{ phrase('admin.general.php_mail') }}
+						</label>
+
+						<div class="dp-group-options" style="display: none">
+							<div class="test-row">
+								<span class="test-button test-account-settings primary"><span class="lightning-small-icon"></span> {{ phrase('admin.general.test_settings') }}</span>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger" name="transport[transport_type]" value="smtp" {% if not default_php_mail and not transport.transport_type or transport.transport_type == 'smtp' %}checked="checked"{% endif %} />
+						{{ phrase('admin.general.smtp_account') }}
+					</label>
+					<div class="dp-group-options" style="display: none">
+						<table cellspacing="0" cellpadding="0" width="100%">
+							<tr>
+								<td class="title" width="120">{{ phrase('agent.general.host') }}:</td>
+								<td>
+									{{ form_widget(form.smtp_options.host, {'attr': {'class': 'small'}}) }}<br />
+								</td>
+							</tr>
+							<tr>
+								<td class="title">{{ phrase('admin.general.secure') }}:</td>
+								{% if get_instance_ability('can_use_secure_smtp') %}
+									<td>{{ form_widget(form.smtp_options.secure, {'attr': {'class': 'small'}}) }}</td>
+								{% else %}
+									<td>
+										<input type="checkbox" disabled="disabled" />
+										<a href="{{ get_service_url('dp.kb.install.error_openssl') }}" class="tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('admin.general.error_ssl_tip') }}" style="font-size: 90%; padding-left: 10px;">Why is this option disabled?</a>
+									</td>
+								{% endif %}
+							</tr>
+							<tr>
+								<td class="title">{{ phrase('admin.general.port') }}:</td>
+								<td>{{ form_widget(form.smtp_options.port, {'attr': {'class': 'small', 'style': 'width: 100px'}}) }}</td>
+							</tr>
+							<tr>
+								<td class="title">{{ phrase('admin.general.requires_auth') }}:</td>
+								<td>
+									<input
+										type="checkbox"
+										class="smtp-requires-auth-check"
+										{% if edittrans.smtp_options.username or edittrans.smtp_options.password %}checked="checked"{% endif %}
+										data-element-handler="DeskPRO.ElementHandler.CheckboxToggle"
+										data-targets="#smtp_auth_username, #smtp_auth_password"
+										data-clear-targets="1"
+									/> {{ phrase('admin.general.yes') }}
+								</td>
+							</tr>
+							<tr id="smtp_auth_username">
+								<td class="title">{{ phrase('admin.general.username') }}:</td>
+								<td>{{ form_widget(form.smtp_options.username, {'attr': {'class': 'small'}}) }}</td>
+							</tr>
+							<tr id="smtp_auth_password">
+								<td class="title">{{ phrase('agent.general.password') }}:</td>
+								<td>{{ form_widget(form.smtp_options.password, {'attr': {'class': 'small'}}) }}</td>
+							</tr>
+						</table>
+
+						<div class="test-row">
+							<span class="test-button test-account-settings primary"><span class="lightning-small-icon"></span> {{ phrase('admin.general.test_settings') }}</span>
+						</div>
+					</div>
+				</div>
+
+				{% if get_instance_ability('can_use_google_apps') %}
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger" name="transport[transport_type]" value="gmail" {% if transport.transport_type == 'gmail' %}checked="checked"{% endif %} />
+						{{ phrase('admin.general.google_apps') }}
+					</label>
+					<div class="dp-group-options" style="display: none">
+						<table cellspacing="0" cellpadding="0" width="100%">
+							<tr>
+								<td class="title" width="120">{{ phrase('admin.general.full_email_address') }}:</td>
+								<td>{{ form_widget(form.gmail_options.username, {'attr': {'class': 'small'}}) }}</td>
+							</tr>
+							<tr>
+								<td class="title">{{ phrase('agent.general.password') }}:</td>
+								<td>{{ form_widget(form.gmail_options.password, {'attr': {'class': 'small'}}) }}</td>
+							</tr>
+						</table>
+						<div class="test-row">
+							<span class="test-button test-account-settings primary"><span class="lightning-small-icon"></span> {{ phrase('admin.general.test_settings') }}</span>
+						</div>
+					</div>
+				</div>
+				{% else %}
+				<div class="dp-input-group grayed">
+					<label>
+						<input type="radio" class="option-trigger" name="transport[transport_type]" value="gmail" {% if transport.transport_type == 'gmail' %}checked="checked"{% endif %} />
+						{{ phrase('admin.general.google_apps') }}
+					</label>
+					<div class="dp-group-options" style="display: none">
+						<p>
+							{{ phrase('admin.general.error_ssl_feature_tip') }}
+							<a href="{{ get_service_url('dp.kb.install.error_openssl') }}">{{ phrase('admin.general.error_ssl_feature_link') }}</a>
+						</p>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="is-not-loading">
+	<button class="clean-white">{{ phrase('agent.general.save') }}</button>
+</div>
+<div class="is-loading">
+	<i class="flat-spinner"></i>
+</div>
+</form>
+
+<div id="test_settings_overlay" style="width: 600px; height: 390px; overflow:auto; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay close-trigger"></span>
+		<h4>{{ phrase('admin.general.test_outgoing_email') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div style="margin-bottom: 3px;">{{ phrase('admin.general.send_a_test_email_to') }}: <input type="text" class="small" name="send_to" value="{{ app.user.primaryEmailAddress() }}" /></div>
+		{% if partial == 'setup' or transport.match_type == 'all' %}
+			<input type="hidden" name="send_from" id="test_send_from_tr" value="" />
+		{% else %}
+			{{ phrase('admin.general.from_email_address') }}: <input type="text" class="small" name="send_from" id="test_send_from_tr" value="" />
+		{% endif %}
+		<div class="result">
+			<div class="is-loading loading-icon-big"><br /><br /></div>
+			<div class="is-not-loading">
+				<div class="success" style="display:none">
+					{{ phrase('admin.general.notice_no_errors_detected') }}
+				</div>
+				<div class="error" style="display:none">
+					<br/>
+					{{ phrase('admin.general.error_sending_test') }}
+					<br/>
+					For information on resolving this, refer to our online article "<a href="https://support.deskpro.com/kb/articles/128-problems-connecting-to-smtp-or-pop3-servers" target="_blank">Problems connecting to SMTP servers</a>".
+					<div class="error-msg" style="margin-top: 8px; padding: 8px; background-color: #fff;">
+						<div class="error-msg-text"></div>
+						<textarea class="error-msg-log" style="width: 95%; height: 150px; font-size: 11px; font-family: Monaco, Courier, monospace; white-space: nowrap; overflow: auto;" wrap="off"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="overlay-footer">
+		<button
+			class="clean-white test-trigger"
+			data-url="{{ path('admin_emailtrans_testaccount') }}"
+		>{{ phrase('admin.general.test_now') }}</button>
+	</div>
+</div>
+
+</div>

@@ -1,0 +1,58 @@
+{% import 'ReportBundle:Overview:macros.html.twig' as macros %}
+<section class="report-wrapper {% if initial_display %}initial-display{% endif %}">
+	<header>
+		<h2>
+			<span class="label-sum">{{ data.sum }}</span> Tickets were Created
+			<span class="drop-option">
+				<select class="grouping-field" name="date_choice">
+					{% for field,title in {
+						'today': 'Today',
+						'this_week': 'This Week',
+						'this_month': 'This Month',
+						'this_year': 'This Year',
+					} %}
+						<option {% if data.date_choice == field %}selected="selected"{% endif %} value="{{ field }}">{{ title }}</option>
+					{% endfor %}
+				</select>
+				<i></i>
+			</span>
+		</h2>
+	</header>
+	<article>
+		<div class="loading-overlay" {% if not initial_display %}style="display: none"{% endif %}><strong>Loading</strong></div>
+		{% if data.values %}
+			<table class="stat-table stat-table-vert" width="100%">
+				<tr>
+					{% for id, title in data.titles %}
+						<td width="{{ 100 / data.titles|length }}%" style="height: 100px; vertical-align: bottom; text-align: center;" valign="bottom">
+							{% if data.values[id] %}
+								{{ data.values[id] }}<br />
+								<table width="100%" class="stat-value" style="vertical-align: bottom;" valign="bottom"><tr>
+									{% set perc = (data.values[id] / data.max|default(1)) * 100 %}
+									{% if perc < 1.0 %}
+										<td class="value"><div style="height: 1px;">&nbsp;</div></td>
+									{% else %}
+										<td class="value"><div style="height: {{ perc }}px">&nbsp;</div></td>
+									{% endif %}
+								</tr></table>
+							{% else %}
+								&nbsp;
+							{% endif %}
+						</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					{% for id, title in data.titles %}
+						<td width="{{ 100 / data.titles|length }}%" style="text-align: center">
+							<span style="font-size:10px">
+								{{ title }}
+							</span>
+						</td>
+					{% endfor %}
+				</tr>
+			</table>
+		{% else %}
+			{{ macros.no_data() }}
+		{% endif %}
+	</article>
+</section>

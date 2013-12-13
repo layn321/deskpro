@@ -1,0 +1,77 @@
+{% if log.action_type == 'changed_agent' %}
+	{{ phrase('agent.general.agent') }}
+	{{ phrase('agent.tickets.changed_to') }}
+	{{log.details.new_agent_name|default(phrase('agent.general.unassigned'))}}
+{% elseif log.action_type == 'changed_agent_team' %}
+	{{ phrase('agent.general.team') }}
+	{{ phrase('agent.tickets.changed_to') }}
+	{{log.details.new_agent_team_name|default(phrase('agent.general.none'))}}
+{% elseif log.action_type == 'participant_added' %}
+	{{ phrase('agent.tickets.participant_added') }}: {{log.details.email}}
+{% elseif log.action_type == 'participant_removed' %}
+	{{ phrase('agent.tickets.participant_removed') }}: {{log.details.email}}
+{% elseif log.action_type == 'ticket_created' %}
+	{{ phrase('agent.general.ticket') }} {{ phrase('agent.tickets.lc_created') }}
+{% elseif log.action_type == 'subject' %}
+	{{ phrase('agent.tickets.subject_changed') }}
+{% elseif log.action_type == 'ticket_split' or log.action_type == 'ticket_split_to' %}
+    {{ phrase('agent.tickets.ticket_split') }}
+{% elseif log.action_type == 'merged' %}
+	{{ phrase('agent.tickets.ticket_merged') }}
+{% elseif log.action_type == 'labels_added' %}
+	{{ phrase('agent.general.labels_added') }}: {{ log.details.labels|implode(', ') }}
+{% elseif log.action_type == 'labels_removed' %}
+	{{ phrase('agent.general.labels_removed') }}: {{ log.details.labels|implode(', ') }}
+{% elseif log.action_type == 'changed_category' %}
+	{{ phrase('agent.general.category') }}
+	{{ phrase('agent.tickets.changed_to') }}
+	{{log.details.new_category_title|default(phrase('agent.general.none'))}}
+{% elseif log.action_type == 'changed_department' %}
+	{{ phrase('agent.general.department') }}
+	{{ phrase('agent.tickets.changed_to') }}
+	{{log.details.new_department_title|default(phrase('agent.general.none'))}}
+{% elseif log.action_type == 'changed_language' %}
+	{{ phrase('agent.general.language') }}
+	{{ phrase('agent.tickets.changed_to') }}
+	{{log.details.new_language_title|default(phrase('agent.general.none'))}}
+{% elseif log.action_type == 'changed_person' %}
+	{{ phrase('agent.general.user') }}
+	{{ phrase('agent.tickets.changed_to') }}
+	{{new_person_name}}
+{% elseif log.action_type == 'message_created' %}
+	{% if log.details.is_agent_note %}
+		{{ phrase('agent.tickets.new_note') }}
+	{% else %}
+		{{ phrase('agent.tickets.new_message') }}
+	{% endif %}
+{% elseif log.action_type == 'message_removed' %}
+	{% if log.details.is_agent_note %}
+		{{ phrase('agent.tickets.log_note_deleted') }}
+	{% else %}
+		{{ phrase('agent.tickets.log_message_deleted') }}
+	{% endif %}
+{% elseif log.action_type == 'changed_priority' %}
+	{{ phrase('agent.general.priority') }}
+	{{ phrase('agent.tickets.changed_to') }} {{log.details.new_priority_title|default(phrase('agent.general.none'))}}
+{% elseif log.action_type == 'changed_workflow' %}
+	{{ phrase('agent.general.workflow') }}
+	{{ phrase('agent.tickets.changed_to') }} {{log.details.new_workflow_title|default(phrase('agent.general.none'))}}
+{% elseif log.action_type == 'changed_urgency' %}
+	{{ phrase('agent.general.urgency') }}
+	{{ phrase('agent.tickets.changed_to') }} {{log.details.new_urgency}}
+{% elseif log.action_type == 'changed_product' %}
+	{{ phrase('agent.general.product') }}
+	{{ phrase('agent.tickets.changed_to') }} {{log.details.new_product_title|default(phrase('agent.general.none'))}}
+{% elseif log.action_type == 'attach_added' %}
+	{{ phrase('agent.tickets.new_attachment') }} {{ phrase('agent.general.id') }} {{log.details.attach_id}} {{ log.details.filename }}
+{% elseif log.action_type == 'attach_removed' %}
+	{{ phrase('agent.tickets.attachment_deleted') }}
+{% elseif log.action_type == 'changed_status' %}
+	{{ phrase('agent.general.status') }}
+	{% set phrase_name = 'agent.tickets.status_' ~ log.details.new_status|replace({'.': '_'}) %}
+	{{ phrase('agent.tickets.changed_to') }} {% if has_phrase(phrase_name) %}{{ phrase(phrase_name) }}{% else %}{{ log.details.new_status }}{% endif %}
+{% elseif log.action_type == 'changed_hold' %}
+	{% if log.details.is_hold %}{{ phrase('agent.tickets.ticket_put_on_hold') }}{% else %}{{ phrase('agent.tickets.ticket_removed_from_hold') }}{% endif %}
+{% elseif log.action_type == 'changed_custom_field' %}
+	{{ phrase('agent.tickets.lc_created') }}: {{ log.details.field_name }}
+{% endif %}

@@ -1,0 +1,32 @@
+{##
+ # The department row of the new ticket form
+ ##}
+
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+{% if set_dep_id %}
+	<input type="hidden" name="newticket[ticket][department_id]" class="department_id" value="{{ set_dep_id }}" />
+{% elseif not app.user.getPermissionsManager().get('Departments').getAllowed('tickets')|length or app.user.getPermissionsManager().get('Departments').getAllowed('tickets')|length == 1 %}
+	{% for cat in app.departments.getPersonDepartments(app.user, 'tickets') %}
+		<input type="hidden" name="newticket[ticket][department_id]" class="department_id" value="{{ cat.id }}" />
+	{% endfor %}
+{% else %}
+	<div class="dp-control-group {% if error_fields['ticket.department_id'] %}dp-error{% endif %} ticket_department">
+		<div class="dp-control-label">
+			<label><strong>{{ phrase('user.tickets.fields_department') }} *</strong></label>
+		</div>
+		<div class="dp-controls dp-fill">
+			<select
+				name="newticket[ticket][department_id]"
+				class="department_id"
+			>
+				<option value=""></option>
+				{% for cat in app.departments.getPersonDepartments(app.user, 'tickets') %}
+					{{ formmacro.select_options_hierarchy(cat, newticket.ticket.department_id) }}
+				{% endfor %}
+			</select>
+			<div class="dp-help-inline dp-error-explain">
+				{{ phrase('user.tickets.form_error_department') }}
+			</div>
+		</div>
+	</div>
+{% endif %}

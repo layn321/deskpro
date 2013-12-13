@@ -1,0 +1,104 @@
+<div data-element-handler="DeskPRO.Admin.ElementHandler.EditPhrasesPage">
+	<form action="{{ path('admin_langs_editphrases_save', {'language_id': language.id|default(0)}) }}" method="post" id="save_phrase_form">
+
+	<div class="content-table">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th class="single-title">ID</th>
+					<th class="single-title">Phrase</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for phrase_id,phrase in master_phrases %}
+					<tr class="phrase-row {% if lang_phrases.custom[phrase_id] %}custom{% endif %}" data-phrase-id="{{ phrase_id }}">
+						<td width="215" style="font-size: 11px;">
+							<span data-phrase-id="{{ phrase_id }}" style="background: url({{ asset('images/agent/icons/copy-content.png') }}) no-repeat 100% 50%; padding-right: 18px; cursor:pointer;" title="Click to insert into template" class="tipped insert-phrase-id-trigger">{{ phrase_id }}</span>
+						</td>
+						<td>
+							<input class="phrase-preview" type="text" style="width: 98%; font-size: 11px; padding: 2px; margin: 0;" value="{% if lang_phrases.custom[phrase_id] %}{{ lang_phrases.custom[phrase_id].phrase }}{% elseif lang_phrases.original[phrase_id] %}{{ lang_phrases.original[phrase_id] }}{% else %}{{ master_phrases[phrase_id] }}{% endif %}" />
+							<textarea style="display: none" class="master_phrase">{{ master_phrases[phrase_id] }}</textarea>
+							<textarea style="display: none" class="lang_phrase">{{ lang_phrases.original[phrase_id] }}</textarea>
+							<textarea style="display: none" class="custom_phrase">{{ lang_phrases.custom[phrase_id].phrase }}</textarea>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<br />
+
+	<select class="lang-langs-nav" style="display: none;">
+		{% for id,title in app.languages.getTitles() %}
+			<option value="{{ id }}" {% if id == language.id %}selected="selected"{% endif %}>{{ title }}</option>
+		{% endfor %}
+	</select>
+
+	<select class="lang-groups-nav" style="display: none;">
+		{% for group,subgroups in { 'user': phrase_groups['user'] } %}
+			{% for subgroup in subgroups %}{% if subgroup != 'lang' %}
+				<option value="{{ group ~ '.' ~ subgroup }}" {% if (group ~ '.' ~ subgroup) == showinggroup %}selected="selected"{% endif %}>{{ phrase('admin.languages.phrasegroup_' ~ group ~ '_' ~ subgroup) }}</option>
+			{% endif %}{% endfor %}
+		{% endfor %}
+	</select>
+
+	<script type="text/x-deskpro-plain" id="change_phrase_overlay">
+		<div class="edit-phrase-overlay" style="width: 725px; height: 400px; display: none;">
+			<div class="overlay-title">
+				<span class="close-trigger close-overlay"></span>
+				<h4>{{ phrase('admin.languages.edit_phrase') }} <label class="phrase_id"></label></h4>
+			</div>
+			<div class="overlay-content">
+				<section class="phrase-section custom">
+					<header>
+						<h4>{{ phrase('admin.languages.your_phrase') }}</h4>
+					</header>
+					<article><textarea class="custom_phrase" name="custom_phrase"></textarea></article>
+				</section>
+				<section class="phrase-section lang">
+					<header>
+						<h4>{{ phrase('admin.languages.default_phrase_for', {'title':language.title}) }}</h4>
+					</header>
+					<article><textarea class="lang_phrase" name="lang_phrase" readonly="readonly"></textarea></article>
+				</section>
+				{% if language.id != 1 %}
+					<section class="phrase-section master">
+						<header>
+							<h4>{{ phrase('admin.languages.default_deskpro_phrase') }}</h4>
+						</header>
+						<article><textarea class="master_phrase" name="master_phrase" readonly="readonly"></textarea></article>
+					</section>
+				{% endif %}
+			</div>
+			<div class="overlay-footer">
+				<button class="clean-white save-trigger">{{ phrase('admin.languages.save_your_phrase') }}</button>
+			</div>
+		</div>
+	</script>
+
+	<div id="add_phrase_overlay" class="edit-phrase-overlay" style="width: 725px; height: 260px; display: none;">
+		<div class="overlay-title">
+			<span class="close-trigger close-overlay"></span>
+			<h4>Add Phrase</h4>
+		</div>
+		<div class="overlay-content">
+			<section class="phrase-section custom">
+				<header>
+					<h4>Unique Phrase ID</h4>
+				</header>
+				<article>custom.<input type="text" class="phrase_id" name="phrase_id" style="width: 200px;" /></article>
+			</section>
+			<section class="phrase-section custom">
+				<header>
+					<h4>{{ phrase('admin.languages.your_phrase') }}</h4>
+				</header>
+				<article><textarea class="custom_phrase" name="custom_phrase"></textarea></article>
+			</section>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white save-trigger" data-add-url="{{ path('admin_langs_newphrase', {language_id: language.id}) }}">{{ phrase('admin.languages.save_your_phrase') }}</button>
+		</div>
+	</div>
+
+	</form>
+</div>

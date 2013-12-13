@@ -1,0 +1,183 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.SettingsPage.Profile';
+</script>
+<form action="{{ path('agent_settings_profile_save') }}" method="post">
+
+	<div class="form-errors" id="agent_settings_win_errors" style="display: none">
+		{{ phrase('agent.general.error_form_correct') }}
+		<ul>
+			<li class="name_short">{{ phrase('agent.general.error_your_name') }}</li>
+			<li class="email_invalid">{{ phrase('agent.general.error_email_address') }}</li>
+			<li class="email_in_use">{{ phrase('agent.general.error_email_dupe_agent') }}</li>
+			<li class="password_short">{{ phrase('agent.general.error_password_short', {len: 5}) }}</li>
+			<li class="password_mismatch">{{ phrase('agent.general.error_password_mismatch') }}</li>
+		</ul>
+	</div>
+
+	<div class="dp-form">
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.general.name') }}</label></div>
+			<div class="dp-form-input">
+				{{ form_widget(form.name) }}
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.settings.override_name') }}</label></div>
+			<div class="dp-form-input">
+				{{ form_widget(form.override_display_name) }}
+				<em class="desc">{{ phrase('agent.settings.override_name_explain') }}</em>
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.general.email') }}</label></div>
+			<div class="dp-form-input">
+				{{ form_widget(form.email, {'attr': {'id': 'settings_profile_email'}}) }}
+			</div>
+			<div class="more_emails_empty" {% if app.user.emails|length != 1 %}style="display: none;"{% endif %}>
+				<a href="#">{{ phrase('agent.settings.add_additional_emails') }} &rarr;</a>
+			</div>
+			<div class="more_emails" {% if app.user.emails|length == 1 %}style="display: none;"{% endif %}>
+				<strong>{{ phrase('agent.settings.additional_emails') }}:</strong>
+				<ul>
+					{% for email in app.user.emails if email.id != app.user.primary_email.id %}
+						<li data-email-id="{{ email.id }}">&bull; <span>{{ email.email }}</span>&nbsp;&nbsp;&nbsp;<i class="icon-trash remove-trigger" title="Remove email"></i></li>
+					{% endfor %}
+					<li class="add-row">{{ phrase('agent.settings.add_another_email') }}: <input type="text" class="more_emails_txt" /> <a class="more_emails_trigger" href="#">{{ phrase('agent.general.add') }}</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.general.timezone') }}</label></div>
+			<div class="dp-form-input">
+				{{ form_widget(form.timezone) }}
+			</div>
+		</div>
+
+		{% if constant('DP_ENABLE_AGENT_LANG') %}
+			<div class="dp-form-row" {% if not app.getLanguages().isMultiLang() %}style="display: none;"{% endif %}>
+				<div class="dp-form-label"><label>{{ phrase('agent.general.language') }}</label></div>
+				<div class="dp-form-input">
+					{{ form_widget(form.language_id) }}
+				</div>
+			</div>
+		{% endif %}
+
+		{% if app.user.getPermissionsManager().get('GeneralChecker').canSetPicture() %}
+		<div class="dp-form-row new-picture">
+			<div class="dp-form-label"><label>{{ phrase('agent.general.label_picture') }}</label></div>
+			<div class="dp-form-input">
+				<table cellspacing="0" cellpadding="0"><tr>
+					<td style="padding-right: 15px;">
+						<img src="{{ app.user.getPictureUrl(80) }}" />
+						<em class="desc" style="display: block;">{{ phrase('agent.settings.your_current_picture') }}</em>
+					</td>
+				<td>
+					<input type="file" name="file-upload" />
+					<div class="files"></div>
+				</td>
+				</tr></table>
+			</div>
+			<script class="template-upload" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				<p>{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</p>
+				{{ '{% } %}' }}
+			</script>
+			<script class="template-download" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				{{ '{% if (file.error) { %}'}}
+				<div class="error">
+					{{ '{%=file.error%}' }}
+				</div>
+				{{ '{% } else { %}'}}
+				<div>
+					<input type="hidden" name="settings_profile[new_picture_blob_id]" class="new_blob_id" value="{{ '{%=file.blob_auth_id%}' }}" />
+					<input type="hidden" name="new_blob_id" class="new_blob_id" value="{{ '{%=file.blob_id%}' }}" />
+					<img src="{{ '{%=file.download_url%}' }}?s=60" class="pic-new" data-setted-size="{{ '{%=file.download_url%}' }}?s=60" />
+				</div>
+				{{ '{% } %}' }}
+				{{ '{% } %}' }}
+			</script>
+		</div>
+		<br class="clear"/>
+		{% endif %}
+
+		<div class="dp-form-row dp-desktop-notifications" style="display:none">
+			<div class="dp-form-label"><label>{{ phrase('agent.settings.desktop_notifs') }}</label></div>
+			<div class="dp-form-input">
+				<button class="clean-white enable-desktop-notifications">{{ phrase('agent.settings.desktop_notifs_enable') }}</button>
+				<div class="dp-desktop-notifications-enabled">
+					<div>{{ phrase('agent.settings.desktop_notifs_are_enabled') }}</div>
+					<div>{{ phrase('agent.settings.desktop_notifs_autohide') }} {{ form_widget(form.auto_dismiss_notifications) }}</div>
+					<div><button class="clean-white generate-test-notification">{{ phrase('agent.settings.desktop_notifs_test') }}</button></div>
+				</div>
+				<div class="dp-desktop-notifications-disabled" style="display:none">
+					<div>{{ phrase('agent.settings.desktop_notifs_explicit_disabled') }}</div>
+				</div>
+			</div>
+		</div>
+
+		{% if app.user.getPasswordHash() %}
+			<div class="dp-form-row">
+				<div class="dp-form-label"><label>{{ phrase('agent.general.change_password') }}</label></div>
+				<div class="dp-form-input double-password">
+					{{ form_widget(form.password, {'attr': { 'placeholder': phrase('agent.general.new_password'), 'class': 'password1' }}) }}
+					{{ form_widget(form.password2, {'attr': { 'placeholder': phrase('agent.general.repeat_password'), 'class': 'password2' }}) }}
+					<em class="desc">{{ phrase('agent.settings.leave_password_blank') }}</em>
+				</div>
+			</div>
+		{% endif %}
+
+		<div class="dp-form-row" >
+			<div class="dp-form-label"><label>{{ phrase('agent.general.tickets') }}</label></div>
+			<div class="dp-form-input">
+				{{ phrase('agent.settings.auto_close_ticket_tabs') }}
+					<label>{{ form_widget(form.ticket_close_reply) }} {{ phrase('agent.settings.auto_close_ticket_tabs_reply') }}</label> &nbsp;&nbsp;
+					<label>{{ form_widget(form.ticket_close_note) }} {{ phrase('agent.settings.auto_close_ticket_tabs_note') }}</label>
+				<br/>
+				<label>
+					{{ form_widget(form.ticket_reverse_order) }}
+					{{ phrase('agent.settings.tickets_reverse_order') }}
+				</label>
+				<br/>
+				<label>{{ form_widget(form.ticket_go_next_reply) }} {{ phrase('agent.settings.tickets_autoload_next') }}</label>
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.general.chat') }}</label></div>
+			<div class="dp-form-input">
+				<label>{{ form_widget(form.hide_claimed_chat) }} {{ phrase('agent.settings.chat_immediate_dismiss') }}</label>
+			</div>
+		</div>
+
+		{% set assign_team_setting = (app.getSetting('core_tickets.new_assignteam') == 'assign' or app.getSetting('core_tickets.reply_assignteam_assigned') == 'assign' or app.getSetting('core_tickets.reply_assignteam_unassigned') == 'assign') %}
+		{% if app.user.getAgent().getTeams()|length >= 2 and assign_team_setting %}
+			<div class="dp-form-row">
+				<div class="dp-form-label"><label>{{ phrase('agent.settings.default_team') }}</label></div>
+				<div class="dp-form-input">
+					<select name="settings_profile[default_team_id]">
+					{% for team in app.user.getAgent().getTeams() %}
+						<option value="{{ team.id }}" {% if form.default_team_id.get('value') == team.id %}selected="selected"{% endif %}>{{ team.name }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+		{% endif %}
+
+		{% if app.user.getApiToken() %}
+			<div class="dp-form-row">
+				<div class="dp-form-label"><label>{{ phrase('agent.general.api_token') }}</label></div>
+				<div class="dp-form-input">
+					<label><input type="checkbox" name="settings_profile[reset_api_token]" value="1" /> {{ phrase('agent.settings.reset_api_token') }}</label>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	<div class="button-container">
+		<button type="submit" class="clean-white submit-trigger">{{ phrase('agent.general.save') }}</button>
+	</div>
+</form>

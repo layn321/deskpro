@@ -1,0 +1,3 @@
+{
+"joomla":{"adapter_class":"Joomla\\Usersource\\Adapter\\Joomla","form_model_class":"Joomla\\Usersource\\Form\\JoomlaModel","form_template":"Joomla:Admin:usersource-edit-joomla.html.twig","form_type_class":"Joomla\\Usersource\\Form\\JoomlaType","title":"Joomla"}
+}

@@ -1,0 +1,25 @@
+{% set count = 0%}
+{% set name = ''%}
+{% set id = ''%}
+
+<header class="list-grouping-bar">
+    <ul>
+        <li  {% if set_group_option == 0 %} class="on" {% endif %} data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id})~ '?group_by=' ~ group_by ~ '&set_group_option= 0' }}">
+            <a>
+                {{ phrase('agent.general.all') }}
+                <span>{{group_total}}</span>
+            </a>
+        </li>
+    {% for  deal in deal_group_info%}
+
+        <li {% if set_group_option == deal.id %} class="on" {% endif %} data-route="listpane:{{ path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id})~ '?group_by=' ~ group_by ~ '&set_group_option= '~ deal.id }}">
+            <a>
+                    {{deal.name}}
+                    <span>{{ deal[1] }}</span>
+            </a>
+        </li>
+    {% endfor %}
+
+    </ul>
+<br class="clear">
+</header>

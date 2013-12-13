@@ -1,0 +1,60 @@
+<article
+	class="row-item download download-{{download.id}} downloads-{{download.id}} related-is-linkable"
+	data-content-type="downloads"
+	data-content-id="{{ download.id }}"
+	data-route="download:{{ path('agent_downloads_view', {'download_id': download.id}) }}"
+	data-route-title="@selector(a.row-title)"
+	data-route-openclass="open"
+>
+	{#<input class="item-select" type="checkbox" value="{{download.id}}" />#}
+	<div class="top-row">
+		<div class="top-row-left">
+			<h3>
+				<a class="row-title click-through">{{ download.title }}</a>
+			</h3>
+		</div>
+		<div class="top-row-right visible-ticket-controls">
+			<div class="bound-faded"></div>
+			<a href="javascript:" class="tipped kb-insert-link dl-insert-link" title="{{ phrase('agent.general.insert_link') }}" data-download-id="{{ download.id }}">{{ phrase('agent.general.insert_content') }}</a>
+			<!--<a href="javascript:" class="tipped kb-insert-link dl-insert-attach"  title="{{ phrase('agent.general.insert_content') }}" data-download-id="{{ download.id }}">{{ phrase('agent.general.add_as_related') }}</a>-->
+		</div>
+		<div class="top-row-right visible-related-content-controls">
+			<div class="bound-faded"></div>
+			<span class="tipped related-link" title="{{ phrase('agent.general.add_as_related') }}"></span>
+			<span class="tipped related-unlink" title="{{ phrase('agent.general.remove_as_related') }}"></span>
+		</div>
+	</div>
+	<hr class="clear-top" />
+	{% if display_fields|length %}
+		<div class="extra-fields">
+			<ul>
+				{% for field in display_fields %}
+					{% if field == 'category' %}
+						<li>
+							<span class="prop-title">{{ phrase('agent.general.category') }}</span>
+							<span class="prop-val">{{ download.category.full_title }}</span>
+						</li>
+					{% elseif field == 'author' %}
+						<li>
+							<span class="prop-title">{{ phrase('agent.general.author') }}</span>
+							<span class="prop-val">{{ download.person.display_name }}</span>
+						</li>
+					{% elseif field == 'date_created' %}
+						<li>
+							<span class="prop-title">{{ phrase('agent.general.date_created') }}</span>
+							<span class="prop-val">{{ download.date_created|date('day')}}</span>
+						</li>
+					{% elseif field == 'num_downloads' %}
+						<li>
+							<span class="prop-title">{{ phrase('agent.general.num_downloads') }}</span>
+							<span class="prop-val">{{ download.num_downloads|default(0) }}</span>
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+			<br class="clear" />
+		</div>
+	{% else %}
+		<br class="clear" />
+	{% endif %}
+</article>

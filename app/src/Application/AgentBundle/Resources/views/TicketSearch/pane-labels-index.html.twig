@@ -1,0 +1,38 @@
+<nav class="pill-two-switcher" {% if not labels_index|length %}style="display: none"{% endif %} data-element-handler="DeskPRO.ElementHandler.SimpleTabs">
+	<ul>
+		<li data-tab-for="#ticket_labels_cloud" class="cloud on">{{ phrase('agent.general.labels_cloud') }}</li>
+		<li data-tab-for="#ticket_labels_list" class="list">{{ phrase('agent.general.labels_list') }}</li>
+	</ul>
+</nav>
+
+<section class="labels-cloud" id="ticket_labels_cloud">
+	{% if labels_cloud|length %}
+		<ul>
+			{% for label,css_class in labels_cloud %}
+				<li class="{{css_class}} nav-label-{{label|slugify}}" data-route="listpane:{{ path('agent_ticketsearch_runcustomfilter') }}?terms[0][type]=label&amp;terms[0][op]=is&amp;terms[0][label]={{label|url_encode}}&amp;view_name=label&amp;view_extra={{label|url_encode}}"><span>{{label}}</span></li>
+			{% endfor %}
+		</ul>
+	{% else %}
+    <aside class="source-info-explain">{{ phrase('agent.general.no_ticket_labels') }}</aside>
+	{% endif %}
+</section>
+<section class="labels-list" id="ticket_labels_list" style="display: none;">
+	{% if labels_index|length %}
+		<table>
+			{% for letter,labels in labels_index %}
+				<tr>
+					<td class="letter">{{ letter }}</td>
+					<td class="labels">
+						<ul>
+							{% for label in labels %}
+								<li class="nav-label-{{label|slugify}}" data-route="listpane:{{ path('agent_ticketsearch_runcustomfilter') }}?terms[0][type]=label&amp;terms[0][op]=is&amp;terms[0][label]={{label|url_encode}}&amp;view_name=label&amp;view_extra={{label|url_encode}}"><span>{{label}}</span></li>
+							{% endfor %}
+						</ul>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+    <aside class="source-info-explain">{{ phrase('agent.general.no_ticket_labels') }}</aside>
+	{% endif %}
+</section>

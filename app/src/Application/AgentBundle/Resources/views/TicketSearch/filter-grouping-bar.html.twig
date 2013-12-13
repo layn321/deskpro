@@ -1,0 +1,87 @@
+{% if grouped_info and grouped_info.counts[-1].total > 0 %}
+	{% if cache_id %}
+		{% if set_group_term %}
+			{% set grouping_url = 'listpane:' ~ path('agent_ticketsearch_runcustomfilter', {'cache_id': cache_id}) ~ '&set_group_term=' ~ set_group_term ~ '&set_group_option=' ~ set_group_option ~ '&group_by=' ~ group_by ~ '&grouping_option=' %}
+		{% else %}
+			{% set grouping_url = 'listpane:' ~ path('agent_ticketsearch_runcustomfilter', {'cache_id': cache_id}) ~ '&group_by=' ~ group_by ~ '&grouping_option=' %}
+		{% endif %}
+	{% elseif sla_id %}
+		{% if set_group_term %}
+			{% set grouping_url = 'listpane:' ~ path('agent_ticketsearch_runsla', {'sla_id': sla_id, 'sla_status': sla_status}) ~ '?set_group_term=' ~ set_group_term ~ '&set_group_option=' ~ set_group_option ~ '&group_by=' ~ group_by ~ '&grouping_option=' %}
+		{% else %}
+			{% set grouping_url = 'listpane:' ~ path('agent_ticketsearch_runsla', {'sla_id': sla_id, 'sla_status': sla_status}) ~ '?group_by=' ~ group_by ~ '&grouping_option=' %}
+		{% endif %}
+	{% else %}
+		{% if set_group_term %}
+			{% set grouping_url = 'listpane:' ~ path('agent_ticketsearch_runfilter', {'filter_id': filter_id}) ~ '?set_group_term=' ~ set_group_term ~ '&set_group_option=' ~ set_group_option ~ '&group_by=' ~ group_by ~ '&grouping_option=' %}
+		{% else %}
+			{% set grouping_url = 'listpane:' ~ path('agent_ticketsearch_runfilter', {'filter_id': filter_id}) ~ '?group_by=' ~ group_by ~ '&grouping_option=' %}
+		{% endif %}
+	{% endif %}
+	<header class="list-grouping-bar">
+		<ul>
+		{% if grouped_info.counts[-1].total > 0 %}
+			<li data-grouping-option="-1" {% if grouping_option == 'DP_NOT_SET' or grouping_option == '-1' %}class="on" id="{{ tplvars.baseId }}_total_grouped_count"{% endif %}>
+				<a data-route="{{ grouping_url ~ '-1' }}">
+					{{- phrase('agent.general.all') -}}
+					<span>{{ grouped_info.counts[-1].total }}</span>
+				</a>
+			</li>
+		{% endif %}
+		{% if grouped_info.counts[0].total > 0 and grouped_info.group1_structure[0].id != 0 %}
+			<li data-grouping-option="0" {% if grouping_option == '0' %}class="on" id="{{ tplvars.baseId }}_total_grouped_count"{% endif %}>
+				<a data-route="{{ grouping_url ~ '0' }}">
+					{{- phrase('agent.general.none') -}}
+					<span>{{ grouped_info.counts[0].total }}</span>
+				</a>
+			</li>
+		{% endif %}
+		{% for cat in grouped_info.group1_structure %}
+			{% set count = grouped_info.counts[cat.id].total %}
+			{% set count_all = count %}
+			{% if cat.children %}
+				{% for subcat in cat.children %}
+					{% set count_all = count_all + grouped_info.counts[subcat.id].total %}
+				{% endfor %}
+			{% endif %}
+			{% if count_all > 0 %}
+				<li data-grouping-option="{{ cat.id }}" {% if not (grouping_option == 'DP_NOT_SET' or grouping_option == '-1') and grouping_option == cat.id %}class="on" id="{{ tplvars.baseId }}_total_grouped_count"{% endif %}>
+					<a data-route="{{ grouping_url ~ cat.id }}"
+                       {% if group_by == 'urgency' %}
+                            class="group-by-pill urgency-{{cat.title}}"
+                       {% endif %}
+                            >
+						{{- cat.title -}}
+						<span>
+							{% if cat.children %}
+								{% if count %}{{ count }}{% endif %}{% if count and count_all %}/{% endif %}{% if count_all %}{{ count_all }}{% endif %}
+								{% if not count and not count_all %}0{% endif %}
+							{% elseif count %}
+								{{ count|default('0') }}
+							{% endif %}
+						</span>
+					</a>
+				</li>
+				{% if cat.children %}
+					{% for subcat in cat.children %}
+						{% set subcount = grouped_info.counts[subcat.id].total %}
+						{% if subcount > 0 %}
+							<li class="subList {% if grouping_option == subcat.id %}on{% endif %}" {% if grouping_option == subcat.id %}id="{{ tplvars.baseId }}_total_grouped_count"{% endif %} data-grouping-option="{{ subcat.id }}">
+								<a data-route="{{ grouping_url ~ subcat.id }}">
+									{{ cat.title }} &gt;
+									{{ subcat.title }}
+									<span>{{ subcount }}</span>
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+		</ul>
+		<br class="clear" />
+	</header>
+{% endif %}
+<header id="{{ tplvars.baseId }}_grouping_loading" class="list-grouping-bar" style="display: none">
+	<div class="loading-icon" style="height: 26px; background-position: 10px 50%;"></div>
+</header>

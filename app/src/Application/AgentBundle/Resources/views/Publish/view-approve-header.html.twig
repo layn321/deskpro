@@ -1,0 +1,17 @@
+{% if app.user.hasPerm('agent_publish.validate') %}
+	<div class="ticket-lock-bar validating-bar" style="padding: 4px; text-align: right;">
+		<div class="options">
+			<button class="dp-button x-small disapprove-trigger">{{ phrase('agent.general.disapprove') }}</button>
+			<button class="dp-button x-small approve-trigger">{{ phrase('agent.general.approve') }}</button>
+		</div>
+		<div class="disapprove-form" style="display: none">
+			{{ phrase('agent.general.disapprove_input') }}:
+			<input type="text" size="55" value="" class="disapprove-reason" />
+			<button class="dp-button x-small disapprove2-trigger">{{ phrase('agent.general.disapprove') }}</button>
+		</div>
+	</div>
+{% else %}
+	<div class="ticket-lock-bar validating-bar" style="padding: 4px; text-align: left;">
+		{{ phrase('agent.publish.awaiting_validation_info') }}
+	</div>
+{% endif %}

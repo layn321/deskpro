@@ -1,0 +1,27 @@
+{% set online_chat_deps = app.departments.getOnlineChatDepartments(app.user) %}
+{% if app.departments.getPersonDepartments(app.user, 'chat').length == 1 %}
+	{% for cat in online_chat_deps %}
+		<input type="hidden" name="department_id" class="department_id" value="{{ cat.id }}">
+	{% endfor %}
+{% else %}
+	<div class="dp-control-group">
+		<div class="dp-control-label">
+			<label>{{ phrase('user.chat.form_create_department') }}</label>
+		</div>
+		<div class="dp-controls">
+			{% if online_chat_deps|length == 1 %}
+				{% for cat in online_chat_deps %}
+					{{ cat.full_title }}
+					<input type="hidden" name="department_id" class="department_id" value="{{ cat.id }}">
+				{% endfor %}
+			{% else %}
+				<select name="department_id" class="department_id">
+					<option value=""></option>
+					{% for cat in online_chat_deps %}
+						{{ formmacro.select_options_hierarchy(cat, initial_department_id) }}
+					{% endfor %}
+				</select>
+			{% endif %}
+		</div>
+	</div>
+{% endif %}

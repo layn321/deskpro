@@ -1,0 +1,19 @@
+{##
+ # The light-weight view page when launched from the website widget
+ ##}
+
+{% set content_link = download.getLink() %}
+{% extends 'UserBundle:Widget:layout-content-overlay.html.twig' %}
+{% block content %}
+<section class="dp-content-post dp-content-page">
+	<header>
+		<h3 class="title"><a href="{{ download.getLink() }}" class="full-page">{{ download.title }}</a></h3>
+	</header>
+	<article>
+		<div class="dp-post">{{ download.content_html|raw }}</div>
+		<p><a class="dp-btn dp-btn-primary" href="{{ path('serve_blob', {'blob_auth_id': download.blob.auth_id, 'filename': download.blob.filename}) }}">
+			{{ phrase('user.downloads.button-download') }}: {{ download.filename }} ({{ download.readable_filesize }})
+		</a></p>
+	</article>
+</section>
+{% endblock %}

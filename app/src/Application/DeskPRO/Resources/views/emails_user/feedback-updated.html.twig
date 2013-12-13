@@ -1,0 +1,15 @@
+<dp:subject>{{ phrase('user.email_subjects.feedback_updated') }}</dp:subject>
+{% if show == 'validated' %}
+	{{ phrase('user.emails.feedback_published', {'title':feedback.title}) }}
+{% elseif show == 'closed' %}
+	{{ phrase('user.emails.feedback_closed', {'title':feedback.title, 'status':feedback.status_category.title}) }}
+{% elseif show == 'closed' %}
+	{{ phrase('user.emails.feedback_updated', {'title': feedback.title, 'status':feedback.statuscategory.title}) }}
+{% endif %}
+
+<br /><br />
+
+{{ phrase('user.emails.feedback_votes', {'count': feedback.votes}) }}
+<a href="{{ url_full('user_feedback_view', {'slug': feedback.url_slug}) }}">
+	{{ url_full('user_feedback_view', {'slug': feedback.url_slug}) }}
+</a>

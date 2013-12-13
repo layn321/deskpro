@@ -1,0 +1,382 @@
+/** sprite: flag-icons; sprite-image: url('../../build/images/sprite-flag-icons.png'); sprite-layout: vertical */
+/** sprite: ui-v; sprite-image: url('../../build/images/sprite-ui-v.png'); sprite-layout: vertical */
+/** sprite: ui-h; sprite-image: url('../../build/images/sprite-ui-h.png'); sprite-layout: horizontal */
+
+@text-color: #404040;
+@subtle-text-color: #9AA2AC;
+@link-color: #4769B3;
+@box-border-color: #ACB6BF;
+
+//-----------------------------------------------
+// Fonts
+//-----------------------------------------------
+
+@heading-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+@body-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+@body-font-bold: "Helvetica Neue",Helvetica,Arial,sans-serif;
+@small-status-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+@button-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+@input-font: @body-font;
+@content-table-th-font: @heading-font;
+@menu-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+@toolbar-font: Helvetica,Arial,sans-serif;
+@count-badge-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+@source-heading-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+@status-pill-font: @body-font;
+
+@body-text-color: #404040;
+@body-text-color-alt: lighten(@body-text-color, 18%);
+@link-text-color: #3964B9;
+@link-text-color-hover: saturate(lighten(@link-text-color, 15%), 40%);
+
+// Get around a bug in less, always have this rule or else compiler error
+// because there are no CSS rules in here, just less stuff
+.less-rule { color: #000; }
+
+.size(@width: 5px, @height: 5px) {
+	height: @height;
+	width: @width;
+}
+
+.pos(@top, @right, @bottom, @left) {
+	top: @top;
+	right: @right;
+	bottom: @bottom;
+	left: @left;
+}
+
+.square(@size: 5px) {
+	.size(@size, @size);
+}
+
+.set-size(@width: 5px, @height: 5px) {
+	height: @height;
+	width: @width;
+	overflow: hidden;
+}
+.set-square(@size: 5px) {
+	.size(@size, @size);
+	overflow: hidden;
+}
+
+.box-shadow(@shadow: 0 1px 3px rgba(0,0,0,.25)) {
+  -webkit-box-shadow: @shadow;
+  -moz-box-shadow: @shadow;
+  box-shadow: @shadow;
+}
+
+.box-shadow-two(@shadow: 0 1px 3px rgba(0,0,0,.25), @shadow2: 0 1px 3px rgba(0,0,0,.25)) {
+	-webkit-box-shadow: @shadow, @shadow2;
+	-moz-box-shadow: @shadow, @shadow2;
+	box-shadow: @shadow, @shadow2;
+}
+
+.box-shadow-three(@shadow: 0 1px 3px rgba(0,0,0,.25), @shadow2: 0 1px 3px rgba(0,0,0,.25), @shadow3: 0 1px 3px rgba(0,0,0,.25)) {
+	-webkit-box-shadow: @shadow, @shadow2;
+	-moz-box-shadow: @shadow, @shadow2;
+	box-shadow: @shadow, @shadow2;
+}
+
+.transition(@transition) {
+	-webkit-transition: @transition;
+	-moz-transition: @transition;
+	transition: @transition;
+}
+
+.gradient-h(@startColor: #555, @endColor: #333, @size: 20) {
+	@startSend: `"@{startColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@startSend_esc: `encodeURI(@{startSend})`;
+	@endSend: `"@{endColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@endSend_esc: `encodeURI(@{endSend})`;
+	background: @startColor url("../../../file.php/gradient?size=@{size}&start_color=@{startSend_esc}&end_color=@{endSend_esc}&direction=horizontal") repeat-y top right ~"/*gradient_h:@{size}:@{startSend}:@{endSend}*/";
+}
+.gradient(@startColor: #555, @endColor: #333, @size: 20) {
+	@startSend: `"@{startColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@startSend_esc: `encodeURI(@{startSend})`;
+	@endSend: `"@{endColor}".replace(/#/, '').replace(/rgba\((.*?),(.*?),(.*?),(.*?)\)/, 'rgb($1,$2,$3)')`;
+	@endSend_esc: `encodeURI(@{endSend})`;
+	background: @startColor url("../../../file.php/gradient?size=@{size}&start_color=@{startSend_esc}&end_color=@{endSend_esc}") repeat-x bottom left ~"/*gradient_v:@{size}:@{startSend}:@{endSend}*/";
+}
+
+.opacity(@opacity: 100) {
+	-khtml-opacity: (@opacity / 100);
+	-moz-opacity: (@opacity / 100);
+	opacity: (@opacity / 100);
+	-ms-filter: e(%('"progid:DXImageTransform.Microsoft.Alpha(Opacity=%d)"', @opacity));
+    filter: e(%("progid:DXImageTransform.Microsoft.Alpha(Opacity=%d)", @opacity));
+}
+
+.opacity-important(@opacity: 100) {
+	filter: e(%("alpha(opacity=%d)", @opacity)) !important;
+	-khtml-opacity: (@opacity / 100) !important;
+	-moz-opacity: (@opacity / 100) !important;
+	opacity: (@opacity / 100) !important;
+}
+
+/**
+* Set a 1px border of color on each side
+*/
+.bordered(@top-color: #EEE, @right-color: #EEE, @bottom-color: #EEE, @left-color: #EEE) {
+	border-top: solid 1px @top-color;
+	border-left: solid 1px @left-color;
+	border-right: solid 1px @right-color;
+	border-bottom: solid 1px @bottom-color;
+}
+
+/**
+* Set a black drop shadow
+*/
+.drop-shadow(@x-axis: 0, @y-axis: 1px, @blur: 2px, @alpha: 0.1) {
+	-webkit-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+	-moz-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+	box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+}
+
+/**
+* Set rounded corners
+*/
+.rounded(@radius: 2px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+}
+
+/**
+* Set a radius on each corner
+*/
+.border-radius(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-top-left-radius: @topleft;
+	-webkit-border-top-right-radius: @topright;
+	-webkit-border-bottom-right-radius: @bottomright;
+	-webkit-border-bottom-left-radius: @bottomleft;
+	-moz-border-radius-topleft: @topleft;
+	-moz-border-radius-topright: @topright;
+	-moz-border-radius-bottomright: @bottomright;
+	-moz-border-radius-bottomleft: @bottomleft;
+	border-top-left-radius: @topleft;
+	border-top-right-radius: @topright;
+	border-bottom-right-radius: @bottomright;
+	border-bottom-left-radius: @bottomleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+.border-radius-tl(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-top-left-radius: @topleft;
+	-moz-border-radius-topleft: @topleft;
+	border-top-left-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+.border-radius-tr(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-top-right-radius: @topleft;
+	-moz-border-radius-topright: @topleft;
+	border-top-right-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+.border-radius-br(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-bottom-right-radius: @topleft;
+	-moz-border-radius-bottomright: @topleft;
+	border-bottom-right-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+.border-radius-bl(@topleft: 0, @topright: 0, @bottomright: 0, @bottomleft: 0) {
+	-webkit-border-bottom-left-radius: @topleft;
+	-moz-border-radius-bottomleft: @topleft;
+	border-bottom-left-radius: @topleft;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+/**
+* Set an inner black shadow
+*/
+.inner-shadow(@horizontal:0, @vertical:1px, @blur:2px, @alpha: 0.4) {
+	-webkit-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+	-moz-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+	box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+}
+
+/**
+* Set an inner shadow with your own oclor
+*/
+.inner-shadow-color(@horizontal:0, @vertical:1px, @blur:2px, @color: rgba(255, 255, 255, 0.5)) {
+	-webkit-box-shadow: inset @horizontal @vertical @blur @color;
+	-moz-box-shadow: inset @horizontal @vertical @blur @color;
+	box-shadow: inset @horizontal @vertical @blur @color;
+}
+
+/**
+* Full box shadow
+*/
+.box-shadow(@arguments) {
+	-webkit-box-shadow: @arguments;
+	-moz-box-shadow: @arguments;
+	box-shadow: @arguments;
+}
+
+/**
+* Transition effect
+*/
+.transition(@duration:0.2s, @ease:ease-out) {
+	-webkit-transition: all @duration @ease;
+	-moz-transition: all @duration @ease;
+	transition: all @duration @ease;
+}
+
+.fade-away(@rgba_start, @rgba_end, @width: 45px, @fallback: transparent) {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: @width;
+
+	background: @fallback; /* old browsers just dont have fading */
+	background: -moz-linear-gradient(left top, @rgba_start 0%, @rgba_end 100%); /* FF 3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,@rgba_start), color-stop(100%,@rgba_end)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left, @rgba_start 0%,@rgba_end 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left, @rgba_start 0%,@rgba_end 100%); /* Opera11.10+ */
+	background: linear-gradient(left, @rgba_start 0%,@rgba_end 100%); /* W3C */
+}
+
+.fade-away-v(@rgba_start, @rgba_end, @height: 45px, @fallback: transparent) {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: @height;
+
+	background: @fallback; /* old browsers just dont have fading */
+	background: -moz-linear-gradient(@rgba_start 0%, @rgba_end 100%); /* FF 3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@rgba_start), color-stop(100%,@rgba_end)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, @rgba_start 0%,@rgba_end 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, @rgba_start 0%,@rgba_end 100%); /* Opera 11.10+ */
+	background: linear-gradient(top, @rgba_start 0%,@rgba_end 100%); /* W3C */
+}
+
+
+.noselect {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.boxmodel-border-box {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+}
+
+.imgel {
+	overflow: hidden;
+	text-indent: -1000px;
+}
+
+
+.iconbase(@w: 16px, @h: 16px) {
+    display: inline-block;
+	width: @w;
+	height: @h;
+	overflow: hidden;
+	text-indent: -100px;
+	line-height: 100%;
+	margin: 0;
+	padding: 0;
+
+	background-repeat: no-repeat;
+	background-position: 0 0;
+}
+
+
+//-----------------------------------------------
+// Urgency Colors
+//-----------------------------------------------
+
+@urgency_user_color: #AAF9AC;
+@urgency_user_borderColor: #639564;
+@urgency_user_textColor: #385739;
+
+@urgency_resolved_color: #90D591;
+@urgency_resolved_borderColor: #669966;
+@urgency_resolved_textColor: #385739;
+
+@urgency_closed_color: #75AF76;
+@urgency_closed_borderColor: #4F7950;
+@urgency_closed_textColor: #1B2E1C;
+
+@urgency_hidden_color: #B0B4C4;
+@urgency_hidden_borderColor: #979BA8;
+@urgency_hidden_textColor: #60626B;
+
+@urgency1_color: #F4F4A9;
+@urgency1_borderColor: #E2DE9C;
+@urgency1_textColor: #4D4938;
+
+@urgency2_color: #FFE491;
+@urgency2_borderColor: #B9A567;
+@urgency2_textColor: #4D4938;
+
+@urgency3_color: #FFCB81;
+@urgency3_borderColor: #B6905A;
+@urgency3_textColor: #3D2E19;
+
+@urgency4_color: #FFB171;
+@urgency4_borderColor: #BF8452;
+@urgency4_textColor: #3D2E19;
+
+@urgency5_color: #FF9962;
+@urgency5_borderColor: #B66B43;
+@urgency5_textColor: #3D2E19;
+
+@urgency6_color: #FF8052;
+@urgency6_borderColor: #C05E3A;
+@urgency6_textColor: #311207;
+
+@urgency7_color: #FF6851;
+@urgency7_borderColor: #A54031;
+@urgency7_textColor: #311207;
+
+@urgency8_color: #FF5351;
+@urgency8_borderColor: #9C2F2D;
+@urgency8_textColor: #311207;
+
+@urgency9_color: #FD3C51;
+@urgency9_borderColor: #A12230;
+@urgency9_textColor: #FFF;
+
+@urgency10_color: #F92851;
+@urgency10_borderColor: #A12230;
+@urgency10_textColor: #FFF;
+
+.status.urgency-10, .marker-urgency-data.urgency-10 {
+	.opacity(100);
+	-webkit-transition: opacity 0.5s linear;
+	-moz-transition: opacity 0.5s linear;
+	-o-transition: opacity 0.5s linear;
+	-ms-transition: opacity 0.5s linear;
+	transition: opacity 0.5s linear;
+}
+
+body.timer-mark .status.urgency-10, body.timer-mark .marker-urgency-data.urgency-10 {
+	.opacity(60);
+	-webkit-transition: opacity 0.5s linear;
+	-moz-transition: opacity 0.5s linear;
+	-o-transition: opacity 0.5s linear;
+	-ms-transition: opacity 0.5s linear;
+	transition: opacity 0.5s linear;
+}

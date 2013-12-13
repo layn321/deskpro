@@ -1,0 +1,40 @@
+{##
+ # A standard error page that is used when a server error is encountered.
+ ##}
+
+{% set page_noindex = true %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> {{ phrase('user.error.error_title') }}</li>
+{% endblock %}
+{% block content %}
+
+{% if app.getLastException()._dp_sn %}
+	<!-- [SN{{ app.getLastException()._dp_sn }}] -->
+{% endif %}
+
+<section class="dp-content-post dp-content-page">
+	<header>
+		{% if app.getLastException()._dp_sn %}
+			<div style="float: {% if is_rtl() %}left{% else %}right{% endif %}; font-size: 11px; color: #5A6467;">
+				{{ phrase('user.error.error_code') }}: {{ app.getLastException()._dp_sn }}
+			</div>
+		{% endif %}
+		<h3 style="margin-bottom: 0">
+			{% if error_title %}
+				{{ error_title }}
+			{% else %}
+				{{ phrase('user.error.error_title') }}
+			{% endif %}
+		</h3>
+	</header>
+	<article>
+		{% if error_message %}
+			{{ error_message }}
+		{% else %}
+			{{ phrase('user.error.server-error') }}
+		{% endif %}
+	</article>
+</section>
+<!-- DeskPRO -->
+{% endblock %}

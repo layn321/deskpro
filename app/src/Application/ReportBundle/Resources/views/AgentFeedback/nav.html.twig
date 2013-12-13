@@ -1,0 +1,8 @@
+<div id="dp_admin_nav" class="dp_admin_nav">
+    <nav>
+        <ul>
+            <li {% if this_page == 'report_agent_feedback_feed' %}class="on"{% endif %}><a href="{{ path('report_agent_feedback_feed', {'page': 0}) }}">Feed</a></li>
+            <li {% if this_page == 'report_agent_feedback_index' %}class="on"{% endif %}><a href="{{ path('report_agent_feedback_summary', {'date': 'now'|date('Y-m') }) }}">Summary</a></li>
+        </ul>
+    </nav>
+</div>

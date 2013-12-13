@@ -1,0 +1,74 @@
+<section class="source-section sys-filters-section">
+	<header>
+		<h1>{{ phrase('agent.deal.open_deals') }}</h1>
+	</header>
+        <ul class="source-list">
+             <li class="sub-expanded">
+                <h3 class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'my', 'deal_status': 'open'}) }}">
+                    <span class="list-counter badge-count" id="">{{my_total_opendeals|default(0)}}</span>
+                    {{ phrase('agent.deal.my_deals') }}
+                </h3>
+                 {% include 'AgentBundle:Deal:deal-nav-list.html.twig' with{'opendeals': myopendeals,'owner_type': 'my', 'deal_status': 'open'} %}
+            </li>
+
+            <li class="sub-expanded">
+                <h3 class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'other', 'deal_status': 'open'}) }}">
+                    <span class="list-counter badge-count" id="">{{other_total_opendeals|default(0)}}</span>
+                    {{ phrase('agent.deal.others_deals') }}
+                </h3>
+                 {% include 'AgentBundle:Deal:deal-nav-list.html.twig' with{'opendeals': otheropendeals, 'owner_type': 'other', 'deal_status': 'open'} %}
+            </li>
+        </ul>
+</section>
+
+<section class="source-section sys-filters-section">
+        <header>
+            <h1>{{ phrase('agent.deal.closed_deals') }}</h1>
+	</header>
+
+        <ul class="source-list">
+            <li class="sub-expanded">
+                <h3 class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'my', 'deal_status': 'close'}) }}">
+                    <span class="list-counter" id="">{{my_close_total_deals|default(0)}}</span>
+                    {{ phrase('agent.deal.my_deals') }}
+                </h3>
+                <ul class="sub-group">
+                     <li>
+                        <span class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'my', 'deal_status': 'won'}) }}">
+                                <span class="list-counter" id="mydeal_won">{{my_won_deals|default(0)}}</span>
+                                {{ phrase('agent.deal.won') }}
+                        </span>
+                     </li>
+                     <li>
+                        <span class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'my', 'deal_status': 'lost'}) }}">
+                                <span class="list-counter" id="mydeal_lost">{{my_lost_deals|default(0)}}</span>
+                                {{ phrase('agent.general.lost') }}
+                        </span>
+                     </li>
+                </ul>
+            </li>
+
+            <li class="sub-expanded">
+                <h3 class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'other', 'deal_status': 'close'}) }}">
+                    <span class="list-counter" id="">{{other_close_total_deals|default(0)}}</span>
+                    {{ phrase('agent.deal.others_deals') }}
+                </h3>
+                <ul class="sub-group">
+                     <li>
+                        <span class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'other', 'deal_status': 'won'}) }}">
+                                <span class="list-counter" id="mydeal_won">{{other_won_deals|default(0)}}</span>
+                                {{ phrase('agent.deal.won') }}
+                        </span>
+                     </li>
+                     <li>
+                        <span class="title" data-route="listpane:{{ path('agent_deal_list',{'owner_type': 'other', 'deal_status': 'lost'}) }}">
+                                <span class="list-counter" id="mydeal_lost">{{other_lost_deals|default(0)}}</span>
+                                {{ phrase('agent.general.lost') }}
+                        </span>
+                     </li>
+                </ul>
+            </li>
+
+        </ul>
+</section>
+

@@ -1,0 +1,17 @@
+<a href="{{ path('dev_lang_index') }}">Back</a>
+
+<h1>Mass Replace</h1>
+
+<form method="post">
+<textarea name="replacements" rows="50" cols="150"></textarea><br />
+<input type="submit" />
+</form>
+
+{% if changed is not empty %}
+<h2>Changed</h2>
+<ul>
+    {% for file in changed %}
+    <li>{{file}}</li>
+    {% endfor %}
+</ul>
+{% endif %}

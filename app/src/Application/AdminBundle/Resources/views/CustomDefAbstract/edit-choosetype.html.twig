@@ -1,0 +1,57 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends layout_tpl ? layout_tpl : 'AdminBundle::layout.html.twig' %}
+{% block page %}
+
+<form action="{{ path(route_basename~'edit', {'field_id': 0}) }}" class="form">
+{{ design.block_sections() }}
+
+	{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Text" checked="checked" /> {{ phrase('admin.custom_fields.text') }}</label></h3></header>
+		<p>{{ phrase('admin.custom_fields.explain_one_line_box') }}</p>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Textarea" /> {{ phrase('admin.custom_fields.textarea') }}</label></h3></header>
+		<p>{{ phrase('admin.custom_fields.explain_multi_line_box') }}</p>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Choice" /> {{ phrase('admin.custom_fields.choice') }}</label></h3></header>
+		<p>{{ phrase('admin.custom_fields.explain_predefined_options') }}</p>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Toggle" /> {{ phrase('admin.custom_fields.toggle') }}</label></h3></header>
+		<p>{{ phrase('admin.custom_fields.explain_toggle') }}</p>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Date" /> {{ phrase('agent.general.date') }}</label></h3></header>
+		<p>{{ phrase('admin.custom_fields.explain_date_field') }}</p>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Display" /> {{ phrase('admin.custom_fields.display') }}</label></h3></header>
+		<p>{{ phrase('admin.custom_fields.explain_widget_field') }}</p>
+	{{ design.block_sections_item_end() }}
+
+	{{ design.block_sections_item() }}
+		<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Hidden" /> {{ phrase('admin.custom_fields.hidden') }}</label></h3></header>
+		<p>{{ phrase('admin.custom_fields.explain_hidden_field') }}</p>
+	{{ design.block_sections_item_end() }}
+
+	{% if def_type == 'people' and app.usersources.getAllUsersources()|length %}
+		{{ design.block_sections_item() }}
+			<header><h3><label><input type="radio" name="fielddef[handler_class]" value="Application\DeskPRO\CustomFields\Handler\Data" /> Usersource Data</label></h3></header>
+			<p>This is a non-editable field that will copy data from a usersource into DeskPRO. This allows you to view and search usersource data from within DeskPRO.</p>
+		{{ design.block_sections_item_end() }}
+	{% endif %}
+
+	<li class="footer">
+		<button class="clean-white">{{ phrase('agent.general.continue') }}</button>
+	</li>
+
+{{ design.block_sections_end() }}
+
+</form>
+{% endblock %}

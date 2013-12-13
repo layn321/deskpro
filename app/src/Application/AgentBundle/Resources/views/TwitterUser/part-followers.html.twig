@@ -1,0 +1,5 @@
+<section class="followers-list list-listing">
+{% for follower in followers %}
+	{% include 'AgentBundle:TwitterUser:part-follower.html.twig' %}
+{% endfor %}
+</section>

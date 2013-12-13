@@ -1,0 +1,86 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+<ul>
+	<li>Twitter Applications</li>
+</ul>
+{% endblock %}
+{% block prepage %}
+<div style="padding: 10px 10px 0 10px;">
+	{{ design.helpbox() }}
+		<p>
+			<strong style="color: #FF5500;">BETA</strong>: Twitter is currently in beta testing. Please report bug reports and feedback to <a href="mailto:support@deskpro.com">support@deskpro.com</a> or
+			submit a ticket on our helpdesk at <a href="https://support.deskpro.com/">https://support.deskpro.com</a>.
+		</p>
+	{{ design.helpbox_end() }}
+
+	{{ design.helpbox() }}
+	<p>
+		To setup the full Twitter integration, you must create two <a href="https://dev.twitter.com/apps" target="_blank">Twitter applications</a>, one for agents and one for end users.
+		The specific permissions required by each are listed below.
+		<a href="https://support.deskpro.com/kb/articles/143-managing-twitter-accounts" target="_blank">Learn more.</a>
+	</p>
+	{{ design.helpbox_end() }}
+</div>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_twitter_apps') }}" method="post" class="dp-form" id="app_form">
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Twitter Agent Application</label>
+		</div>
+		<div class="dp-form-input" id="agent_app">
+			<div><span style="display: inline-block; width: 120px">Consumer Key:</span> <input type="text" name="agent_consumer_key" value="{{ app.getSetting('core.twitter_agent_consumer_key') }}" /></div>
+			<div style="margin-top: 3px"><span style="display: inline-block; width: 120px">Consumer Secret:</span> <input type="text" name="agent_consumer_secret" value="{{ app.getSetting('core.twitter_agent_consumer_secret') }}" /></div>
+			<p style="margin-top: 5px">This application requires <i>Read, Write and Access direct messages</i> permissions.</p>
+		</div>
+	</div>
+
+	{% if accounts|length %}
+		<div class="alert-message block-message note">
+			Any existing Twitter accounts will need to be re-added if the agent application is changed.
+		</div>
+	{% endif %}
+
+	<div class="dp-form-row" style="margin-top: 20px">
+		<div class="dp-form-label">
+			<label>Twitter User Application</label>
+		</div>
+		<div class="dp-form-input">
+			<div><span style="display: inline-block; width: 120px">Consumer Key:</span> <input type="text" name="user_consumer_key" value="{{ app.getSetting('core.twitter_user_consumer_key') }}" /></div>
+			<div style="margin-top: 3px"><span style="display: inline-block; width: 120px">Consumer Secret:</span> <input type="text" name="user_consumer_secret" value="{{ app.getSetting('core.twitter_user_consumer_secret') }}" /></div>
+			<p style="margin-top: 5px">This application requires <i>Read only</i> permissions.</p>
+		</div>
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Save Applications</button>
+	</footer>
+
+	{{ form_token() }}
+	<input type="hidden" name="process" value="1" />
+</form>
+
+{% if accounts|length %}
+<script type="text/javascript">
+$(function() {
+	$('#app_form').submit(function(e) {
+		var prevent = false;
+		$('#agent_app input[type=text]').each(function (){
+			if (!$.trim($(this).val()).length) {
+				prevent = true;
+			}
+		});
+
+		if (prevent) {
+			e.preventDefault();
+			alert('You must specify an agent application or remove any existing Twitter accounts.');
+		}
+	})
+});
+</script>
+{% endif %}
+
+{% endblock %}

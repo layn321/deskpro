@@ -1,0 +1,43 @@
+<section class="dp-portal-simpleheader-editor">
+	<div class="overlay-title">
+		<span class="close-overlay close-trigger"></span>
+		<h4>Configure Twitter Block</h4>
+	</div>
+	<div class="overlay-content">
+		{% if not consumer_key %}
+			<div style="margin-bottom: 1em">
+				<a class="btn primary" href="{{ path('admin_twitter_apps') }}">Setup Twitter Application</a>
+				<div>The Twitter block cannot be enabled until this is done.</div>
+			</div>
+		{% else %}
+			<div style="margin-bottom: 1em">
+				<a class="btn primary" href="{{ path('admin_portal_twitter_oauth', {start: 1}) }}">Authenticate with Twitter</a>
+				{% if not data.token or not data.secret %}<div>The Twitter block cannot be enabled until this is done.</div>{% endif %}
+			</div>
+		{% endif %}
+
+		<div class="dp-form">
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>Timeline from Twitter User</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" class="twitter_name" value="{{ data.twitter_name|default('deskpro') }}" />
+				</div>
+			</div>
+
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>Max Items to Retrieve</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" class="max_items" value="{{ data.max_items|default('5') }}" />
+				</div>
+			</div>
+
+			<div class="save-btn-wrap" style="text-align: center">
+				<button class="clean-white save-trigger">{{ phrase('agent.general.save') }}</button>
+			</div>
+		</div>
+	</div>
+</section>

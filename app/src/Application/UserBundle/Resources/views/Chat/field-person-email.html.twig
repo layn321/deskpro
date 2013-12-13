@@ -1,0 +1,16 @@
+{% if not app.user.id %}
+	<div class="dp-control-group">
+		<div class="dp-control-label">
+			<label>{{ phrase('user.chat.email') }}</label>
+		</div>
+		<div class="dp-controls">
+			{% if not app.user.email_address %}
+				<input type="text" name="email" placeholder="{{ phrase('user.chat.email') }}" value="{{ initial_email }}" />
+			{% else %}
+				<strong style="font-size: 110%;">{{ app.user.email_address }}</strong>
+				&nbsp; (<a href="{{ path('user_logout', {auth: static_security_token('user_logout', 0), via: 'user_chat' }) }}">{{ phrase('user.general.log_out') }}</a>)
+				<input type="hidden" name="email" value="{{ app.user.email_address }}" />
+			{% endif %}
+		</div>
+	</div>
+{% endif %}

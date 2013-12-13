@@ -1,0 +1,28 @@
+{% for snippet in snippets %}
+	<li class="snippet snippet-{{ snippet.id }}" data-snippet-id="{{ snippet.id }}">
+		<div class="show">
+			<div class="controls">
+				<div><span class="edit-trigger"></span></div>
+				<div><span class="expand-trigger"></span></div>
+			</div>
+			<div class="snippet-content" data-snippet-id="{{ snippet.id }}">
+				<label>
+					{{ snippet.title_use.show }}
+				</label>
+				{% if snippet.shortcut_code %}<span class="snippet-code">%{{ snippet.shortcut_code }}%</span>{% endif %}
+				<div class="content show">
+					<div class="main-content">
+						{% if snippet.title_use.myId and snippet.title_use.myId != snippet.title_use.showId %}
+							<strong>{{ snippet.title_use.my }}:</strong>
+						{% endif %}
+						{{ snippet.snippet_use.show }}
+						{% for snippet_info in snippet.snippet %}
+							<textarea style="display: none;" class="lang-{{ snippet_info.language_id }} snippet-value" data-language-id="{{ snippet_info.language_id }}">{{ snippet_info.value|default("")|escape }}</textarea>
+						{% endfor %}
+					</div>
+					<div class="fadeaway"></div>
+				</div>
+			</div>
+		</div>
+	</li>
+{% endfor %}

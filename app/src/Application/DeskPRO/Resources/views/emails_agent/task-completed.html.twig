@@ -1,0 +1,5 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>{{ phrase('agent.emails.task_completed', {title: task.title}) }}</dp:subject>
+{{ phrase('agent.emails.agent_completed_task_you_created', {agent: performer.getDisplayContact(), title: task.title}) }}
+<br /><br />
+<a href="{{ url_full('agent') }}#app.tasks,tasks:delegate:total">{{ phrase('agent.emails.view_delegated_tasks') }}</a>

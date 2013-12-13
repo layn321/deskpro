@@ -1,0 +1,82 @@
+{% include 'DeskPRO:pdf_agent:header.html.twig' %}
+
+<sethtmlpageheader name="deskproHeader" page="ALL" value="on" show-this-page="1" />
+
+{% include 'DeskPRO:pdf_agent:footer.html.twig' %}
+
+<sethtmlpagefooter name="deskproFooter" page="ALL" value="on" show-this-page="1" />
+
+<style type="text/css">
+    body {
+        font-family: DejaVuSans;
+    }
+
+	h1 {
+		margin-top: 0px;
+	}
+
+	a:link {
+		color: black;
+	}
+
+	.report-builder-table {
+		border: 1px solid #E1E3E6;
+		margin: 10px 0;
+		border-collapse: collapse;
+	}
+
+	.report-builder-table td,
+	.report-builder-table th {
+		padding: 8px;
+		vertical-align: middle;
+		text-align: left;
+		border: 1px solid #DDDDDD;
+		line-height: 100%;
+	}
+
+	.report-builder-table .row-header th {
+		background: #e6e9ec;
+		border-bottom: 1px solid #d5d5d5;
+
+		padding: 6px;
+		padding-top: 7px;
+		font-size: 13px;
+		color: #595959;
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		text-align: left;
+		line-height: 100%;
+
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.report-builder-table .row-header .label { text-align: center }
+
+	.matrix .row-body th {
+		background-color: #E5E8ED;
+		color: #000;
+		white-space: nowrap;
+		text-align: right;
+	}
+
+	.matrix .row-body.even th {
+		background-color: #E5E8ED;
+	}
+
+	.report-builder-table .odd { background: #fff; }
+	.report-builder-table .even { background: #F2F4F8; }
+	.report-builder-table .null { font-style: italic; }
+
+	.report-builder-table td.column-total,
+	.report-builder-table tr.total-row td,
+	.report-builder-table tr.total-row th {
+		border-top: 1px solid #E5E8ED;
+		background: #E1E4EC;
+		font-size: 11px;
+		padding: 6px;
+	}
+</style>
+<h1>{{ title }}</h1>
+<div>Generated: {{ "now"|date('fulltime') }} ({{ "now"|date('P') }} GMT)</div>
+
+{{ html|raw }}

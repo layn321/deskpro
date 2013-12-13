@@ -1,0 +1,48 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.DownloadList';
+</script>
+<div class="layout-content">
+<div class="content">
+
+	<header class="section-header">
+		<h1>
+			{{ phrase('agent.general.downloads') }}
+		</h1>
+	</header>
+
+	{% include 'AgentBundle:Downloads:search-form.html.twig' %}
+
+	<section class="news-simple-list deskpro-results-list no-check">
+		{% include 'AgentBundle:Downloads:list-page.html.twig' %}
+	</section>
+
+	{% if results|length %}
+		<footer class="results-nav">
+			<div class="cursor">
+				{% set phrase_part1 %}<span class="results-showing-count" id="{{baseId}}_showing_count">{{ ((cur_page - 1) * 50) + 1 }} - {{ showing_to }}</span>{% endset %}
+				{% set phrase_part2 %}<span class="results-total-count" id="{{baseId}}_total_count">{{ total_results }}</span>{% endset %}
+				{{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+			</div>
+			{% if total_results > 50 %}
+				<ul class="pagenav {% if cur_page == 1 %}no-prev{% endif %} {% if cur_page == num_pages %}no-next{% endif %}">
+					{% if cur_page > 1 %}
+						<li class="prev" data-route="listpane:{{ path('agent_downloads_list', {'category_id': category.id, p: cur_page - 1 }) }}"></li>
+					{% else %}
+						<li class="prev no-prev"></li>
+					{% endif %}
+
+					{% if cur_page < num_pages %}
+						<li class="next" data-route="listpane:{{ path('agent_downloads_list', {'category_id': category.id, p: cur_page + 1 }) }}"></li>
+					{% else %}
+						<li class="next no-next"></li>
+					{% endif %}
+				</ul>
+			{% endif %}
+			<div class="loading">
+
+			</div>
+		</footer>
+	{% endif %}
+
+</div>
+</div>

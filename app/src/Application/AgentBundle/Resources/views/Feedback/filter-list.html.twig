@@ -1,0 +1,102 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+	{% if list_type == 'category' %}
+		{{ set_tplvar('subgroup_url', path('agent_feedback_category', {'category_id': category_id}) ~ '?subgroup=SUBGROUP_ID') }}
+	{% elseif list_type == 'status' %}
+		{{ set_tplvar('subgroup_url', path('agent_feedback_status', {'status': status}) ~ '?subgroup=SUBGROUP_ID') }}
+	{% endif %}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.FeedbackFilter';
+		{% if list_type == 'category' %}
+			pageMeta.refreshUrl = '{{ path('agent_feedback_category', {'category_id': category_id}) }}';
+			pageMeta.url_fragment = '{{ url_fragment('agent_feedback_category', {'category': category}) }}';
+		{% elseif list_type == 'status' %}
+			pageMeta.refreshUrl = '{{ path('agent_feedback_status', {'status': status}) }}?';
+			pageMeta.url_fragment = '{{ url_fragment('agent_feedback_status', {'status': status}) }}';
+		{% elseif list_type == 'label' %}
+			pageMeta.refreshUrl = '{{ path('agent_feedback_label', {'label': label}) }}?';
+			pageMeta.url_fragment = '{{ url_fragment('agent_feedback_status', {'label': label}) }}';
+		{% elseif list_type == 'validating' %}
+			pageMeta.refreshUrl = '{{ path('agent_feedback_validating') }}?';
+		{% else %}
+			pageMeta.refreshUrl = '{{ path('agent_feedback_filter') }}?cache_id={{cache_id}}';
+		{% endif %}
+		{% if cache_id %}
+			pageMeta.cache_id = {{cache_id}};
+		{% endif %}
+		{% if not feedback %}
+			pageMeta.noResults = true;
+		{% endif %}
+
+		{% if list_type == 'status '%}
+			pageMeta.url_fragment = '{{ url_fragment('agent_feedback_status', {'status': status}) }}';
+		{% elseif list_type == 'label' %}
+			pageMeta.url_fragment = '{{ url_fragment('agent_feedback_label', {'label': label.id}) }}';
+		{% elseif list_type == 'category' %}
+			pageMeta.url_fragment = '{{ url_fragment('agent_feedback_category', {'category_id': category_id}) }}';
+		{% endif %}
+
+		pageMeta.perPage = 50;
+		pageMeta.currentPage = {{ cur_page }};
+		pageMeta.resultIds = {{ result_ids|json_encode|raw }};
+	</script>
+
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-feedback"></i> {{ phrase('agent.feedback.list_title', {count: result_ids|length|default(0)}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	{% include 'AgentBundle:Feedback:filter-display-options.html.twig' %}
+	{% include 'AgentBundle:Feedback:filter-control-bar.html.twig' %}
+	{% include 'AgentBundle:Feedback:filter-grouping-bar.html.twig' %}
+	{% include 'AgentBundle:Feedback:filter-massactions-bar.html.twig' %}
+
+	<section class="feedback-simple-list list-listing">
+		{% include 'AgentBundle:Feedback:filter-page.html.twig' %}
+	</section>
+
+	{% if not feedback|length %}
+		<section class="list-listing no-results">
+			<p>{{ phrase('agent.general.there_are_no_results') }}</p>
+		</section>
+	{% endif %}
+
+	{% if feedback|length %}
+		<footer class="results-nav">
+			<div class="cursor">
+				{{ phrase('agent.feedback.showing_results') }}
+				<span class="results-showing-count" id="{{ tplvars.baseId }}_showing_count"></span>
+				{{ phrase('agent.general.of') }}
+				<span class="results-total-count" id="{{ tplvars.baseId }}_total_count">{{ result_ids|length }}</span>
+			</div>
+			{% if result_ids|length > per_page %}
+				<ul class="pagenav no-prev">
+					<li class="prev"></li>
+					<li class="next"></li>
+				</ul>
+			{% endif %}
+			<div class="loading">
+
+			</div>
+		</footer>
+	{% endif %}
+
+{% endblock pane_content %}

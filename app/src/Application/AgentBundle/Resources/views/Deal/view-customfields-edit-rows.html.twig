@@ -1,0 +1,6 @@
+{% for f in custom_fields %}
+	<dt class="">{{ f.title }}</dt>
+	<dd class="">
+		{{ render_custom_field_form(f) }}
+	</dd>
+{% endfor %}

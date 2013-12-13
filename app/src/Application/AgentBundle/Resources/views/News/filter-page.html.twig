@@ -1,0 +1,93 @@
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for news in results %}
+		<article
+			class="row-item news news-{{news.id}} related-is-linkable"
+			data-content-type="news"
+			data-content-id="{{ news.id }}"
+			data-route="news:{{ path('agent_news_view', {'news_id': news.id}) }}"
+			data-route-title="@selector(a.row-title)"
+			data-route-openclass="open"
+		>
+			{#<input class="item-select" type="checkbox" value="{{news.id}}" />#}
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="row-title click-through"><span class="obj-title-news_{{ news.id }}">{{ news.title }}</span></a>
+					</h3>
+				</div>
+				<div class="top-row-right">
+					<div class="bound-fade"></div>
+				</div>
+				<div class="top-row-right visible-related-content-controls">
+					<div class="bound-fade"></div>
+					<span class="tipped related-link" title="{{ phrase('agent.general.add_as_related') }}"></span>
+					<span class="tipped related-unlink" title="{{ phrase('agent.general.remove_as_related') }}"></span>
+				</div>
+			</div>
+			<hr class="clear-top" />
+			{% if display_fields|length %}
+				<div class="extra-fields">
+					<ul>
+						<li>
+							<span class="prop-title">
+								{{ phrase('agent.publish.status_' ~ news.status_code|replace({'.':'_'})) }}
+							</span>
+						</li>
+						{% for field in display_fields %}
+							{% if field == 'category' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.category') }}</span>
+									<span class="prop-val">{{ news.category.full_title }}</span>
+								</li>
+							{% elseif field == 'author' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.author') }}</span>
+									<span class="prop-val">{{ news.person.display_name }}</span>
+								</li>
+							{% elseif field == 'date_created' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.date_created') }}</span>
+									<span class="prop-val">{{ news.date_created|date('day')}}</span>
+								</li>
+							{% elseif field == 'num_comments' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.comments') }}</span>
+									<span class="prop-val">{{ comment_counts[news.id]|default(0) }}</span>
+								</li>
+							{% elseif field == 'labels' %}
+								{% if news.labels|length %}
+									<li>
+										<span class="prop-title">{{ phrase('agent.general.labels') }}</span>
+										<span class="prop-val labels">
+											{% for label in news.labels %}
+												<span class="listing-tag">{{ label }}</span>
+											{% endfor %}
+										</span>
+									</li>
+								{% endif %}
+							{% elseif field == 'rating' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.rating') }}</span>
+									<span class="prop-val">
+										{{ phrase('agent.general.x_up_votes', {count: news.up_votes}) }},
+										{{ phrase('agent.general.x_down_votes', {count: news.down_votes}) }}
+									</span>
+								</li>
+							{% elseif field == 'rating_votes' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.number_of_ratings') }}</span>
+									<span class="prop-val">
+										{{ news.num_ratings }}
+									</span>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+					<br class="clear" />
+				</div>
+			{% else %}
+				<br class="clear" />
+			{% endif %}
+		</article>
+	{% endfor %}
+</section>

@@ -1,0 +1,73 @@
+{% import 'ReportBundle:Overview:macros.html.twig' as macros %}
+<section class="report-wrapper {% if initial_display %}initial-display{% endif %}">
+	<header>
+		<h2>
+			<span class="label-sum">{{ data.sum }}</span> Chats were Created
+			<span class="drop-option">
+				<select class="grouping-field" name="date_choice">
+					{% for field,title in {
+						'today': 'Today',
+						'this_week': 'This Week',
+						'this_month': 'This Month',
+						'this_year': 'This Year',
+					} %}
+						<option {% if data.date_choice == field %}selected="selected"{% endif %} value="{{ field }}">{{ title }}</option>
+					{% endfor %}
+				</select>
+				<i></i>
+			</span>
+		</h2>
+		<h3>
+			Showing Grouped by
+			<span class="drop-option">
+				<i></i>
+				<select class="grouping-field" name="grouping_field">
+					<optgroup label="Chat Fields">
+					<option {% if data.grouping_field == 'department' %}selected="selected"{% endif %} value="department">Department</option>
+					<option {% if data.grouping_field == 'agent' %}selected="selected"{% endif %} value="agent">Agent</option>
+					</optgroup>
+					<optgroup label="User Fields">
+						<option {% if data.grouping_field == 'user' %}selected="selected"{% endif %} value="user">User</option>
+						<option {% if data.grouping_field == 'organization' %}selected="selected"{% endif %} value="organization">Organization</option>
+						<option {% if data.grouping_field == 'usergroup' %}selected="selected"{% endif %} value="usergroup">Usergroup</option>
+						{% for field_def in app.getCustomFieldManager('people').getFields() %}
+							<option {% if data.grouping_field == ('user_field.' ~ field_def.id) %}selected="selected"{% endif %} value="user_field.{{ field_def.id }}">{{ field_def.title }}</option>
+						{% endfor %}
+					</optgroup>
+				</select>
+			</span>
+		</h3>
+	</header>
+	<article>
+		<div class="loading-overlay" {% if not initial_display %}style="display: none"{% endif %}><strong>Loading</strong></div>
+		{% if data.values %}
+			<table class="stat-table" width="100%">
+				{% for id, title in data.titles %}
+					{% if data.values[id] %}
+						<tr>
+							<td class="title"><span>{{ title }}</span></td>
+							<td width="100%">
+								<table width="100%" class="stat-value"><tr>
+									{% set perc = (data.values[id] / data.max|default(1)) * 100 %}
+									{% if perc < 1.0 %}
+										<td class="value" width="1%"><div>&nbsp;</div></td>
+										<td width="{{ 100 - 1 }}%">{{ data.values[id] }}</td>
+									{% else %}
+										<td class="value" width="{{ perc }}%"><div>&nbsp;</div></td>
+										<td width="{{ 100 - perc }}%">{{ data.values[id] }}</td>
+									{% endif %}
+								</tr></table>
+							</td>
+						</tr>
+					{% endif %}
+				{% endfor %}
+				<tr class="total-row">
+					<td class="title">Total:</td>
+					<td class="val">{{ data.sum }}</td>
+				</tr>
+			</table>
+		{% else %}
+			{{ macros.no_data() }}
+		{% endif %}
+	</article>
+</section>

@@ -1,0 +1,39 @@
+{##
+ # Search results in the website widget and portal search box suggestions
+ ##}
+<li class="{{ type }} {{ type }}-{{ item.id }}">
+	<div class="top-row">
+		{% if type == 'article' %}<i class="dp-icon-folder-open"></i>
+		{% elseif type == 'news' %}<i class="dp-icon-bookmark"></i>
+		{% elseif type == 'download' %}<i class="dp-icon-download-alt"></i>
+		{% elseif type == 'feedback' %}<i class="dp-icon-file"></i>
+		{% endif %}
+		{% if q %}
+			<a
+				href="{{ item.getLink() }}"
+				onclick="this.href='{{ path('user_search', {q: q, c: count, t: security_token(q ~ count), gourl: item.getLink() }) }}'"
+				class="view-item"
+				data-content-type="{{ type }}"
+				data-content-id="{{ item.id }}"
+				data-link="{{ path('user_search', {q: q, c: count, t: security_token(q ~ count), gourl: item.getLink() }) }}"
+			>
+		{% else %}
+			<a href="{{ item.getLink() }}" class="view-item" data-content-type="{{ type }}" data-content-id="{{ item.id }}">
+		{% endif %}
+			<span>{{ item.title }}</span>
+		</a>
+		<div class="fadeaway"></div>
+	</div>
+	<div class="summary">
+		{% if type == 'article' %}
+			{{ item.getSearchSummary(100) }}
+		{% elseif type == 'news' %}
+			{{ item.date_created|date('day') }} {% if item.num_comments %}&middot; <a href="{{ item.getLink() }}" class="view-item" data-content-type="{{ type }}" data-content-id="{{ item.id }}">{{ phrase('user.general.count_comments', {'count': item.num_comments}) }}{% endif %}</a>
+		{% elseif type == 'download' %}
+			{{ item.getFileName() }} &middot; {{ item.getReadableFileSize() }}
+		{% elseif type == 'feedback' %}
+            {{ phrase('user.feedback.count_votes', {'count': item.total_rating}) }} &middot; <a href="{{ item.getLink() }}" class="view-item" data-content-type="{{ type }}" data-content-id="{{ item.id }}">{{ phrase('user.general.count_comments', {'count': item.num_comments}) }}</a>
+		{% endif %}
+		<div class="fadeaway"></div>
+	</div>
+</li>

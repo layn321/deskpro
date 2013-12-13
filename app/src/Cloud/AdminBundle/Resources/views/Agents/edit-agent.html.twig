@@ -1,0 +1,35 @@
+{% extends 'AdminBundle:Agents:edit-agent.html.twig' %}
+{% block agent_form_bottom %}
+	{% if not agent.id and app.getVariable('num_agents') >= app.getVariable('max_agents') %}
+		<br />
+		<div style="background-color: #F2EAB7; padding: 15px; border: 1px solid #E0CD80; border-radius: 5px; -webkit-border-radius: 5px;">
+			Your helpdesk is currently using all {{ app.getVariable('num_agents') }} agents allowed by your service plan.
+			You can upgrade your plan now to add another agent seat for an extra $30 a month.
+			<div style="background-color: #FFFED3; padding: 10px; margin-top: 10px; margin-bottom: 10px; border-radius: 5px; -webkit-border-radius: 5px; -webkit-box-shadow: inset 0px 0px 2px 2px rgba(0, 0, 0, 0.2); box-shadow: inset 0px 0px 2px 2px rgba(0, 0, 0, 0.2);">
+				<label>
+					<input type="checkbox" value="1" name="add_agent_seat" id="add_agent_seat" />
+					Yes, add another agent seat to my plan for an extra $30 a month
+				</label>
+			</div>
+			To view your plan and manage billing details, go to your <a class="billing" href="{{ app.request.getBaseUrl() }}/billing"><span class="check">{{ phrase('agent.general.billing_interface') }}</span></a>.
+		</div>
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var save_control = $('#save_control');
+				var add_opt = $('#add_agent_seat');
+
+				function update() {
+					if (add_opt.prop('checked')) {
+						save_control.slideDown('fast');
+					} else {
+						save_control.slideUp('fast');
+					}
+				};
+
+				update();
+				add_opt.on('click', update);
+			});
+		</script>
+	{% endif %}
+{% endblock %}

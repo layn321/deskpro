@@ -1,0 +1,20 @@
+{% if version_info %}
+	<div style="padding-top: 5px; padding-bottom: 5px;">
+		The latest build is
+		<a href="{{ version_info.changelog_url }}" target="_blank" onclick="window.open(this.href, 'changelog','width=750,height=750,location=0,menubar=0,scrollbars=1,status=1,toolbar=0,resizable=1'); return false;">
+			<span class="{% if version_info.count_behind != 0 %}label important{% endif %}" title="Built on {{ version_info.build|date('Y-m-d') }}">#{{ version_info.build_num_base }}</span>
+		</a>.
+	</div>
+
+	<article class="box-hint" style="text-align: center">
+		{% if version_info.count_behind == 0 %}
+			<span style="background: url({{ asset('images/agent/icons/check.png') }}) no-repeat 100% 50%; padding-right: 17px;">{{ phrase('admin.general.you_are_up_to_date') }}</span>
+		{% else %}
+			{{ phrase('admin.general.you_are_outdated_by_x_buils', {count: version_info.count_behind}) }}
+			<a style="margin-top: 8px; margin-bottom: 8px;" class="btn primary" href="{{ path('admin_upgrade') }}">{{ phrase('admin.general.click_here_for_upgrade_instructions') }}</a>
+			<div style="font-size: 10px; text-align: center;">
+				<a href="{{ version_info.changelog_url }}" target="_blank" onclick="window.open(this.href, 'changelog','width=750,height=750,location=0,menubar=0,scrollbars=1,status=1,toolbar=0,resizable=1'); return false;">View change log</a>
+			</div>
+		{% endif %}
+	</article>
+{% endif %}

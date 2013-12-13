@@ -1,0 +1,139 @@
+{##
+ # The standard inline login form used in some forms. This asks the user for their email address, but offers
+ # an inline form to log in instead. On the newticket page, this also allows the user to choose amongst their email addresses in the.
+ ##}
+
+<div id="dp_inline_login_row" class="dp-inline-login dp-inline-login-email {% if login_error %}open{% endif %}">
+	{% if app.user.is_guest %}
+		{% if login_error %}
+		<div class="alert-message error dp-inline-login-err">
+			{{ phrase('user.profile.login_error') }}
+		</div>
+		{% endif %}
+
+		<div class="dp-control-group {% if error_fields[form_key_prefix ~ 'email'] %}dp-error{% endif %}">
+			<div class="dp-control-label">
+				<label>
+					<strong>{{ phrase('user.general.your_email_address') }} *</strong>
+					<aside>
+						{% if context == 'newticket' %}
+							{{ phrase('user.tickets.email_explain') }}
+						{% endif %}
+					</aside>
+				</label>
+			</div>
+			<div class="dp-controls dp-fill-half">
+				<input type="text" id="dp_inline_login_email" name="{{ email_form_name }}" value="{{ initial_value }}" data-field-validators="DeskPRO.Form.LengthValidator" />
+				<div style="font-size: 11px;">
+					{%- set phrase_link -%}
+						<a href="{{path('user_login')}}" class="dp-inline-login-open">{{ phrase('user.general.log_in') }}</a>
+					{%- endset -%}
+					{{ phrase('user.profile.login_if_registered', {'link': phrase_link}, true) }}
+				</div>
+				<div class="dp-help-inline dp-error-explain">
+					{% if errors[form_key_prefix ~ 'email.account_disabled'] is not empty %}
+						{{ phrase('user.profile.account_disabled_message') }}
+					{% else %}
+						{{ phrase('user.general.form_fix_email') }}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		<div class="dp-control-group dp-inline-login-pass" style="display: none">
+			<div class="dp-login-section">
+				<div class="dp-control-label">
+					<label><strong>{{ phrase('user.profile.password') }}</strong> <a class="forgot" href="{{ path('user_login_resetpass') }}">{{ phrase('user.profile.lost_qm') }}</a></label>
+				</div>
+				<div class="dp-controls">
+					<input type="password" id="dp_inline_login_pass" />
+					<div class="dp-loading">
+						{{ phrase('user.general.loading') }}
+					</div>
+					<div class="dp-btn-row">
+						<button class="dp-btn dp-btn-primary dp-login-trigger {% if mode == 'advanced' %}mode-advanced{% endif %}">{{ phrase('user.general.log_in') }}</button>
+						<button class="dp-btn dp-inline-login-open">{{ phrase('user.portal.login-box_cancel-button') }}</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="dp-reset-section" style="display: none">
+				<div class="dp-reset-desc">
+					{{ phrase('user.profile.lost_password_explain') }}
+					<br />
+					<div class="dp-btn-row">
+						<div class="not-loading">
+							<button class="btn small dp-do-send">{{ phrase('user.profile.lost_password_send_btn') }}</button>
+							<a class="back">{{ phrase('user.portal.login-box_cancel-button') }}</a>
+						</div>
+						<div class="is-loading">
+							{{ phrase('user.general.loading') }}
+						</div>
+					</div>
+				</div>
+				<div class="dp-reset-sent" style="display: none">
+					{{ phrase('user.profile.lost_password_sent') }}<br />
+					<a class="dp-btn small back">{{ phrase('user.profile.lost_password_back_btn') }}</a>
+				</div>
+			</div>
+		</div>
+
+	{% else %}
+		{% if app.user.emails|length %}
+			<div
+				class="dp-inline-email-manage with-handler"
+				{% if mode == 'advanced' %}
+				data-element-handler="DeskPRO.User.ElementHandler.InlineEmailManage"
+				data-security-token="{{ security_token('email_manage') }}"
+				{% endif %}
+			>
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label><strong>{{ phrase('user.general.your_email_address') }}</strong></label>
+						{% if mode == 'advanced' %}
+						<em class="change-email"><a href="{{ path('user_profile') }}">{{ phrase('user.profile.change_email') }}</a></em>
+						<em class="change-email-close" style="display: none"><a>{{ phrase('user.profile.done_changing_email') }}</a></em>
+						{% endif %}
+					</div>
+					<div class="dp-controls dp-fill">
+						<input type="text" id="dp_inline_login_email" class="dp-email-field" name="{{ email_form_name }}" value="{{ app.user.primary_email_address }}" readonly="readonly" />
+
+					</div>
+				</div>
+				{% if mode == 'advanced' %}
+					<div class="dp-email-manage-controls" style="display: none">
+						<strong>{{ phrase('user.profile.choose_email') }}:</strong><br />
+						<ul class="radio-list">
+							{% for email in app.user.emails %}
+								<li>
+									<label><input type="radio" name="dp_inline_email_choice_radio" value="{{ email.email }}" {% if email.id == app.user.primary_email.id %}checked="checked"{% endif %} /> {{ email.email }}</label>
+								</li>
+							{% endfor %}
+							<li>
+								<label>
+									<input type="radio" name="dp_inline_email_choice_radio" value="NEW" />
+									{{ phrase('user.profile.choose_email_new') }}:
+								</label>
+								<input type="text" class="small dp_inline_email_new" value="" name="dp_inline_email_new" />
+							</li>
+						</ul>
+					</div>
+				{% endif %}
+			</div>
+		{% else %}
+			<div class="dp-control-group {% if error_fields[form_key_prefix ~ 'email'] %}dp-error{% endif %}">
+				<div class="dp-control-group">
+					<div class="dp-control-label">
+						<label>{{ phrase('user.general.your_email_address') }} *</label>
+					</div>
+				</div>
+				<div class="dp-controls dp-fill">
+					<input type="text" id="dp_inline_login_email" class="dp-email-field" name="{{ email_form_name }}" value="" />
+					<div class="dp-help-inline dp-error-explain">
+						{{ phrase('user.general.form_fix_email') }}
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	{% endif %}
+</div>

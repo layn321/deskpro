@@ -1,0 +1,24 @@
+<header class="list-control-bar">
+	<ul class="btn-controls">
+		<li class="display-options display-options-trigger"><a></a></li>
+		<li class="right"><span class="sep"></span></li>
+	</ul>
+	<ul>
+		<li>{{ phrase('agent.general.ordered_by') }} </li>
+		<li class="order-by-menu-trigger menu-fitted" data-menu-button=".button"><a class="button">
+			<span class="label">
+				{% if 'date_created' in cache.criteria.order_by %}
+					{{ phrase('agent.general.date_created') }}
+				{% elseif 'view_count' in cache.criteria.order_by %}
+					{{ phrase('agent.publish.view_count') }}
+				{% endif %}
+			</span>
+			<em></em>
+		</a></li>
+		<li><span class="sep"></span></li>
+	</ul>
+	<ul class="order-by-menu" style="display: none">
+		<li data-order-by="date">{{ phrase('agent.general.date_created') }}</li>
+		<li data-order-by="views">{{ phrase('agent.general.num_views') }}</li>
+	</ul>
+</header>

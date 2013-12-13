@@ -1,0 +1,129 @@
+{##
+ # The view ticket page
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	{% if is_participant %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+	{% else %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_organization') }}">{{ phrase('user.tickets.organization_tickets', {organization: ticket.organization.name}) }}</a></li>
+	{% endif %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}">{{ ticket.subject }}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ ticket.subject }} - {{ is_participant ? phrase('user.tickets.your_tickets') : phrase('user.tickets.organization_tickets', {organization: ticket.organization.name}) }}
+{% endblock %}
+{% block content %}
+
+<section class="dp-ticket dp-content-page dp-content-post">
+	<header>
+		{% if ticket.status == 'awaiting_agent' or ticket.status == 'awaiting_user' %}
+			<div class="dp-status-switcher" title="{{ phrase('user.tickets.click_to_close') }}">
+				<div class="dp-status active dp-status-open">{{ phrase('user.tickets.status_open') }}</div>
+				<a class="dp-status switcher dp-status-closed" href="{{ path('user_tickets_resolve', {'ticket_ref': ticket.public_id}) }}">{{ phrase('user.tickets.status_resolved') }}</a>
+			</div>
+		{% elseif ticket.status == 'resolved' or ticket.status == 'closed' %}
+			<div class="dp-status dp-status-resolved">{{ phrase('user.tickets.status_resolved') }}</div>
+		{% endif %}
+		<h3 style="margin-bottom: 0">{{ ticket.subject }}</h3>
+		<ul class="dp-post-info">
+			<li class="dp-id"><i class="dp-icon-bookmark"></i> {{ phrase('user.tickets.ticket_ref') }}: {{ ticket.public_id }}</li>
+			<li class="dp-date"><i class="dp-icon-calendar"></i> {{ ticket.date_created|date('fulltime') }}</li>
+		</ul>
+	</header>
+	<article class="dp-ticket-info">
+		<div class="dp-modify-link-row">
+			<i class="dp-icon-pencil"></i> <a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id, edit: 1}) }}">{{ phrase('user.tickets.edit') }}</a>
+		</div>
+		{% include 'UserBundle:TicketView:view-ticketinfo.html.twig' %}
+	</article>
+	<article class="dp-messages-wrap">
+		<section class="dp-comments-box">
+			<article>
+				<ul>
+					{% for message in ticket.displayable_messages %}
+						{% include 'UserBundle:TicketView:view-message.html.twig' %}
+					{% endfor %}
+				</ul>
+			</article>
+		</section>
+	</article>
+
+	{% if ticket.status == 'awaiting_agent' %}
+		<article class="dp-early-close dp-well">
+			{{ phrase('user.tickets.reply.if_resolved', {'link_url': path('user_tickets_resolve', {'ticket_ref': ticket.public_id})}) }}
+		</article>
+	{% elseif ticket.status == 'resolved' and app.user.hasPerm('tickets.reopen_resolved') %}
+		<article class="dp-early-close dp-well">
+			<p>{{ phrase('user.tickets.reply.resolved_explain') }}</p>
+			<p>{{ phrase('user.tickets.reply.set_unresolved', {'link_url': path('user_tickets_unresolve', {'ticket_ref': ticket.public_id})}) }}</p>
+		</article>
+	{% endif %}
+
+	{% if ticket.status not in ['awaiting_agent', 'awaiting_user', 'resolved'] or (ticket.status == 'resolved' and not app.user.hasPerm('tickets.reopen_resolved')) %}
+		<article class="dp-reply-wrap dp-well dp-newreply-wrap">
+			<header>
+				<h4>{{ phrase('user.tickets.new_reply') }}</h4>
+			</header>
+			<div class="dp-well dp-well-light">
+				<p>
+					{{ phrase('user.tickets.new_reply_closed_explain') }}
+				</p>
+			</div>
+		</article>
+	{% else %}
+		<article class="dp-reply-wrap dp-well dp-newreply-wrap">
+			<header>
+				<h4>{{ phrase('user.tickets.new_reply') }}</h4>
+			</header>
+			<div class="dp-well dp-well-light">
+				<form action="{{ path('user_tickets_addreply', {'ticket_ref': ticket.public_id}) }}" method="POST" class="with-form-validator" enctype="multipart/form-data">
+					{{ form_token() }}
+					<div class="dp-form">
+						{% if errors|length %}
+							<div class="dp-alert dp-alert-error">
+								{{ phrase('user.tickets.form_errors_correct') }}
+								<!--
+								{{ debug_var(error_fields) }}
+								{{ debug_var(errors) }}
+								-->
+							</div>
+						{% endif %}
+						<div class="dp-control-group {% if error_fields['message'] %}dp-error{% endif %}" style="position:relative;">
+							<div class="dp-drop-file-zone"><h1>{{ phrase('user.general.upload-drag') }}</h1></div>
+							<div class="dp-controls dp-fill">
+								<textarea
+									name="newreply[message]"
+									cols="120"
+									rows="5"
+									style="width: 98%; height: 200px"
+									placeholder="{{ phrase('user.tickets.type_your_reply_here') }}"
+									data-field-validators="DeskPRO.Form.LengthValidator"
+									data-min-len="5"
+								>{{ newreply.message }}</textarea>
+
+								<div class="dp-help-inline dp-error-explain">
+									{{ phrase('user.tickets.message_error') }}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="dp-control-group">
+						<div class="dp-control-label">
+							<label>{{ phrase('user.general.attachments') }}</label>
+						</div>
+						<div class="dp-controls">
+							{% include 'UserBundle:Common:form-upload-input.html.twig' %}
+						</div>
+					</div>
+
+					<button class="dp-btn dp-btn-primary" style="margin-top: 10px;">{{ phrase('user.tickets.reply.form.button') }}</button>
+				</form>
+			</div>
+		</article>
+	{% endif %}
+</section>
+
+{% endblock %}

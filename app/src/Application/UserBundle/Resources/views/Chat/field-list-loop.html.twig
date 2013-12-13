@@ -1,0 +1,46 @@
+{##
+ # This template helps draw the fields that are to be displayed on the newchat page based on the layout
+ # defined from the admin interfacer.
+ #
+ # You generally don't want to edit this template directly because it contains logic for wrapper elements.
+ #
+ # If you want to modify the appearance of fields, edit one of the field-*.html.twig
+ # templates instead.
+ ##}
+{% for item in all_items %}
+
+{% if item.field_type == 'chat_department' %}
+<div data-field-id="chat_department" class="chat-display-field chat_department" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:Chat:field-department.html.twig' %}
+</div>
+{% endif %}
+
+{% if type != 'modify' %}
+{% if item.field_type == 'person_name' %}
+<div data-field-id="person_name" class="chat-display-field person_name" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:Chat:field-person-name.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{% if type != 'modify' %}
+{% if item.field_type == 'person_email' %}
+<div data-field-id="person_email" class="chat-display-field person_email" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:Chat:field-person-email.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{###############
+ # Custom Fields
+ ###############}
+
+{% for f in custom_fields %}
+{% if item.field_type == 'chat_field' and item.field_id == f.id %}
+<div data-field-id="chat_field[{{f.id}}]" class="dp-control-group custom-field chat_field_{{f.id}} chat-display-field" {% if item.rules or item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:Chat:field-custom-field.html.twig' %}
+</div>
+{% endif %}
+{% endfor %}
+
+{% endfor %}

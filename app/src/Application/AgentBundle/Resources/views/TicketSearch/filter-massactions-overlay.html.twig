@@ -1,0 +1,281 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script type="text/x-deskpro-plain" class="mass-actions-overlay-tpl">
+<div
+	class="mass-actions-overlay-container mass-actions"
+	data-base-id="%baseId%"
+	data-upload-url="{{ path('agent_accept_upload') }}"
+>
+	<%scriptWord% type="text/x-deskpro-plain" class="radio-tpl">
+		<button class="clean-white radio"><span class="radio-title"></span></button>
+	</%scriptWord%>
+	<section class="mass-actions-overlay">
+		<header>
+			<span class="close close-trigger"></span>
+			<h1>
+				{{ phrase('agent.general.apply_to_x_selections', {'placeholder': '<span class="selected-tickets-count"></span>'}, true) }}
+			</h1>
+		</header>
+		<article class="popover-inner">
+        {{ agentui.scroll_containers('', '') }}
+			{% if macros|length %}
+				<div class="macro-load">
+					<select name="macro_id" class="macro macro_id is-not-loading" data-placeholder="Apply a macro">
+						<option value="0">{{ phrase('agent.tickets.apply_a_macro') }}</option>
+						<optgroup label="Macros">
+							{% for macro in macros %}
+								<option value="{{ macro.id }}">{{ macro.title }}</option>
+							{% endfor %}
+						</optgroup>
+					</select>
+					<span class="is-loading loading-icon" style="float:left; position: relative; top: 2px;"></span>
+				</div>
+			{% endif %}
+
+			<div class="macro-options" style="display: none; padding: 15px;">
+				<div class="confirm-macro-overlay">
+					<ul class="actions-list"></ul>
+				</div>
+			</div>
+
+			<div class="actions-input">
+				<dl>
+					<dt>{{ phrase('agent.general.change_status') }}</dt>
+					<dd>
+						<label class="radio-item" data-attach-class="status status-resolved">
+							<input type="radio" name="actions[status]" value="resolved" class="button-toggle" />
+							<span class="radio-title">{{ phrase('agent.tickets.set_resolved') }}</span>
+						</label>
+						<label class="radio-item" data-attach-class="status status-awaiting_user">
+							<input type="radio" name="actions[status]" value="awaiting_user" class="button-toggle" />
+							<span class="radio-title">{{ phrase('agent.tickets.set_awaiting_user') }}</span>
+						</label>
+						<label class="radio-item" data-attach-class="status status-awaiting_agent">
+							<input type="radio" name="actions[status]" value="awaiting_agent" class="button-toggle" />
+							<span class="radio-title">{{ phrase('agent.tickets.set_awaiting_agent') }}</span>
+						</label>
+						<label class="radio-item" data-attach-class="status status-hidden_delete">
+							<input type="radio" name="actions[status]" value="hidden.deleted" class="button-toggle" />
+							<span class="radio-title">{{ phrase('agent.tickets.set_delete') }}</span>
+						</label>
+						<label class="radio-item" data-attach-class="status status-hidden_spam">
+							<input type="radio" name="actions[status]" value="hidden.spam" class="button-toggle" />
+							<span class="radio-title">{{ phrase('agent.general.mark_spam') }}</span>
+						</label>
+					</dd>
+				</dl>
+
+				<table cellspacing="0" cellpadding="0" border="0"><tr>
+					<td>
+						<dl>
+							<dt>{{ phrase('agent.general.agent') }}</dt>
+							<dd>
+								<select name="actions[agent]" class="dpe_select" data-style-type="icons" data-select-icon-size="22">
+									<option value="-1"></option>
+									<option value="0">{{ phrase('agent.general.unassigned') }}</option>
+
+									{% for agent in agents %}
+										<option data-icon="{{ agent.getPictureUrl(20) }}" value="{{ agent.id }}">{{ agent.display_name }}</option>
+									{% endfor %}
+								</select>
+							</dd>
+						</dl>
+					</td>
+					<td style="padding-left: 10px;">
+						<dl>
+							<dt>{{ phrase('agent.general.team') }}</dt>
+							<dd>
+								<select name="actions[agent_team]" class="dpe_select">
+									<option value="-1"></option>
+									<option value="0">{{ phrase('agent.general.no_team') }}</option>
+
+									{% for team in agent_teams %}
+									<option value="{{ team.id }}">{{ team.name }}</option>
+									{% endfor %}
+								</select>
+							</dd>
+						</dl>
+					</td>
+				</tr></table>
+
+				<dl>
+					<dt>{{ phrase('agent.general.followers') }}</dt>
+					<dd>
+						<select name="actions[add_participants][add_participants][]" class="dpe_select dpe_select_noborder" multiple="multiple" data-style-type="icons" data-select-width="auto" data-select-icon-size="16" data-placeholder="{{ phrase('agent.tickets.add_followers') }}">
+							<option data-icon="{{ app.user.getPictureUrl(16) }}" value="{{ app.user.id }}">{{ app.user.display_name }}</option>
+							{% for agent in agents %}
+							{% if agent.id != app.user.id %}
+								<option data-icon="{{ agent.getPictureUrl(16) }}" value="{{ agent.id }}">{{ agent.display_name }}</option>
+							{% endif %}
+							{% endfor %}
+						</select>
+					</dd>
+				</dl>
+
+				<table cellspacing="0" cellpadding="0" border="0"><tr>
+					<td>
+						<dl>
+							<dt>{{ phrase('agent.general.department') }}</dt>
+							<dd>
+								{% include 'AgentBundle:Common:select-department.html.twig' with {
+									'name': 'actions[department]',
+									'with_blank': true,
+									'with_blank2': true,
+									'blank_title': '',
+									'departments': app.departments.getPersonDepartments(app.user, 'tickets', [ticket.department.id|default(0)], 'assign'),
+									'add_classname': 'dpe_select',
+									'with_blank_value': '-1'
+								} %}
+							</dd>
+						</dl>
+					</td>
+					{% if app.getSetting('core.use_ticket_category') %}
+					<td style="padding-left: 10px;">
+						<dl>
+							<dt>{{ phrase('agent.general.category') }}</dt>
+							<dd>
+								{% include 'AgentBundle:Common:select-category.html.twig' with {
+									'name': 'actions[category]',
+									'with_blank': true,
+									'with_blank2': true,
+									'blank_title': '',
+									'categories': ticket_options.ticket_categories_hierarchy,
+									'add_classname': 'dpe_select',
+									'with_blank_value': '-1'
+								} %}
+							</dd>
+						</dl>
+					</td>
+					{% endif %}
+					{% if app.getSetting('core.use_product') %}
+					<td style="padding-left: 10px;">
+						<dl>
+							<dt>{{ phrase('agent.general.category') }}</dt>
+							<dd>
+								{% include 'AgentBundle:Common:select-product.html.twig' with {
+									'name': 'actions[product]',
+									'with_blank': true,
+									'with_blank2': true,
+									'blank_title': '',
+									'products': ticket_options.products_hierarchy,
+									'add_classname': 'dpe_select',
+									'with_blank_value': '-1'
+								} %}
+							</dd>
+						</dl>
+					</td>
+					{% endif %}
+					{% if app.getSetting('core.use_ticket_priority') %}
+					<td style="padding-left: 10px;">
+						<dl>
+							<dt>{{ phrase('agent.general.priority') }}</dt>
+							<dd>
+								{% include 'AgentBundle:Common:select-priority.html.twig' with {
+									'name': 'actions[priority]',
+									'with_blank': true,
+									'with_blank2': true,
+									'blank_title': '',
+									'priorities': ticket_options.ticket_priorities,
+									'add_classname': 'dpe_select',
+									'with_blank_value': '-1'
+								} %}
+							</dd>
+						</dl>
+					</td>
+					{% endif %}
+					{% if app.getSetting('core.use_ticket_workflow') %}
+					<td style="padding-left: 10px;">
+						<dl>
+							<dt>{{ phrase('agent.general.workflow') }}</dt>
+							<dd>
+								{% include 'AgentBundle:Common:select-workflow.html.twig' with {
+									'name': 'actions[workflow]',
+									'with_blank': true,
+									'with_blank2': true,
+									'blank_title': '',
+									'workflows': ticket_options.ticket_workflows,
+									'add_classname': 'dpe_select',
+									'with_blank_value': '-1'
+								} %}
+							</dd>
+						</dl>
+					</td>
+					{% endif %}
+					{% if app.languages.isMultiLang() %}
+					<td style="padding-left: 10px;">
+						<dl>
+							<dt>{{ phrase('agent.general.language') }}</dt>
+							<dd>
+								{% include 'AgentBundle:Common:select-language.html.twig' with {
+									'name': 'actions[language]',
+									'with_blank': true,
+									'with_blank2': true,
+									'blank_title': '',
+									'languages': app.languages.getAll(),
+									'add_classname': 'dpe_select',
+									'with_blank_value': '-1'
+								} %}
+							</dd>
+						</dl>
+					</td>
+					{% endif %}
+				</table>
+
+				{% if app.user.hasPerm('agent_tickets.reply_mass') %}
+				<div class="profile-box-container reply-box-wrap">
+					<header>
+						<nav>
+							<ul><li>{{ phrase('agent.tickets.mass_reply') }}</li></ul>
+						</nav>
+					</header>
+					<section class="ticketreply">
+						<article>
+							<section>
+								<ul id="%baseId%_attach_row" style="display: none">
+									<li class="attach-row">
+										<label><span>{{ phrase('agent.general.attachments') }}</span></label>
+										<div>
+											<ul class="files"></ul>
+											<br class="clear"/>
+										</div>
+									</li>
+
+									{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'actions[reply][attach_ids][]', scriptWord: '%scriptWord%'} %}
+								</ul>
+								<div class="input-wrap">
+									<textarea id="%baseId%_replybox_txt" name="actions[reply][reply_text]"></textarea>
+									<input type="hidden" id="{{localBaseId}}_is_html_reply" name="actions[reply][is_html]" value="0" />
+								</div>
+							</section>
+						</article>
+					</section>
+				</div>
+				{% endif %}
+				<dl>
+					<dt>{{ phrase('agent.general.other_properties') }}</dt>
+					<dd>
+						<div class="other-properties-wrapper">
+							<div class="dp-form-row">
+								<div class="dp-form-input">
+									<div class="search-form actions-list">
+										<div class="search-terms">
+										</div>
+										<div class="term add-term-row" style="display:none"><span class="add-term">+</span> {{ phrase('agent.general.add_action_term') }}</div>
+									</div>
+									{% include 'DeskPRO:Common:ticket-trigger-actions.html.twig' with { 'classname': 'actions-builder-tpl', 'term_options': ticket_options } %}
+								</div>
+							</div>
+						</div>
+					</dd>
+				</dl>
+			</div>
+        {{ agentui.scroll_containers_end() }}
+		</article>
+		<footer>
+			<div class="is-not-loading"><button class="apply-actions">{{ phrase('agent.general.apply') }}</button></div>
+			<div class="is-loading">
+				<div class="loading-icon" style="margin-top: 5px;">&nbsp;</div>
+			</div>
+		</footer>
+	</section>
+</div>
+</script>

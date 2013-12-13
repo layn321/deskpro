@@ -1,0 +1,25 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.TwitterStatusOverlay';
+{% include 'AgentBundle:Twitter:list-urls.js.twig' %}
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<header>
+	<span class="close close-trigger">{{ phrase('agent.general.close_lc') }}</span>
+	<h1>{{ phrase('agent.general.view') }}</h1>
+</header>
+<article class="full" data-width="600" data-height="{{ parents ? 400 : 300 }}">
+	{% if parents %}
+		<div class="twitter-parents">
+			<h3>{{ phrase('agent.twitter.previous_tweets') }}</h3>
+			{% for parent in parents %}
+				{% include 'AgentBundle:TwitterStatus:status-simple.html.twig' with {'status': parent} %}
+			{% endfor %}
+		</div>
+	{% endif %}
+
+	<div class="twitter-status-inline" style="padding: 10px">
+		{% include 'AgentBundle:TwitterStatus:list-row.html.twig' with {'hide_archive_tools': true, 'link_to_twitter': true} %}
+	</div>
+</article>

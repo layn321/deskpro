@@ -1,0 +1,447 @@
+{# Box Summary #}
+{{ dp_widgets(baseId, 'profile', 'summary', 'above', person_api) }}
+
+{% if person.summary|length or perms.edit %}
+	<div class="profile-box-container summary"
+		data-element-handler="DeskPRO.Agent.ElementHandler.FormSaver"
+		data-form-save-url="{{ path('agent_people_ajaxsave', {'person_id': person.id}) }}"
+	>
+		<header>
+			{% if perms.edit %}
+				<div class="controls">
+					<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+					<div class="saved" style="display: none">{{ phrase('agent.general.saved') }}</div>
+					<div class="save" style="display: none">{{ phrase('agent.general.save') }}</div>
+				</div>
+			{% endif %}
+			{{ dp_widget_tabs_header(baseId, 'profile', 'summary', {
+				(baseId ~ '_summary_body'): phrase('agent.general.summary')
+			}) }}
+		</header>
+		<section id="{{baseId}}_summary_body">
+			<input type="hidden" name="action" value="set-summary" />
+			<div class="textarea-section"><textarea class="integrated" id="{{baseId}}_summary" name="summary" {% if not perms.edit %}onkeydown="return false;"{% endif %}>{{ person.summary }}</textarea></div>
+		</section>
+		{{ dp_widget_tabs(baseId, 'profile', 'summary', 'section', person_api) }}
+	</div>
+{% endif %}
+
+{{ dp_widgets(baseId, 'profile', 'summary', 'below', person_api) }}
+{# /Box Summary #}
+
+{# Properties Box #}
+{{ dp_widgets(baseId, 'profile', 'properties', 'above', person_api) }}
+
+<div class="profile-box-container properties" id="{{baseId}}_properties_box">
+	<header>
+		{% if perms.edit %}
+			<div class="controls">
+				<span class="edit-gear prop-edit-trigger"></span>
+				<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+				<button class="cancel" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+				<button class="save" style="display: none">{{ phrase('agent.general.save') }}</button>
+			</div>
+		{% endif %}
+		{{ dp_widget_tabs_header(baseId, 'profile', 'properties', {
+			(baseId ~ '_properties_body'): phrase('agent.general.properties')
+		}) }}
+	</header>
+	<section id="{{baseId}}_properties_body">
+		<div class="table-list" id="{{baseId}}_custom_fields_rendered">
+			{% include 'AgentBundle:Person:view-customfields-rendered-rows.html.twig' %}
+		</div>
+		{% if perms.edit %}
+		<div class="table-list" id="{{baseId}}_custom_fields_editable" style="display: none">
+			{% include 'AgentBundle:Person:view-customfields-edit-rows.html.twig' %}
+		</div>
+		{% endif %}
+	</section>
+	{{ dp_widget_tabs(baseId, 'profile', 'properties', 'section', person_api) }}
+</div>
+
+{{ dp_widgets(baseId, 'profile', 'properties', 'below', person_api) }}
+{# /Properties Box #}
+
+{# Interaction Tabs #}
+{{ dp_widgets(baseId, 'profile', 'interactions', 'above', person_api) }}
+
+{% if person_tickets_count or person_chats_count or person_charges %}
+<div class="profile-box-container tabbed">
+	<header>
+		<nav>
+			<ul>
+				{% if person_tickets_count %}<li data-tab-for="#{{baseId}}_tickets_tab" class="on">{{ phrase('agent.general.tickets') }} <span class="count">{{ person_tickets_count }}</span></li>{% endif %}
+				{% if person_chats_count %}<li data-tab-for="#{{baseId}}_chats_tab">{{ phrase('agent.general.chats') }} <span class="count">{{ person_chats_count }}</span></li>{% endif %}
+				{% if person_charges %}<li data-tab-for="#{{baseId}}_billing_tab">Billing <span class="count">{{ person_charge_totals.count }}</span></li>{% endif %}
+				{% for widget in dp_widgets_raw('profile', 'interactions', 'tab') %}
+					<li data-tab-for="#{{ dp_widget_id(baseId, widget) }}">{{widget.title|raw}}</li>
+				{% endfor %}
+			</ul>
+		</nav>
+	</header>
+	<section>
+		{# Tickets Tab #}
+		{% if person_tickets_count %}
+		<article id="{{baseId}}_tickets_tab" class="on">
+			<table class="tickets-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody id="{{baseId}}_tickets_initial">
+					{% for ticket in person_tickets_initial %}
+						<tr>
+							<td>
+								<div class="fade-container">
+									<div class="line">
+										<a data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': ticket.id}) }}" data-route-title="@text"><span class="id-number">#{{ ticket.id }}</span> {{ticket.subject}}</a>
+									</div>
+									<div class="bound-fade"></div>
+								</div>
+							</td>
+							<td {% if not ticket.agent %}colspan="2"{% endif %}>
+								<div class="status-pill status urgency-{{ ticket.urgency }} {{ ticket.status_code|replace({'.': '_'}) }}" style="float: right; position: relative; top: 0px;">
+									<label>{{ phrase('agent.tickets.status_' ~ ticket.status_code|replace({'.': '_'})) }}</label>
+									{% if ticket.status == 'awaiting_agent' %}<i class="ticket-urgency" data-urgency="{{ ticket.urgency }}">{{ ticket.urgency }}</i>{% endif %}
+								</div>
+							</td>
+							{% if ticket.agent %}
+								<td width="16" style="width: 16px; padding:0; padding-right: 4px;">
+									<span
+										class="tipped"
+										title="{{ ticket.agent.display_name }}"
+										style="background: url('{{ ticket.agent.getPictureUrl(16) }}') no-repeat 0 50%; height: 16px; width: 16px; overflow: hidden; display: block;"
+									></span>
+								</td>
+							{% endif %}
+						</tr>
+					{% endfor %}
+					{% if person_tickets|length %}
+						{% if person_tickets|length >= 250 %}
+							<tr class="more" >
+								<td colspan="100">
+									<button class="clean-white" data-route="listpane:{{ path('agent_ticketsearch_runcustomfilter') }}?search_person_id={{ person.id }}">
+										{{ phrase('agent.general.view_all_x_tickets', {'count':person_tickets_count}) }}
+									</button>
+								</td>
+							</tr>
+						{% else %}
+							<tr class="more" >
+								<td colspan="100">
+									<button class="clean-white" id="{{baseId}}_tickets_viewall">
+										{{ phrase('agent.general.view_all_x_tickets', {'count':person_tickets_count}) }}
+									</button>
+								</td>
+							</tr>
+						{% endif %}
+					{% endif %}
+				</tbody>
+				{% if person_tickets|length <= 250 %}
+					<tbody id="{{baseId}}_tickets_rest" style="display: none;">
+						{% for ticket in person_tickets %}
+							<tr>
+								<td>
+									<div class="fade-container">
+										<div class="line">
+											<a data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': ticket.id}) }}" data-route-title="@text"><span class="id-number">#{{ ticket.id }}</span> {{ticket.subject}}</a>
+										</div>
+										<div class="bound-fade"></div>
+									</div>
+								</td>
+								<td {% if not ticket.agent %}colspan="2"{% endif %}>
+									<div class="status-pill status urgency-{{ ticket.urgency }} {{ ticket.status_code|replace({'.': '_'}) }}" style="float: right; position: relative; top: 0px;">
+										<label>{{ phrase('agent.tickets.status_' ~ ticket.status_code|replace({'.': '_'})) }}</label>
+										{% if ticket.status == 'awaiting_agent' %}<i class="ticket-urgency" data-urgency="{{ ticket.urgency }}">{{ ticket.urgency }}</i>{% endif %}
+									</div>
+								</td>
+								{% if ticket.agent %}
+									<td width="16" style="width: 16px; padding:0; padding-right: 4px;">
+										<span
+											class="tipped"
+											title="{{ ticket.agent.display_name }}"
+											style="background: url('{{ ticket.agent.getPictureUrl(16) }}') no-repeat 0 50%; height: 16px; width: 16px; overflow: hidden; display: block;"
+										></span>
+									</td>
+								{% endif %}
+							</tr>
+						{% endfor %}
+					</tbody>
+				{% endif %}
+			</table>
+		</article>
+		{% endif %}
+		{# /Tickets Tab #}
+
+		{% if person_chats_count %}
+		<article id="{{baseId}}_chats_tab">
+			<table class="tickets-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+					{% for chat in person_chats %}
+						<tr>
+							<td>
+								<div class="fade-container">
+									<div class="line">
+										{{ chat.date_created|date('day_short') }}
+										<a data-route="page:{{ path('agent_userchat_view', {'conversation_id': chat.id}) }}" data-route-notabreload="1" data-route-title="@text">{{ chat.getSubjectLine() }}</a>
+									</div>
+									<div class="bound-fade"></div>
+								</div>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</article>
+		{% endif %}
+
+		{% if person_charges %}
+		<article id="{{baseId}}_billing_tab">
+			<table class="tickets-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+			{% for charge in person_charges %}
+				{% include 'AgentBundle:Common:billing-row-simple.html.twig' %}
+			{% endfor %}
+			<tr>
+				<th colspan="2">
+					Totals:
+					{{ person_charge_totals.count }} charges &bull;
+					{% if person_charge_totals.charge_time %}{{ person_charge_totals.charge_time|time_length }}{% if person_charge_totals.charge %} &bull; {% endif %}{% endif %}
+					{% if person_charge_totals.charge %}{{ person_charge_totals.charge|number_format(2) }} {{ app.getSetting('core_tickets.billing_currency') }}{% endif %}
+				</th>
+			</tr>
+			</table>
+		</article>
+		{% endif %}
+
+		{{ dp_widget_tabs(baseId, 'profile', 'interactions', 'article', person_api) }}
+	</section>
+</div>
+{% endif %}
+
+{{ dp_widgets(baseId, 'profile', 'interactions', 'below', person_api) }}
+{# /Interaction Tabs #}
+
+{# Info Tabs #}
+{{ dp_widgets(baseId, 'profile', 'info', 'above', person_api) }}
+
+<div class="profile-box-container tabbed">
+	<header>
+		<nav>
+			<ul>
+				{% if notes|length or perms.notes %}<li data-tab-for="#{{baseId}}_notes_tab" class="on">{{ phrase('agent.general.notes') }} <span class="count" id="{{baseId}}_notes_count">{{ notes|length }}</span></li>{% endif %}
+				{% if activity_stream|length %}<li data-tab-for="#{{baseId}}_activity_tab">{{ phrase('agent.general.activity_stream') }}</li>{% endif %}
+				<li data-tab-for="#{{baseId}}_tracking_tab">{{ phrase('agent.general.detail') }}</li>
+				{% for widget in dp_widgets_raw('profile', 'info', 'tab') %}
+					<li data-tab-for="#{{ dp_widget_id(baseId, widget) }}">{{widget.title|raw}}</li>
+				{% endfor %}
+			</ul>
+		</nav>
+	</header>
+	<section>
+		{# Notes Tab #}
+		{% if notes|length or perms.notes %}
+			<article id="{{baseId}}_notes_tab" class="on">
+				<div class="notes-wrap">
+					<ul>
+						{% for note in notes|reverse %}
+							{% include 'AgentBundle:Person:note-li.html.twig' with {'note': note} %}
+						{% endfor %}
+						{% if perms.notes %}
+							<li class="new-note"
+								data-element-handler="DeskPRO.Agent.ElementHandler.FormSaver"
+								data-form-list-selector="ul"
+								data-form-result-html-key="note_li_html"
+								data-form-save-url="{{ path('agent_people_ajaxsave_note', {'person_id': person.id}) }}"
+								data-form-count-el="#{{baseId}}_notes_count"
+							>
+								<header>
+									<div class="controls">
+										<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+										<div class="saved" style="display: none">{{ phrase('agent.general.saved') }}</div>
+										<div class="save" style="display: none">{{ phrase('agent.general.save') }}</div>
+									</div>
+									<h3>{{ phrase('agent.general.new_note') }}</h3>
+								</header>
+								<div class="textarea-section"><textarea class="integrated" name="note" placeholder="" data-not-blank="1"></textarea></div>
+							</li>
+						{% endif %}
+					</ul>
+				</div>
+			</article>
+		{% endif %}
+		{# /Notes Tab #}
+
+		{# Activity Tab #}
+		{% if activity_stream|length %}
+		<article id="{{baseId}}_activity_tab">
+			<table class="tickets-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+				{% for action in activity_stream %}
+					<tr>
+						<td>
+							<div class="fade-container">
+								<div {% if action.action_type != 'agent_login_as' %}class="line"{% endif %}>
+									<span class="what">
+										{% if action.action_type == 'registered' %}
+											{{ phrase('agent.people.act_reg') }}
+										{% elseif action.action_type == 'new_ticket' %}
+											{{ phrase('agent.people.act_submitted_ticket') }}
+											<a class="with-route" data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': action.details.ticket_id }) }}">
+												{{ action.details.subject }}
+												{{ action.details.subject }}
+											</a>
+										{% elseif action.action_type == 'new_chat' %}
+											Created a chat:
+											{% set chat = person_chats[action.details.convo_id] %}
+											<a data-route="page:{{ path('agent_userchat_view', {'conversation_id': chat.id}) }}" data-route-notabreload="1" data-route-title="@text">{{ chat.getSubjectLine() }}</a>
+										{% elseif action.action_type == 'new_ticket_reply' %}
+											{{ phrase('agent.people.act_replied_ticket') }}
+											<a class="with-route" data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': action.details.ticket_id }) }}">
+												{{ action.details.subject }}
+											</a>
+										{% elseif action.action_type == 'agent_login_as' %}
+											Agent logged in as this user:<br/>
+											<span style="font-size: 10px;">#{{ action.details.agent_id }} {{ action.details.agent_name }} ({{ action.details.agent_email }})</span>
+										{% endif %}
+									</span>
+								</div>
+								<div class="bound-fade"></div>
+							</div>
+							<time class="timeago" datetime="{{ action.date_created|date('c', 'UTC') }}">{{ action.date_created|date('day') }}</time>
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</article>
+		{% endif %}
+		{# /Activity Tab #}
+
+		{# Tracking Tab #}
+		<article id="{{baseId}}_tracking_tab">
+			<table class="info-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td class="label" width="80">{{ phrase('agent.general.id') }}</td>
+					<td class="value">
+						{{ person.id }}
+					</td>
+				</tr>
+				<tr>
+					<td class="label" width="80">{{ phrase('agent.general.created') }}</td>
+					<td class="value">
+						<time>{{person.date_created|date('fulltime')}}</time>
+						(<time class="timeago" datetime="{{person.date_created|date('c', 'UTC')}}"></time>)
+					</td>
+				</tr>
+				<tr>
+					<td class="label">{{ phrase('agent.people.creation_by') }}</td>
+					<td class="value">
+						{% if person.creation_system == 'web.person' %}
+							{{ phrase('agent.people.reg_website') }}
+						{% elseif person.creation_system == 'web.agent' %}
+							{{ phrase('agent.people.reg_agent') }}
+						{% elseif person.creation_system == 'gateway.person' %}
+							{{ phrase('agent.people.reg_gateway') }}
+						{% else %}
+							{{ person.creation_system }}
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">{{ phrase('agent.general.last_login') }}</td>
+					<td class="value">
+						{% if person.date_last_login %}
+							<time>{{person.date_last_login|date('fulltime')}}</time>
+							(<time class="timeago" datetime="{{person.date_last_login|date('c', 'UTC')}}"></time>)
+						{% else %}
+							{{ phrase('agent.general.never') }}
+						{% endif %}
+					</td>
+				</tr>
+				{% if session %}
+					<tr>
+						<td class="label">{{ phrase('agent.general.online_now') }}</td>
+						<td class="value">
+							<time>{{session.date_created|date('fulltime')}}</time>
+							(<time class="timeago" datetime="{{session.date_created|date('c', 'UTC')}}"></time>)
+						</td>
+					</tr>
+					<tr>
+						<td class="label">{{ phrase('agent.general.last_activity') }}</td>
+						<td class="value">
+							<time>{{session.date_last|date('fulltime')}}</time>
+							(<time class="timeago" datetime="{{session.date_last|date('c', 'UTC')}}"></time>)
+							on page <em class="short-url-prev tipped" title="{{ session.visitor.last_track.page_url }}">{{ session.visitor.last_track.page_url|url_domain }}</em>
+					</tr>
+					<tr>
+						<td class="label">{{ phrase('agent.general.landing_page') }}</td>
+						<td class="value">
+							{{ phrase('agent.people.user_landed_on_page') }}
+							<em class="short-url-prev tipped" title="{{ session.visitor.initial_track.page_url }}">{{ session.visitor.initial_track.page_url|url_domain }}</em>
+							{% if session.visitor.visit_track.ref_page_url %}
+								{{ phrase('agent.people.and_came_from') }}
+								<em class="short-url-prev tipped" title="{{ session.visitor.visit_track.ref_page_url }}">{{ session.visitor.visit_track.ref_page_url|url_domain }}</em>
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<td class="label">{{ phrase('agent.general.ip_address') }}</td>
+						<td class="value">
+							{{ session.visitor.ip_address }}
+						</td>
+					</tr>
+					<tr>
+						<td class="label">{{ phrase('agent.general.browser_agent') }}</td>
+						<td class="value">
+							{{ session.visitor.last_track.user_agent }}
+						</td>
+					</tr>
+				{% elseif visitor %}
+					<tr>
+						<td class="label">{{ phrase('agent.general.last_activity') }}</td>
+						<td class="value">
+							<time>{{visitor.date_last|date('fulltime')}}</time>
+							(<time class="timeago" datetime="{{visitor.date_last|date('c', 'UTC')}}"></time>)
+							on page <em class="tipped" title="{{ visitor.last_track.page_url }}">...</em>
+					</tr>
+					<tr>
+						<td class="label">{{ phrase('agent.general.landing_page') }}</td>
+						<td class="value">
+							{{ phrase('agent.people.user_landed_on_page') }}
+							<em class="tipped" title="{{ visitor.initial_track.page_url }}">...</em>
+							{% if visitor.visit_track.ref_page_url %}
+								{{ phrase('agent.people.and_came_from') }}
+								<em class="tipped" title="{{ visitor.visit_track.ref_page_url }}">...</em>
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<td class="label">{{ phrase('agent.general.ip_address') }}</td>
+						<td class="value">
+							{{ visitor.ip_address }}
+						</td>
+					</tr>
+					<tr>
+						<td class="label">{{ phrase('agent.general.browser_agent') }}</td>
+						<td class="value">
+							{{ visitor.last_track.user_agent }}
+						</td>
+					</tr>
+				{% endif %}
+				<tr>
+					<td class="label">Auto-responder?</td>
+					<td class="value">
+						<select id="{{baseId}}_disable_autoresponses">
+							<option value="0" {% if not person.disable_autoresponses %}selected="selected"{% endif %}>{{ phrase('agent.people.user_not_autoresponder') }}</option>
+							<option value="1" {% if person.disable_autoresponses %}selected="selected"{% endif %}>{{ phrase('agent.people.user_is_autoresponder') }}</option>
+						</select>
+						{% if person.disable_autoresponses and person.disable_autoresponses_log %}
+							<div style="font-size:10px;" id="{{ baseId }}_disable_autoresponses_reason">
+								{{ person.disable_autoresponses_log }}
+							</div>
+						{% endif %}
+					</td>
+				</tr>
+			</table>
+		</article>
+		{# /Tracking Tab #}
+
+		{{ dp_widget_tabs(baseId, 'profile', 'info', 'article', person_api) }}
+	</section>
+</div>
+
+{{ dp_widgets(baseId, 'profile', 'info', 'below', person_api) }}
+{# /Info Tabs #}

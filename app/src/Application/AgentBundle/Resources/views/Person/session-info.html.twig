@@ -1,0 +1,46 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Basic';
+</script>
+<div class="profile layout-content with-scrollbar">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+
+<table class="list" cellspacing="0" width="100%">
+	<tr class="white line-1">
+		<td width="120">{{ phrase('agent.general.landing_page') }}</td>
+		<td><input type="text" style="width: 90%" value="{{ session.visitor.initial_track.page_url }}" /></td>
+	</tr>
+	<tr class="white line-1">
+		<td>{{ phrase('agent.general.current_page') }}</td>
+		<td><input type="text" style="width: 90%" value="{{ session.visitor.last_track.page_url }}" /></td>
+	</tr>
+	<tr class="white line-1">
+		<td>{{ phrase('agent.general.referrer') }}</td>
+		<td><input type="text" style="width: 90%" value="{{ session.visitor.visit_track.ref_page_url }}" /></td>
+	</tr>
+	<tr class="white line-1">
+		<td>{{ phrase('agent.general.initial_visit') }}</td>
+		<td>{{ session.visitor.date_created|date('Y-m-d H:i:s') }}</td>
+	</tr>
+	<tr class="white line-1">
+		<td>{{ phrase('agent.general.session_started') }}</td>
+		<td>{{ session.date_created|date('Y-m-d H:i:s') }}</td>
+	</tr>
+	<tr class="white line-1">
+		<td>{{ phrase('agent.general.last_activity') }}</td>
+		<td>{{ session.visitor.date_last|date('Y-m-d H:i:s') }}</td>
+	</tr>
+	<tr class="white line-1">
+		<td>{{ phrase('agent.general.ip_address') }}</td>
+		<td>
+			{% if session.visitor.ip_address %}
+				<img src="http://api.hostip.info/flag.php?ip=12.215.42.19" border="0" width="53" height="27" align="left" style="padding-right: 8px;" />
+			{% endif %}
+			{{ session.visitor.ip_address }}
+		</td>
+	</tr>
+	<tr class="white line-1">
+		<td>{{ phrase('agent.general.browser_agent') }}</td>
+		<td>{{ session.visitor.last_track.user_agent }}</td>
+	</tr>
+</table>

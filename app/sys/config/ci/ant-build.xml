@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="deskpro" basedir="." default="build">
+	<target name="build" depends="get-new,php-documentor,phpunit,phpcs,phpmd"></target>
+	<target name="get-new">
+		<exec executable="/bin/bash" dir="${basedir}"><arg line="update.sh"></arg></exec>
+	</target>
+	<target name="php-documentor">
+		<exec executable="phpdoc" dir="${basedir}/source">
+			<arg line="-ct type -ue on -t ${basedir}/build/api -tb /opt/phpUnderControl/data/phpdoc -o HTML:Phpuc:phpuc -i /appfiles/vendor/ -d ."></arg>
+		</exec>
+	</target>
+	<target name="phpunit">
+		<exec executable="phpunit" dir="${basedir}/source" failonerror="on">
+			<arg line="--log-junit ${basedir}/build/logs/junit.xml --coverage-clover ${basedir}/build/logs/phpunit.coverage.xml --coverage-html ${basedir}/build/coverage --bootstrap appfiles/sys/tests/bootstrap.php appfiles/sys/tests"></arg>
+		</exec>
+	</target>
+	<target name="phpcs">
+		<exec executable="phpcs" dir="${basedir}/source" output="${basedir}/build/logs/checkstyle.xml">
+			<arg line="--standard=appfiles/sys/config/ci/phpcs_ruleset.xml --report=checkstyle --extensions=php appfiles/src/Orb appfiles/src/Application"></arg>
+		</exec>
+	</target>
+	<target name="phpmd">
+		<exec executable="phpmd" dir="${basedir}/source">
+			<arg line="--suffixes 'php' 'appfiles/src/Orb,appfiles/src/Application' xml 'appfiles/sys/config/ci/phpmd_rules.xml'"></arg>
+		</exec>
+	</target>
+</project>

@@ -1,0 +1,20 @@
+{% extends 'UserBundle::layout.html.twig' %}
+{% block content %}
+<div class="dp-error-page">
+	<div class="dp-content-block">
+		<div class="dp-box">
+			<div class="dp-box-content-wrapper">
+				<div class="dp-box-content">
+					<p>
+						{{ phrase('user.profile.email_validate_exists') }}
+					</p>
+
+					<p>
+						{{ phrase('user.profile.email_validate_exists', {'link_url': path('user_tickets_new')}) }}
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

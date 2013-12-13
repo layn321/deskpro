@@ -1,0 +1,7 @@
+{% for part in participants %}
+	{% if not part.person.is_agent %}
+		<li class="person person-{{part.person.id}}" data-person-id="{{part.person.id}}">
+			<img src="{{ part.person.getPictureUrl(15) }}" width="15" height="15" /> {{ part.email_address }}
+		<li>
+	{% endif %}
+{% endfor %}

@@ -1,0 +1,27 @@
+{% set this_page = 'feedback_cats' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li><a href="{{ path('admin_feedback_cats_edit', {'category_id': '0'}) }}">Create New Type</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>Feedback Types</li>
+</ul>
+{% endblock %}
+{% block content %}
+<div class="dp-page-box">
+
+<div class="page-content">
+	{{ design.structure_table({ 'save_order_url': path('admin_feedback_cats_updateorders') }) }}
+		{% for category in all_categories %}
+			{% include 'AdminBundle:Feedback:cats-row.html.twig' %}
+		{% endfor %}
+	{{ design.structure_table_end() }}
+</div>
+
+</div>
+{% endblock %}

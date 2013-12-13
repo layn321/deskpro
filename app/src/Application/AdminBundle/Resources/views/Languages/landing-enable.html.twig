@@ -1,0 +1,23 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<style type="text/css">#dp_admin_page { display: none; }</style>
+{% endblock %}
+{% block pagebar %}
+<ul>
+	<li>Languages</li>
+</ul>
+{% endblock %}
+{% block pagebar_after %}
+<div class="portal-toggle">
+	<a class="toggle-btn disabled" href="{{ path('admin_langs', {set_enable_languages: 1}) }}" style="margin-top: 24px;"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+	<h3>Language Support</h3>
+	<p>
+		The multi-lingual features of DeskPRO are currently disabled. If you want to have greater control over the
+		language used on your helpdesk you should enable this feature.
+	</p>
+	<p>
+		Once enabled, you will be able to install multiple language packs and modify the text phrases
+		used throughout the system.
+	</p>
+</div>
+{% endblock %}

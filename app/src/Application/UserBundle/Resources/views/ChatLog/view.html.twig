@@ -1,0 +1,117 @@
+{##
+ # The view chat page
+ ##}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_chatlogs') }}">{{ phrase('user.chat.log-title') }}</a></li>
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_chatlogs_view', {conversation_id: convo.id}) }}">{{ convo.getSubjectLine() }}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ convo.getSubjectLine() }}
+{% endblock %}
+{% block content %}
+
+<section class="dp-ticket dp-content-page dp-content-post">
+	<header>
+		<h3 style="margin-bottom: 0">{{ convo.getSubjectLine() }}</h3>
+		<ul class="dp-post-info">
+			<li class="dp-id"><i class="dp-icon-bookmark"></i> {{ phrase('user.chat.log_chat-id') }}: {{ convo.id }}</li>
+			<li class="dp-date"><i class="dp-icon-calendar"></i> {{ convo.date_created|date('fulltime') }}</li>
+		</ul>
+	</header>
+	<article class="dp-ticket-info">
+		<table class="dp-table dp-table-striped dp-table-bordered">
+			<tbody>
+				<tr>
+					<th>{{ phrase('user.chat.log_fields_department') }}</th>
+					<td>
+						{% if convo.department %}
+							{{ dp.full_title(convo.department) }}
+						{% else %}
+							{{ phrase('user.chat.log_no_department') }}
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{ phrase('user.chat.log_fields_agent') }}</th>
+					<td>
+						{% if convo.agent %}
+							{{ convo.agent.getDisplayNameUser() }}
+						{% else %}
+							{{ phrase('user.chat.log_unassigned') }}
+						{% endif %}
+					</td>
+				</tr>
+				{% for f in custom_fields %}
+					{% if convo.hasCustomField(f.field_def.id) %}
+						<tr>
+							<th>{{f.title}}</th>
+							<td>
+								{{ render_custom_field(f) }}
+							</td>
+						</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</article>
+	<article class="dp-messages-wrap">
+		<section class="dp-chat-log-box">
+			<table width="100%">
+				<tbody>
+					{% for message in convo_messages %}
+						{% if message.is_sys %}
+							<tr class="message-row sys-message">
+								<th class="author" width="10" nowrap="nowrap">*</th>
+								<td class="message">
+									{% if message.metadata.phrase_id %}
+										{% if message.is_html %}
+											{{ phrase('agent.userchat.'~ message.metadata.phrase_id, message.metadata, true) }}
+										{% else %}
+											{{ phrase('agent.userchat.'~ message.metadata.phrase_id, message.metadata) }}
+										{% endif %}
+									{% elseif message.is_html %}
+										{{message.content|raw}}
+									{% else %}
+										{{message.content}}
+									{% endif %}
+								</td>
+								<td class="time" width="10" nowrap="nowrap">{{ message.date_created|date('time') }}</td>
+							</tr>
+						{% elseif message.origin == 'agent' %}
+							<tr class="message-row agent-message">
+								<th class="author" width="10" nowrap="nowrap">
+									{{ message.getAuthorName() }}
+								</th>
+								<td class="message">
+									{% if message.is_html %}
+										{{message.content|raw}}
+									{% else %}
+										{{message.content}}
+									{% endif %}
+								</td>
+								<td class="time" width="10" nowrap="nowrap">{{ message.date_created|date('time') }}</td>
+							</tr>
+						{% else %}
+							<tr class="message-row user-message">
+								<th class="author" width="10" nowrap="nowrap">
+									{{ phrase('user.chat.log_message_author-you') }}
+								</th>
+								<td class="message">
+									{% if message.is_html %}
+										{{message.content|raw}}
+									{% else %}
+										{{message.content}}
+									{% endif %}
+								</td>
+								<td class="time" width="10" nowrap="nowrap">{{ message.date_created|date('time') }}</td>
+							</tr>
+						{% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</section>
+	</article>
+</section>
+
+{% endblock %}

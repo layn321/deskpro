@@ -1,0 +1,56 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('admin.general.mysql_status') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+{% if mysqlprocs %}
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left"> &nbsp; {{ phrase('agent.general.id') }}</th>
+				<th style="text-align:left"> &nbsp; {{ phrase('agent.general.user') }}</th>
+				<th style="text-align:left"> &nbsp; {{ phrase('admin.server.mysql_col_command') }}</th>
+				<th style="text-align:left"> &nbsp; {{ phrase('admin.server.mysql_col_time') }}</th>
+				<th style="text-align:left"> &nbsp; {{ phrase('admin.server.mysql_col_state') }}</th>
+				<th style="text-align:left"> &nbsp; {{ phrase('admin.server.mysql_col_info') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for info in mysqlprocs %}
+				<tr>
+					<td>{{ info.Id }}</td>
+					<td>{{ info.User }}@{{ info.Host }}/{{ info.db }}</td>
+					<td>{{ info.Command }}</td>
+					<td>{{ info.Time }}</td>
+					<td>{{ info.State }}</td>
+					<td>{{ info.Info }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+<br />
+{% endif %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left" width="50%">&nbsp; {{ phrase('admin.general.variable_name') }}</th>
+				<th style="text-align:left">&nbsp; {{ phrase('agent.general.value') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for name,value in mysqlstatus %}
+				<tr>
+					<td>{{ name }}</td>
+					<td>{{ value }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

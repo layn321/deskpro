@@ -1,0 +1,9 @@
+{% extends 'AdminBundle:Plugins:install_step.html.twig' %}
+{% block step_content %}
+	<form action="{{ path('admin_plugins_install_step', {'plugin_id': 'dp_highrise', 'step': 1}) }}" method="post">
+		<input type="hidden" name="process" value="1" />
+		Auth Key: <input type="text" name="api_auth_key" value="123" /><br />
+		URL: <input type="text" name="highrise_url" value="123" /><br />
+		<button class="dp-button">Install</button>
+	</form>
+{% endblock %}

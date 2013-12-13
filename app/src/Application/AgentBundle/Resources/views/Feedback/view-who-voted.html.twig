@@ -1,0 +1,57 @@
+<div class="overlay-title">
+	<h4>{{ phrase('agent.publish.who_voted') }}</h4>
+</div>
+
+<div class="overlay-content">
+	<div class="who-voted-controls">
+		<label>
+			<input type="checkbox" class="show-people" value="1" checked="checked" />
+			{{ phrase('agent.publish.who_voted_show_people') }}
+		</label>
+		&nbsp;&nbsp;
+		<label>
+			<input type="checkbox" class="show-guests" value="1" checked="checked" />
+			{{ phrase('agent.publish.who_voted_show_guests') }}
+		</label>
+	</div>
+
+	<div class="inner-box-tab-content box-list no-pad">
+	<table class="list general who-voted do-show-people do-show-guests" cellspacing="0" width="100%">
+		<thead>
+			<tr>
+				<th>{{ phrase('agent.publish.who_voted') }}</th>
+				<th>{{ phrase('agent.general.votes') }}</th>
+				<th width="100">{{ phrase('agent.general.date') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for vote in feedback_votes %}
+				<tr class="{% if vote.person %}type-person{% else %}type-guest{% endif %}">
+					<td>
+						{% if vote.person %}
+							<a class="with-route" data-route="page:{{ path('agent_people_view', {'person_id': vote.person.id}) }}">
+								{{ vote.person.display_name }}
+							</a>
+							{% if vote.person.primary_email_address %}
+								&lt;{{ vote.person.primary_email_address }}&gt;
+							{% endif %}
+						{% else %}
+							{{ phrase('agent.general.anonymous') }} ({{ vote.ip_address}})
+							{% if vote.name %}{{ vote.name }}{% endif %}
+							{% if vote.email %}{{ vote.email }}{% endif %}
+						{% endif %}
+					</td>
+					<td>{{ vote.num_votes }}</td>
+					<td><time class="timeago" datetime="{{ vote.date_created|date('c', 'UTC') }}">{{ vote.date_created|date('day_short') }}</time></td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="3" align="center">
+						{{ phrase('agent.publish.who_voted_none') }}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	</div>
+</div>

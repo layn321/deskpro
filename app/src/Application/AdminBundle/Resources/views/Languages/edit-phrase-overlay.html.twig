@@ -1,0 +1,25 @@
+<script type="text/x-deskpro-plain" id="change_phrase_overlay">
+	<div class="edit-phrase-overlay" style="width: 725px; height: 400px; display: none;">
+		<div class="overlay-title">
+			<span class="close-trigger close-overlay"></span>
+			<h4>{{ phrase('admin.languages.edit_phrase') }} <label class="phrase_id"></label></h4>
+		</div>
+		<div class="overlay-content">
+			<section class="phrase-section custom">
+				<header>
+					<h4>{{ phrase('admin.languages.your_phrase') }}</h4>
+				</header>
+				<article><textarea class="custom_phrase" name="custom_phrase"></textarea></article>
+			</section>
+			<section class="phrase-section master">
+				<header>
+					<h4>{{ phrase('admin.languages.default_deskpro_phrase') }}</h4>
+				</header>
+				<article><textarea class="master_phrase" name="master_phrase" readonly="readonly"></textarea></article>
+			</section>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white save-trigger">{{ phrase('admin.languages.save_your_phrase') }}</button>
+		</div>
+	</div>
+</script>

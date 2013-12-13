@@ -1,0 +1,141 @@
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+<script>
+{% if filter %}
+	{% if filter.sys_name %}
+		pageMeta.url_fragment = '{{ url_fragment('agent_ticketsearch_runnamedfilter', {'filter_name': filter.sys_name}) }}';
+	{% else %}
+		pageMeta.url_fragment = '{{ url_fragment('agent_ticketsearch_runfilter', {'filter_id': filter.id}) }}';
+	{% endif %}
+
+	pageMeta.filter_id = {{filter_id}};
+	pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TicketFilter';
+	{% set refresh_url %}{{ path('agent_ticketsearch_runfilter', {'filter_id': filter_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&view_name={{ view_name }}{% endset %}
+	pageMeta.refreshUrl = '{{ refresh_url }}';
+	pageMeta.viewTypeUrl = '{{ path('agent_ticketsearch_runfilter', {'filter_id': filter_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&view_type=$view_type&view_name={{ view_name }}';
+{% elseif sla_id %}
+	pageMeta.url_fragment = '{{ url_fragment('agent_ticketsearch_runsla', {'sla_id': sla_id, 'sla_status': sla_status}) }}';
+
+	pageMeta.sla_id = {{sla_id}};
+	pageMeta.sla_status = '{{ sla_status }}';
+	pageMeta.sla_filter = '{{ sla_filter }}';
+	pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TicketSla';
+	{% set refresh_url %}{{ path('agent_ticketsearch_runsla', {'sla_id': sla_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&view_name={{ view_name }}{% endset %}
+	pageMeta.refreshUrl = '{{ refresh_url }}';
+	pageMeta.viewTypeUrl = '{{ path('agent_ticketsearch_runsla', {'sla_id': sla_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&view_type=$view_type&view_name={{ view_name }}';
+{% else %}
+	pageMeta.cache_id = {{cache_id}};
+	pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TicketCustomFilter';
+	{% set refresh_url %}{{ path('agent_ticketsearch_runcustomfilter', {'cache_id': cache_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&view_name={{ view_name }}{% endset %}
+	pageMeta.refreshUrl = '{{ refresh_url }}';
+	pageMeta.viewTypeUrl = '{{ path('agent_ticketsearch_runcustomfilter', {'cache_id': cache_id}) }}?set_group_term={{ set_group_term }}&set_group_option={{ set_group_option }}&view_type=$view_type&view_name={{ view_name }}';
+{% endif %}
+
+pageMeta.saveListPrefsUrl = '{{ path('agent_ajax_save_prefs') }}';
+pageMeta.getMacroUrl = '{{ path('agent_ticketsearch_ajax_get_macro') }}?macro_id=$macro_id';
+pageMeta.deleteTicketUrl = '{{ path('agent_ticketsearch_ajax_delete_tickets') }}';
+pageMeta.viewTicketUrl = '{{ path('agent_ticket_view', {'ticket_id': '0000'})|replace({'0000': '$ticket_id'}) }}';
+pageMeta.loadFirst = {% if load_first %}true{% else %}false{% endif %};
+pageMeta.fetchResultsUrl = '{{ path('agent_ticketsearch_getpage', {'view_type': 'list', 'view_name': view_name}) }}';
+pageMeta.viewType = 'list';
+pageMeta.view_name = '{{ view_name }}';
+
+{% if not tickets %}
+	pageMeta.noResults = true;
+{% endif %}
+
+pageMeta.perPage = {{ per_page }};
+pageMeta.ticketResultIds = {{ ticket_ids|json_encode|raw }};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<section class="dp-overlay">
+	<header>
+		<div class="controls">
+			<a class="order-by-menu-trigger clean-white arrow menu-fitted">{{ phrase('agent.general.ordered_by') }} <span class="label order-by-{{ order_by[1] }}">{{ order_by_summary }}</span><em></em></a>
+			<a class="group-by-menu-trigger clean-white arrow menu-fitted">{{ phrase('agent.general.grouped_by') }} <span class="label">{{ grouping_summary|default(phrase('agent.general.none')) }}</span><em></em></a>
+			<a class="display-options-trigger clean-white">{{ phrase('agent.general.display_options') }}</a>
+		</div>
+
+		<ul style="display: none" class="order-by-menu">
+            <li data-order-by="urgency_asc" class="order-by-asc">{{ phrase('agent.general.urgency') }}</li>
+            <li data-order-by="urgency_desc" class="order-by-desc">{{ phrase('agent.general.urgency') }}</li>
+			<li data-order-by="date_created_asc" class="order-by-asc">{{ phrase('agent.general.date_opened') }}</li>
+			<li data-order-by="date_created_desc" class="order-by-desc">{{ phrase('agent.general.date_opened') }}</li>
+            {% if app.getSetting('core.use_ticket_priority') %}
+			<li data-order-by="priority_asc" class="order-by-asc">{{ phrase('agent.general.priority') }}</li>
+			<li data-order-by="priority_desc" class="order-by-desc">{{ phrase('agent.general.priority') }}</li>
+            {% endif %}
+			<li data-order-by="time_waiting_asc" class="order-by-asc">{{ phrase('agent.general.time_waiting') }}</li>
+			<li data-order-by="time_waiting_desc" class="order-by-desc">{{ phrase('agent.general.time_waiting') }}</li>
+			<li data-order-by="total_user_waiting_asc" class="order-by-asc">{{ phrase('agent.general.total_time_waiting') }}</li>
+			<li data-order-by="total_user_waiting_desc" class="order-by-desc">{{ phrase('agent.general.total_time_waiting') }}</li>
+		</ul>
+		<ul style="display: none" class="group-by-menu">
+			<li data-group-by="">{{ phrase('agent.general.none') }}</li>
+			<li data-group-by="department">{{ phrase('agent.general.department') }}</li>
+			{% if app.getSetting('core.use_ticket_category') %}<li data-group-by="category">{{ phrase('agent.general.category') }}</li>{% endif %}
+			{% if app.getSetting('core.use_ticket_category') %}<li data-group-by="priority">{{ phrase('agent.general.priority') }}</li>{% endif %}
+			{% if app.getSetting('core.use_ticket_workflow') %}<li data-group-by="workflow">{{ phrase('agent.general.workflow') }}</li>{% endif %}
+			{% if app.getSetting('core.use_product') %}<li data-group-by="product">{{ phrase('agent.general.product') }}</li>{% endif %}
+			<li data-group-by="organization">{{ phrase('agent.general.organization') }}</li>
+			<li data-group-by="language">{{ phrase('agent.general.language') }}</li>
+			<li data-group-by="urgency">{{ phrase('agent.general.urgency') }}</li>
+			<li data-group-by="agent">{{ phrase('agent.general.agent') }}</li>
+			{% if app.getSetting('core.use_agent_team') %}<li data-group-by="agent_team">{{ phrase('agent.general.agent_team') }}</li>{% endif %}
+			<li data-group-by="time_waiting">{{ phrase('agent.general.time_waiting') }}</li>
+			<li data-group-by="total_user_waiting">{{ phrase('agent.general.total_time_waiting') }}</li>
+			<li data-group-by="date_created">{{ phrase('agent.general.time_since_creation') }}</li>
+		</ul>
+
+		<span class="close close-trigger"></span>
+		<h1>{{ phrase('agent.general.tickets') }}</h1>
+	</header>
+	<article>
+		{% include 'AgentBundle:TicketSearch:filter-display-options-overlay.html.twig' with {show_all: 1 } %}
+
+		{% include 'AgentBundle:TicketSearch:filter-grouping-bar.html.twig' %}
+
+		<div class="table-result-list">
+			<table cellspacing="0" width="100%">
+				{% include 'AgentBundle:TicketSearch:part-results-list.html.twig' %}
+			</table>
+		</div>
+	</article>
+	<div class="full-loading" style="display: none">
+		<em>{{ phrase('agent.general.loading') }}</em>
+	</div>
+	<footer class="is-ticket-list bottom-action-bar">
+		<div class="check-count selection-bar">
+			{{ phrase('agent.general.x_selected', {'num_placeholder': '<span class="selected-count">0</span>'}, true) }}
+
+			<button class="clean-white perform-actions-trigger">
+				<span>{{ phrase('agent.general.perform_actions') }}</span>
+			</button>
+		</div>
+		<div class="pagecontrols results-nav">
+			<div class="cursor">
+				<a target="_blank" href="{{ refresh_url }}&view_type=csv&_rt={{ security_token('request_token', 10800) }}">
+					<button class="clean-white">
+						<span>{{ phrase('agent.tickets.export_to_csv') }}</span>
+					</button>
+				</a>
+				{% set phrase_part1 %}
+				<span class="results-showing-count" id="{{baseId}}_showing_count"></span>
+				{% endset %}
+				{% set phrase_part2 %}
+				<span class="results-total-count" id="{{baseId}}_total_count">{{ ticket_ids|length }}</span>
+				{% endset %}
+				{{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+			</div>
+			{% if ticket_ids|length > per_page %}
+				<ul class="pagenav no-prev">
+					<li class="prev"></li>
+					<li class="next"></li>
+				</ul>
+			{% endif %}
+		</div>
+
+		{% include 'AgentBundle:TicketSearch:filter-massactions-overlay.html.twig' %}
+	</footer>
+</section>

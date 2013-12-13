@@ -1,0 +1,21 @@
+{% extends 'AgentBundle:Common:display-options-layout.html.twig' %}
+{% block other_options %}
+	<div style="display: none">
+		<select name="order_by" class="sel-order-by">
+			<option class="date" value="article.date_created:desc">{{ phrase('agent.general.date_created_newestoldest') }}</option>
+			<option value="article.date_created:asc">{{ phrase('agent.general.date_created_oldestnewest') }}</option>
+			{# VIEW_COUNTER <option class="views" value="article.view_count:desc">{{ phrase('agent.publish.view_count_highest_lowest') }}</option> #}
+			{# VIEW_COUNTER <option value="article.view_count:asc">{{ phrase('agent.publish.view_count_lowest_highest') }}</option>#}
+		</select>
+	</div>
+{% endblock %}
+{% block display_elements_list %}
+	<li data-field="author"><label><input type="checkbox" name="author" {% if 'author' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.author') }}</label></li>
+	<li data-field="category"><label><input type="checkbox" name="category" {% if 'category' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.categories') }}</label></li>
+	<li data-field="date_created"><label><input type="checkbox" name="date_created" {% if 'date_created' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.date_created') }}</label></li>
+	<li data-field="num_comments"><label><input type="checkbox" name="num_comments" {% if 'num_comments' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.number_of_comments') }}</label></li>
+	<li data-field="labels"><label><input type="checkbox" name="labels" {% if 'labels' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.labels') }}</label></li>
+	<li data-field="rating"><label><input type="checkbox" name="rating" {% if 'rating' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.rating') }}</label></li>
+	<li data-field="rating_votes"><label><input type="checkbox" name="rating_votes" {% if 'rating' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.number_of_ratings') }}</label></li>
+	{# VIEW_COUNTER <li data-field="view_count"><label><input type="checkbox" name="view_count" {% if 'view_count' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.num_views') }}</label></li> #}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% if not depth %}
+<tbody>
+{% endif %}
+	<tr data-item-id="{{ category.id }}" class="depth-{{ depth|default(0) }} category category-{{category.id}} {% if category.parent %}is-sub parent-{{ category.parent.id }}{% endif %} {% if category.children|length %}has-children{% endif %}" data-category-id="{{category.id}}">
+		<td class="title">
+			<a href="{{ path('admin_feedback_cats_edit', {'category_id': category.id}) }}" class="edit-title">
+				{{category.title}}
+			</a>
+		</td>
+	</tr>
+	{% if category.children|length %}
+		{% for sub_cat in category.children %}
+			{% include 'AdminBundle:Feedback:cats-row.html.twig' with {'category': sub_cat, 'is_sub': true, 'depth': depth|default(0) + 1 } %}
+		{% endfor %}
+	{% endif %}
+{% if not depth %}
+</tbody>
+{% endif %}

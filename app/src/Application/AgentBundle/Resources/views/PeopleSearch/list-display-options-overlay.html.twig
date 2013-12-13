@@ -1,0 +1,33 @@
+{% extends 'AgentBundle:Common:display-options-layout.html.twig' %}
+{% block other_options %}
+	<div style="display: none">
+		{{ phrase('agent.general.order_by') }}: <select name="order_by" class="sel-order-by">
+			<option value="person.id:desc" class="date_created">{{ phrase('agent.general.date_created_newestoldest') }}</option>
+			<option value="person.id:asc">{{ phrase('agent.general.date_created_oldestnewest') }}</option>
+			<option value="person.name:asc" class="people_name">{{ phrase('agent.general.name_az') }}</option>
+			<option value="person.name:desc">{{ phrase('agent.general.name_za') }}</option>
+			<option value="people.date_last_login:desc" class="last_login">{{ phrase('agent.general.last_login_time') }}</option>
+			<option value="people.organization:asc" class="org">{{ phrase('agent.general.organization') }}</option>
+			<option value="people.num_tickets:desc" class="num_tickets">{{ phrase('agent.search.number_of_tickets') }}</option>
+		</select>
+	</div>
+{% endblock %}
+{% block display_elements_list %}
+	<li data-field="subject" {% if not show_all %}style="display: none"{% endif %}><label><input type="checkbox" name="name" {% if not show_all or 'name' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.name') }}</label></li>
+	<li data-field="email" {% if not show_all %}style="display: none"{% endif %}><label><input type="checkbox" name="email" {% if not show_all or 'email' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.email_address') }}</label></li>
+	<li data-field="org" {% if not show_all %}style="display: none"{% endif %}><label><input type="checkbox" name="org" {% if not show_all or 'org' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.organization') }}</label></li>
+	<li data-field="org_pos" {% if not show_all %}style="display: none"{% endif %}><label><input type="checkbox" name="org_pos" {% if not show_all or 'org_pos' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.position') }}</label></li>
+	{% if app.getUsersourceManager().getUsersources() %}
+		<li data-field="person_username"><label><input type="checkbox" name="person_username" {% if not show_all or 'person_username' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.username') }}</label></li>
+	{% endif %}
+
+	{% if app.languages.isMultiLang() %}
+		<li data-field="language"><input type="checkbox" name="language" {% if 'language' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.language') }}</li>
+	{% endif %}
+
+	<li data-field="labels"><input type="checkbox" name="labels" {% if 'labels' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.general.labels') }}</li>
+	<li data-field="num_tickets"><input type="checkbox" name="num_tickets" {% if 'num_tickets' in display_fields %}checked="checked"{% endif %} /> {{ phrase('agent.search.number_of_tickets') }}</li>
+	{% for f in person_field_defs %}
+		<li data-field="person_fields[{{f.id}}]"><input type="checkbox" name="person_fields[{{f.id}}]" {% if "person_fields[#{f.id}]" in display_fields %}checked="checked"{% endif %} /> {{f.title}}</li>
+	{% endfor %}
+{% endblock %}

@@ -1,0 +1,122 @@
+{% import 'DeskPRO:emails_common:layout-macros.html.twig' as layout %}
+{% set log_row %}
+	{% if log.action_type == 'free' %}
+		{{ log.details.message }}
+	{% elseif log.action_type == 'changed_agent' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.assigned_agent') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_agent_name|default(phrase('agent.general.unassigned'))}}</span>
+		{{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_agent_name|default(phrase('agent.general.unassigned'))}}</span>
+	{% elseif log.action_type == 'changed_agent_team' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.assigned_team') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_agent_team_name|default(phrase('agent.general.none'))}}</span>
+		{{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_agent_team_name|default(phrase('agent.general.none'))}}</span>
+	{% elseif log.action_type == 'participant_added' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.tickets.participant_added') }}</span>: <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.email}}</span>
+	{% elseif log.action_type == 'participant_removed' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.tickets.participant_removed') }}</span>: <span style="{{ layout.actiontext_style('old-val') }}">{{log.details.email}}</span>
+	{% elseif log.action_type == 'ticket_created' %}
+		{{ phrase('agent.general.ticket') }} <span style="{{ layout.actiontext_style('new-val') }}">ID {{log.details.ticket_id}}</span> {{ phrase('agent.tickets.lc_created') }}
+	{% elseif log.action_type == 'subject' %}
+		{{ phrase('agent.tickets.subject_changed_from') }} <span style="{{ layout.actiontext_style('old-val') }}">{{ log.details.old_subject }}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{ log.details.new_subject }}</span>
+	{% elseif log.action_type == 'ticket_split' %}
+		{{ phrase('agent.tickets.ticket_split_from') }} <span style="{{ layout.actiontext_style('old-val') }}">ID {{log.details.from_ticket_id}}</span>
+	{% elseif log.action_type == 'ticket_split_to' %}
+    	{{ phrase('agent.tickets.ticket_split_to') }} <span class="{{ layout.actiontext_style('old-val') }}">ID {{log.details.to_ticket_id}}</span> ({{ phrase('agent.tickets.x_messages_moved', {'count': log.details.messages_moved|default(0)}) }})
+	{% elseif log.action_type == 'merged' %}
+		{{ phrase('agent.general.ticket') }} <span style="{{ layout.actiontext_style('old-val') }}">ID {{log.id_before}}</span> {{ phrase('agent.tickets.merged_into_this') }}
+	{% elseif log.action_type == 'merged_message' %}
+		{{ phrase('agent.general.message') }} <span style="{{ layout.actiontext_style('old-val') }}">ID {{log.details.message_id}}</span> {{ phrase('agent.tickets.into_this_from_ticket', {'id':log.details.old_ticket_id}) }}
+	{% elseif log.action_type == 'merged_attach' %}
+		{{ phrase('agent.tickets.attachment') }} <span style="{{ layout.actiontext_style('old-val') }}">ID {{log.id_object}}</span> {{ phrase('agent.tickets.into_this_from_ticket', {'id':log.id_before}) }}
+	{% elseif log.action_type == 'labels_added' %}
+		Labels added: <span style="{{ layout.actiontext_style('new-val') }}">{{ log.details.labels|implode(', ') }}</span>
+	{% elseif log.action_type == 'labels_removed' %}
+		Labels removed: <span style="{{ layout.actiontext_style('new-val') }}">{{ log.details.labels|implode(', ') }}</span>
+	{% elseif log.action_type == 'changed_category' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.category') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_category_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_category_title|default(phrase('agent.general.department'))}}</span>
+	{% elseif log.action_type == 'changed_department' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.department') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_department_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_department_title|default(phrase('agent.general.organization'))}}</span>
+	{% elseif log.action_type == 'changed_language' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.language') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_language_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_language_title|default(phrase('agent.general.organization'))}}</span>
+	{% elseif log.action_type == 'changed_organization' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.organization') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_org_name|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_org_name|default(phrase('agent.general.none'))}}</span>
+	{% elseif log.action_type == 'changed_subject' %}
+		<span class="type">Subject</span> {{ phrase('agent.tickets.changed_from') }}
+		<span class="old-val">{{log.details.old_subject|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span class="new-val">{{log.details.new_subject|default(phrase('agent.general.none'))}}</span>
+	{% elseif log.action_type == 'changed_person' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('admin.api.user_owner') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">ID {{log.details.old_person_id}} {{old_person_name}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">ID {{log.details.new_person_id}} {{new_person_name}}</span>
+	{% elseif log.action_type == 'executed_triggers' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.ticket_triggers') }}</span> {{ phrase('agent.tickets.applied') }}:
+		<span style="{{ layout.actiontext_style('new-val') }}">{{ log.details.trigger_titles }}</span>
+	{% elseif log.action_type == 'executed_escalations' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.ticket_escalations') }}</span> {{ phrase('agent.tickets.applied') }}:
+		<span style="{{ layout.actiontext_style('new-val') }}">{{ log.details.trigger_titles }}</span>
+	{% elseif log.action_type == 'message_created' %}
+		<span style="{{ layout.actiontext_style('type') }}">
+			{% if log.details.is_agent_note %}
+				{{ phrase('agent.tickets.new_note') }}
+			{% else %}
+				{{ phrase('agent.tickets.new_message') }}
+			{% endif %}
+		</span>
+		{% if log.details.message_id %}<span style="{{ layout.actiontext_style('new-val') }}">ID {{log.details.message_id}}</span>{% endif %}
+		{% if log.details.ip_address %}
+		{{ phrase('agent.tickets.from_web', {'address':log.details.ip_address}) }}
+		{% endif %}
+		{% if log.details.email %}
+		{{ phrase('agent.tickets.from_email', {'address':log.details.email}) }}
+		{% endif %}
+	{% elseif log.action_type == 'message_removed' %}
+		{% if log.details.is_agent_note %}
+			<span class="{{ layout.actiontext_style('type') }}">Note deleted</span>
+		{% else %}
+			<span class="{{ layout.actiontext_style('type') }}">Message deleted</span>
+		{% endif %}
+		<span class="{{ layout.actiontext_style('old-val') }}l">ID {{log.details.message_id}}</span>
+		{% if log.details.is_agent_message %}
+			(written by agent {{ log.details.person_name }})
+		{% else %}
+			(written by {{ log.details.person_name }}, ID {{ log.details.person_id }})
+		{% endif %}
+	{% elseif log.action_type == 'changed_priority' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.priority') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_priority_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_priority_title|default(phrase('agent.general.workflow'))}}</span>
+	{% elseif log.action_type == 'changed_workflow' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.workflow') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_workflow_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_workflow_title|default(phrase('agent.general.urgency'))}}</span>
+	{% elseif log.action_type == 'changed_urgency' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.urgency') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_urgency}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_urgency}}</span>
+	{% elseif log.action_type == 'changed_product' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.product') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{log.details.old_product_title|default(phrase('agent.general.none'))}}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{log.details.new_product_title|default(phrase('agent.general.status'))}}</span>
+	{% elseif log.action_type == 'attach_added' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.tickets.new_attachment') }}</span> <span style="{{ layout.actiontext_style('new-val') }}">ID {{log.details.attach_id}} {{ log.details.filename }}</span>
+	{% elseif log.action_type == 'attach_removed' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.tickets.attachment_deleted') }}</span> <span style="{{ layout.actiontext_style('old-val') }}">ID {{log.details.old_attach_id}} {{ log.details.filename }}</span>
+		{% if log.details.message_id %}
+			from message <span class="{{ layout.actiontext_style('old-val') }}">ID {{log.details.message_id}}</span>
+			{% if log.details.message_person_name %}written by {{ log.details.message_person_name }}{% endif %}
+		{% endif %}
+	{% elseif log.action_type == 'changed_status' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ phrase('agent.general.status') }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{ phrase( 'agent.tickets.status_' ~ log.details.old_status|replace({'.': '_'})) }}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{ phrase( 'agent.tickets.status_' ~ log.details.new_status|replace({'.': '_'})) }}</span>
+	{% elseif log.action_type == 'changed_hold' %}
+		{% if log.details.is_hold %}Ticket put on hold{% else %}Ticket no longer on hold{% endif %}
+	{% elseif log.action_type == 'changed_custom_field' %}
+		<span style="{{ layout.actiontext_style('type') }}">{{ log.details.field_name }}</span> {{ phrase('agent.tickets.changed_from') }}
+		<span style="{{ layout.actiontext_style('old-val') }}">{{ log.details.value_before|default('(no value)') }}</span> {{ phrase('agent.tickets.changed_to') }} <span style="{{ layout.actiontext_style('new-val') }}">{{ log.details.value_after|default('(no value)') }}</span>
+	{% elseif hide_unknow%}
+		{{ log.action_type }}
+	{% endif %}
+{% endset %}
+{% if log_row|trim|length %}
+<div style="{{ layout.actiontext_style('row') }}">
+	&mdash; {{ log_row|raw }}
+</div>
+{% endif %}

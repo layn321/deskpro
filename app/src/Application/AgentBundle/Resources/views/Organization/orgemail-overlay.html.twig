@@ -1,0 +1,61 @@
+<div class="email-assoc-overlay mass-actions-overlay" data-overlay-apply-class="email-assoc-overlay">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.organizations.email_domain_assoc_title', {'name': org.name}) }}</h4>
+	</div>
+	<div class="overlay-content">
+
+		{% if org_email_domains|length %}
+		<div class="profile-box-container emails-exist">
+			<header>
+				<h4>{{ phrase('agent.organizations.email_domain_assoc') }}</h4>
+			</header>
+			<section>
+				<table class="tickets-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+					{% for domain in org_email_domains %}
+						<tr data-org-domain="{{ domain }}"><td>
+							<button class="clean-white small delete-button">{{ phrase('agent.general.delete') }}</button>
+							<button class="clean-white small cancel-delete-button" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+							<h3>{{ domain }}</h3>
+							{% if org_count_domain_nonmembers[domain] or org_count_domain_takenmembers[domain]  %}
+								<div class="controls-box move-controls">
+									<ul>
+										{% if org_count_domain_nonmembers[domain] %}
+											<li class="move-users">{{ phrase('agent.organizations.email_domain_assoc_move', {'count':org_count_domain_nonmembers[domain]}) }}</li>
+										{% endif %}
+										{% if org_count_domain_takenmembers[domain] %}
+											<li class="move-all-users">{{ phrase('agent.organizations.email_domain_assoc_move_all', {'count': org_count_domain_takenmembers[domain]}) }}</li>
+										{% endif %}
+									</ul>
+								</div>
+							{% endif %}
+							<div class="controls-box delete-controls" style="display: none">
+								<ul>
+									<li class="remove-email">{{ phrase('agent.organizations.email_domain_assoc_remove') }}</li>
+									{% if org_count_domain_members[domain] %}<li class="remove-email-users">
+										{{ phrase('agent.organizations.email_domain_assoc_remove_users', {'count': org_count_domain_members[domain]}) }}
+									</li>{% endif %}
+								</ul>
+							</div>
+						</td></tr>
+					{% endfor %}
+				</table>
+			</section>
+		</div>
+		{% endif %}
+
+		{# Box Summary #}
+		<div class="profile-box-container new">
+			<header>
+				<div class="controls">
+					<div class="save" style="display: none">{{ phrase('agent.general.add') }}</div>
+					<div class="saving" style="display: none">{{ phrase('agent.general.saving') }}</div>
+				</div>
+				<h4>{{ phrase('agent.organizations.email_domain_assoc_add') }}</h4>
+			</header>
+			<section>
+				<div class="textarea-section"><input type="text" class="integrated new-domain" value="" placeholder="" /></div>
+			</section>
+		</div>
+		{# /Box Summary #}
+	</div>
+</div>

@@ -1,0 +1,50 @@
+{% extends 'AgentBundle::layout-popup.html.twig' %}
+{% block content %}
+	<nav id="popup_top_tabbar">
+		<ul>
+			<li {% if type == 'normal' %}class="on"{% endif %}><a href="{{ path('agent_ticket_message_window', {ticket_id: ticket.id, message_id: message.id, type: 'normal', _rt: security_token('request_token', 10800)}) }}">{{ phrase('agent.tickets.normal_message') }}</a></li>
+			<li {% if type == 'raw' %}class="on"{% endif %}><a href="{{ path('agent_ticket_message_window', {ticket_id: ticket.id, message_id: message.id, type: 'raw', _rt: security_token('request_token', 10800)}) }}">{{ phrase('agent.tickets.raw_message') }}</a></li>
+			<li {% if type == 'raw2' %}class="on"{% endif %}><a href="{{ path('agent_ticket_message_window', {ticket_id: ticket.id, message_id: message.id, type: 'raw2', _rt: security_token('request_token', 10800)}) }}" onclick="return confirm('{{ phrase('agent.tickets.unsanitized_message_confirm') }}');">{{ phrase('agent.tickets.unsanitized_message') }}</a></li>
+			<li {% if type == 'source' %}class="on"{% endif %}><a href="{{ path('agent_ticket_message_window', {ticket_id: ticket.id, message_id: message.id, type: 'source', _rt: security_token('request_token', 10800)}) }}">{{ phrase('agent.general.source_code') }}</a></li>
+		</ul>
+	</nav>
+
+	{##################################################################################################################}
+	{% if type == 'normal' %}
+
+	<div style="background-color: #fff; padding: 10px;">
+		{% if message.message_full %}{{ message.message_full|raw }}{% else %}{{ message.message_html|raw }}{% endif %}
+	</div>
+
+	{##################################################################################################################}
+	{% elseif type == 'raw' or type == 'raw2' %}
+
+	<div style="background-color: #fff; padding: 10px;">
+		{{ message_raw|raw }}
+	</div>
+
+	{##################################################################################################################}
+	{% elseif type == 'source' %}
+
+	<div style="background-color: #fff; padding: 10px;">
+		{% if body_html %}
+			<strong>{{ phrase('agent.tickets.html_body') }}:</strong><br/>
+			<textarea style="width: 98%; height: 300px; font-family: Monaco, Consolas, monospace; font-size: 12px; color:#000;">{{ body_html }}</textarea>
+			<br/><br/>
+		{% endif %}
+
+		{% if body_text %}
+			<strong>{{ phrase('agent.tickets.text_body') }}:</strong><br/>
+			<textarea style="width: 98%; height: 300px; font-family: Monaco, Consolas, monospace; font-size: 12px; color:#000;">{{ body_text }}</textarea>
+			<br/><br/>
+		{% endif %}
+
+		{% if raw_source %}
+			<strong>{{ phrase('agent.tickets.full_email_source') }}:</strong><br/>
+			<textarea style="width: 98%; height: 300px; font-family: Monaco, Consolas, monospace; font-size: 12px; color:#000;">{{ raw_source }}</textarea>
+			<br/><br/>
+		{% endif %}
+	</div>
+
+	{% endif %}
+{% endblock %}

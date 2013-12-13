@@ -1,0 +1,12 @@
+<<li class="publish inside"
+	data-type="publish"
+	data-route="listpane:{{ path('agent_publish_validatingcomments') }}"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time></time>
+	<big>{{ phrase('agent.publish.new_comment_on', {name: comment.getObject().title }) }}</big>
+	<small>
+		{{ phrase('agent.publish.comment_by', {name: comment.getUserDisplayContact() }) }}
+		{% if comment.status == 'validating' %}({{ phrase('agent.general.requires_validation') }}){% endif %}
+	</small>
+</li>

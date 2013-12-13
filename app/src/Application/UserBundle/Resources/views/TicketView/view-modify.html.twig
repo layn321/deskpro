@@ -1,0 +1,108 @@
+{##
+ # The view ticket page
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	{% if is_participant %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+	{% else %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_organization') }}">{{ phrase('user.tickets.organization_tickets', {organization: ticket.organization.name}) }}</a></li>
+	{% endif %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}">{{ ticket.subject }}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ ticket.subject }} - {{ is_participant ? phrase('user.tickets.your_tickets') : phrase('user.tickets.organization_tickets', {organization: ticket.organization.name}) }}
+{% endblock %}
+{% block head %}
+<script type="text/javascript" src="{{ asset('/javascripts/DeskPRO/User/ElementHandler/EditTicket.js') }}"></script>
+<script type="text/javascript">
+var ticketReader = {
+	getCategoryId: function() {
+		var cat = $('select.category_id');
+		var catId = cat.val();
+
+		var subCat = $('.sub-options-category_id.sub-options-' + catId);
+		if (subCat.length) {
+			var subCatId = $('select', subCat).val();
+			return parseInt(subCatId) || 0;
+		}
+
+		return parseInt(catId) || 0;
+	},
+	getPriorityVal: function() {
+		var id = this.getPriorityId();
+		if (!id) {
+			return -999999999;
+		}
+
+		if (!window.DESKPRO_TICKET_PRI_MAP || !window.DESKPRO_TICKET_PRI_MAP[id]) {
+			return 0;
+		}
+
+		return parseInt(window.DESKPRO_TICKET_PRI_MAP[id]);
+	},
+	getPriorityId: function() {
+		var cat = $('select.priority_id');
+		var catId = cat.val();
+
+		var subCat = $('.sub-options-priority_id.sub-options-' + catId);
+		if (subCat.length) {
+			var subCatId = $('select', subCat).val();
+			return parseInt(subCatId) || 0;
+		}
+
+		return parseInt(catId) || 0;
+	},
+	getProductId: function() {
+		var cat = $('select.product_id');
+		var catId = cat.val();
+
+		var subCat = $('.sub-options-product_id.sub-options-' + catId);
+		if (subCat.length) {
+			var subCatId = $('select', subCat).val();
+			return parseInt(subCatId) || 0;
+		}
+
+		return parseInt(catId) || 0;
+	},
+	getOrganizationId: function() {
+		return {{ app.user.organization.id|default(0) }};
+	},
+	getWorkflow: function() {
+		return 0;
+	}
+};
+</script>
+<script type="text/javascript">
+{{ ticket_display_js|raw }}
+</script>
+<link rel="stylesheet" type="text/css" href="{{ asset('stylesheets/vendor/jquery-ui/portal-theme/jquery-ui.css') }}" />
+{% endblock %}
+{% block content %}
+<section class="dp-portal-section dp-new-ticket-section">
+	<article>
+		<form
+			action="{{ path('user_tickets_view', {ticket_ref: ticket.getPublicId(), edit: 1}) }}"
+			method="post"
+			id="dp_newticket_form"
+			enctype="multipart/form-data"
+			class="with-form-validator with-handler"
+			data-element-handler="DeskPRO.User.ElementHandler.EditTicket"
+		>
+			{{ form_token() }}
+			<input type="hidden" name="process" value="1" />
+
+			{#--- FIELDS CONTAINER ---#}
+			<div id="fields_container">
+				{# First time outputs items in order and visible depending on the page data #}
+				{% include 'UserBundle:NewTicket:field-list-loop.html.twig' with {'type': 'modify', 'page_data': default_page_data, 'mode': 'default', 'page_data_field_ids': page_data_field_ids }%}
+			</div>
+			{#--- FIELDS CONTAINER ---#}
+
+			<input class="dp-btn dp-btn-primary" type="submit" value="{{ phrase('user.tickets.submit') }}" />
+		</form>
+	</article>
+</section>
+
+{% endblock %}

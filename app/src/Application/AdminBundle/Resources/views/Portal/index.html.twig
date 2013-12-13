@@ -1,0 +1,114 @@
+{% set this_page = 'portal_editor' %}
+{% set body_class = 'portal_editor' %}
+{% set admin_page_class = 'with-top' %}
+{% extends 'AdminBundle:Portal:layout.html.twig' %}
+{% block html_head %}
+	<script src="{{ asset('vendor/colorpicker/js/colorpicker.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('vendor/colorpicker/js/eye.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('vendor/colorpicker/js/utils.js') }}" type="text/javascript"></script>
+	<link rel="stylesheet" href="{{ asset('vendor/colorpicker/css/colorpicker.css') }}" type="text/css" />
+{% endblock %}
+{% block page_nav_portal %}
+	{% if app.getSetting('user.portal_enabled') %}
+	<div style="text-align: center; padding-top: 4px;">
+		<button class="clean-white" id="portal_colors_trigger"><span>{{ phrase('admin.portal.color_editor') }}</span></button>
+	</div>
+	{% endif %}
+{% endblock %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('admin.general.portal') }}</li>
+	</ul>
+{% endblock %}
+{% block pagebar_after %}
+	<div class="portal-toggle">
+		{% if app.getSetting('user.portal_enabled') %}
+			<a class="toggle-btn" href="{{ path('admin_portal_toggle', {enable: '0'}) }}"><em>{{ phrase('admin.portal.click_to_disable') }}</em></a>
+		{% else %}
+		<a class="toggle-btn disabled" href="{{ path('admin_portal_toggle', {enable: '1'}) }}"><em>{{ phrase('admin.portal.click_to_enable') }}</em></a>
+		{% endif %}
+		<p>{{ phrase('admin.portal.warning_dont_want_public_site') }}</p>
+	</div>
+{% endblock %}
+{% block dp_full_page %}
+<div id="dp_fauxbrowser" style="height: 600px;"><div>
+	<div id="dp_fauxbrowser_top"><div><div>
+		<em class="address">{{ app.getSetting('core.deskpro_url') }}{{ portal_path }}</em>
+	</div></div></div>
+	<div id="dp_fauxbrowser_middle">
+		{% if viewing_page == 'new-ticket' %}
+			<div class="page-note">
+				Customize the fields to display and their order using the <a href="{{ path('admin_tickets_editor') }}">Ticket Layout Editor &rarr;</a>
+				<div class="shadow"></div>
+			</div>
+		{% endif %}
+	<div>
+
+{% include 'AdminBundle:Portal:portal-color-editor.html.twig' %}
+
+	{% if app.getSetting('user.portal_enabled') %}
+		<div
+			id="admin_portal_editor"
+			data-element-handler="DeskPRO.Admin.ElementHandler.PortalEditor"
+			{% if portal_path %}
+				data-portal-url="/{{ portal_path }}?admin_portal_controls=1"
+			{% else %}
+				data-portal-url="{{ app.request.getBaseUrl() }}/{{ portal_path }}?admin_portal_controls=1"
+			{% endif %}
+			data-url-update-orders="{{ path('admin_portal_updateblockorder') }}"
+			data-url-block-toggle="{{ path('admin_portal_blocktoggle', {pid: '_PID_'}) }}"
+		>
+			<div id="portal_iframe_loading"><h1>{{ phrase('admin.portal.loading_editor') }}</h1></div>
+			<iframe id="portal_iframe" frameborder="0" marginheight="0" marginwidth="0" scrolling="no" style="border:0;margin:0;padding:0;"></iframe>
+
+			<script type="text/x-deskpro-tmpl" id="admin_portal_block_html_edit_tpl">
+				<section class="dp-html-editor">
+					<div class="overlay-title">
+						<span class="close-overlay close-trigger"></span>
+						<h4>{{ phrase('admin.portal.edit_html') }}</h4>
+					</div>
+					<div class="overlay-content">
+						<textarea style="width: 98%; height: 98%; color: #000; size: 10px; font-family: Monaco, Consolas, monospace;"></textarea>
+					</div>
+					<div class="overlay-footer">
+						<button class="save-trigger clean-white">{{ phrase('agent.general.save') }}</button>
+					</div>
+				</section>
+			</script>
+
+			<script type="text/x-deskpro-tmpl" id="admin_portal_block_simple_html_edit_tpl">
+				<section class="dp-portal-simpleheader-editor">
+					<div class="overlay-title">
+						<span class="close-overlay close-trigger"></span>
+						<h4>Custom Sidebar Block</h4>
+					</div>
+					<div class="overlay-content">
+						<div class="text">
+							<div class="input-title"><input type="text" class="title" name="title" style="width: 65%; color: #000; size: 10px; font-family: Monaco, Consolas, monospace;" value="{{ title }}" placeholder="Enter a title here" /></div>
+							<div class="input-title">
+								<textarea rows="10" cols="60" style="width: 98%; color: #000; size: 10px; font-family: Monaco, Consolas, monospace;" name="content" class="content" placeholder="Enter the block contents heres">{{ content }}</textarea>
+							</div>
+						</div>
+					</div>
+					<div class="overlay-footer">
+						<button class="clean-white save-text-trigger">{{ phrase('agent.general.save') }}</button>
+					</div>
+				</section>
+			</script>
+		</div>
+	{% else %}
+		<div class="dp-page-box">
+			<div class="editor-disabled">
+				<p>
+                    {{ phrase('admin.portal.portal_is_disabled', {'url':app.getSetting('core.deskpro_url')}) }}
+				</p>
+				<p>
+                    {{ phrase('admin.portal.click_button_to_reenable_or_use_widgets', {'path':path('admin_tickets_editor')}) }}
+				</p>
+			</div>
+		</div>
+	{% endif %}
+	</div></div>
+	<div id="dp_fauxbrowser_bottom"><div><div></div></div></div>
+</div></div>
+{% endblock %}

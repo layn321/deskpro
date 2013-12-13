@@ -1,0 +1,29 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.MediaManagerPage.Browse';
+</script>
+<div class="manager-window-content">
+{% for blob in blobs %}
+	<div class="blob-row blob-{{blob.id}} {% if blob.isImage() %}is-image{% endif %}" data-blob-id="{{ blob.id }}">
+		{% if blob.isImage() %}
+			<img class="thumbnail" src="{{ blob.thumbnail_url }}" style="float: right; margin: 0 0 6px 6px" />
+		{% endif %}
+		<a href="{{ blob.download_url }}" class="tipped" target="_blank" title="Click to download">{{ blob.filename }}</a>
+		<br />
+		<button
+			class="clean-white insert-trigger"
+			data-download-url="{{ blob.download_url }}"
+			data-is-image="{% if blob.is_image %}1{% else %}0{% endif %}"
+			data-file-name="{{ blob.filename }}"
+			data-blob-id="{{ blob.id }}"
+		>{{ phrase('agent.general.insert_into_article') }}</button>
+		<button class="clean-white" onclick="prompt('', '{{ blob.download_url }}')">{{ phrase('agent.general.copy_url') }}</button>
+		{% if blob.isImage() %}
+			<br style="clear: both; height: 1px; overflow: hiden;" />
+		{% endif %}
+	</div>
+{% else %}
+	<p>
+		{{ phrase('agent.publish.no_uploads_yet') }}
+	</p>
+{% endfor %}
+</div>

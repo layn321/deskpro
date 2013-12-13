@@ -1,0 +1,20 @@
+{% extends 'AdminBundle:Plugins:install_step.html.twig' %}
+{% block step_content %}
+	<form action="{{ path('admin_plugins_install_step', {'plugin_id': 'dp_fbwidgets', 'step': 1}) }}" method="post">
+		<input type="hidden" name="process" value="1" />
+		Facebook Admins (comma separated): <input type="text" name="facebook_admins" value="123" /><br />
+
+		<h3>Like Button</h3>
+		Enable Facebook Like button? Yes<input type="radio" name="facebook_like" value="1" />
+		No<input type="radio" name="facebook_like" value="0" /><br />
+
+		{#
+			<h3>Comments</h3>
+			Enable Facebook comments? Yes<input type="radio" name="use_fb_comments" value="1" />
+			No<input type="radio" name="use_fb_comments" value="0" /><br />
+
+			Number of comments to load: <input type="text" name="facebook_comments_num_posts" value="25" /><br />
+			<button class="dp-button">Install</button>
+		#}
+	</form>
+{% endblock %}

@@ -1,0 +1,8 @@
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for comment_info in validating_comments %}
+		{% set info = comment_info.info %}
+		{% set comment = comment_info.obj %}
+
+		{% include 'AgentBundle:Publish:validating-comments-page-row.html.twig' %}
+	{% endfor %}
+</section>

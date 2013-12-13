@@ -1,0 +1,41 @@
+<article
+	class="content-message message-{{message.id}} {% if comment.status == 'agent' %}note-message{% elseif message.person.is_agent %}agent-message{% else %}user-message{% endif %} {% if comment.status == 'validating' %}validating{% endif %}"
+	data-comment-id="{{comment.id}}"
+	data-content-type="{{ comment.object_content_type }}"
+>
+	<div class="avatar">
+		<img
+			src="{% if comment.person %}{{ comment.person.getPictureUrl(40) }}{% else %}{{ path('serve_default_picture', {'s': 40}) }}{% endif %}"
+			alt="" width="40" height="40"
+		/>
+	</div>
+	<div class="content">
+		<header>
+			<span class="edit-gear comment-edit-btn"></span>
+			{% if comment_num %}
+				<span class="message-counter">#{{ comment_num }}</span>
+			{% endif %}
+			{% if comment.status == 'validating' or (comment.status == 'visible' and comment.is_reviewed == 0) %}<span class="comment-validate-btn count tipped" title="{{ phrase('agent.publish.validating_comment_manage_tip') }}">{{ phrase('agent.general.validate') }}</span>{% endif %}
+			{% if comment.person %}
+				<h4
+					class="with-route person-popover"
+					data-person-id="{{ comment.person.id }}"
+					data-route="page:{{ path('agent_people_view', {'person_id': comment.person.id}) }}"
+				>{{ comment.person.name }}</h4>
+			{% else %}
+				<h4>
+					{% if comment.name or comment.email %}
+						{% if comment.name %}{{ comment.name }}{% endif %}
+						{% if comment.email %}&lt;{{ comment.email }}&gt;{% endif %}
+					{% else %}
+						{{ phrase('agent.general.anonymous') }}
+					{% endif %}
+				</h4>
+			{% endif %}
+			<time class="timeago" datetime="{{comment.date_created|date('c', 'UTC')}}"></time>
+		</header>
+		<div class="body-text">
+			<div class="rendered-message">{{ comment.content_html|raw }}</div>
+		</div>
+	</div>
+</article>

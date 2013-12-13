@@ -1,0 +1,109 @@
+{% if not in_body %}
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+{% endif %}
+{% if app.isDebug() and (has_raw_assets is not defined or (has_raw_assets is defined and has_raw_assets)) %}
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+	{{ dp_asset_html('agent_interface_print_css', {'media':'print'}) }}
+
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+	{{ dp_asset_html('agent_deskpro_ui') }}
+	{{ dp_asset_html('agent_misc') }}
+	{{ dp_asset_html('agent_agent_ui') }}
+	{{ dp_asset_html('agent_window_sections') }}
+	{{ dp_asset_html('agent_settingswin') }}
+	{{ dp_asset_html('agent_pages') }}
+	{{ dp_asset_html('agent_pages_lists') }}
+	{{ dp_asset_html('agent_element_handlers') }}
+
+	{% if app.getBrowserSniffer().getBrowser() == 'Internet Explorer' %}{{ dp_asset_html('agent_interface_ie_css') }}{% endif %}
+
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+
+	<style type="text/css">
+		#dp_right_collapsed ul li span {
+			left: 22px;
+		}
+	</style>
+{% else %}
+	{{ dp_asset_html('agent') }}
+	{{ dp_asset_html('agent_vendor_out_css') }}
+	{{ dp_asset_html('agent_css1') }}
+	{{ dp_asset_html('agent_css2') }}
+	{{ dp_asset_html('agent_interface_print_css', {'media':'print'}) }}
+
+	<!--[if IE]>{{ dp_asset_html('agent_interface_ie_css') }}<![endif]-->
+{% endif %}
+
+{% if not no_interface_data %}
+	{% if app.isDebug() %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?nocache=1&v={{ security_token('lang') }}"></script>
+	{% else %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?v={{ app.getSetting('core.deskpro_build') }}"></script>
+	{% endif %}
+	<script src="{{ path('agent_interface_data_js') }}"></script>
+{% endif %}
+
+<link rel="stylesheet" href="{{ asset('fonts/font-awesome.min.css') }}" type="text/css" />
+
+<script type="text/javascript">
+	var DP_REQUEST_TOKEN = '{{ security_token('request_token', 10800) }}';
+
+	$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+
+		var url = options.url;
+		if (url.indexOf('?') == -1) {
+			url += '?';
+		} else {
+			url += '&';
+		}
+		url += '_rt=' + DP_REQUEST_TOKEN;
+
+		options.url = url;
+
+		// Auto-retry with network errors
+
+		options.numTries    = originalOptions.numTries || 3;
+		options.retryCodes  = originalOptions.retryCodes || [500, 502, 503];
+		options.tryNum      = originalOptions.tryNum || 1;
+
+		if (window.DP_DEBUG) {
+			options.retryCodes = [];
+		}
+
+		if (typeof originalOptions.numTries != 'undefined') {
+			options.numTries = originalOptions.numTries;
+		}
+
+		if (options.numTries > 1 && options.tryNum == 1) {
+			if (!originalOptions.error) {
+				options.realError = function() {};
+			} else {
+				if (originalOptions.context) {
+					options.realError = function(innerJqXhr, textStatus, httpError) { originalOptions.error.call(originalOptions.context, innerJqXhr, textStatus, httpError); };
+				} else {
+					options.realError = originalOptions.error;
+				}
+			}
+
+			options.error = function(innerJqXhr, textStatus, httpError) {
+				var retryable = false;
+
+				if (textStatus === "error" && options.retryCodes.indexOf(innerJqXhr.status) !== -1) {
+					retryable = true;
+				}
+
+				if (retryable && options.tryNum < options.numTries) {
+					options.tryNum++;
+					return $.ajax(options);
+				} else {
+					return options.realError(innerJqXhr, textStatus, httpError);
+				}
+			};
+		}
+
+		return options;
+	});
+</script>

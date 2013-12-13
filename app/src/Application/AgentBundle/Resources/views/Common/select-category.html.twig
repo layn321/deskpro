@@ -1,0 +1,11 @@
+{% include 'AgentBundle:Common:select-standard.html.twig' with {
+	'name': name,
+	'id': id,
+	'add_classname': 'category_id ' ~ add_classname,
+	'add_attr': add_attr,
+	'with_blank': with_blank,
+	'blank_title': blank_title,
+	'categories': categories,
+	'selected': selected,
+	'with_blank_value': with_blank_value|default('')
+} %}

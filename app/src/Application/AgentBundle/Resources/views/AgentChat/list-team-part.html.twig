@@ -1,0 +1,21 @@
+<section class="search-reuslts page-set" data-page="{{page}}">
+	{% for convo in conversations %}
+		<article
+			class="row-item convo-{{ convo.id }} without-selection"
+			data-convo-id="{{ convo.id }}"
+			data-route="page:{{ path('agent_agentchat_view', {'conversation_id': convo.id}) }}" data-route-title="@selector(a.subject)" data-route-openclass="open">
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="subject click-through">
+							{{ convo.agent_team.name }}
+						</a>
+					</h3>
+				</div>
+			</div>
+			<div class="userinfo general">
+				<time class="timeago" datetime="{{ convo.date_created|date('c', 'UTC') }}">{{ convo.date_created|date('day_short') }}</time>
+			</div>
+		</article>
+	{% endfor %}
+</section>

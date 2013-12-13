@@ -1,0 +1,27 @@
+<div class="search-form">
+	<form action="{{ path('agent_ticketsearch_runcustomfilter') }}" method="post" id="tickets_search_form">
+		<div class="search-terms"></div>
+		<div class="term"><span class="add-term">{{ phrase('agent.general.widget_add') }}</span> {{ phrase('agent.general.order_by') }}</div>
+		<div class="term">
+			{{ phrase('agent.general.order_by') }}
+			<select name="filter[order_by]">
+				<option value="ticket.date_created:desc">{{ phrase('agent.tickets.date_opened_newerolder') }}</option>
+				<option value="ticket.date_created:asc">{{ phrase('agent.tickets.date_opened_oldernewer') }}</option>
+				<option value="ticket.priority:desc">{{ phrase('agent.tickets.priority_highestlowest') }}</option>
+				<option value="ticket.priority:asc">{{ phrase('agent.tickets.priority_lowesthighest') }}</option>
+			</select>
+		</div>
+		<div class="term">
+			{{ phrase('agent.tickets.group_by') }}
+			<select name="filter[group_by]">
+				<option value="">{{ phrase('agent.tickets.no_grouping') }}</option>
+				{% for id,name in {'priority_id':phrase('agent.general.priority'), 'status':phrase('agent.general.search'), 'department_id':phrase('agent.general.search'), 'category_id':phrase('agent.general.search'), 'product_id':phrase('agent.general.search'), 'agent_id':phrase('agent.general.search'), 'agent_team_id':phrase('agent.general.search')} %}
+					<option value="{{id}}" {%if filter.group_by == id %}selected="selected"{%endif%}>{{name}}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<center><input type="submit" value="{{ phrase('agent.general.search') }}" /></center>
+	</form>
+</div>
+
+{% include 'DeskPRO:Common:ticket-search-criteria.html.twig' with { 'classname': 'search-builder-tpl"', 'term_options': ticket_options } %}

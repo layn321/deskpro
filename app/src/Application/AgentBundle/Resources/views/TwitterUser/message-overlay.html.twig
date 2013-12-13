@@ -1,0 +1,16 @@
+<div class="overlay twitter-message-overlay twitter-message-send">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.twitter.send_user_message_on_twitter', {name: '@'~user.screen_name}) }}</h4>
+	</div>
+
+	<div class="new-message overlay-content">
+		{% include 'AgentBundle:TwitterStatus:message-block.html.twig' with {
+			'account': account,
+			'default_type': 'public',
+			'default_text': '@' ~ user.screen_name ~ ' ',
+			'send_text': phrase('agent.twitter.send_tweet'),
+			'reply_form_extra': '<input type="hidden" name="user_id" value="' ~ user.id ~ '" />',
+			'hide_cancel': true
+		} %}
+	</div>
+</div>

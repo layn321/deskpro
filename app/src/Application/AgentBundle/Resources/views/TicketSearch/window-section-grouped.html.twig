@@ -1,0 +1,27 @@
+<nav id="ticket_grouping_options">
+	<ul>
+		<li><span class="mode-menu-trigger mode menu" data-mode="agent">{{ phrase('agent.tickets.your_tickets') }}</span></li>
+		<li><span class="grouping-menu-trigger menu grouping1" data-groupby="department_id">{{ phrase('agent.general.department') }}</span></li>
+		<li><span class="grouping-menu-trigger menu grouping2" data-groupby="">{{ phrase('agent.general.none') }}</span></li>
+	</ul>
+</nav>
+<section id="ticket_grouping_list">
+	<ul class="nav-list"></ul>
+</section>
+
+<ul id="overview_mode_menu" class="mode-menu" style="display:none">
+	<li data-mode="agent">{{ phrase('agent.tickets.your_tickets') }}</li>
+	<li data-mode="participant">{{ phrase('agent.tickets.subscribed_tickets') }}</li>
+	<li data-mode="agent_team">{{ phrase('agent.tickets.your_teams_tickets') }}</li>
+	<li data-mode="unassigned">{{ phrase('agent.tickets.filter_unassigned') }}</li>
+	<li data-mode="all">{{ phrase('agent.tickets.filter_all') }}</li>
+</ul>
+<ul id="overview_grouping_menu" class="grouping-menu" style="display:none">
+	<li data-groupby="none">{{ phrase('agent.general.none') }}</li>
+	<li data-groupby="department_id">{{ phrase('agent.general.department') }}</li>
+	{% if app.getSetting('core.use_ticket_category') %}<li data-groupby="category_id">{{ phrase('agent.general.category') }}</li>{% endif %}
+	{% if app.getSetting('core.use_ticket_priority') %}	<li data-groupby="priority_id">{{ phrase('agent.general.priority') }}</li>{% endif %}
+	{% if app.getSetting('core.use_product') %}<li data-groupby="product_id">{{ phrase('agent.general.product') }}</li>{% endif %}
+	<li data-groupby="agent_id">{{ phrase('agent.general.agent') }}</li>
+	{% if app.getSetting('core.use_ticket_workflow') %}<li data-groupby="workflow_id">{{ phrase('agent.general.workflow') }}</li>{% endif %}
+</ul>

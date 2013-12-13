@@ -1,0 +1,21 @@
+<table border="0" cellspacing="0" cellpadding="3">
+	<tr><td>
+		<div class="dp-author-row">
+			{% if show_author_email or person_id == message.person.id or not message.person.is_agent %}
+				{{ phrase('user.emails.ticket_message_title', { date: message.date_created|date('full'), time: message.date_created|date('time'), author: (is_to_agent ? message.person.display_name|e : message.person.display_name_user|e) ~ ' &lt;' ~ message.person.primary_email_address ~ '&gt;' }, true) }}
+			{% else %}
+				{{ phrase('user.emails.ticket_message_title', { date: message.date_created|date('full'), time: message.date_created|date('time'), author: (is_to_agent ? message.person.display_name|e : message.person.display_name_user|e) }, true) }}
+			{% endif %}
+		</div>
+	</td></tr>
+	<tr><td>
+		<table border="0" cellspacing="0" cellpadding="0" width="100%"><tr><td>
+			{% if message.person.is_agent %}
+				<div class="dp-quoted-message">{% include 'DeskPRO:emails_common:ticket-message-agent.html.twig' %}<!-- DP_MESSAGE_END --></div>
+			{% else %}
+				<div class="dp-quoted-message">{% include 'DeskPRO:emails_common:ticket-message.html.twig' %}<!-- DP_MESSAGE_END --></div>
+			{% endif %}
+		</td></tr></table>
+	</td></tr>
+</table>
+<div class="dp-spacer">&nbsp;</div>

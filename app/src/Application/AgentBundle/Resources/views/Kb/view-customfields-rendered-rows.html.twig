@@ -1,0 +1,8 @@
+{% for f in custom_fields %}
+	{% if f.hasValue %}
+		<dt class="">{{ f.title }}</dt>
+		<dd class="">
+			{{ render_custom_field(f) }}
+		</dd>
+	{% endif %}
+{% endfor %}

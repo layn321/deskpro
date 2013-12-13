@@ -1,0 +1,4 @@
+<input type="hidden" class="api-info" value="{{ widget.api_info|json_encode }}" />
+<input type="hidden" class="ticket-info" value="{{ {'subject': ticket.subject, 'id': ticket.id, 'viewUrl': 'example.com/'~ticket.id}|json_encode }}" />
+<input type="hidden" class="person-info" value="{{ {'display_name': person.display_name, 'id': person.id }|json_encode }}" />
+<button class="dp-button green send-trigger">{{ phrase('agent.tickets.announce_this_ticket_in_campfire') }}</button>

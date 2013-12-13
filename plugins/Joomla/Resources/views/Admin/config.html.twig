@@ -1,0 +1,46 @@
+{% extends 'AdminBundle:Plugins:config.html.twig' %}
+{% block inner_form %}
+
+<div class="alert-message block-message info">
+	<h1>Installation Instructions</h1>
+	<p>
+		This plugin requires a companion plugin installed on your Joomla website. Follow these simple steps to install the Joomla DeskPRO plugin:
+	</p>
+	<ul>
+		<li>1. Download the Joomla plugin from the DeskPRO website: <a href="https://www.deskpro.com/members/download-plugins/deskpro-joomla.zip" target="_blank">https://www.deskpro.com/members/download-plugins/deskpro-joomla.zip</a></li>
+		<li>2. From your Joomla Administration interface click <strong>Extensions &rarr; Extension Manager</strong></li>
+		<li>3. Click the button to browse your hard-drive for the deskpro-joomla.zip file you just downloaded, then click "Upload &amp; Install"</li>
+		<li>4. Go to <strong>Extensions &rarr; Plugin Manager</strong> and enter "DeskPRO" into the search box at the top. Click the title of the DeskPRO plugin to edit it.</li>
+		<li>5. Change the status to "Enabled" then click the <strong>Basic Options</strong> tab.</li>
+		<li>6. Enter the URL to your DeskPRO intallation in the first box, then copy the "Joomla Secret Key" displayed on this page into the "Secret Key" field in Joomla.</li>
+		<li>7. Click the "Save &amp; Close" button to save your changes.</li>
+	</ul>
+</div>
+
+<div class="setting_field_row">
+	<h4>API Configuration</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label>Joomla URL</label>
+			<input type="text" name="settings[joomla_url]" value="{{ app.getSetting(plugin.id ~ '.joomla_url') }}" style="width: 50%; padding: 5px" />
+			<p>This is the URL to your Joomla site (without any trailing slash).</p>
+		</div>
+
+		<div class="field_row">
+			<label>Joomla Secret Key</label>
+			<input type="text" name="settings[joomla_secret]" value="{{ app.getSetting(plugin.id ~ '.joomla_secret') }}" style="width: 50%; padding: 5px" />
+			<p>Enter the Joomla Secret Key. This needs to be copied to the DeskPRO plugin on your Joomla site. In Joomla, go to Admin &gt; Extensions &gt; Plug-in Manager &gt; Find "DeskPRO" and click on the title &gt; Click on the "Basic Options" tab.</p>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Single Sign On</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<button class="clean-white" name="configure_usersource" value="1">Configure Joomla Single Sign On</button>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

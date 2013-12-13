@@ -1,0 +1,74 @@
+<section class="new-user-chat-alert new-chat-dlg" data-conversation-id="{{ convo.id }}" id="new_user_chat_alert_{{ convo.id }}" data-play-sound="new-chat">
+	<header>{{ phrase('agent.userchat.new_chat') }}</header>
+	<div class="content">
+		<div class="row name">
+			<div class="form-label"><label>{{ phrase('agent.chat.chat_started_by') }}</label></div>
+			<div class="form-input">
+				<span class="label-by-name">
+					{% if person %}
+						<a data-route="person:{{ path('agent_people_view', {person_id: person.id}) }}">{{ person.display_name }} &lt;{{ person.email_address }}&gt;</a>
+					{% else %}
+						{% if convo.person_name or convo.person_email %}
+							{% if convo.person_name %}{{ convo.person_name }}{% endif %}
+							{% if convo.person_email %}&lt;{{ convo.person_email }}&gt;{% endif %}
+						{% else %}
+							{{ phrase('agent.chat.x_by_anonymousymous') }}
+						{% endif %}
+					{% endif %}
+				</span>
+			</div>
+		</div>
+
+		{% if convo.department %}
+			<div class="row department">
+				<div class="form-label"><label>{{ phrase('agent.general.department') }}</label></div>
+				<div class="form-input">{{ convo.department.full_title }}</div>
+			</div>
+		{% endif %}
+
+		<div class="row waiting">
+			<div class="form-label"><label>{{ phrase('agent.general.user_waiting') }}</label></div>
+			<div class="form-input"><span class="wait-timer" data-time="{{ waiting_secs }}">{{ phrase('agent.chat.count_seconds', {'count':waiting_secs}) }}</span></div>
+		</div>
+
+		<div class="row taken" style="display: none">
+			<div class="form-label"><label>{{ phrase('agent.userchat.taken_by') }}</label></div>
+			<div class="form-input"><span class="place-assigned-name"></span></div>
+		</div>
+
+		{% if url %}
+			<div class="row url">
+				<div class="form-label"><label>{{ phrase('agent.chat.user_is_viewing') }}</label></div>
+				<div class="form-input"><a href="{{ url }}" title="{{ url }}">{{ url|truncate(50) }}</a></div>
+			</div>
+		{% endif %}
+
+		{% if tickets|length %}
+			<div class="row tickets">
+				<div class="form-label"><label>{{ phrase('agent.general.open_tickets') }}</label></div>
+				<div class="form-input">
+					<ul>
+						{% for ticket in tickets %}
+							<li>
+								<a data-route="ticket:{{ path('agent_ticket_view', {ticket_id: ticket.id}) }}">{{ ticket.subject }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		{% endif %}
+
+		{% if visitor %}
+			<div class="row ip">
+				<div class="form-label"><label>{{ phrase('agent.general.ip_address') }}</label></div>
+				<div class="form-input">{{ visitor.ip_address }}</div>
+			</div>
+		{% endif %}
+	</div>
+	<footer>
+		<div>
+			<a href="#" class="btn cancel dismiss-trigger"><i class="icon-ban-circle"></i> {{ phrase('agent.general.dismiss') }}</a>
+			<a href="#"class="btn accept-trigger"><i class="icon-ok"></i> {{ phrase('agent.userchat.take_chat') }} </a>
+		</div>
+	</footer>
+</section>

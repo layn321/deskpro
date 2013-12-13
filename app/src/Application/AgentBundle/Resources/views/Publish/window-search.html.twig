@@ -1,0 +1,86 @@
+<section class="source-pane-search">
+
+	{##################################################################################################################}
+	{# Type #}
+	{##################################################################################################################}
+
+	<div class="input-row">
+		<div class="input-row-title">
+			<strong>{{ phrase('agent.general.type') }}</strong>
+		</div>
+		<div class="input-row-body add-to-search">
+			<select class="dp-select-widget-simple content_type" name="content_type" data-target-menu="auto">
+				<option selected="selected" value="articles">{{ phrase('agent.general.articles') }}</option>
+				<option value="news">{{ phrase('agent.general.news') }}</option>
+				<option value="downloads">{{ phrase('agent.general.downloads') }}</option>
+			</select>
+		</div>
+	</div>
+
+	{##################################################################################################################}
+	{# Text #}
+	{##################################################################################################################}
+
+	<div class="input-row">
+		<div class="input-row-title">
+			<strong>{{ phrase('agent.general.search_terms') }}</strong>
+		</div>
+		<div class="input-row-body add-to-search">
+			<input class="full" type="text" name="query" value="" placeholder="{{ phrase('agent.general.enter_search_terms') }}" />
+		</div>
+	</div>
+
+	{##################################################################################################################}
+	{# Category #}
+	{##################################################################################################################}
+
+	{% macro render_cat_option(cat, prev, depth) %}
+		{% if depth %}{% set title = prev ~ ' / ' ~ cat.title %}{% else %}{% set title = cat.title %}{% endif %}
+		{% if cat.children|length %}
+			{% for subcat in cat.children %}
+				{{ _self.render_cat_option(subcat, title, depth+1) }}
+			{% endfor %}
+		{% else %}
+			<option value="{{ cat.id }}">{{ title }}</option>
+		{% endif %}
+	{% endmacro %}
+
+	<div class="input-row">
+		<div class="input-row-title">
+			<strong>{{ phrase('agent.general.categories') }}</strong>
+		</div>
+		<div class="input-row-body add-to-search">
+			<div class="cat-select-type cat-select-articles">
+				<select class="dp-select-widget-simple" name="article_categories[]" multiple="multiple" data-target-menu="auto">
+					{% for cat in kb_cats %}
+						{{ _self.render_cat_option(cat, '', 0) }}
+					{% endfor %}
+				</select>
+			</div>
+
+			<div class="cat-select-type cat-select-news" style="display: none;">
+				<select class="dp-select-widget-simple" name="news_categories[]" multiple="multiple" data-target-menu="auto">
+					{% for cat in news_cats %}
+						{{ _self.render_cat_option(cat, '', 0) }}
+					{% endfor %}
+				</select>
+			</div>
+
+			<div class="cat-select-type cat-select-downloads" style="display: none;">
+				<select class="dp-select-widget-simple" name="download_categories[]" multiple="multiple" data-target-menu="auto">
+					{% for cat in download_cats %}
+						{{ _self.render_cat_option(cat, '', 0) }}
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		<button class="dp-btn trigger-submit-search" data-search-url="{{ path('agent_publish_search') }}">{{ phrase('agent.general.search') }}</button>
+		<div style="padding-top: 4px; text-align: center; font-size: 11px;">
+			<a href="#" class="reset-form-trigger">{{ phrase('agent.general.reset') }}</a>
+		</div>
+	</footer>
+
+</section>

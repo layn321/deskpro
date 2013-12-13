@@ -1,0 +1,9 @@
+<div>
+  {% for task in tasks %}
+    <div>
+      {{ task.name}}
+    </div>
+  {% endfor %}
+</div>
+
+<div>{{ phrase('agent.tasks.count') }}: {{ tasks|length }}</div>

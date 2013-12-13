@@ -1,0 +1,30 @@
+<dp:subject>
+	{% if new_articles and updated_articles %}
+		{{ phrase('user.email_subjects.kb_sub_new_and_updated') }}
+	{% elseif new_articles %}
+		{{ phrase('user.email_subjects.kb_sub_new') }}
+	{% else %}
+		{{ phrase('user.email_subjects.kb_sub_updated') }}
+	{% endif %}
+</dp:subject>
+
+{% if new_articles %}
+	<h1>{{ phrase('user.emails.kb-new-articles', {count: new_articles|length}) }}</h1>
+	<ul>
+		{% for article in new_articles %}
+			<li><a href="{{ url_full('user_articles_article', {slug: article.getUrlSlug()}) }}">{{ article.title }}</a></li>
+		{% endfor %}
+	</ul>
+{% endif %}
+
+{% if updated_articles %}
+	<h1>{{ phrase('user.emails.kb-updated-articles', {count: updated_articles|length}) }}</h1>
+	<ul>
+		{% for article in updated_articles %}
+			<li><a href="{{ url_full('user_articles_article', {slug: article.getUrlSlug()}) }}">{{ article.title }}</a></li>
+		{% endfor %}
+	</ul>
+{% endif %}
+
+<div class="dp-hr">&nbsp;</div>
+{{ phrase('user.emails.kb-explain', {unsubscribe_url: url_full('user_articles_unsub_all', {person_id: person.id, auth: unsub_auth}) }) }}

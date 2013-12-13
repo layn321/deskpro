@@ -1,0 +1,36 @@
+<div class="dp-content-block dp-newticket-page">
+	<div class="dp-box">
+		<div class="dp-box-header">
+			<h1>{{ phrase('user.tickets.title') }}</h1>
+		</div>
+		<div class="dp-box-content-wrapper">
+			<div class="dp-box-content dp-form">
+				<form action="{{ path('user_tickets_new') }}" method="post" id="dp_newticket_form" enctype="multipart/form-data">
+				{{ form_token() }}
+				<input type="hidden" name="nojs" value="1" />
+				<input type="hidden" name="no_submit" value="1" />
+					{###############
+					 # Department
+					 ###############}
+					<div class="dp-control-group {% if error_fields['ticket.department_id'] %}dp-error{% endif %}">
+						<div class="dp-control-label">
+							<label><strong>{{ phrase('user.tickets.begin_with_department') }}</strong></label>
+						</div>
+						<div class="department_id_wrapper with-sub-options dp-controls dp-fill">
+							<select name="set_dep_id">
+								<option value=""></option>
+								{% for id,title in ticket_options.departments_full %}
+									<option value="{{id}}">{{title}}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+
+					<div class="dp-footer">
+						<input class="btn primary" type="submit" value="{{ phrase('user.tickets.btn_continue') }}" />
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

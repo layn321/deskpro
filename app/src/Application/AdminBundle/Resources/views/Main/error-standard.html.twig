@@ -1,0 +1,14 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagetitle %}{% if error_title %}<h1>{{ error_title }}</h1>{% endif %}{% endblock %}
+{% block page %}
+	{{ error_message|raw }}
+
+	{% if error_list %}
+		<ul>
+			{% for e in error_list %}
+				<li>{{ e }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}

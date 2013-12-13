@@ -1,0 +1,44 @@
+{##
+ # The ticket listing showing all a users tickets
+ ##}
+{% import 'UserBundle::macros.html.twig' as dp %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_chatlogs') }}">{{ phrase('user.chat.log-title') }}</a></li>
+{% endblock %}
+{% block page_title %}{{ phrase('user.chat.log-title') }}{% endblock %}
+{% block content %}
+
+<section class="dp-ticketlist-section dp-portal-section">
+	<header>
+		<h1>{{ phrase('user.chat.log-title') }}</h1>
+	</header>
+	<div class="dp-content-block">
+		<div class="dp-content-wrapper">
+			<ul class="dp-ticket-list">
+				{% for convo in chat_conversations %}
+					<li>
+						<div class="dp-title">
+							<div class="dp-fadeaway-container">
+								<h4 class="dp-fadetitle">
+									<a href="{{ path('user_chatlogs_view', {conversation_id: convo.id }) }}">{{ convo.getSubjectLine() }}</a>
+								</h4>
+								<div class="dp-fadeaway-inner-container">
+									<div class="dp-fadeaway"></div>
+								</div>
+							</div>
+						</div>
+						<ul class="dp-post-info">
+							{% if convo.department %}
+								<li class="dp-category"><i class="dp-icon-folder-close"></i> {{ convo.department.full_title }}</li>
+							{% endif %}
+							<li class="dp-date"><i class="dp-icon-calendar"></i> {{ phrase('user.chat.log_created-date', {date: convo.date_created|date('full')}) }}</li>
+						</ul>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</section>
+
+{% endblock %}

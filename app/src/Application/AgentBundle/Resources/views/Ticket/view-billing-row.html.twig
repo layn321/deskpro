@@ -1,0 +1,14 @@
+<tr>
+	<td>
+		{% if charge.charge_time %}
+			{{ charge.charge_time|time_length }}
+		{% endif %}
+		{% if charge.amount %}
+			{{ charge.amount|number_format(2) }} {{ app.getSetting('core_tickets.billing_currency') }}
+		{% endif %}
+	</td>
+	<td>{{ charge.agent.name }}</td>
+	<td><time class="timeago" datetime="{{charge.date_created|date('c', 'UTC')}}">{{charge.date_created|date('fulltime')}}</time></td>
+	<td>{{ charge.comment }}</td>
+	<td class="delete"><a href="{{ path('agent_ticket_chargedelete', {ticket_id: ticket.id, charge_id: charge.id, security_token: security_token('delete_charge'), '_rt': security_token('request_token', 10800)}) }}" class="billing-delete">{{ phrase('agent.general.delete') }}</a></td>
+</tr>

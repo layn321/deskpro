@@ -1,0 +1,95 @@
+{##
+ # The ticket listing showing all a users tickets
+ ##}
+{% import 'UserBundle::macros.html.twig' as dp %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+{% endblock %}
+{% block page_title %}{{ phrase('user.tickets.your_tickets') }}{% endblock %}
+{% block content %}
+
+{% macro ticket_row(ticket, last_messages, show_owner) %}
+	<li>
+		<div class="dp-title">
+			<div class="dp-fadeaway-container">
+				<h4 class="dp-fadetitle">
+					<a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id }) }}">{{ ticket.subject }}</a>
+					{% if show_owner %}<span class="ticket-creator">{{ ticket.person.display_name }}</span>{% endif %}
+					{% if 0 %}
+					<a target="_blank" href="{{ path('user_tickets_view', {'ticket_ref': ticket.id, 'pdf': 1}) }}">
+						<img src="{{ asset('images/filetypes/page_white_acrobat.png') }}" alt="{{ phrase('user.tickets.download_pdf') }}" />
+					</a>
+					{% endif %}
+				</h4>
+				<div class="dp-fadeaway-inner-container">
+					<div class="dp-fadeaway"></div>
+				</div>
+			</div>
+		</div>
+		<ul class="dp-post-info">
+			<li class="dp-category"><i class="dp-icon-folder-close"></i> {{ ticket.department.full_title }}</li>
+			<li class="dp-author"><i class="dp-icon-user"></i>
+				{% if last_messages[ticket.id].person.id == app.user.id %}
+					{{ phrase('user.tickets.list_last_activity_by_you') }}
+				{% else %}
+					{{ phrase('user.tickets.list_last_activity_by_x', {'name': last_messages[ticket.id].person.display_name_user}) }}
+				{% endif %}
+				(<span class="timeago" title="{{ last_messages[ticket.id].date_created|date('c', 'UTC') }}">{{ last_messages[ticket.id].date_created|date('fulltime') }}</span>)
+			</li>
+			<li class="dp-date"><i class="dp-icon-calendar"></i> {{ phrase('user.tickets.list_created-date', {date: ticket.date_created|date('full')}) }}</li>
+		</ul>
+	</li>
+{% endmacro %}
+
+{% set sort_form %}
+	<form class="dp-ticket-sort" action="{{ path('user_tickets') }}">
+		<select name="sort">
+			<option value="date_created" {% if sort == 'date_created' %}selected="selected"{% endif %}>{{ phrase('user.tickets.date_created') }}</option>
+			<option value="last_reply" {% if sort == 'last_reply' %}selected="selected"{% endif %}>{{ phrase('user.tickets.last_reply') }}</option>
+			<option value="department" {% if sort == 'department' %}selected="selected"{% endif %}>{{ phrase('user.tickets.fields_department') }}</option>
+		</select>
+		<input type="submit" class="dp-btn-primary" value="{{ phrase('user.general.btn_sort') }}" />
+	</form>
+{% endset %}
+
+{% if active_tickets|length %}
+	<section class="dp-ticketlist-section dp-portal-section">
+		<header>
+			{{ sort_form|raw }}
+			<h1>{{ phrase('user.tickets.open_tickets') }}</h1>
+		</header>
+		<div class="dp-content-block">
+			<div class="dp-content-wrapper">
+				<ul class="dp-ticket-list">
+					{% for ticket in active_tickets %}
+						{{ _self.ticket_row(ticket, last_messages) }}
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<br />
+{% endif %}
+
+{% if resolved_tickets|length %}
+	<section class="dp-ticketlist-section dp-portal-section">
+		<header>
+			{% if not active_tickets %}{{ sort_form|raw }}{% endif %}
+			<h1>{{ phrase('user.tickets.list_resolved') }}</h1>
+		</header>
+		<div class="dp-content-block">
+			<div class="dp-content-wrapper">
+				<ul class="dp-ticket-list">
+					{% for ticket in resolved_tickets %}
+						{{ _self.ticket_row(ticket, last_messages) }}
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<br />
+{% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+<script type="text/javascript">
+	var BASE_URL = '{{ path('user') }}';
+	var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+	var ASSETS_BASE_URL = '{{ asset('') }}';
+	var ASSETS_BASE_URL_FULL = '{{ asset_full('') }}';
+	var DESKPRO_PERSON_ID = {{ app.user.id }};
+	var DESKPRO_TEAM_IDS = {{ app.user.getAgent.getTeamIds()|json_encode }};
+	var DESKPRO_SESSION_ID = {{ app.session.getEntityId() }};
+	var DESKPRO_PROXY_KEY = '{{ app.session.getSessionSecret('proxy_key') }}';
+	var DESKPRO_PERSON_TZ = '{{ app.user.timezone }}';
+	var DESKPRO_PERSON_NOTIFICATION_DISMISS = parseInt('{{ app.user.getPref('agent.ui.auto_dismiss_notification', 60) }}', 10);
+
+	var DESKPRO_PERSON_LANG_ID  = {{ app.user.language.id }};
+	var DESKPRO_DEFAULT_LANG_ID = {{ app.languages.getDefaultId() }};
+
+	var DESKPRO_ENABLE_KB_SHORTCUTS = {% if app.getSetting('core.agent_enable_kb_shortcuts') %}true{% else %}false{% endif %};
+
+	{# {% if app.user.is_admin %} #}
+	var DESKPRO_PERSON_ISADMIN = true;
+	{# {% endif %} #}
+	var DESKPRO_PERSON_PERMS = {
+		'agent_tickets.create': {% if app.user.hasPerm('agent_tickets.create') %}true{% else %}false{% endif %},
+		'agent_people.create': {% if app.user.hasPerm('agent_people.create') %}true{% else %}false{% endif %},
+		'agent_org.create': {% if app.user.hasPerm('agent_org.create') %}true{% else %}false{% endif %},
+		'agent_publish.create': {% if app.user.hasPerm('agent_publish.create') %}true{% else %}false{% endif %},
+		'chat_dep_ids': [
+			0{% for id in chat_dep_ids %},{{id}}{% endfor %}
+		]
+	};
+
+	{% if app.getSetting('agent.ui_snippets_use_client_db') %}var DESKPRO_SNIPPETS_USE_CLIENT_DB = true;{% endif %}
+
+	var DESKPRO_TIME_OUT_OF_SYNC = false;
+	var DESKPRO_TIME_OUT_OF_SYNC_IGNORE = parseInt({{ app.user.getPref('agent.ui.tz_detect_dismiss')|json_encode|raw }}) + 100;
+
+	var DP_SETTINGS = {
+		{% for x in ['core.use_agent_team', 'core.use_product', 'core.use_ticket_category', 'core.use_ticket_priority', 'core.use_ticket_workflow', 'core_tickets.enable_agent_rte'] %}
+			'{{ x }}': {% if app.getSetting(x) %}true{% else %}false{% endif %},
+		{% endfor %}
+		'rand': {{ rand() }}
+	};
+	var DP_AGENT_RTE_BUTTONS = {
+		{% for x in ['html', 'bold', 'italic', 'underline', 'strike', 'color', 'alignment', 'list', 'image', 'link', 'table', 'hr'] %}
+			'{{ x }}': {% if app.getSetting('core_tickets.agent_rte_button_' ~ x) %}true{% else %}false{% endif %},
+		{% endfor %}
+		'_': false
+	};
+</script>

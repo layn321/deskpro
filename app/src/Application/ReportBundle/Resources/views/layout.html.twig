@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="robots" content="NOINDEX" />
+	<meta http-equiv="X-UA-Compatible" content="IE=100" />
+	<title>DeskPRO Reports</title>
+
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+	{{ dp_asset_html('admin_interface_css') }}
+
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+	{{ dp_asset_html('agent_deskpro_ui') }}
+	{{ dp_asset_html('admin_admin_ui') }}
+	{{ dp_asset_html('admin_admin_handlers') }}
+	{{ dp_asset_html('report_report_ui') }}
+
+	{{ dp_asset_html('report_interface_css') }}
+
+	<link rel="stylesheet" href="{{ asset('fonts/font-awesome.min.css') }}" type="text/css" />
+
+	<script type="text/javascript" charset="utf-8">
+		var DP_TINYMCE_URL = '{{ asset('javascripts/tiny_mce/tiny_mce.js') }}';
+		var BASE_URL = '{{ app.request.getBaseUrl() }}';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		if (!window.DESKPRO_URL_REGISTRY) window.DESKPRO_URL_REGISTRY = {};
+
+		window._page_exec_stack = [];
+		function _win_exec() {
+			window.DeskPRO_Window = new DeskPRO.Report.Window();
+			window.DeskPRO_Window.initPage();
+
+			if (window._page_exec) {
+				window._page_exec_stack.push(_page_exec);
+			}
+
+			for (var i = 0; i < window._page_exec_stack.length; i++) {
+				window._page_exec_stack[i]();
+			}
+
+			if (window.DeskPRO_Page) {
+				DeskPRO_Page.initPage();
+			}
+
+			// Init all others too
+			var re = /^DeskPRO_Page_/;
+			for (i in window) {
+				if (re.test(i)) {
+					window[i].initPage();
+				}
+			}
+		}
+
+		{% block html_headjs_load %}{% endblock %}
+
+		$(document).ready(function() {
+			_win_exec();
+		});
+	</script>
+	{% block html_head %}{% endblock %}
+	{% block page_js_exec %}{% endblock %}
+
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+	<style type="text/css">
+		#dp_header {
+			overflow: hidden;
+		}
+	</style>
+</head>
+<body class="reports-interface {% if is_demo %}is-demo{% endif %}">
+
+<!-- BEGIN HEADER BAR -->
+<div id="dp_header">
+
+	<div class="user-profile pull-left">
+		<img class="gravatar pull-left" src="{{ app.user.getPictureUrl(31) }}">
+		<div class="username">{{ phrase('agent.chrome.hello-user', {name: app.user.name}) }}</div>
+		<ul class="nav-profile">
+			{% if app.user.can_admin %}<li><i class="icon-cogs"></i> <a class="admin" href="{{ app.request.getBaseUrl() }}/admin/login?dpsid-agent={{ app.getSession().getId() }}"><span>Admin</span></a></li>{% endif %}
+			{% if app.user.can_agent %}<li><i class="icon-inbox"></i> <a class="agent" href="{{ app.request.getBaseUrl() }}/agent/"><span class="check">Agent</span></a></li>{% endif %}
+			<li onclick="window.location='{{ path('user_logout', {'auth': static_security_token('user_logout', 0)}) }}?to=agent'; return false;"><i class="icon-signout"></i> <a>{{ phrase('agent.chrome.link_logout') }}</a></li>
+		</ul>
+	</div>
+
+	<ul class="reports-nav">
+		<li class="trends {% if this_page == 'overview' %}on{% endif %}">
+			<span
+				class="tipped"
+				data-tipped-options="hook: 'topleft', maxWidth: 500, skin: 'cloud', border: 1, shadow: {opacity:  0.5}"
+				title="Overview gives you a clear, simple, interactive dashboard into the key metrics from your helpdesk. You can modify most statistics to sub-group the data by a particular property you are interested in or change the date range a statistic is generated for."
+			><a href="{{ path('report') }}">{{ phrase('agent.report.overview') }}</a></span>
+		</li>
+		<li class="builder {% if this_page == 'report_builder' %}on{% endif %}">
+			<span
+				class="tipped"
+				data-tipped-options="hook: 'topleft', maxWidth: 500, skin: 'cloud', border: 1, shadow: {opacity:  0.5}"
+				title="Report Builder is our powerful custom statistic and graph generator. With this tool you can generate almost any statistic about your helpdesk. The tools comes with a library of pre-built statistics and an editor to allow you to create your own."
+			><a href="{{ path('report_builder') }}">{{ phrase('agent.report.report_builder') }}</a></span>
+		</li>
+		{% if app.getSetting('core_tickets.enable_billing') %}
+		<li class="billing {% if this_page == 'report_billing' %}on{% endif %}">
+			<span
+				class="tipped"
+				data-tipped-options="hook: 'topleft', maxWidth: 500, skin: 'cloud', border: 1, shadow: {opacity:  0.5}"
+				title="Billing gives you access to reports on charges that agents have made to tickets. Billing reports include lists of charges and totals for charges per person, agent and organization."
+			><a href="{{ path('report_billing') }}">Billing</a></span>
+		</li>
+		{% endif %}
+		<li class="tech-activity {% if this_page == 'agent_activity_index' %}on{% endif %}">
+			<span
+				class="tipped"
+				data-tipped-options="hook: 'topleft', maxWidth: 500, skin: 'cloud', border: 1, shadow: {opacity:  0.5}"
+				title="Agent Activity gives you a detailed report into the activity of your agents on a specified date."
+			><a href="{{ path('report_agent_activity_index') }}">{{ phrase('agent.report.agent_activity') }}</a></span>
+		</li>
+		<li class="tech-hours {% if this_page == 'report_agent_hours_index' %}on{% endif %}">
+			<span
+				class="tipped"
+				data-tipped-options="hook: 'topleft', maxWidth: 500, skin: 'cloud', border: 1, shadow: {opacity:  0.5}"
+				title="Agent Hours gives you an aggregate view of the time your agents are logged into the helpdesk on a specified date."
+			><a href="{{ path('report_agent_hours_index') }}">{{ phrase('agent.report.agent_hours') }}</a></span>
+		</li>
+		{% if app.getSetting('core.tickets.enable_feedback') %}
+			<li class="feedback {% if this_page == 'report_agent_feedback_feed' or this_page == 'report_agent_feedback_index' %}on{% endif %}">
+				<span
+					class="tipped"
+					data-tipped-options="hook: 'topleft', maxWidth: 500, skin: 'cloud', border: 1, shadow: {opacity:  0.5}"
+					title="Feedback gives you a feed and aggregate view of the ticket feedback ratings from your customers."
+				><a href="{{ path('report_agent_feedback_feed', {'page':0}) }}">Ticket Feedback</a></span>
+			</li>
+		{% endif %}
+	</ul>
+</div>
+<!-- /BEGIN HEADER BAR -->
+
+{% block nav_block %}{% endblock %}
+
+{% block all_page %}
+<div id="dp_page_wrap" class="dp_page_wrap">
+
+	{% set pagebar %}{% block pagebar %}{% endblock %}{% endset %}
+	{% if pagebar|trim|length %}
+		<div id="dp_admin_pagebar" class="dp_admin_pagebar">{{ pagebar|raw }}</div>
+	{% endif %}
+
+	<div id="dp_admin_page" class="dp_admin_page {% if not pagebar|trim|length %}no-header{% endif %}">
+		{% block content %}
+			<div class="dp-page-box">
+				<div class="page-content">
+					{% block page %}{% endblock %}
+				</div>
+			</div>
+		{% endblock %}
+	</div>
+</div>
+{% endblock %}
+
+</body>
+</html>

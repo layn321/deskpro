@@ -1,0 +1,114 @@
+{% if app.getSetting('core.setup_initial') %}{% set is_post_install = false %}{% else %}{% set is_post_install = true %}{% endif %}
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+	<title>{{ phrase('admin.general.deskpro_admin_interface') }}</title>
+	<meta charset="utf-8" />
+	<meta name="robots" content="noindex,nofollow" />
+	<link rel="shortcut icon" id="favicon" href="{{ asset('images/admin/favicon-admin.ico') }}" />
+
+	<script type="text/javascript">
+		{% if constant('DP_DEBUG') %}
+			DP_DEBUG = true;
+		{% else %}
+			DP_DEBUG = false;
+		{% endif %}
+	</script>
+
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+	{{ dp_asset_html('admin_interface_css') }}
+
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+	{{ dp_asset_html('agent_deskpro_ui') }}
+    {{ dp_asset_html('admin_admin_ui') }}
+    {{ dp_asset_html('admin_admin_handlers') }}
+
+    <script type="text/javascript" charset="utf-8">
+		var DP_TINYMCE_URL = '{{ asset('javascripts/tiny_mce/tiny_mce.js') }}';
+		var BASE_URL = '{{ app.request.getBaseUrl() }}/';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		if (!window.DESKPRO_URL_REGISTRY) window.DESKPRO_URL_REGISTRY = {};
+
+		window.DeskPRO_Window = new DeskPRO.Admin.Window();
+
+		function _win_exec() {
+			window.DeskPRO_Window.initPage();
+
+			if (window._page_exec) {
+				_page_exec();
+			}
+
+			if (window.DeskPRO_Page) {
+				DeskPRO_Page.initPage();
+			}
+		}
+
+		{% block html_headjs_load %}{% endblock %}
+
+		$(document).ready(function() {
+			_win_exec();
+		});
+	</script>
+	{% block html_head %}{% endblock %}
+	{% block page_js_exec %}{% endblock %}
+
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+
+	{% if app.isDebug() %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?nocache=1&v={{ security_token('lang') }}"></script>
+	{% else %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?v={{ app.getSetting('core.deskpro_build') }}"></script>
+	{% endif %}
+</head>
+<body class="dp">
+
+{% block header %}
+<!-- BEGIN NAV BAR -->
+<div id="dp_admin_nav">
+	<div id="dp_admin_nav_sections" class="deskproPane">
+		<ul class="start-ul">
+			<li>
+				<a href="{{ app.request.getBaseUrl() }}admin/"><span class="start">Admin</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+		<ul class="start-ul">
+			<li>
+				<a href="{{ app.request.getBaseUrl() }}agent/"><span class="agents">Agent</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+	</div>
+</div>
+
+{% endblock %}
+
+<!-- /BEGIN NAV BAR -->
+<div id="dp_page_wrap">
+
+<div id="dp_admin_page" class="dp_admin_page with-pagetabs">
+	<div id="dp_admin_page_inner" class="dp_admin_page_inner">
+		<div class="dp-page-box">
+			<div class="page-content">
+				{% if message %}
+					{{ message }}
+				{% elseif error_message %}
+					{{ error_message }}
+				{% else %}
+					{{ phrase('admin.menu.error_no_permission') }}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+{##
+ # The form displayed to get user feedback of a ticket message. This is in a popup window.
+ ##}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+	{% if setrating %}
+		<script type="text/javascript">
+		$(document).ready(function() {
+			$.ajax({
+				url: '{{ path('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, 'rating': feedback.rating, 'save': 1})|replace({'&amp;': '&'})|raw }}',
+				type: 'GET'
+			});
+		});
+		</script>
+	{% endif %}
+{% endblock %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.your_tickets') }}</a></li>
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets_view', {'ticket_ref': ticket.public_id}) }}">{{ ticket.subject }}</a></li>
+{% endblock %}
+{% block content %}
+<section class="dp-portal-section" style="padding-top:0; margin-top: 0;">
+	<header>
+		<h1>{{ phrase('user.tickets.rate_support') }}</h1>
+	</header>
+	<article>
+
+		{% if not setrating %}
+			<table class="dp-layout" width="100%"><tr>
+				<td style="vertical-align: top;" width="80">
+					<img src="{{ message.person.getPictureUrl(80) }}" alt="{{ message.person.display_name_user }}" style="float:left; margin: 0 11px 0 0;" />
+				</td>
+				<td style="vertical-align: top;">
+					<p>{{ phrase('user.tickets.rate-intro', {name: message.person.display_name_user, subject: ticket.subject}) }}</p>
+					<p>{{ phrase('user.tickets.rate-question') }}</p>
+
+					<form action="{{ path('user_tickets_feedback_save', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id}) }}" method="post">
+						{{ form_token() }}
+						<table class="dp-layout" width="550" align="center"><tr>
+							<td width="33%" style="padding: 10px;">
+								<label class="dp-rate-box dp-positive">
+									<i>
+										☺
+									</i>
+									<span>
+										<input type="radio" name="rating" value="1" {% if feedback.rating == 1 %}checked="checked"{% endif %} style="display: inline" />
+										{{ phrase('user.tickets.rate-positive') }}
+									</span>
+								</label>
+							</td>
+							<td width="33%" style="padding: 10px;">
+								<label class="dp-rate-box dp-neutral">
+									<i>
+										&mdash;
+									</i>
+									<span>
+										<input type="radio" name="rating" value="0" {% if feedback.rating == 0 %}checked="checked"{% endif %} style="display: inline" />
+										{{ phrase('user.tickets.rate-neutral') }}
+									</span>
+								</label>
+							</td>
+							<td width="33%" style="padding: 10px;">
+								<label class="dp-rate-box dp-negative">
+									<i>
+										☹
+									</i>
+									<span>
+										<input type="radio" name="rating" value="-1" {% if feedback.rating == -1 %}checked="checked"{% endif %} style="display: inline" />
+										{{ phrase('user.tickets.rate-negative') }}
+									</span>
+								</label>
+							</td>
+						</tr><tr>
+							<td colspan="3" style="padding: 10px; padding-top: 0;">
+								<textarea name="message" style="width: 520px; height: 60px;" placeholder="{{ phrase('user.tickets.feedback_message_leave_comment') }}">{{ feedback.message }}</textarea>
+
+								<button class="dp-btn dp-btn-primary" type="submit" style="margin-top: 10px;">{{ phrase('user.feedback.submit_feedback') }}</button>
+							</td>
+						</tr></table>
+					</form>
+				</td>
+			</tr></table>
+		{% else %}
+			<p>{{ phrase('user.tickets.rate-thanks-vialink') }}</p>
+
+			<form action="{{ path('user_tickets_feedback_save', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id}) }}" method="post">
+				{{ form_token() }}
+				<input type="hidden" name="rating" value="{{ feedback.rating }}" />
+				<textarea name="message" style="width: 520px; height: 60px;" placeholder="{{ phrase('user.tickets.feedback_message_leave_comment') }}">{{ feedback.message }}</textarea>
+
+				<br />
+				<button class="dp-btn dp-btn-primary" type="submit" style="margin-top: 10px;">{{ phrase('user.feedback.submit_feedback') }}</button>
+			</form>
+		{% endif %}
+	</article>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="robots" content="NOINDEX" />
+	<meta http-equiv="X-UA-Compatible" content="IE=100" />
+
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+	{{ dp_asset_html('admin_interface_css') }}
+
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+	{{ dp_asset_html('agent_deskpro_ui') }}
+	{{ dp_asset_html('admin_admin_ui') }}
+	{{ dp_asset_html('admin_admin_handlers') }}
+	{{ dp_asset_html('report_report_ui') }}
+
+	{{ dp_asset_html('report_graphs') }}
+	{{ dp_asset_html('report_interface_css') }}
+
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+</head>
+<body>
+
+<div id="dp_page_wrap" class="dp_page_wrap">
+	<div id="dp_admin_page" class="dp_admin_page no-header">
+		<div class="dp-page-box">
+			<div class="page-content">
+				{{ error_message }}
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

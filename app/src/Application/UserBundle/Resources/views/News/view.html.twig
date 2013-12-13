@@ -1,0 +1,68 @@
+{##
+ # The full news view page.
+ ##}
+
+{% import 'UserBundle:Common:macros-social.html.twig' as social %}
+{% set this_section = 'news' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+	<meta property="og:url" content="{{ path('user_news_view', {'slug': news.url_slug}) }}" />
+	<meta property="og:title" content="{{news.title}}" />
+	<meta property="og:type" content="blog" />
+	<link rel="canonical" href="{{ url('user_news_view', {'slug': news.url_slug}) }}" />
+{% endblock %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_news') }}">{{ phrase('user.news.title') }}</a></li>
+	{% for cat in news.category.getTreeParents() %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_news', {'slug': cat.url_slug}) }}">{{cat.title}}</a></li>
+	{% endfor %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_news', {'slug': news.category.url_slug}) }}">{{news.category.title}}</a></li>
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_news_view', {'slug': news.url_slug}) }}">{{ news.title }}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ news.title }}
+	-
+	{{ phrase('user.news.title') }}
+	{% for cat in category_path %}
+		/ {{cat.title}}
+	{% endfor %}
+{% endblock %}
+{% block content %}
+
+<section class="dp-news-post dp-content-post dp-content-page">
+	<div class="dp-cal-date" title="{{ phrase('user.news.posted_date', {'date':news.date_created|date('fulltime')}) }}">
+		<div class="dp-month">{{ news.date_created|date('M')|upper }}</div>
+		<div class="dp-day">{{ news.date_created|date('d') }}</div>
+	</div>
+	<header>
+		<h3 style="margin-bottom: 0"><a href="{{ path('user_news_view', {'slug': news.url_slug}) }}">{{ news.title }}</a></h3>
+		<ul class="dp-post-info">
+			<li class="dp-author"><i class="dp-icon-user"></i> {{ news.person.display_name_user }}</li>
+			<li class="dp-category"><i class="dp-icon-folder-close"></i> <a href="{{ path('user_news', {'slug': news.category.url_slug })}}">{{ news.category.title }}</a></li>
+		</ul>
+	</header>
+	<article>
+		{{ news.content_html|raw }}
+	</article>
+	<footer>
+		{% include 'UserBundle:Common:labels-box.html.twig' with {'labels': news.labels} %}
+		{% include 'UserBundle:Common:related-box.html.twig' with { object: news, type: 'news', related_content: related_content } %}
+
+		{% if app.user.hasPerm('news.rate') %}
+			{% include 'UserBundle:Common:rating-bar.html.twig' with {'content_object': news} %}
+		{% endif %}
+
+		{% if app.getSetting('core.show_share_widget') %}
+			{{ social.social_block(url('user_feedback_view', {'slug': news.url_slug}), news.title) }}
+		{% endif %}
+	</footer>
+</section>
+
+{% include 'UserBundle:Common:comments-box.html.twig' with {
+	'type': 'news',
+	'comments': comments,
+	'form_action': path('user_news_newcomment', {'post_id': news.id}),
+	'check_perm': 'news.comment'
+} %}
+
+{% endblock %}

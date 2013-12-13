@@ -1,0 +1,20 @@
+{% set field_input %}
+	{% if field_handler_name == 'Toggle' and field_def.getOption('label_text') %}<label>{% endif %}
+	{% block field_input %}
+		{{ form_widget(formView, {'id': elId, 'attr':{'class': field_def.getOption('custom_css_classname', '')}}) }}
+	{% endblock %}
+	{% if field_handler_name == 'Toggle' and field_def.getOption('label_text') %} {{ field_def.getOption('label_text')|raw }}</label>{% endif %}
+{% endset %}
+{% block content %}
+	{% if field_handler_name == 'Date' %}
+		<div class="{{field_type}}_{{field_def.id}} {{field_handler_name}} datepicker form {{ field_def.getOption('custom_css_classname', '') }} customfield" id="{{elId}}_form_wrap">
+			<div class="date-input">
+				{{- field_input }}{{ field_def.getHtmlOption()|raw -}}
+			</div>
+		</div>
+	{% else %}
+		<div class="{{field_type}}_{{field_def.id}} {{field_handler_name}} form {{ field_def.getOption('custom_css_classname', '') }} customfield" id="{{elId}}_form_wrap">
+			{{- field_input }}{{ field_def.getHtmlOption()|raw -}}
+		</div>
+	{% endif %}
+{% endblock %}

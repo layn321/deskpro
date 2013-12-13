@@ -1,0 +1,168 @@
+<div class="extended-merge overlay">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.people.merge_people') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+
+		<div class="simple-help-box">
+			<p>
+				{{ phrase('agent.people.merge_people_info') }}
+			</p>
+		</div>
+
+		<form>
+			<div
+				class="person-finder"
+				data-element-handler="DeskPRO.Agent.ElementHandler.PersonSearchBox"
+				data-search-url="{{ path('agent_peoplesearch_performquick', {'format': 'json', 'limit': 10, 'start_with': 'a', 'with_agents': 1}) }}"
+				data-highlight-term="1"
+				data-touch-focus="1"
+				data-search-param="term"
+			>
+				<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+					<li><a>
+						<span class="user-name"></span>
+						<address>&lt;<span class="user-email"></span>&gt;</address>
+						<div class="bound-fade"></div>
+					</a></li>
+				</script>
+				<div class="input-wrapper">
+					<input type="text" style="width: 98%" class="term" placeholder="{{ phrase('agent.people.find_person') }}" class="user-input" />
+				</div>
+				<input type="hidden" name="person_id" class="person-id" value="" />
+				<div class="person-search-box" style="display: none">
+					<section>
+						<ul class="results-list">
+
+						</ul>
+					</section>
+				</div>
+			</div>
+		</form>
+
+		{% if other_person %}
+			<div class="merge-data-wrap">
+				<table class="merge-data" width="100%">
+					<tbody>
+						<tr class="header-row">
+							<td class="first">&nbsp;</td>
+							<td colspan="2"><div class="switcher-wrap">
+								<div class="left-text merge-target-button" data-merge-id="{{ person.id }}" data-keep="1">{{ phrase('agent.general.merge_keep_this') }}</div>
+								<button class="switch-trigger clean-white" style="margin-top: 1px;">&lsaquo; {{ phrase('agent.general.merge_switch_btn') }} &rsaquo;</button>
+								<div class="right-text merge-target-button" data-merge-id="{{ other_person.id }}">{{ phrase('agent.general.merge_merge_this') }}</div>
+							</div></td>
+						</tr>
+					</tbody>
+					<tbody class="merge-data-rows">
+						<tr>
+							<th nowrap="nowrap"><div>{{ phrase('agent.general.id') }}</div></th>
+							<td width="50%">{{ person.id }}</td>
+							{% if other_person %}<td width="50%">{{ other_person.id }}</td>{% endif %}
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><div>{{ phrase('agent.general.name') }}</div></th>
+							<td width="50%">{{ person.name }}</td>
+							{% if other_person %}<td width="50%">{{ other_person.name }}</td>{% endif %}
+						</tr>
+						<tr class="mergeable">
+							<th nowrap="nowrap"><div>{{ phrase('agent.general.email') }}</div></th>
+							<td width="50%">
+								{% if person.emails is not empty %}
+								<ul>
+								{% for email in person.emails %}
+									<li>{{ email.email }}</li>
+								{% endfor %}
+								</ul>
+								{% endif %}
+							</td>
+							{% if other_person %}
+								<td width="50%">
+									{% if other_person.emails is not empty %}
+										<ul>
+											{% for email in other_person.emails %}
+												<li>{{ email.email }}</li>
+											{% endfor %}
+										</ul>
+									{% endif %}
+								</td>
+							{% endif %}
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><div>{{ phrase('agent.general.organization') }}</div></th>
+							<td width="50%">{{ person.organization ? person.organization.name : '' }}</td>
+							{% if other_person %}
+								<td width="50%">{{ other_person.organization ? other_person.organization.name : '' }}</td>
+							{% endif %}
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><div>{{ phrase('agent.general.position') }}</div></th>
+							<td width="50%">{{ person.organization_position }}</td>
+							{% if other_person %}
+								<td width="50%">{{ other_person.organization_position }}</td>
+							{% endif %}
+						</tr>
+						<tr>
+							<th nowrap="nowrap"><div>{{ phrase('agent.general.timezone') }}</div></th>
+							<td width="50%">{{ person.timezone }} (GMT {{ person.getTimezoneOffset(true) }})</td>
+							{% if other_person %}
+								<td width="50%">{{ other_person.timezone }} (GMT {{ other_person.getTimezoneOffset(true) }})</td>
+							{% endif %}
+						</tr>
+
+						{% for k,f in person_custom_fields %}
+							<tr>
+								<th nowrap="nowrap"><div>{{ f.title }}</div></th>
+								<td width="50%">{% if f.hasValue %}{{ render_custom_field(f) }}{% endif %}</td>
+								{% if other_person %}
+									<td width="50%">{% if other_custom_fields[k].hasValue %}{{ render_custom_field(other_custom_fields[k]) }}{% endif %}</td>
+								{% endif %}
+							</tr>
+						{% endfor %}
+
+						<tr class="mergeable">
+							<th nowrap="nowrap"><div>{{ phrase('agent.general.labels') }}</div></th>
+							<td width="50%">
+								{% if person.labels is not empty %}
+									<ul>
+										{% for label in person.labels %}
+											<li>{{ label.label }}</li>
+										{% endfor %}
+									</ul>
+								{% endif %}
+							</td>
+							{% if other_person %}
+								<td width="50%">
+									{% if other_person.labels is not empty %}
+										<ul>
+											{% for label in other_person.labels %}
+												<li>{{ label.label }}</li>
+											{% endfor %}
+										</ul>
+									{% endif %}
+								</td>
+							{% endif %}
+						</tr>
+						{% if other_person and (other_person.is_agent or person.is_agent) %}
+						<tr class="always-keep">
+							<th nowrap="nowrap"><div>{{ phrase('agent.people.is_agent') }}</div></th>
+							<td width="50%">{% if person.is_agent %}Is an agent{% endif %}</td>
+							<td width="50%">{% if other_person.is_agent %}Is an agent{% endif %}</td>
+						</tr>
+						{% endif %}
+					</tbody>
+				</table>
+			</div>
+		{% endif %}
+	</div>
+	{% if other_person %}
+		<div class="overlay-footer">
+			<div class="is-not-loading">
+				<button class="clean-white merge-trigger">{{ phrase('agent.people.merge_submit_btn') }}</button>
+			</div>
+			<div class="is-loading">
+				<div class="loading-icon"></div>
+			</div>
+		</div>
+	{% endif %}
+</div>

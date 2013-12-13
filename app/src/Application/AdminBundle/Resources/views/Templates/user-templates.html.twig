@@ -1,0 +1,59 @@
+{% set this_page = 'portal_templates' %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.TemplateEditList' %}
+{% import 'AdminBundle:Templates:macros.html.twig' as tplmacro %}
+{% extends 'AdminBundle:Portal:layout.html.twig' %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li><a href="{{ path('admin_templates_other') }}">{{ phrase('admin.templates.edit_agent_and_admin_templates') }}</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>{{ phrase('admin.general.templates') }}</li>
+</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TemplateEditList.js') }}"></script>
+{% if open_template %}
+	<script type="text/javascript">
+		var OPEN_TEMPLATE = {{ open_template|json_encode|raw }};
+		$(document).ready(function() {
+			var row = $('tr[data-template-name="' + OPEN_TEMPLATE + '"]');
+			if (row[0]) {
+				row.find('.edit-tpl-trigger').click();
+			}
+		});
+	</script>
+{% endif %}
+{% endblock %}
+
+{% block page %}
+
+<div class="content-table template-dir">
+	<table width="100%">
+		<thead class="">
+		<tr>
+			<th class="single-title" colspan="10">
+				<span class="count">4 Templates</span>
+				<h1 class="toggle-section expanded">Custom Templates</h1>
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+			{{ tplmacro.render_tpl('UserBundle::custom-header.html.twig', {shortname: 'custom-header.html'}) }}
+			{{ tplmacro.render_tpl('UserBundle::custom-footer.html.twig', {shortname: 'custom-footer.html'}) }}
+			{{ tplmacro.render_tpl('UserBundle::custom-headinclude.html.twig', {shortname: 'custom-headinclude.html'}) }}
+			{{ tplmacro.render_tpl('UserBundle:Css:custom.css.twig', {shortname: 'custom.css'}) }}
+		</tbody>
+	</table>
+</div>
+<br />
+
+{% for bundle_name,dirs in list %}
+	{% for dirname,dirinfo in dirs %}{% if dirname != 'Test' %}
+		{{ tplmacro.render_dir(bundle_name, dirname, dirinfo) }}
+	{% endif %}{% endfor %}
+{% endfor %}
+
+{{ tplmacro.render_editor_overlay() }}
+{% endblock %}

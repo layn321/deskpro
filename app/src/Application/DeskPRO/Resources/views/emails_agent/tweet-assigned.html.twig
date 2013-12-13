@@ -1,0 +1,15 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>{{ phrase('agent.emails.tweet_assigned_to_you_by', {agent: performer.getDisplayName()}) }}</dp:subject>
+{% if account_status.agent %}
+
+	{{ phrase('agent.emails.agent_assigned_you_tweet', {agent: performer.getDisplayContact()}) }}
+	<blockquote>{{ account_status.status.parsed_text|raw }}</blockquote>
+	<a href="{{ url_full('agent') }}#app.twitter,tw-own:{{ account_status.account.id }}::">{{ phrase('agent.emails.view_your_tweets') }}</a>
+
+{% elseif account_status.agent_team %}
+
+	{{ phrase('agent.emails.agent_assigned_team_tweet', {agent: performer.getDisplayContact()}) }}
+	<blockquote>{{ account_status.status.parsed_text|raw }}</blockquote>
+	<a href="{{ url_full('agent') }}#app.twitter,tw-team:{{ account_status.account.id }}::">{{ phrase('agent.emails.view_team_tweets') }}</a>
+
+{% endif %}

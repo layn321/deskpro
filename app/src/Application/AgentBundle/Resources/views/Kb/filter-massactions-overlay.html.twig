@@ -1,0 +1,81 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<div
+	class="mass-actions-overlay-container mass-actions"
+	data-base-id="{{ tplvars.baseId }}"
+	data-upload-url="{{ path('agent_accept_upload') }}"
+>
+	<section id="kb-mass-action-overlay" class="mass-actions-overlay">
+		<header>
+			<span class="close close-trigger"></span>
+			<h1>
+				{{ phrase('agent.general.apply_to_x_selections', {'placeholder': '<span class="selected-tickets-count"></span>'}, true) }}
+			</h1>
+		</header>
+		<article>
+            {{ agentui.scroll_containers('', '') }}
+			<div class="dp-radio-expander-form">
+				<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+					<div class="dp-form-row">
+						<div class="dp-form-input">
+							<input type="hidden" name="from_category" value="{{ category.id }}" />
+
+							<div class="dp-input-group">
+								<label>
+									<input type="radio" class="option-trigger" name="action" value="draft" />
+									{{ phrase('agent.publish.set_as_draft') }}
+								</label>
+
+								<div class="dp-group-options" style="display: none">
+									<span>{{ phrase('agent.publish.ask_set_to_draft') }}</span>
+									<div class="execute-row">
+										<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+									</div>
+								</div>
+							</div>
+
+							<div class="dp-input-group">
+								<label>
+									<input type="radio" class="option-trigger" name="action" value="delete" />
+									{{ phrase('agent.general.delete') }}
+								</label>
+								<div class="dp-group-options" style="display: none">
+									<span>{{ phrase('agent.general.ask_delete_selected') }}</span>
+									<div class="execute-row">
+										<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+									</div>
+								</div>
+							</div>
+
+							<div class="dp-input-group">
+								<label>
+									<input type="radio" class="option-trigger" name="action" value="move" />
+									{{ phrase('agent.publish.change_category') }}
+								</label>
+								<div class="dp-group-options" style="display: none">
+									<label>
+										{{ phrase('agent.publish.move_to') }}:
+										{% include 'AgentBundle:Common:select-standard.html.twig' with {
+											'name': 'to_category',
+											'id': baseId ~ '_cat',
+											'add_classname': 'category_id',
+											'add_attr': '',
+											'with_blank': 1,
+											'blank_title': '',
+											'categories': article_categories,
+											'selected': 0
+										} %}
+									</label>
+
+									<div class="execute-row">
+										<a class="apply-actions">{{ phrase('agent.publish.apply_action') }}</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+            {{ agentui.scroll_containers_end() }}
+		</article>
+	</section>
+</div>

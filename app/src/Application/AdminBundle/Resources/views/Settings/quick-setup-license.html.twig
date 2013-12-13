@@ -1,0 +1,154 @@
+{% if not is_import %}
+<div class="page-radio-group {%  if not license_code %}open{% endif %}" id="lic_group_get_demo">
+	<header>
+		<h3><label><input type="radio" {%  if not license_code %}checked="checked"{% endif %} name="lic_box" /> Get a demo license</input></label></h3>
+	</header>
+	<article>
+		<form action="{{ path('admin_license_reqdemo') }}" method="post" data-lic-request-url="{{ ma_server }}/api/license/request-demo.json" data-build="{{ constant('DP_BUILD_TIME') }}">
+			<input type="hidden" name="process" value="1" />
+
+			{% for k,v in licdata_report %}<input type="hidden" name="{{ k }}" value="{{ v }}" />{% endfor %}
+
+			<div class="alert-message block-message error errors-box" style="display: none;">
+				<strong>{{ phrase('admin.license.error_encountered') }}:</strong>
+				<ul>
+					<li class="error-item error_email">{{ phrase('agent.general.error_email_address') }}</li>
+					<li class="error-item error_timeout">{{ phrase('admin.license.error_you_timed_out') }}</li>
+					<li class="error-item error_server_error">{{ phrase('admin.license.error_licensing_server_problems') }}</li>
+					<li class="error-item error_request_error">{{ phrase('admin.license.license_server_detected_error', {'error':errors.request_error}) }}</li>
+					<li class="error-item error_unknown_request_error">{{ phrase('admin.license.error_licence_server_connection') }}</li>
+					<li class="error-item error_site_name">{{ phrase('admin.license.error_site_name') }}</li>
+					<li class="error-item error_site_url">{{ phrase('admin.license.error_site_url') }}</li>
+					<li class="error-item error_phone">{{ phrase('admin.license.error_phone') }}</li>
+					<li class="error-item error_name">Please enter your name</li>
+				</ul>
+
+				<div class="error-item error_timeout error_server_error error_request_error error_unknown_request_error" style="display: none">
+					<p>
+						{{ phrase('admin.license.explain_connection_problems') }}
+						<br />
+						<button class="clean-white" style="margin: 15px;">Try Again &rarr;</button>
+					</p>
+					<p style="font-size: 110%; color: #000; margin-top: 10px; padding-top: 20px; border-top: 1px solid #FBC7C6;">
+						<a href="{{ path('admin_license_keyfile', {email_address: email_address|default(app.user.primary_email_address) }) }}" class="install-key-file" style="float:left;">Download Key File</a>
+						<br />
+						{% set phrase_link %}
+						<a href="mailto:support@deskpro.com" style="color: #000;">{{ phrase('agent.general.supportdeskprocom') }}</a>
+						{% endset %}
+						{{ phrase('admin.license.do_if_license_has_problems', {'link':phrase_link}, true) }}
+					</p>
+					<br class="clear" />
+				</div>
+			</div>
+
+			<input type="hidden" name="process" value="1" />
+			<input type="hidden" name="build" value="{{ constant('DP_BUILD_TIME') }}" />
+			<input type="hidden" name="install_key" value="{{ app.getSetting('core.install_key') }}" />
+			<input type="hidden" name="install_token" value="{{ app.getSetting('core.install_token') }}" />
+			<table cellspacing="0" cellpadding="0" class="form-table" width="100%">
+				<tr>
+					<td class="label" width="250" valign="middle">Email Address to Send License:</td>
+					<td><input type="text" id="lic_email_address" name="email_address" value="{{ app.user.primary_email_address }}" style="width: 90%;" placeholder="Email Address" /></td>
+				</tr>
+				<tr>
+					<td class="label" width="250" valign="middle">Your Name:</td>
+					<td><input type="text" id="lic_name" name="user_name" value="{{ app.user.display_name }}" style="width: 90%;" placeholder="Your Name" /></td>
+				</tr>
+				<tr>
+					<td class="label" valign="middle">Your Organization's Name:</td>
+					<td><input type="text" id="lic_website_name" name="website_name" value="{{ app.getSetting('core.site_name') }}" style="width: 90%;" placeholder="Organization Name" /></td>
+				</tr>
+				<tr>
+					<td class="label"  valign="middle">Your Organization's Website URL:</td>
+					<td><input type="text" id="lic_website_url" name="website_url" value="{{ app.getSetting('core.site_url') }}" style="width: 90%;" placeholder="Website URL" /></td>
+				</tr>
+				<tr>
+					<td class="label"  valign="middle">Your Phone Number:</td>
+					<td>
+						<table width="561">
+							<tr>
+								<td width="200" valign="top" style="vertical-align: top; padding-left: 0;">
+									<select name="phone_country" id="lic_phone_country" style="width: 200px" data-select-width="180">
+										{% for title in calling_countries %}
+											<option value="{{ title }}" {% if "United States" in title and loop.index < 10 %}selected="selected"{% endif %}>{{ title }}</option>
+										{% endfor %}
+									</select>
+								</td>
+								<td valign="top" style="vertical-align: top">
+									<input type="text" id="lic_phone" name="phone" value="" style="width: 100%; display: inline;" placeholder="Phone Number" />
+								</td>
+								<td valign="middle" nowrap="nowrap">
+									&nbsp;&nbsp;
+									Extension: <input type="text" id="lic_phone" name="phone_ext" value="" style="width: 60px; font-size: 11px; padding: 1px; margin: 0; display: inline;" />
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>
+						<div class="is-not-loading">
+							<button class="clean-white">{{ phrase('admin.license.get_demo_license') }}</button>
+						</div>
+						<div class="is-loading">
+							<i class="flat-spinner"></i>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</article>
+</div>
+{% endif %}
+
+<div class="page-radio-group {% if license_code or is_import %}open{% endif %}" id="lic_group_enter_license">
+	<header>
+		<h3><label><input type="radio" name="lic_box" {% if license_code %}checked="checked"{% endif %} /> Enter license code</input></label></h3>
+	</header>
+	<article>
+
+		<div class="alert-message block-message error errors-box" style="display: none">
+			<strong>{{ phrase('admin.license.error_encountered') }}:</strong>
+			<ul>
+				<li>{{ phrase('admin.license.notice_invalid_license', {'invalid':'<span class="lic-err-code"></span>'}, true) }}</li>
+			</ul>
+			<div style="margin-top: 12px; font-size: 11px; line-height: 135%;">
+				Note for existing DeskPRO v3 Customers: You will need to generate a new license code for use with v4.<br/>Log in to your members area at <a href="https://www.deskpro.com/members/">https://www.deskpro.com/members/</a>
+			</div>
+		</div>
+
+		<form action="{{ path('admin_license_input_save') }}" method="post">
+			<table cellspacing="0" cellpadding="0" class="form-table" width="100%">
+				<tr>
+					<td class="label" width="150" valign="middle">License code:</td>
+					<td>
+						<div class="alert-message block-message success demo-sent-message" style="display: none;">
+							Your demo license has been sent to your email address <span id="place_lic_email"></span>. Please copy and paste the code from your email into the box below.
+							<br />
+							&larr; <a id="lic_do_send_again">Didn't get the license email or want to change your email address? Go back and try again</a>.
+						</div>
+						{% if is_import %}
+							<div class="alert-message block-message success demo-sent-message">
+								You can get your license code from your members area at <a href="https://www.deskpro.com/members/" target="_blank">https://www.deskpro.com/members/</a>.<br/>
+								If you cannot find your license code or need any help, please contact <a href="mailto:support@deskpro.com">support@deskpro.com</a>.
+							</div>
+						{% endif %}
+						<textarea name="license_code" style="height: 150px; width: 90%;"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>
+						<div class="is-not-loading">
+							<button class="clean-white">Save License &rarr;</button>
+						</div>
+						<div class="is-loading">
+							<i class="flat-spinner"></i>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</article>
+</div>

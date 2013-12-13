@@ -1,0 +1,18 @@
+{##
+ # The news listing that appears on the portal homepage.
+ ##}
+
+<section class="dp-portal-section">
+	<header>
+		<h1>{{ phrase('user.news.latest_news') }}</h1>
+	</header>
+	<div class="dp-content-block dp-news-block">
+		<div class="dp-content-wrapper">
+			<ul class="dp-content-list">
+				{% for news in news_entries %}
+					{% include 'UserBundle:News:filter-list-item.html.twig' %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</section>

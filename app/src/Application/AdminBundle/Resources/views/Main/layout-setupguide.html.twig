@@ -1,0 +1,26 @@
+{% set nexttask = app.setup_guide.getNextTask() %}
+{% if nexttask %}
+<div id="dp_admin_steps">
+	{#
+	<div class="view-all">
+		view all
+		<div id="dp_admin_steps_list">
+			<ul>
+				{% for id,info in app.setup_guide.getTasks() %}
+					<li class="{% if app.setup_guide.isTaskComplete(id) %}complete{% endif %}"><a href="{{ path(info.route) }}">{{ phrase('admin.setup.' ~ id) }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	#}
+	<div class="next">
+		{{ phrase('admin.menu.next_step') }}: <a href="{{ path(nexttask.route) }}" class="step">{{ phrase('admin.setup.taskid_' ~ nexttask.id) }}</a>
+		<em class="skip" onclick="window.location='{{ path('admin_skip_setup_todo') }}';">{{ phrase('admin.menu.or_skip') }}</em>
+	</div>
+	<div class="ui-progress-bar ui-container blue">
+		<div class="ui-progress" style="width: {{ app.setup_guide.getPercentComplete() }}%;">
+			<span class="ui-label"><b class="value">{{ app.setup_guide.getPercentComplete() }}%</b></span>
+		</div>
+	</div>
+</div>
+{% endif %}

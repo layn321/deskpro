@@ -1,0 +1,49 @@
+<div class="user-listing">
+	<div style="height: 365px; overflow: auto;">
+		<table cellspacing="0" cellpadding="0" width="100%">
+			<caption>
+				{{ phrase('agent.chrome.chat_list_online-users', {count: visitors|length}, true) }}
+			</caption>
+			<thead>
+				<tr>
+					<th class="col-head">{{ phrase('agent.chrome.chat_list_heading_user') }}</th>
+					<th class="col-head">{{ phrase('agent.chrome.chat_list_heading_current-page') }}</th>
+					<th class="col-head" width="10">{{ phrase('agent.chrome.chat_list_heading_time') }} <em class="reload-table-btn"></em></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for vis in visitors %}
+					<tr>
+						<td>
+							<div style="width: 170px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								<span class="link" data-route="page:{{ path('agent_usertrack_view', {visitor_id: vis.id}) }}">
+									<span {% if vis.visit_track.geo_country %}class="with-country" style="background-image: url({{ asset('images/flags/' ~ vis.visit_track.geo_country|lower ~ '.png') }});" title="{{ vis.visit_track.geo_country|country_name }}" {% endif %}>
+										{% if vis.person %}
+											{{ vis.person.display_name }}
+										{% else %}
+											{{ vis.name }}
+										{% endif %}
+									</span>
+								</span>
+							</div>
+						</td>
+						<td>
+							<div style="width: 300px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+								<a href="{{ vis.recent_track.page_url }}" target="_blank">
+									{{ vis.recent_track.page_url|url_trim_scheme(true) }}
+								</a>
+							</div>
+						</td>
+						<td nowrap="nowrap" width="10"><span style="white-space: nowrap; display: block;">{{ vis.date_last|date('time') }}</span></td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="100" style="text-align: center">
+							{{ phrase('agent.chrome.chat_list_no-online-users') }}
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>

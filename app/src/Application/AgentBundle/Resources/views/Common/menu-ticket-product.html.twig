@@ -1,0 +1,17 @@
+<ul class="menu product_id {{add_classname}}" data-option-name="product_id" style="display:none">
+	{% for prod in products %}
+		{% if last_with_child %}
+			<li data-option-value="{{prod.id}}" class="sep prod-{{prod.id}}">-</li>
+		{% endif %}
+		{% if prod.children %}
+			<li data-option-value="{{prod.id}}" class="section-title prod-{{prod.id}}">{{prod.title}}</li>
+			{% for subprod in prod.children %}
+				<li data-option-value="{{subprod.id}}" data-parent-id="{{prod.id}}" class="prod-{{prod.id}} prod-{{subprod.id}}">{{subprod.title}}</li>
+			{% endfor %}
+			{% set last_with_child = true %}
+		{% else %}
+			<li data-option-value="{{prod.id}}" class="prod-{{prod.id}}">{{prod.title}}</li>
+			{% set last_with_child = false %}
+		{% endif %}
+	{% endfor %}
+</ul>

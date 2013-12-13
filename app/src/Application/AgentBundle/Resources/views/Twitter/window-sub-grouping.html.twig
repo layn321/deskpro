@@ -1,0 +1,71 @@
+<ul class="nav-list nav-list-small indented" {% if not group_by %}style="display: none;"{% endif %}>
+	{% if group_by == 'type' %}
+		{% for group_type,name in {
+			'favorite': phrase('agent.twitter.starred'),
+			'direct': phrase('agent.twitter.direct_messages'),
+			'reply': phrase('agent.twitter.replies'),
+			'mention': phrase('agent.twitter.mentions'),
+			'retweet': phrase('agent.twitter.retweets'),
+			'other': phrase('agent.general.other')
+		} %}
+			<li {% if not data[group_type] %}style="display:none"{% endif %}>
+				<div class="item is-nav-item twitter-sub-group-{{ account.id }}-{{ section_type }}-type-{{ group_type }}" data-route="listpane:{{ path(route, {'account_id': account.id, 'group': 'type', 'group_value': group_type}) }}">
+					<h3>
+						{{ name }}
+					</h3>
+					<div class="float-side">
+						<em class="counter list-counter">{{ data[group_type]|default(0) }}</em>
+					</div>
+				</div>
+			</li>
+		{% endfor %}
+	{% elseif group_by == 'agent' %}
+		<li {% if not data[0] %}style="display:none"{% endif %}>
+			<div class="item is-nav-item twitter-sub-group-{{ account.id }}-{{ section_type }}-agent-0" data-route="listpane:{{ path(route, {'account_id': account.id, 'group': 'agent', 'group_value': 0}) }}">
+				<h3>
+					{{ phrase('agent.general.none') }}
+				</h3>
+				<div class="float-side">
+					<em class="counter list-counter">{{ data[0]|default(0) }}</em>
+				</div>
+			</div>
+		</li>
+		{% for agent in agents %}
+			<li {% if not data[agent.id] %}style="display:none"{% endif %}>
+				<div class="item is-nav-item twitter-sub-group-{{ account.id }}-{{ section_type }}-agent-{{ agent.id }}" data-route="listpane:{{ path(route, {'account_id': account.id, 'group': 'agent', 'group_value': agent.id}) }}">
+					<h3>
+						<span
+							style="background: url('{{ agent.getPictureUrl(16) }}') no-repeat 0 50%; height: 16px; padding-left: 19px; display: block;"
+						>{{ agent.display_name }}</span>
+					</h3>
+					<div class="float-side">
+						<em class="counter list-counter">{{ data[agent.id]|default(0) }}</em>
+					</div>
+				</div>
+			</li>
+		{% endfor %}
+	{% elseif group_by == 'team' %}
+		<li {% if not data[0] %}style="display:none"{% endif %}>
+			<div class="item is-nav-item twitter-sub-group-{{ account.id }}-{{ section_type }}-team-0" data-route="listpane:{{ path(route, {'account_id': account.id, 'group': 'team', 'group_value': 0}) }}">
+				<h3>
+					{{ phrase('agent.general.none') }}
+				</h3>
+				<div class="float-side">
+					<em class="counter list-counter">{{ data[0]|default(0) }}</em>
+				</div>
+			</div>
+		</li>
+		{% for team in teams %}
+			<li {% if not data[team.id] %}style="display:none"{% endif %}>
+				<div class="item is-nav-item twitter-sub-group-{{ account.id }}-{{ section_type }}-team-{{ team.id }}" data-route="listpane:{{ path(route, {'account_id': account.id, 'group': 'team', 'group_value': team.id}) }}">
+					<h3>
+						{{ team.name }}
+					</h3>
+					<div class="float-side">
+						<em class="counter list-counter">{{ data[0]|default(0) }}</em>
+					</div>
+				</div>
+			</li>
+		{% endfor %}
+	{% endif %}
+</ul>

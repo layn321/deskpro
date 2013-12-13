@@ -1,0 +1,34 @@
+{##
+ # Used to draw the knowledgebase category lists on the browse page
+ ##}
+<ul class="dp-browse-list">
+	{% set count = 0 %}
+	{% for cat in categories %}
+		{% if count != 0 and count % 2 == 0 %}</ul><ul class="dp-browse-list">{% endif %}
+		{% set count = count + 1 %}
+		<li>
+			<h3 class="dp-fadeaway-container"><a class="dp-fadeaway-title" href="{{ path('user_articles', {'slug': cat.url_slug}) }}">{{ phrase_object(cat) }}</a><div class="dp-fadeaway"></div></h3>
+			<ul class="dp-contains-fadaway">
+				{% for article in category_articles[cat.id] %}
+					<li>
+						<div class="dp-fadeaway-container">
+							<a class="dp-fadeaway-title" href="{{ path('user_articles_article', {'slug': article.url_slug}) }}">{{ article.title }}</a>
+							<div class="dp-fadeaway"></div>
+						</div>
+					</li>
+				{% else %}
+					<li>{{ phrase('user.knowledgebase.category_no-articles') }}</li>
+				{% endfor %}
+			</ul>
+			<br class="dp-br-clear" />
+			{% set this_cat_counts = category_counts[cat.id ~ '_total'] %}
+			{% if this_cat_counts %}
+				<div class="dp-view-more">
+					<a href="{{ path('user_articles', {'slug': cat.url_slug}) }}">
+						{{ phrase('user.knowledgebase.link_view-all', {'count': '<span class="dp-badge dp-badge-info dp-small">' ~ this_cat_counts ~ '</span>'}, true) }} {{ language_arrow('right') }}
+					</a>
+				</div>
+			{% endif %}
+		</li>
+	{% endfor %}
+</ul>

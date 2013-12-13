@@ -1,0 +1,168 @@
+{% extends 'AgentBundle:Login:layout.html.twig' %}
+{% block head %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.show-lost-password-trigger').on('click', function(ev) {
+				ev.preventDefault();
+				$('#normal_view').hide();
+				$('#lost_fields').show();
+				$('#lost_fields_sent').hide();
+			});
+
+			$('.show-login-form-trigger').on('click', function(ev) {
+				ev.preventDefault();
+				$('#normal_view').show();
+				$('#lost_fields').hide();
+				$('#lost_fields_sent').hide();
+			});
+
+			$('#do_send_lost').on('submit', function(ev) {
+				ev.preventDefault();
+
+				var postData = {
+					email: $('#lost_email').val().trim()
+				};
+
+				if (!postData.email.length || postData.email.indexOf('@') === -1) {
+					alert('Please enter an email address');
+					return;
+				}
+
+				$('#lost_fields_submit').hide();
+				$('#lost_fields_laoding').show();
+
+				$.ajax({
+					url: '{{ path(route_prefix~'_send_lost') }}',
+					data: postData,
+					complete: function() {
+						$('#lost_fields_submit').show();
+						$('#lost_fields_loading').hide();
+					},
+					success: function(data) {
+						if (data && data.status) {
+							$('#normal_view').show();
+							$('#lost_fields').hide();
+							$('#lost_fields_sent').hide();
+
+							if (data.status == 'usersource_redirect') {
+								window.location = data.url;
+							} else if (data.status == 'usersource_no_reset') {
+								alert('You are registered through ' + data.usersource_name + '. You cannot reset your password from this page.');
+							}
+							return;
+						}
+						$('#lost_fields_sent').show();
+						$('#normal_view').hide();
+						$('#lost_fields').hide();
+					}
+				});
+			});
+
+			{% if app.getRequest().query.has('lost') %}
+				$('#lost_link').trigger('click');
+			{% endif %}
+		});
+	</script>
+{% endblock %}
+{% block content %}
+
+{##############################################################################################################}
+{# LOGIN FORM #}
+{##############################################################################################################}
+
+<div id="normal_view">
+	<div class="title">
+		{{ phrase('agent.general.log_in') }}
+	</div>
+	<div class="content">
+		<form action="{{ path(route_prefix~'_login_authenticate_local') }}" method="post">
+				<input type="hidden" name="agent_login" value="1" />
+				{% if return %}<input type="hidden" name="return" value="{{return}}" />{% endif %}
+				{% if timeout %}<div class="error" style="display: block">{{ phrase('agent.login.session_timeout') }}</div>{% endif %}
+				{% if failed_login_name %}<div class="error">{{ phrase('agent.login.login_failed') }}</div>{% endif %}
+				{% if has_done_reset %}<div class="success">{{ phrase('agent.login.password_was_reset') }}</div>{% endif %}
+				{% if has_logged_out %}<div class="success">{{ phrase('agent.login.has_logged_out') }}</div>{% endif %}
+
+				{% if failed_login_name == "1" %}{% set failed_login_name = "" %}{% endif %}
+
+				<fieldset>
+					<p>
+						<i class="icon-envelope-alt"></i>
+						<input type="{% if app.usersourceManager.getWithCapability('form_login') %}text{% else %}email{% endif %}" class="text" value="{{ failed_login_name }}" name="email" id="email" size="40" placeholder="{{ phrase('agent.general.email') }}{% if app.usersourceManager.getWithCapability('form_login') %}/ {{ phrase('agent.general.username') }}{% endif %}" tabindex="1" />
+					</p>
+					<p>
+						<i class="icon-lock"></i>
+						<input type="password" class="text" value="" name="password" id="password" size="40"  tabindex="2" placeholder="{{ phrase('agent.general.password') }}" />
+					</p>
+					<p>
+						<table cellspacing="0" cellpadding="0" border="0">
+							<tr>
+								<td width="10" valign="middle" style="vertical-align: middle;"><input type="checkbox" name="remember_me" id="rem_cb" value="1" tabindex="3" /></td>
+								<td valign="middle" style="vertical-align: middle;">
+									&nbsp;
+									<label for="rem_cb">
+										{{ phrase('agent.login.remember_me') }}
+									</label>
+								</td>
+							</tr>
+						</table>
+					</p>
+				</fieldset>
+				<p><input class="full-width" type="submit" value="{{ phrase('agent.general.log_in') }}" /></p>
+				<p class="text-right"><a href="#" class="show-lost-password-trigger">{{ phrase('agent.login.forgot_password') }}</a></p>
+		</form>
+	</div>
+</div>
+
+{##############################################################################################################}
+{# LOST PASSWORD #}
+{##############################################################################################################}
+
+<div id="lost_fields" style="display: none">
+	<div class="title">
+		{{ phrase('agent.general.lost_password') }}
+	</div>
+	<div class="content">
+		<form id="do_send_lost">
+			<fieldset>
+				<p>{{ phrase('agent.login.reset-password-info') }}</p>
+				<p>
+					<i class="icon-envelope-alt"></i>
+					<input type="text" class="text" value="{{ failed_login_name }}" name="email" id="lost_email" size="40" placeholder="{{ phrase('agent.general.email') }}" tabindex="1" />
+				</p>
+			</fieldset>
+			<div id="lost_fields_submit">
+				<p><input class="full-width" type="submit" value="{{ phrase('agent.login.email_instructions') }}" /></p>
+				<p><a class="show-login-form-trigger" href="#">&larr; {{ phrase('agent.login.back_to_login') }}</a></p>
+			</div>
+			<div id="lost_fields_laoding" style="display: none;">
+				<center>
+					<img src="{{ asset('images/spinners/loading-big-circle.gif') }}" />
+				</center>
+			</div>
+		</form>
+	</div>
+</div>
+
+{##############################################################################################################}
+{# LOST PASSWORD:SENT #}
+{##############################################################################################################}
+
+<div id="lost_fields_sent" style="display: none">
+	<div class="title">
+		{{ phrase('agent.general.lost_password') }}
+	</div>
+	<div class="content">
+		<form>
+			<fieldset>
+				<p>{{ phrase('agent.login.reset-password-sent') }}</p>
+			</fieldset>
+			<p><a class="show-login-form-trigger" href="#">&larr; {{ phrase('agent.login.back_to_login') }}</a></p>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	document.getElementById('email').focus();
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+<section id="publish_outline_glossary">
+	<div style="text-align: center; padding: 10px;">
+		<button class="dp-btn dp-btn-small add-new glossary-new-trigger">{{ phrase('agent.publish.add_new_glossary') }}</button>
+	</div>
+	<div class="labels-list" style="border-top: none;">
+		<table>
+			{% for letter,words in glossary_words %}
+				<tr data-letter="{{ letter }}" {% if not words|length %}style="display: none"{% endif %}>
+					<td class="letter">{{ letter }}</td>
+					<td class="labels">
+						<ul>
+							{% for id,word in words %}
+								<li>
+									<span class="glossary-word-trigger word-{{id}}" data-word-id="{{id}}">
+									{{word}}
+									</span>
+								</li>
+							{% endfor %}
+						</ul>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+
+	<div class="glossary-add-dlg dp-overlay" style="display:none;">
+		<div class="overlay-title"><h4>{{ phrase('agent.publish.add_new_glossary') }}</h4></div>
+		<div class="overlay-content">
+			<div><input type="text" class="word" value="" style="width: 350px" placeholder="{{ phrase('agent.publish.word_title') }}" data-select-width="364" /></div>
+			<textarea class="definition" rows="2" cols="50" style="width: 98%; height: 150px; margin-top: 5px;" placeholder="{{ phrase('agent.publish.word_def') }}"></textarea>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white save-trigger">{{ phrase('agent.general.add') }}</button>
+		</div>
+	</div>
+
+	<div class="glossary-edit-dlg dp-overlay" style="display:none;">
+		<div class="overlay-title"><h4>{{ phrase('agent.publish.edit_new_glossary') }}</h4></div>
+		<div class="overlay-content">
+			<div class="form">
+				<div><input type="text" class="word" value="" style="width: 350px" placeholder="{{ phrase('agent.publish.word_title') }}" data-select-width="364" /></div>
+				<textarea class="definition" rows="2" cols="50" style="width: 98%; height: 150px; margin-top: 5px;" placeholder="{{ phrase('agent.publish.word_def') }}"></textarea>
+				<input type="hidden" class="word_id" value="" />
+			</div>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white delete-trigger">{{ phrase('agent.general.delete') }}</button>
+			<button class="clean-white save-trigger">{{ phrase('agent.general.save') }}</button>
+		</div>
+	</div>
+</section>

@@ -1,0 +1,183 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.TicketTriggersPage' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TicketTriggersPage.js') }}"></script>
+<script type="text/javascript">
+	var UPDATE_ORDER_URL = '{{ path('admin_tickettriggers_updateorder') }}';
+</script>
+{% endblock %}
+{% block pagetabs %}
+<ul>
+	<li><a href="{{ path('admin_tickettriggers', {list_type: 'new'}) }}">New Ticket Triggers</a></li>
+	<li class="on"><a href="{{ path('admin_tickettriggers', {list_type: 'update'}) }}">Ticket Updated Triggers</a></li>
+	<li><a href="{{ path('admin_agents_notifications') }}">Agent Notifications</a></li>
+</ul>
+{% endblock %}
+{% block page %}
+
+{% macro trigger_row(index, trigger, type) %}
+	<li class="item-row trigger-row is-trigger {% if trigger.is_enabled %}{% else %}off{% endif %} orderable" id="trigger_{{ trigger.id }}" data-trigger-id="{{ trigger.id }}">
+		<span class="field-id">ID: {{ trigger.id }}</span>
+		<div class="dp-block-controls">
+			<ul>
+				{% if not trigger.isUneditable() %}
+					<li class="dp-edit"><a href="{{ path('admin_tickettriggers_edit', {'id': trigger.id}) }}" class="popout-trigger"><span></span></a></li>
+				{% endif %}
+				{% if not trigger.sys_name %}
+					<li class="dp-remove"><a href="{{ path('admin_tickettriggers_delete', {id: trigger.id, auth: security_token('delete_trigger') }) }}" class="confirm-delete-trigger" data-prompt="{{ phrase('admin.tickets.confirm_delete_trigger') }}"><span></span></a></li>
+				{% endif %}
+				<li class="dp-on-off trigger-toggle"><span class="off" {% if trigger.is_enabled %}style="display: none"{% endif %}>{{ phrase('admin.general.off') }}</span><span class="on" {% if not trigger.is_enabled %}style="display: none"{% endif %}>{{ phrase('agent.general.on') }}</span></li>
+			</ul>
+		</div>
+		<div class="contents">
+			<div class="trigger-desc">
+				<table cellspacing="0" cellpadding="0"><tr><td valign="middle" width="400" style="vertical-align: middle;">
+					<div class="terms">
+						{% if trigger.sys_name and trigger.sys_name == trigger.title and has_phrase('agent.general.triggers_' ~ trigger.sys_name|replace({'.': '_'})) %}
+							{{ phrase('agent.general.triggers_' ~ trigger.sys_name|replace({'.': '_'})) }}
+							<br />
+						{% elseif trigger.title %}
+							{{ trigger.title }}
+							<br />
+						{% endif %}
+
+						{% set all_terms = trigger.getAllTermDescriptions(true) %}
+						{% set any_terms = trigger.getAnyTermDescriptions(true) %}
+						{% if all_terms or any_terms %}
+							{% if all_terms %}
+								<em class="op ctrl">IF ALL:</em>
+								{% for desc in all_terms %}
+									{% if loop.index > 1 %}
+										<br /><em class="op">{{ phrase('agent.general.and') }}</em>
+									{% endif %}
+									<span class="term">{{ desc|raw }}</span>
+								{% endfor %}
+							{% endif %}
+
+							{% if any_terms %}
+								{% if all_terms %}<br /><em class="op ctrl">AND IF ANY:</em>
+								{% else %}<em class="op ctrl">IF ANY:</em>{% endif %}
+								{% for desc in any_terms %}
+									{% if loop.index > 1 %}
+										<br /><em class="op">{{ phrase('agent.general.and') }}</em>
+									{% endif %}
+									<span class="term">{{ desc|raw }}</span>
+								{% endfor %}
+							{% endif %}
+						{% elseif not trigger.title %}
+							<span class="term">{{ phrase('admin.tickets.any_ticket') }}</span>
+						{% endif %}
+					</div>
+				</td><td valign="middle" width="400" style="padding-left: 15px; vertical-align: middle;">
+					<div class="actions">
+						<em class="op ctrl">{{ phrase('admin.tickets.then') }}</em>
+						{% for desc in trigger.getActionDescriptions() %}
+							<span class="term">{{ desc|raw }}</span>
+							{% if not loop.last %}<br /><em class="op">{{ phrase('agent.general.and') }}</em>{% endif %}
+						{% endfor %}
+					</div>
+				</td></tr></table>
+			</div>
+		</div>
+		<br class="clear" />
+	</li>
+{% endmacro %}
+
+<div class="content-table template-dir trigger-dir">
+	<table width="100%" class="simple">
+		<thead>
+			<tr>
+				<th class="single-title" colspan="10">
+					<div style="float: right">
+						<a class="clean-white" href="{{ path('admin_tickettriggers_new', {trigger_type: 'update.agent'}) }}">Add New Trigger</a>
+					</div>
+					<h1 class="noexpand">
+						Ticket updated by an agent
+					</h1>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<ul class="item-list trigger-set">
+						{% include 'AdminBundle:TicketTriggers:agent-notify-row.html.twig' %}
+						{% for trigger in triggers['update.agent'] %}
+							{{ _self.trigger_row(loop.index, trigger, type) }}
+						{% endfor %}
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div class="content-table template-dir trigger-dir" style="margin-top: 8px;">
+	<table width="100%" class="simple">
+		<thead>
+			<tr>
+				<th class="single-title" colspan="10">
+					<div style="float: right">
+						<a class="clean-white" href="{{ path('admin_tickettriggers_new', {trigger_type: 'update.user'}) }}">Add New Trigger</a>
+					</div>
+					<h1 class="noexpand">
+						Ticket updated by a user
+					</h1>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<ul class="item-list trigger-set">
+						{% include 'AdminBundle:TicketTriggers:agent-notify-row.html.twig' %}
+						{% for trigger in triggers['update.user'] %}
+							{{ _self.trigger_row(loop.index, trigger, type) }}
+						{% endfor %}
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% if show_api_option %}
+	<div class="content-table template-dir trigger-dir" style="margin-top: 8px;">
+		<table width="100%" class="simple">
+			<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<div style="float: right">
+							<a class="clean-white" href="{{ path('admin_tickettriggers_new', {trigger_type: 'update.api'}) }}">Add New Trigger</a>
+						</div>
+						<h1 class="noexpand">
+							Ticket updated via the API
+						</h1>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<ul class="item-list trigger-set">
+							{% for trigger in triggers['update.api'] %}
+								{{ _self.trigger_row(loop.index, trigger, type) }}
+							{% else %}
+								<li>
+									You have not defined any triggers for ticket updates via the API.
+									<a href="{{ path('admin_tickettriggers_new', {trigger_type: 'update.api'}) }}">Create one now</a>.
+								</li>
+							{% endfor %}
+						</ul>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+{% endif %}
+
+<div style="padding-top: 25px;text-align: right">
+	<a href="{{ path('admin_tickettriggers_export') }}">Import/Export Triggers &rarr;</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+{##
+ # The ticket tab of the website widget overlay
+ ##}
+{% import 'UserBundle:Common:macros-form.html.twig' as formmacro %}
+<div id="newticket" class="tab" style="display: none;">
+	<form id="dp_newticket_form" action="{{ path('user_widget_newticket') }}" method="POST" id="dp_newticket_form" class="with-form-validator" enctype="multipart/form-data">
+		<input type="hidden" name="website_url" value="{{ website_url }}" />
+
+		{{ form_token('newticket_widget') }}
+		{% if app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+			<div class="socials">
+				<div>
+					<span>{{ phrase('user.widget.login-connect') }}</span>
+					<ul>
+						{% for usersource in app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+							<li>{{ render_usersource(usersource, 'widget_overlay_btn') }}</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		{% endif %}
+
+		<table class="form-table" cellspacing="0" cellpadding="0" width="100%">
+			<tbody>
+				<tr>
+					<th width="120">
+						{{ phrase('user.widget.name') }}
+					</th>
+					<td>
+						<div class="dp-form-row-person_name">
+							<div class="txt">
+								{{ form_widget(ticketform.person.name, {
+									'attr': {
+										'data-field-validators': 'DeskPRO.Form.LengthValidator',
+										'data-min-len': 2,
+										'class': 'name-field'
+									}
+								}) }}
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.form_error_name') }}</span>
+							</span>
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th>
+						{{ phrase('user.widget.email') }}
+					</th>
+					<td>
+						<div class="dp-form-row-person_email">
+							<div class="txt">
+								<input type="text" class="email-field" id="dp_newticket_email" name="newticket[person][email]" value="" data-field-validators="DeskPRO.Form.LengthValidator" data-min-len="4" />
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.form_error_email') }}</span>
+							</span>
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th>
+						{{ phrase('user.widget.ticket_form_subject') }}
+					</th>
+					<td>
+						<div class="dp-form-row-ticket_subject">
+							<div class="txt txt-wide">
+								{{ form_widget(ticketform.ticket.subject, {
+									'attr': {
+										'data-field-validators': 'DeskPRO.Form.LengthValidator',
+										'data-min-len': 5,
+										'class': 'search-collect'
+									}
+								}) }}
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.ticket_form_error_subject') }}</span>
+							</span>
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th>
+						{{ phrase('user.widget.ticket_form_department') }}
+					</th>
+					<td>
+						<div class="dp-form-row-ticket_department_id">
+							<div class="fields-row">
+								<select name="newticket[ticket][department_id]">
+									<option value=""></option>
+									{% for cat in app.departments.getPersonDepartments(app.user, 'tickets') %}
+										{{ formmacro.select_options_hierarchy(cat, newticket.ticket.department_id) }}
+									{% endfor %}
+								</select>
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.ticket_form_error_department') }}</span>
+							</span>
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th style="vertical-align: top;">
+						{{ phrase('user.widget.ticket_form_message') }}
+					</th>
+					<td>
+						<div class="fields-row message dp-form-row-ticket_message">
+						<table cellspacing="0" cellpadding="0" width="100%"><tr><td><div style="position: relative">
+							<div class="dp-drop-file-zone"><h1>{{ phrase('user.widget.ticket_form_upload-drag') }}</h1></div>
+							<div class="textarea">
+								{{ form_widget(ticketform.ticket.message, {
+									'attr': {
+										'class': 'dp-message',
+										'data-field-validators': 'DeskPRO.Form.LengthValidator',
+										'data-min-len': 10,
+										'class': addclass
+									}
+								}) }}
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.ticket_form_error_message') }}</span>
+							</span>
+						</div></td></tr></table>
+					</div>
+					<div class="fields-row file-row">
+						{% include 'UserBundle:Common:form-upload-input.html.twig'  with { showAsLink: true } %}
+					</div>
+					</td>
+				</tr>
+				<tr>
+					<th>&nbsp;</th>
+					<td>
+						<div class="submit-row">
+							<button type="submit" class="btn-activity dp-show-not-loading">{{ phrase('user.widget.ticket_form_submit') }}</button>
+							<i class="spinner-flat dp-show-is-loading"></i>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+	<div class="thank-you" id="dp_newticket_done" style="display: none">
+		<h2>{{ phrase('user.widget.ticket_form_completed-title') }}</h2>
+		<p>{{ phrase('user.widget.ticket_form_completed') }}</p>
+	</div>
+</div>

@@ -1,0 +1,506 @@
+<!DOCTYPE HTML>
+<html lang="en" id="dp_login_page">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="NOINDEX" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>{{ phrase('agent.general.log_in') }}</title>
+<script type="text/javascript">
+	if (typeof pageMeta !== 'undefined') pageMeta.goToLogin = true;
+</script>
+<style type="text/css">
+	html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+	td { margin: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+	body { line-height: 1; }
+	ol, ul { list-style: none; }
+	blockquote, q { quotes: none; }
+	blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+	a:focus, button:focus, input:focus, textarea:focus, submit:focus { outline: 0; }
+	b, i { font-weight: inherit; font-style: inherit; }
+	b { font-weight: bold; }
+	i { font-style: italic; }
+	ins { text-decoration: none; }
+	del { text-decoration: line-through; }
+	table { border-collapse: collapse; border-spacing: 0; }
+	td { vertical-align: top; }
+
+	html {
+		background: #91ada1 url('{{ asset('images') }}/login/background.jpg') no-repeat center top fixed;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
+
+	body {
+		font-family: Helvetica, Arial, Geneva, sans-serif;
+		font-size: 13px;
+	}
+
+	.pull-left {
+		float: left;
+	}
+	.pull-right {
+		float: right;
+	}
+	a {
+		color: #1b72b3;
+		text-decoration: none;
+	}
+	a:hover {
+		color: #1b72b3;
+		text-decoration: underline;
+	}
+
+	#dp_login {
+		position: relative;
+	}
+	#dp_login #wrapper {
+		width: 360px;
+		position: absolute;
+		top: 40px;
+		left: 50%;
+		margin-left: -180px;
+	}
+	#dp_login #wrapper .client-logo {
+		position: relative;
+		height: 110px;
+		background: #fff;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		overflow: hidden;
+	}
+	#dp_login #wrapper .client-logo .drag-files {
+		margin: 10px;
+		padding: 10px;
+		height: 68px;
+		width: 318px;
+		text-align: center;
+		border: 1px dashed #7b838b;
+		color: #7b838b;
+		font-weight: bold;
+		display: table;
+		background: #eee;
+	}
+	#dp_login #wrapper .client-logo .drag-files:hover {
+		cursor: move;
+	}
+	#dp_login #wrapper .client-logo .drag-files p {
+		display: block;
+		vertical-align: middle;
+		text-align: center;
+		padding-top: 15px;
+	}
+	#dp_login #wrapper .client-logo .drag-files .progress-bar {
+		height: 4px;
+		width: 200px;
+		border: 1px solid #2e83c2;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		margin: 10px auto 0;
+		overflow: hidden;
+	}
+	#dp_login #wrapper .client-logo .drag-files .progress-bar span {
+		background: #2e83c2;
+		display: block;
+		height: 4px;
+	}
+	#dp_login #wrapper .client-logo .logo {
+		text-align: center;
+		margin-top: 20px;
+	}
+	#dp_login #wrapper .client-logo .error {
+		color: #e74c3c;
+	}
+	#dp_login #wrapper .dialog-box {
+		min-height: 270px;
+		margin: 20px 0;
+		background: #fafafb;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+		-moz-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+		-webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+	}
+	#dp_login #wrapper .dialog-box .title {
+		background: #2b2f33;
+		color: #838b92;
+		height: 50px;
+		line-height: 54px;
+		font-size: 14px;
+		padding: 0 30px;
+		font-weight: bold;
+		-webkit-border-radius: 3px 3px 0 0;
+		-moz-border-radius: 3px 3px 0 0;
+		-ms-border-radius: 3px 3px 0 0;
+		-o-border-radius: 3px 3px 0 0;
+		border-radius: 3px 3px 0 0;
+	}
+	#dp_login #wrapper .dialog-box .title.admin {
+		background: #440006;
+	}
+	#dp_login #wrapper .dialog-box .content {
+		padding: 10px 30px;
+	}
+	#dp_login #wrapper .dialog-box .content form p {
+		position: relative;
+		margin: 20px 0;
+		color: #838b92;
+	}
+	#dp_login #wrapper .dialog-box .content form p br {
+		display: none;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset label {
+		margin: 0;
+		padding: 0;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p input[type="text"],
+	#dp_login #wrapper .dialog-box .content form fieldset p input[type="email"],
+	#dp_login #wrapper .dialog-box .content form fieldset p input[type="password"] {
+		display: block;
+		padding: 0 12px 0 42px;
+		width: 244px;
+		height: 40px;
+		line-height: 40px;
+		margin: 0;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		border: solid 1px #c3c4c7;
+		box-shadow: none;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p input:focus {
+		border-color: #1b72b3;
+		color: #1b72b3;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p input.wrong {
+		border-color: #e74c3c;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p .label {
+		cursor: text;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset p i {
+		position: absolute;
+		left: 12px;
+		top: 11px;
+		font-size: 18px;
+		color: #656c73;
+		opacity: 0.35;
+	}
+	#dp_login #wrapper .dialog-box .content form fieldset i.icon-lock {
+		font-size: 20px;
+		left: 14px;
+	}
+	#dp_login #wrapper .dialog-box .content form input[type="submit"] {
+		border: none;
+		display: block;
+		background: #1b72b3;
+		height: 42px;
+		padding: 0 15px;
+		text-align: center;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+		color: #fff;
+		font-size: 14px;
+	}
+	#dp_login #wrapper .dialog-box .content form input[type="submit"]:hover {
+		background: #2e83c2;
+		cursor: pointer;
+	}
+	#dp_login #wrapper .dialog-box .content form input.full-width {
+		width: 300px;
+		padding: 0;
+	}
+	#dp_login #wrapper .dialog-box .content form p.text-right {
+		text-align: right;
+		margin-bottom: 10px;
+	}
+	#dp_login #wrapper .dialog-box .content form .go-back {
+		margin-left: 10px;
+		line-height: 42px;
+	}
+	#dp_login #wrapper .dialog-box .content .error {
+		background: #e74c3c;
+		color: #fff;
+		padding: 12px 15px;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	#dp_login #wrapper .dialog-box .content .success {
+		background: #27ae60;
+		color: #fff;
+		padding: 12px 15px;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	#dp_login #wrapper .deskpro-logo {
+		height: 100px;
+		background: url('{{ asset('images') }}/login/logo-deskpro.png') no-repeat center center;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	#dp_login #wrapper .deskpro-logo:hover {
+		opacity: 0.75;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	#lost_explain_wrap {
+		position: relative;
+		z-index: 100;
+	}
+	#lost_explain {
+		display: none;
+		font-size: 12px;
+		text-align: left;
+		position: absolute;
+		border-radius: 10px 10px 10px 10px;
+		padding: 20px;
+		background: none repeat scroll 0% 0% rgb(255, 255, 255);
+		width: 362px;
+		left: -50px;
+		box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+		top: -29px;
+	}
+
+	#lost_explain i.close {
+		position: absolute;
+		top: -3px;
+		right: -3px;
+		color: #777;
+		border: 1px solid #777;
+		background: #fff;
+		line-height: 100%;
+		padding: 2px;
+		cursor: pointer;
+		width: 10px;
+		text-align: center;
+		border-radius: 20px;
+		font-style: normal;
+	}
+
+	#client_logo_upload {
+		position: relative;
+		overflow: hidden;
+	}
+
+	#client_logo_upload input[type="file"] {
+		position: absolute;
+		top: -100px;
+		left: -100px;
+		z-index: 1;
+		padding: 1000px;
+		margin: 0;
+	}
+
+	.dp-loading-on .dp-not-loading { display: none; }
+	.dp-loading-on .dp-loading { display: block; }
+	.dp-not-loading { display: block; }
+	.dp-loading { display: none; }
+
+	#client_logo_upload .dp-loading {
+		background: url({{ asset('images/spinners/loading-big-circle.gif') }}) no-repeat 50% 50%;
+		height: 50px;
+	}
+
+	#client_logo_img > div.img {
+		width: 360px;
+		height: 110px;
+		background-position: 50% 50%;
+		background-repeat: no-repeat;
+	}
+
+	#client_logo_img {
+		position: relative;
+	}
+
+	#client_logo_img .remove-btn {
+		display: none;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: #888;
+		background: rgba(0,0,0, 0.55);
+		text-align: center;
+		padding: 5px;
+		color: #fff;
+		cursor: pointer;
+	}
+
+	#client_logo_img:hover .remove-btn {
+		display: block;
+	}
+</style>
+<script type="text/javascript" charset="utf-8" src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+</head>
+<body>
+
+<div id="dp_login">
+	<div id="wrapper">
+
+		<div class="client-logo">
+			<div id="client_logo_img" {% if not logo_blob %}style="display: none;"{% endif %}>
+				<div class="img" {% if logo_blob %}style="background-image: url({{ logo_blob.getThumbnailUrl('360x100') }}&size-fit=1)"{% endif %}></div>
+				<div class="remove-btn">Click here to remove</div>
+			</div>
+			<div class="drag-files" id="client_logo_upload" {% if logo_blob %}style="display: none;"{% endif %}>
+				<div class="dp-loading"></div>
+				<div class="dp-not-loading">
+					<input type="file" name="upfile" />
+					<p>Drag & drop your logo here<br />or click to upload it.</p><br />
+				</div>
+			</div>
+		</div>
+
+		<div class="dialog-box">
+			<div class="title admin">
+				{{ phrase('agent.general.log_in') }} &mdash; Admin
+			</div>
+			<div class="content">
+				<form action="{{ path('admin_login_authenticate_local') }}" method="post" id="login_form">
+					<input type="hidden" name="remove_logo" value="0" />
+					<input type="hidden" name="new_logo" value="0" />
+
+					<input type="hidden" name="agent_login" value="1" />
+					{% if return %}<input type="hidden" name="return" value="{{return}}" />{% endif %}
+					{% if timeout %}<div class="error" style="display: block">{{ phrase('agent.login.session_timeout') }}</div>{% endif %}
+					{% if failed_login_name %}<div class="error">{{ phrase('agent.login.login_failed') }}</div>{% endif %}
+					{% if has_done_reset %}<div class="success">{{ phrase('agent.login.password_was_reset') }}</div>{% endif %}
+					{% if has_logged_out %}<div class="success">{{ phrase('agent.login.has_logged_out') }}</div>{% endif %}
+
+					{% if failed_login_name == "1" %}{% set failed_login_name = "" %}{% endif %}
+
+					<fieldset>
+						<p>
+							<i class="icon-envelope-alt"></i>
+							<input type="{% if app.usersourceManager.getWithCapability('form_login') %}text{% else %}email{% endif %}" class="text" value="{% if failed_login_name %}{{ failed_login_name }}{% elseif agent_session and agent_session.person.primary_email_address %}{{ agent_session.person.primary_email_address }}{% endif %}" name="email" id="email" size="40" placeholder="{{ phrase('agent.general.email') }}{% if app.usersourceManager.getWithCapability('form_login') %}/ Username{% endif %}" tabindex="1" />
+						</p>
+						<p>
+							<i class="icon-lock"></i>
+							<input type="password" class="text" value="" name="password" id="password" size="40"  tabindex="2" placeholder="{{ phrase('agent.general.password') }}" />
+						</p>
+						<p>
+							<table cellspacing="0" cellpadding="0" border="0">
+								<tr>
+									<td width="10" valign="middle" style="vertical-align: middle;"><input type="checkbox" name="remember_me" id="rem_cb" value="1" tabindex="3" /></td>
+									<td valign="middle" style="vertical-align: middle;">
+										&nbsp;
+										<label for="rem_cb">
+											{{ phrase('agent.login.remember_me') }}
+										</label>
+									</td>
+								</tr>
+							</table>
+						</p>
+					</fieldset>
+					<p><input class="full-width" type="submit" value="{{ phrase('agent.general.log_in') }}" /></p>
+					<p class="text-right"><a href="#" class="show-lost-password-trigger">{{ phrase('agent.login.forgot_password') }}</a></p>
+					<div id="lost_explain_wrap">
+						<div id="lost_explain">
+							<i class="close">x</i>
+							To reset admin passwords, you must a special command-line tool:
+							<br/>See <a href="https://support.deskpro.com/kb/articles/93">https://support.deskpro.com/kb/articles/93</a>
+						</div>
+					</div>
+				</form>
+			</div>
+
+
+		</div>
+		<div class="deskpro-logo">
+	</div>
+</div>
+
+<script type="text/javascript">
+{% if not agent_session.person.primary_email_address and not failed_login_name %}
+	var el = document.getElementById('email');
+{% else %}
+	var el = document.getElementById('password');
+{% endif %}
+if (el) {
+	el.focus();
+}
+
+$('.show-lost-password-trigger').on('click', function(ev) {
+	ev.preventDefault();
+	$('#lost_explain').fadeIn();
+});
+$('#lost_explain').find('.close').on('click', function(ev) {
+	ev.preventDefault();
+	$('#lost_explain').fadeOut();
+});
+</script>
+
+<link rel="stylesheet" href="{{ asset('fonts/font-awesome.min.css') }}" type="text/css" />
+<script type="text/javascript" charset="utf-8" src="{{ asset('vendor/jquery/jquery-ui/jquery.ui.widget.min.js') }}"></script>
+<script type="text/javascript" charset="utf-8" src="{{ asset('vendor/jquery/fileupload/jquery.iframe-transport.js') }}"></script>
+<script type="text/javascript" charset="utf-8" src="{{ asset('vendor/jquery/fileupload/jquery.fileupload.js') }}"></script>
+<script type="text/javascript">
+$('#client_logo_upload').fileupload({
+	dataType: 'json',
+	url: '{{ path('admin_login_logoupload', {_dp_security_token: security_token() }) }}',
+	start: function() {
+		$('#client_logo_upload').addClass('dp-loading-on');
+	},
+	stop: function() {
+		$('#client_logo_upload').removeClass('dp-loading-on');
+	},
+	done: function (e, data) {
+		console.log(e);
+		console.log(data);
+		$('#client_logo_upload').removeClass('dp-loading-on');
+
+		if (data.result.error) {
+			alert('Please upload a valid image');
+			return;
+		}
+
+		$('#client_logo_upload').hide();
+
+		$('#client_logo_img').show().find('.img').css({
+			'background-image': 'url(' + data.result.download_url_scaled + ')'
+		});
+		$('#login_form').find('input[name="new_logo"]').val(data.result.blob_auth_id);
+	},
+	singleFileUploads: true,
+	autoUpload: true,
+	fileInput: $('#client_logo_upload').find('input[type="file"]')
+});
+
+$(document).bind('drop dragover', function (e) {
+    e.preventDefault();
+});
+
+$('#client_logo_img').find('.remove-btn').on('click', function(){
+	$('#client_logo_img').hide();
+	$('#client_logo_upload').show();
+	$('#login_form').find('input[name="remove_logo"]').val('1');
+});
+</script>
+</body>
+</html>

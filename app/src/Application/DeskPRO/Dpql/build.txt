@@ -1,0 +1,29 @@
+The DPQL lexer and parser are generated using 2 PEAR projects:
+
+ * PHP Lexer Generator: http://pear.php.net/package/PHP_LexerGenerator/redirected
+ * PHP Parser Generator: http://pear.php.net/package/PHP_ParserGenerator/redirected
+
+The lexer rules are stored in Lexer.plex and the generated lexer in Lexer.php.
+
+The parser rules are stored in Parser.y and the generated parser in Parser.php.
+The parser build process will also create Parser.out with additional information/debugging.
+
+REBUILDING THE LEXER
+--------------------
+If you update Lexer.plex, the generated version must be rebuilt using build-lexer.php.
+Run build-lexer.php via the command line with no additional arguments.
+
+Note the output for any errors.
+
+REBUILDING THE PARSER
+---------------------
+If you update Parser.y, the generated version must be rebuilt using build-parser.php.
+Run build-parser.php via the command line with no additional arguments.
+
+Note the output for any errors or parsing conflicts. You will find more details
+in Parser.out.
+
+REBUILDING BOTH
+---------------
+If you wish to rebuild both at the same time, build.php will simply rebuild the
+lexer and then the parser.

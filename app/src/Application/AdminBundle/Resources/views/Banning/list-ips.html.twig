@@ -1,0 +1,51 @@
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.IpBanningPage' %}
+{% extends 'AdminBundle:Banning:layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/IpBanningPage.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a id="new_ip_ban_btn">{{ phrase('admin.banning.add_ip_ban') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.banning.banning_ip_addresses') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<nav class="page-top-hugnav">
+	<ul>
+		<li>
+			<input type="text" class="filter-input" id="filter_list" value="" placeholder="{{ phrase('admin.banning.filter_list_') }}" />
+		</li>
+	</ul>
+	<br class="clear" />
+</nav>
+
+<ul id="ip_rows" class="banned-list">
+	{% for ip in banned_ips %}
+		{% include 'AdminBundle:Banning:ip-row.html.twig' %}
+	{% endfor %}
+</ul>
+<br class="clear" />
+
+<div id="ip_ban_overlay" style="width: 400px; height: 150px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.banning.ban_ip_address') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<input type="hidden" class="save-url" value="{{ path('admin_banning_newip') }}?ip={ip}" />
+		{{ phrase('admin.banning.ip_address_pattern') }}: <input type="text" name="ip" value="" style="width: 200px;" />
+		<br />
+		<small>{{ phrase('admin.banning.examples_ip_patterns') }}</small>
+	</div>
+	<div class="overlay-footer">
+		<button class="clean-white save-trigger">{{ phrase('admin.banning.save_ban') }}</button>
+	</div>
+</div>
+
+{% endblock %}

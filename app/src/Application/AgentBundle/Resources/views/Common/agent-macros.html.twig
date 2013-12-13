@@ -1,0 +1,35 @@
+{% macro name_or_me(person, noval) %}
+	{% if person.id == app.user.id %}
+		{{ phrase('agent.general.me') }}
+	{% elseif not person %}
+		{{ noval }}
+	{% else %}
+		{{ person.display_name }}
+	{% endif %}
+{% endmacro %}
+
+{% macro team_name_or_me(team, noval) %}
+	{% if not app.getSetting('core.use_agent_team') %}{{ noval }}{% endif %}
+	{% if app.user.getAgent().isTeamMember(team.id) and app.user.getAgent().isSingleTeams() %}
+		{{ phrase('agent.general.my_team') }}
+	{% elseif not team %}
+		{{ noval }}
+	{% else %}
+		{{ team.name }}
+	{% endif %}
+{% endmacro %}
+
+{% macro preload_content(id, content) %}
+	{% if content %}<script type="text/x-deskpro-plain" id="{{ id }}">{{ content|plain_template_filter|raw }}</script>{% endif %}
+{% endmacro %}
+
+{% macro scroll_containers(addclass, outOfScrollArea) %}
+	<div class="layout-content with-scrollbar {{ addclass }}">
+	{{ outOfScrollArea }}
+	<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+	<div class="scroll-viewport"><div class="scroll-content">
+{% endmacro %}
+
+{% macro scroll_containers_end() %}
+	</div></div></div>
+{% endmacro %}

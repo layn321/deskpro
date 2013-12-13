@@ -1,0 +1,7 @@
+{% extends 'AgentBundle:TextSnippets:base-widget-shell.html.twig' %}
+{% block pagemeta %}
+	pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.SnippetViewer';
+	pageMeta.title = '{{ phrase('agent.snippets.chat_snippets') }}';
+	pageMeta.snippet_typename = 'chat';
+	pageMeta.baseId = '%baseId%';
+{% endblock %}

@@ -1,0 +1,52 @@
+{##
+ # A single message within a ticket in the view ticket page
+ ##}
+
+<li class="{% if message.person.is_agent %}agent-reply{% endif %}">
+	<header>
+		<div class="avatar" style="width: 40px; height: 40px; background-image: url('{{ message.person.getPictureUrl(40) }}');"></div>
+		<div class="byline" style="margin-{% if is_rtl() %}right{% else %}left{% endif %}: 48px;">
+			<h4>{{ message.person.display_name_user }}</h4>
+			<ul class="dp-post-info">
+				<li class="dp-date"><i class="dp-icon-calendar"></i> {{ message.date_created|date('fulltime') }}</li>
+			</ul>
+		</div>
+	</header>
+	<article>
+		{{ message.message_html|raw }}
+
+		{% if message_to_attach[message.id] %}
+			<ul class="attachment-list">
+				{% for attach_id in message_to_attach[message.id] %}
+					{% set ticket_attach = attachments[attach_id] %}
+					<li class="{% if ticket_attach.blob.isImage() %}is-image{% else %}dp-fileicon dp-fileicon-{{ticket_attach.blob.extension|default('none')}}{% endif %}" rel="message-{{message.id}}">
+						{% if ticket_attach.blob.isImage() %}
+							<a href="{{ ticket_attach.blob.download_url }}" target="_blank"><img src="{{ path('serve_blob', {'blob_auth_id': ticket_attach.blob.auth_id, 'filename': ticket_attach.blob.filename, 's': 50, 'size-fit': '1'}) }}" alt="" class="preview" /></a>
+						{% endif %}
+						<a href="{{ ticket_attach.blob.download_url }}" target="_blank">{{ticket_attach.blob.filename}}</a>
+						<span class="size">({{ ticket_attach.blob.readable_filesize }})</span>
+					</li>
+				{% endfor %}
+			</ul>
+		{%endif%}
+
+		{% if app.getSetting('core.tickets.enable_feedback') and message.id == last_agent_message_id and message.person.id != app.user.id %}
+			<div class="feedback-link">
+				<span class="desc">
+					<a href="{{ path('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id }) }}">
+						{% if user_ratings[message.id] is not defined %}
+							{{ phrase('user.tickets.was_reply_helpful') }}
+						{% elseif user_ratings[message.id] == 1 %}
+							{{ phrase('user.tickets.you_rated_helpful') }}
+						{% elseif user_ratings[message.id] == -1 %}
+							{{ phrase('user.tickets.you_rated_unhelpful') }}
+						{% elseif user_ratings[message.id] == 0 %}
+							{{ phrase('user.tickets.you_rated_neutral') }}
+						{% endif %}
+					</a>
+				</span>
+			</div>
+			<br class="clearfix" />
+		{% endif %}
+	</article>
+</li>

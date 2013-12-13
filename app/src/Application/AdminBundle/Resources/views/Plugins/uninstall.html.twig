@@ -1,0 +1,11 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block page %}
+<form action="{{ path('admin_plugins_uninstall', {'plugin_id': plugin.id}) }}" method="post">
+
+	<p>Are you sure you want to uninstall the plugin {{plugin.title}}? All plugin data will be removed.</p>
+	<button class="btn">Uninstall Plugin</button>
+
+	<input type="hidden" name="process" value="1" />
+	{{ form_token() }}
+</form>
+{% endblock %}

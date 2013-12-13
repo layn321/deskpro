@@ -1,0 +1,51 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/BatchTool.js') }}"></script>
+<style type="text/css">
+.batch-tool .batch-log {
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+}
+
+.batch-tool.running .batch-log {
+	padding-bottom: 38px;
+	background: url({{ asset('images/spinners/loading-big-circle.gif') }}) no-repeat 50% 99%;
+}
+</style>
+{% endblock %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_usergroups_new') }}">{{ phrase('admin.user_rules.user_rules') }}</a></li>
+		<li><a href="{{ path('admin_userrules_edit', {rule_id:rule.id}) }}">{{ phrase('admin.user_rules.edit_rule') }}</a></li>
+		<li>Apply Rule</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+	This tool will apply your user rule to all existing users in the database. This can take a few minutes depending
+	on the size of your database.
+
+	<br/><br/>
+	<br/><br/>
+
+	<div class="batch-tool"
+		data-element-handler="DeskPRO.Admin.ElementHandler.BatchTool"
+		data-url="{{ path('admin_userrules_applyrun', {rule_id:rule.id}) }}"
+	>
+		<div class="batch-start">
+			<button class="btn primary start-trigger">Start Now &rarr;</button>
+		</div>
+
+		<div class="batch-log" style="display: none;">
+
+		</div>
+
+		<div class="batch-done" style="display: none;">
+			<br/>
+			<br/>
+			<strong>All finished</strong><br/>
+		</div>
+	</div>
+{% endblock %}

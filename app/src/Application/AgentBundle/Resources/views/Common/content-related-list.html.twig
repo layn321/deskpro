@@ -1,0 +1,50 @@
+<section class="linked-content">
+	<div class="no-related-content" {% if related_content.articles or related_content.news or related_content.downloads or related_content.feedback%}style="display: none"{% endif %}>
+		{{ phrase('agent.publish.no_related_explain') }}
+	</div>
+	<div class="articles related-section" {% if not related_content.articles %}style="display: none"{% endif %}>
+		<h4>{{ phrase('agent.general.related_articles') }}</h4>
+		<ul class="related-list">
+			{% for article in related_content.articles %}
+				<li class="related-content articles-{{article.id}}" data-content-type="articles" data-content-id="{{ article.id }}">
+					<button class="clean-white small remove noedit-hide">{{ phrase('agent.general.remove') }}</button>
+					<a class="link-title link-route with-route" data-route="page:{{ object_path_agent(article) }}">{{ article.title }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div class="downloads related-section" {% if not related_content.downloads %}style="display: none"{% endif %}>
+		<h4>{{ phrase('agent.general.related_downloads') }}</h4>
+		<ul class="related-list">
+			{% for download in related_content.downloads %}
+				<li class="related-content downloads-{{download.id}}" data-content-type="articles" data-content-id="{{ download.id }}">
+					<button class="clean-white small remove noedit-hide">{{ phrase('agent.general.remove') }}</button>
+					<a class="link-title link-route with-route" data-route="page:{{ object_path_agent(download) }}">{{ download.title }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div class="news related-section" {% if not related_content.news %}style="display: none"{% endif %}>
+		<h4>{{ phrase('agent.general.related_news') }}</h4>
+		<ul class="related-list">
+			{% for news in related_content.news %}
+				<li class="related-content news-{{news.id}}" data-content-type="news" data-content-id="{{ news.id }}">
+					<button class="clean-white small remove noedit-hide">{{ phrase('agent.general.remove') }}</button>
+					<a class="link-title link-route with-route" data-route="page:{{ object_path_agent(news) }}">{{ news.title }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+    <div class="feedback related-section" {% if not related_content.feedback %}style="display: none"{% endif %}>
+		<h4>{{ phrase('agent.general.related_feedback') }}</h4>
+		<ul class="related-list">
+			{% for feedback in related_content.feedback %}
+				<li class="related-content feedback-{{feedback.id}}" data-content-type="feedback" data-content-id="{{ feedback.id }}">
+					<button class="clean-white small remove noedit-hide">{{ phrase('agent.general.remove') }}</button>
+					<a class="link-title link-route with-route" data-route="page:{{ object_path_agent(feedback) }}">{{ feedback.title }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+</section>

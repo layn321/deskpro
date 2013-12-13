@@ -1,0 +1,28 @@
+<article
+	class="content-message message message-draft-{{draft.id}} agent-draft-message agent-{{ draft.person.id }}"
+	data-message-draft-id="{{draft.id}}"
+>
+	<div class="avatar"><img
+			src="{{ draft.person.getPictureUrl(40) }}"
+			alt=""
+			width="40"
+			height="40"
+			class="agent-link" data-agent-id="{{ draft.person.id }}"
+		/></div>
+	<div class="content">
+		<header>
+			<span class="message-counter">{{ phrase('agent.tickets.draft') }}</span>
+			<h4	class="agent-link" data-agent-id="{{ draft.person.id }}">{{draft.person.display_name}} <span class="email-part">&lt;{{ draft.person.getPrimaryEmailAddress() }}&gt;</span></h4>
+			<time class="full-time">{{draft.date_created|date('fulltime')}}</time>
+			<time class="timeago" datetime="{{draft.date_created|date('c', 'UTC')}}">{{draft.date_created|date('fulltime')}}</time>
+		</header>
+		<div class="body-text">
+			<div class="draft-block">{% if draft.extras.is_note %}{{ phrase('agent.tickets.draft_note') }}{% else %}{{ phrase('agent.tickets.draft_message') }}{% endif %}</div>
+			<div class="body-text-message unreset" {% if ticket.language and ticket.language.is_rtl %}dir="rtl"{% endif %} {% if message.show_full_hint %}style="display: none"{% endif %}>
+				{{draft.message_html|safe_link_urls_html }}
+			</div>
+			<div class="draft-block">{% if draft.extras.is_note %}Draft Note{% else %}Draft Message{% endif %}</div>
+			<div class="fade-bar"></div>
+		</div>
+	</div>
+</article>

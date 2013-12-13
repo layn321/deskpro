@@ -1,0 +1,317 @@
+<div id="menus_container">
+
+	{#############################
+	 # Server Menu
+	 #############################}
+
+	{% if not app.isCloud %}
+		<div id="server_menu">
+			<ul>
+				<li class="link-logs">
+					<a href="{{ path('admin_server_checks') }}">{{ phrase('admin.menu.check_server_requirements') }}</a>
+					<p>{{ phrase('admin.menu.check_server_requirements_explain') }}</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_server_file_checks') }}">{{ phrase('admin.menu.check_file_integrity') }}</a>
+					<p>{{ phrase('admin.menu.check_file_integrity_explain') }}</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_server_attach') }}">{{ phrase('admin.general.file_uploads') }}</a>
+					<p>{{ phrase('admin.menu.manage_storage') }}</p>
+				</li>
+				<li class="link-scheduled-task">
+					<a href="{{ path('admin_server_cron') }}">{{ phrase('admin.general.scheduled_tasks') }}</a>
+					<p>{{ phrase('admin.menu.manage_scheduled_tasks') }}</p>
+				</li>
+				<li class="link-database-tools">
+					<a href="{{ path('admin_server_phpinfo') }}">{{ phrase('admin.general.php_info') }}</a>
+					<p>{{ phrase('admin.menu.view_php_installation') }}</p>
+				</li>
+				<li class="link-server-info">
+					<a href="{{ path('admin_server_mysqlinfo') }}">{{ phrase('admin.general.mysql_info') }}</a>
+					<p>{{ phrase('admin.menu.view_mysql_installation') }}</p>
+				</li>
+				<li class="link-server-info">
+					<a href="{{ path('admin_server_testemail') }}">Test Outgoing Email</a>
+					<p>Send a test email from DeskPRO to verify your outgoing email settings are valid.</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_server_mysql_sorting') }}">Update MySQL Sort Order</a>
+					<p>Update the MySQL data sorting order to ensure that data is sorted correctly for your language.</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_server_mysqlstatus') }}">{{ phrase('admin.general.mysql_status') }}</a>
+					<p>{{ phrase('admin.menu.view_mysql_status') }}</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_emailgateway_errors') }}">{{ phrase('admin.menu.email_gateway_errors') }}</a>
+					<p>{{ phrase('admin.menu.view_logged_gateway_errors') }}</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_server_error_logs') }}">{{ phrase('admin.general.error_logs') }}</a>
+					<p>{{ phrase('admin.menu.view_logged_errors') }}</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_sendmail_queue_index') }}">Sendmail Queue</a>
+					<p>View and manage your outgoing email queue.</p>
+				</li>
+				<li class="link-logs">
+					<a href="{{ path('admin_server_task_queue_logs') }}">Task Queue Logs</a>
+					<p>View the logs for background tasks that have been triggered.</p>
+				</li>
+			</ul>
+		</div>
+	{% endif %}
+
+
+	{#############################
+	 # Users Menu
+	 #############################}
+
+	<div id="users_menu">
+		<ul>
+			<li class="link-settings">
+				<a href="{{ path('admin_userreg_options') }}">{{ phrase('admin.menu.registration') }}</a>
+				<p>{{ phrase('admin.menu.change_registration') }}</p>
+			</li>
+			<li class="link-fields">
+				<a href="{{ path('admin_usergroups') }}">{{ phrase('admin.menu.user_groups') }}</a>
+				<p>{{ phrase('admin.menu.create_user_groups') }}</p>
+			</li>
+			<li class="link-fields">
+				<a href="{{ path('admin_customdefpeople') }}">{{ phrase('admin.menu.fields') }}</a>
+				<p>{{ phrase('admin.menu.create_custom_fields_people') }}</p>
+			</li>
+			<li class="link-labels">
+				<a href="{{ path('admin_labels', {'label_type': 'people'}) }}">{{ phrase('agent.general.labels') }}</a>
+				<p>{{ phrase('admin.menu.define_user_labels') }}</p>
+			</li>
+			<li class="link-fields">
+				<a href="{{ path('admin_customdeforganizations') }}">{{ phrase('admin.general.organization_fields') }}</a>
+				<p>{{ phrase('admin.menu.create_custom_fields') }}</p>
+			</li>
+			<li class="link-labels">
+				<a href="{{ path('admin_labels', {'label_type': 'organizations'}) }}">{{ phrase('admin.menu.organization_labels') }}</a>
+				<p>{{ phrase('admin.menu.define_organization_labels') }}</p>
+			</li>
+			<li class="link-fields">
+				<a href="{{ path('admin_userrules') }}">{{ phrase('admin.menu.rules') }}</a>
+				<p>{{ phrase('admin.menu.set_email_patterns') }}</p>
+			</li>
+			<li class="link-fields">
+				<a href="{{ path('admin_banning_emails') }}">{{ phrase('admin.general.banning') }}</a>
+				<p>{{ phrase('admin.menu.ban_items') }}</p>
+			</li>
+			<li class="link-fields">
+				<a href="{{ path('admin_import') }}">Import Users</a>
+				<p>Import users from a CSV file.</p>
+			</li>
+		</ul>
+	</div>
+
+
+	{#############################
+	 # Integrate Menu
+	 #############################}
+
+	<div id="integrate_menu">
+		<ul>
+			<li class="link-embeds">
+				<a href="{{ path('admin_website_embeds') }}">Website Embeds</a>
+				<p>Embed buttons and contact forms into your website with copy-and-paste Javascript snippets.</p>
+			</li>
+
+			<li class="link-widgets">
+				<a href="{{ path('admin_widgets') }}">Widgets</a>
+				<p>Manage widgets that add additional functions to the agent interface.</p>
+			</li>
+
+			<li class="link-plugins">
+				<a href="{{ path('admin_plugins') }}">{{ phrase('admin.menu.plugins') }}</a>
+				<p>{{ phrase('admin.menu.manage_plugins') }}</p>
+			</li>
+
+			<li class="link-webhooks">
+				<a href="{{ path('admin_webhooks') }}">Web Hooks</a>
+				<p>Manage web hooks that allow you to call external URLs based on events.</p>
+			</li>
+
+			<li class="link-api-keys">
+				<a href="{{ path('admin_api_keylist') }}">API Keys</a>
+				<p>Manage API keys that allow third-party integrations to access your DeskPRO data.</p>
+			</li>
+		</ul>
+	</div>
+
+	{#############################
+	 # Portal menu
+	 #############################}
+
+	<div id="portal_menu">
+		<ul>
+			<li><a href="{{ path('admin_portal') }}">{{ phrase('admin.portal.portal_editor') }}</a></li>
+			<li><a href="{{ path('admin_templates_user') }}">{{ phrase('admin.general.templates') }}</a></li>
+			<li><a href="{{ path('admin_langs_editlang', {language_id: app.languages.getDefault().getId()}) }}">Phrases</a></li>
+		</ul>
+	</div>
+
+	{#############################
+	 # Tickets Menu
+	 #############################}
+
+	<div id="tickets_menu">
+		<ul>
+			<li class="link-fields">
+				<a href="{{ path('admin_departments', {type:'tickets'}) }}">Departments</a>
+				<p>{{ phrase('admin.menu.manage_departments') }}</p>
+			</li>
+			<li class="link-email">
+				<a href="{{ path('admin_emailgateways') }}">Email Accounts</a>
+				<p>{{ phrase('admin.menu.manage_email_accounts') }}</p>
+			</li>
+			<li class="link-fields">
+				<a href="{{ path('admin_tickets_fields') }}">{{ phrase('admin.menu.fields') }}</a>
+				<p>{{ phrase('admin.menu.manage_ticket_fields') }}</p>
+			</li>
+			<li class="link-ticket-triggers">
+				<a href="{{ path('admin_tickettriggers') }}">{{ phrase('admin.general.triggers') }}</a>
+				<p>{{ phrase('admin.menu.define_triggers') }}</p>
+			</li>
+			<li class="link-ticket-settings">
+				<a href="{{ path('admin_features') }}">{{ phrase('admin.menu.settings_and_features') }}</a>
+				<p>{{ phrase('admin.menu.set_other_ticket_features') }}</p>
+			</li>
+			<li class="link-ticket-triggers">
+				<a href="{{ path('admin_ticketescalations') }}">Escalations</a>
+				<p>{{ phrase('admin.menu.define_escalations') }}</p>
+			</li>
+			<li class="link-ticket-sla">
+				<a href="{{ path('admin_tickets_slas') }}">SLAs</a>
+				<p>Setup service level agreements to help your agents resolve tickets more efficiently.</p>
+			</li>
+			<li class="link-ticket-filters">
+				<a href="{{ path('admin_tickets_filters') }}">{{ phrase('agent.general.filters') }}</a>
+				<p>{{ phrase('admin.menu.create_filters') }}</p>
+			</li>
+			<li class="link-labels">
+				<a href="{{ path('admin_labels', {'label_type': 'tickets'}) }}">{{ phrase('agent.general.labels') }}</a>
+				<p>{{ phrase('admin.menu.define_ticket_labels') }}</p>
+			</li>
+			<li>
+				<a href="{{ path('admin_templates_email') }}">{{ phrase('admin.menu.email_notification_templates') }}</a>
+				<p>{{ phrase('admin.menu.edit_notification_emails') }}</p>
+			</li>
+		</ul>
+	</div>
+
+	{#############################
+	 # Chat Menu
+	 #############################}
+
+	<div id="chat_menu">
+		<ul>
+			{% if not app.getSetting('core.apps_chat') %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'chat', enable: '1'}) }}">Enable Chat</a></li>
+			{% else %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'chat', enable: '0'}) }}">Disable Chat</a></li>
+				<li class="link-fields">
+					<a href="{{ path('admin_departments', {type:'chat'}) }}">{{ phrase('admin.general.departments') }}</a>
+					<p>{{ phrase('admin.menu.manage_departments') }}</p>
+				</li>
+				<li class="link-fields">
+					<a href="{{ path('admin_customdefchat') }}">Fields</a>
+					<p>Manage custom fields added to chats</p>
+				</li>
+			{% endif %}
+		</ul>
+	</div>
+
+
+	{#############################
+	 # KB menu
+	 #############################}
+
+	<div id="kb_menu">
+		<ul>
+			{% if not app.getSetting('core.apps_kb') %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'kb', enable: '1'}) }}">Enable Knowledgebase</a></li>
+			{% else %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'kb', enable: '0'}) }}">Disable Knowledgebase</a></li>
+				<li class="link-fields">
+					<a href="{{ app.request.getBaseUrl() }}/agent/#app.publish" target="_blank">{{ phrase('admin.portal.manage_articles') }}</a>
+					<p>Manage content from the agent interface.</p>
+				</li>
+				{% if not app.isCloud() %}
+					<li class="link-email-accounts">
+						<a href="{{ path('admin_kb_gateways') }}">Email Accounts</a>
+						<p>Setup the email accounts that your agents can send mail to to create draft knowledgebase articles.</p>
+					</li>
+				{% endif %}
+			{% endif %}
+		</ul>
+	</div>
+
+	{#############################
+	 # Feedback menu
+	 #############################}
+
+	<div id="feedback_menu">
+		<ul>
+			{% if not app.getSetting('core.apps_feedback') %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'feedback', enable: '1'}) }}">Enable Feedback</a></li>
+			{% else %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'feedback', enable: '0'}) }}">Disable Feedback</a></li>
+				<li class="link-fields"><a href="{{ path('admin_feedback_statuses') }}">{{ phrase('agent.general.statuses') }}</a></li>
+				<li class="link-fields"><a href="{{ path('admin_feedback_cats') }}">{{ phrase('agent.general.types') }}</a></li>
+				<li class="link-fields"><a href="{{ path('admin_feedback_usercats') }}">{{ phrase('agent.general.categories') }}</a></li>
+				<li class="link-fields">
+					<a href="{{ app.request.getBaseUrl() }}/agent/#app.feedback" target="_blank">{{ phrase('admin.portal.manage_feedback') }}</a>
+					<p>Manage content from the agent interface.</p>
+				</li>
+			{% endif %}
+		</ul>
+	</div>
+
+	{#############################
+	 # Downloads menu
+	 #############################}
+
+	<div id="downloads_menu">
+		<ul>
+			{% if not app.getSetting('core.apps_downloads') %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'downloads', enable: '1'}) }}">Enable Downloads</a></li>
+			{% else %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'downloads', enable: '0'}) }}">Disable Downloads</a></li>
+				<li class="link-fields"><a href="{{ app.request.getBaseUrl() }}/agent/#app.publish" target="_blank">{{ phrase('admin.portal.manage_downloads') }}</a></li>
+			{% endif %}
+		</ul>
+	</div>
+
+	{#############################
+	 # News menu
+	 #############################}
+
+	<div id="news_menu">
+		<ul>
+			{% if not app.getSetting('core.apps_news') %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'news', enable: '1'}) }}">Enable News</a></li>
+			{% else %}
+				<li><a href="{{ path('admin_apps_toggle', {app: 'news', enable: '0'}) }}">Disable News</a></li>
+				<li class="link-fields"><a href="{{ app.request.getBaseUrl() }}/agent/#app.publish" target="_blank">{{ phrase('admin.portal.manage_news') }}</a></li>
+			{% endif %}
+		</ul>
+	</div>
+
+	{#############################
+	 # Twitter menu
+	 #############################}
+
+	<div id="twitter_menu">
+		<ul>
+			<li>
+				<a href="{{ path('admin_twitter_accounts') }}">Manage Twitter Accounts</a>
+				<p>Setup Twitter accounts so they can be managed by agents directly from the agent interface.</p>
+			</li>
+		</ul>
+	</div>
+</div>

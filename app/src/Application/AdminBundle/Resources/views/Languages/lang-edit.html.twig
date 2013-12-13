@@ -1,0 +1,71 @@
+{% extends 'AdminBundle:Languages:lang-layout.html.twig' %}
+{% block pagebar %}
+     <ul>
+		<li><a href="{{ path('admin_langs') }}">{{ phrase('admin.general.languages') }}</a></li>
+		{% if language.id %}
+			<li>{{ phrase('admin.languages.edit_language') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.languages.new_language') }}</li>
+		{% endif %}
+     </ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_langs_editlang', {'language_id': language.id|default(0)}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.title') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.title) }}
+		</div>
+	</div>
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.general.locale') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.locale) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Flag</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="checkbox-rows">
+				<ul style="max-height: 110px;">
+					<li>
+						<label>
+							<input type="radio" name="language[flag]" value="" {% if not language.flag_image %}checked="checked"{% endif %} />
+							None
+						</label>
+					</li>
+					{% for flag in flags %}
+					<li>
+						<label>
+							<input type="radio" name="language[flag]" value="{{ flag }}" {% if language.flag_image == flag %}checked="checked"{% endif %} />
+							<span style="background: url({{ asset('images/flags/' ~ flag) }}); display: inline-block; width: 16px; height: 11px; margin: 0 3px 0 3px;"></span>
+							{{ flag }}
+						</label>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<button class="clean-white">{{ phrase('agent.general.save') }}</button>
+
+</form>
+
+<div style="width: 70%; text-align: right">
+	<a class="delete-link" href="{{ path('admin_langs_dellang', {'language_id': language.id, 'security_token': security_token('delete_lang') }) }}" onclick="return confirm('{{ phrase('admin.languages.confirm_delete_languages') }}');">{{ phrase('admin.languages.delete_language') }}</a>
+</div>
+
+{% endblock %}

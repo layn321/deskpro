@@ -1,0 +1,38 @@
+<div class="inner-box-tab-content">
+
+    <ul class="task-comment-list">
+        {% for deal_task in assoceated_tasks %}
+            <li data-note-id="{{deal_task.task.id}}" class="note">
+
+                <div class="message">
+                    <div class="message-avatar">
+                            {{deal_task.task.title}}
+                    </div>
+                    <div class="message-body">
+                        <span>
+                            {{ phrase('agent.general.assigned_to') }} {% if deal_task.task.assigned_agent.name is not null%}
+                            <a data-route="person:{{ path('agent_people_view', {'person_id': deal_task.task.assigned_agent.id|default('0')}) }}">
+                                {{deal_task.task.assigned_agent.name}}
+                            </a>
+
+                            {% elseif deal_task.task.assigned_agent_team.name %} {{deal_task.task.assigned_agent_team.name}}
+                            {% endif %}
+                        </span>|
+                        <span>
+                        {% if deal_task.task.isDueToday(app.user) == 1 %} {{ phrase('agent.deal.due_today') }}{% elseif deal_task.task.isDueTomorrow(app.user) %}{{ phrase('agent.deal.due_tomorrow') }}
+                        {% elseif deal_task.task.isOverdue %}Over Due on {{deal_task.task.date_due|date('day')}}
+                        {% else %}Due {{deal_task.task.date_due|date('day')}} {% endif %}
+
+                        </span>
+
+                    </div>
+                </div>
+
+            </li>
+        {% endfor %}
+</ul>
+    <ul class="createBtnPopups">
+        <li class="create_deal_task_btn"><a><span class="createTask">{{ phrase('agent.deal.new_task_kbd_k') }}</span></a></li>
+    </ul>
+
+</div>

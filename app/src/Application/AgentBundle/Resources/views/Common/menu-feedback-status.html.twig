@@ -1,0 +1,31 @@
+<ul class="menu status status-menu {{add_classname}}" data-option-name="status" style="display:none">
+	<li
+		class="status-new"
+		data-status-type="new"
+		data-option-value="new"
+	>{{ phrase('agent.feedback.status_new') }}</li>
+	<li
+		class="section-title status-active"
+		data-status-type="active"
+		data-option-value="active"
+	>{{ phrase('agent.feedback.status_active') }}</li>
+	{% for cat in active_status_cats %}
+		<li
+			class="status-{{cat.id}}"
+			data-status-type="active"
+			data-option-value="active.{{cat.id}}"
+		>{{cat.title}}</li>
+	{% endfor %}
+	<li
+		class="section-title status-closed"
+		data-status-type="closed"
+		data-option-value="closed"
+	>{{ phrase('agent.tickets.status_closed') }}</li>
+	{% for cat in closed_status_cats %}
+		<li
+			class="status-{{cat.id}}"
+			data-status-type="closed"
+			data-option-value="closed.{{cat.id}}"
+		>{{cat.title}}</li>
+	{% endfor %}
+</ul>

@@ -1,0 +1,32 @@
+{##
+ # The layout used when displaying a content page launched from the website widget.
+ ##}
+{% set content %}{% block content %}{% endblock %}{% endset %}
+{% if app.getRequest().query.get('_partial') == 'overlaySuggest' %}
+	{{ content|raw }}
+{% else %}
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml" class="dp-simple-popup {% if is_rtl() %}rtl{% endif %}" {{ language_html_attr() }}>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		{% include 'UserBundle::layout-resources.html.twig' %}
+		{% block head %}{% endblock %}
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('a').each(function() {
+					$(this).attr('target', '_blank');
+				});
+			});
+		</script>
+	</head>
+	<body id="dp_content_overlay">
+		<div id="dp">
+
+			<article id="dp_article_content">
+				{{ content|raw }}
+			</article>
+		</div>
+	</body>
+	</html>
+{% endif %}

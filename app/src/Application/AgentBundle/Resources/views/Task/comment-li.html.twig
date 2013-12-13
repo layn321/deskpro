@@ -1,0 +1,18 @@
+<li data-note-id="{{comment.id}}" class="note">
+	<div class="message">
+		<div class="message-avatar">
+			<img src="{{ comment.person.getPictureUrl(25) }}" alt="" width="25" height="25" />
+		</div>
+		<div class="message-body">
+			<div class="message-meta">
+				<time class="timeago" title="{{comment.date_created|date('c', 'UTC')}}">{{comment.date_created|date('day')}}</time>
+				<h4>{{comment.person.name}}:</h4>
+			</div>
+			<div class="message-text">
+				<p>
+					{{comment.content_html|raw}}
+				</p>
+			</div>
+		</div>
+	</div>
+</li>

@@ -1,0 +1,23 @@
+<article
+	class="twitter-user twitter-user-inline user-{{ user.id }}"
+	data-user-id="{{ user.id }}"
+>
+	<div class="user-body">
+		<div class="photo" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">
+			<img src="{{ user.profile_image_url }}" width="48" height="48" border="0" />
+		</div>
+		<div class="info">
+			<h4>
+				<span class="name user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ user.name }}</span>
+				<span class="screen-name user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">@{{ user.screen_name }}</span>
+			</h4>
+			<div class="description">{{ user.description }}</div>
+		</div>
+
+		<div class="extra-row">
+			<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ phrase('agent.twitter.following') }}: {{ user.friends_count }}</span>
+			<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ phrase('agent.twitter.followers') }}: {{ user.followers_count }}</span>
+			<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': user.id}) }}">{{ phrase('agent.twitter.interactions') }}: {{ user.countAccountInteractions(account) }}</span>
+		</div>
+	</div>
+</article>

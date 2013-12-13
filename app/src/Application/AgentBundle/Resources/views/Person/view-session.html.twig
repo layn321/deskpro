@@ -1,0 +1,120 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.PersonSession';
+{% if visitor.name %}
+	pageMeta.title = {{ visitor.name|json_encode|raw }};
+{% elseif visitor.email %}
+	pageMeta.title = {{ visitor.email|json_encode|raw }};
+{% else %}
+	pageMeta.title = 'Anonymous User';
+{% endif %}
+pageMeta.session_id = {{session.id}};
+pageMeta.visitor_id = {{visitor.id|default(0)}};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{# Page Containers #}
+<div class="profile layout-content with-scrollbar">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /Page Containers #}
+
+<header class="page-header">
+	<div class="titlewrap">
+		<h1>
+			{% if visitor.name or visitor.email %}
+				{% if visitor.name %}
+					{{ visitor.name }}
+				{% endif %}
+				{% if visitor.email %}
+					&lt;{{ visitor.email }}&gt;
+				{% endif %}
+			{% else %}
+                {{ phrase('agent.people.anonymous_user', {'id':visitor.id}) }}
+			{%endif %}
+		</h1>
+	</div>
+	<br class="clear" />
+</header>
+
+<div class="profile-box-container tabbed">
+	<header>
+		<nav>
+			<ul id="{{baseId}}_chats_tab_triggers">
+				{% if person_chats_count %}<li data-tab-for="#{{baseId}}_chats_tab">{{ phrase('agent.general.chats') }} <span class="count">{{ person_chats_count }}</span></li>{% endif %}
+				{% if person_tickets_count %}<li data-tab-for="#{{baseId}}_session_tab">{{ phrase('agent.general.detail') }}</li>{% endif %}
+			</ul>
+		</nav>
+	</header>
+	<section>
+		{% if person_chats_count %}
+		<article id="{{baseId}}_chats_tab">
+			<table class="tickets-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+					{% for chat in person_chats %}
+						<tr>
+							<td>
+								<div class="fade-container">
+									<div class="line">
+										<a data-route="page:{{ path('agent_userchat_view', {'conversation_id': chat.id}) }}" data-route-title="@text">{{ chat.getSubjectLine() }}</a>
+									</div>
+									<div class="bound-fade"></div>
+								</div>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</article>
+		{% endif %}
+
+		<article id="{{baseId}}_session_tab">
+			<table class="info-simple" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td class="label">{{ phrase('agent.people.online_now') }}</td>
+					<td class="value">
+						{{ phrase('agent.people.since') }}
+						<time>{{session.date_created|date('fulltime')}}</time>
+						(<time class="timeago" datetime="{{session.date_created|date('c', 'UTC')}}"></time>)
+					</td>
+				</tr>
+				<tr>
+					<td class="label">{{ phrase('agent.general.last_activity') }}</td>
+					<td class="value">
+						<time>{{session.date_last|date('fulltime')}}</time>
+						(<time class="timeago" datetime="{{session.date_last|date('c', 'UTC')}}"></time>)
+						{{ phrase('agent.people.on_page') }} <em class="tipped" title="{{ session.visitor.last_track.page_url }}">...</em>
+				</tr>
+				<tr>
+					<td class="label">{{ phrase('agent.general.landing_page') }}</td>
+					<td class="value">
+						{{ phrase('agent.people.user_landed_on_page') }}
+						<em class="tipped" title="{{ session.visitor.initial_track.page_url }}">...</em>
+						{% if session.visitor.visit_track.ref_page_url %}
+							{{ phrase('agent.people.and_came_from') }}
+							<em class="tipped" title="{{ session.visitor.visit_track.ref_page_url }}">...</em>
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">{{ phrase('agent.general.ip_address') }}</td>
+					<td class="value">
+						{{ session.visitor.ip_address }}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">{{ phrase('agent.general.user_agent') }}</td>
+					<td class="value">
+						{{ session.visitor.last_track.user_agent }}
+					</td>
+				</tr>
+			</table>
+		</article>
+		{# /Tracking Tab #}
+	</section>
+</div>
+
+{# Page Containers #}
+</div></div>
+</div>
+{# /Page Containers #}

@@ -1,0 +1,104 @@
+{##
+ # This template helps draw the fields that are to be displayed on the newticket page based on the layout
+ # defined from the admin interfacer.
+ #
+ # You generally don't want to edit this template directly because it contains logic for wrapper elements.
+ #
+ # If you want to modify the appearance of fields, edit one of the field-*.html.twig
+ # templates instead.
+ ##}
+{% for item in all_items %}
+
+{% if item.field_type == 'ticket_department' %}
+<div data-field-id="ticket_department" class="ticket-display-field ticket_department" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-department.html.twig' %}
+</div>
+{% endif %}
+
+{% if item.field_type == 'ticket_subject' %}
+<div data-field-id="ticket_subject" class="ticket-display-field ticket_subject" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-subject.html.twig' %}
+</div>
+{% endif %}
+
+{% if item.field_type == 'ticket_cc_emails' %}
+<div data-field-id="ticket_cc_emails" class="ticket-display-field ticket_cc_emails" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-cc.html.twig' %}
+</div>
+{% endif %}
+
+{% if type == 'modify' and user_participants|length %}
+{% if item.field_type == 'ticket_remove_ccs' %}
+<div data-field-id="ticket_remove_ccs" class="ticket-display-field ticket_remove_ccs" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-cc-remove.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{% if type != 'modify' %}
+{% if item.field_type == 'person_name' %}
+<div data-field-id="person_name" class="ticket-display-field person_name" {% if item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-person-name.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{% if type != 'modify' %}
+	{% if item.field_type == 'message' %}
+	<div data-field-id="message" class="ticket-display-field message" {% if (item.rules or item.id not in page_data_field_ids) %}style="display: none"{% endif %}>
+		{% include 'UserBundle:NewTicket:field-message.html.twig' %}
+	</div>
+	{% endif %}
+
+	{% if item.field_type == 'attachments' %}
+	<div data-field-id="attachments" class="ticket-display-field attachments" {% if item.rules or item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+		{% include 'UserBundle:NewTicket:field-attachments.html.twig' %}
+	</div>
+	{% endif %}
+{% endif %}
+
+{% if app.getSetting('core.use_ticket_category') %}
+{% if item.field_type == 'ticket_category' %}
+<div data-field-id="ticket_category" class="ticket_category ticket-display-field" {% if item.rules or item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-ticket-category.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{% if app.getSetting('core.use_product') %}
+{% if item.field_type == 'ticket_product' %}
+<div data-field-id="ticket_product" class="ticket_product ticket-display-field" {% if item.rules or item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-product.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{% if app.getSetting('core.use_ticket_priority') %}
+{% if item.field_type == 'ticket_priority' %}
+<div data-field-id="ticket_priority" class="ticket_priority ticket-display-field" {% if item.rules or item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-ticket-priority.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{###############
+ # Custom Fields
+ ###############}
+
+{% for f in custom_fields %}
+{% if item.field_type == 'ticket_field' and item.field_id == f.id %}
+<div data-field-id="ticket_field[{{f.id}}]" class="dp-control-group custom-field ticket_field_{{f.id}} ticket-display-field" {% if item.rules or item.id not in page_data_field_ids %}style="display: none"{% endif %}>
+	{% include 'UserBundle:NewTicket:field-custom-field.html.twig' %}
+</div>
+{% endif %}
+{% endfor %}
+
+{% if captcha_html %}
+{% if item.field_type == 'captcha' %}
+<div data-field-id="captcha" class="ticket-display-field captcha">
+	{% include 'UserBundle:NewTicket:field-captcha.html.twig' %}
+</div>
+{% endif %}
+{% endif %}
+
+{% endfor %}

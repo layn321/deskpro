@@ -1,0 +1,24 @@
+<div class="setting_field_row" xmlns="http://www.w3.org/1999/html">
+	<h4>
+		Ticket Templates
+		<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Ticket templates are pre-defined messages that agents can use when creating tickets from the agent interface."></span>
+	</h4>
+	<div class="setting_fields">
+		{% if message_templates|length %}
+			<ul class="small-detail-list" style="margin-bottom: 6px;">
+				{% for msgtpl in message_templates %}
+					<li>
+						<a class="editable-link" href="{{ path('admin_ticket_msgtpl_edit', {id: msgtpl.id}) }}"><span>
+							{{ msgtpl.title|default('(untitled)') }}
+							{% if msgtpl.department %}(Department: {{ msgtpl.department.full_title }}){% endif %}
+						</span></a>
+					</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+
+		<a class="clean-white" href="{{ path('admin_ticket_msgtpl_new') }}" style="padding: 1px 6px;"><span>
+			Add a new message template
+		</span></a>
+	</div>
+</div>

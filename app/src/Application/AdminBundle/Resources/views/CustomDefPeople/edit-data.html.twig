@@ -1,0 +1,21 @@
+{% extends base_edit_tpl %}
+{% block form_extra %}
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Specific Usersource</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.usersource_id) }}
+			<br /><small style="font-size: 10px;">Only save the value from this usersource. Leave blank to try and fetch the field from any usersource.</small>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Field Name</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.field_name) }}
+		</div>
+	</div>
+{% endblock %}

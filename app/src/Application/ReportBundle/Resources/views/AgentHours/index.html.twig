@@ -1,0 +1,447 @@
+{% set this_page = 'report_agent_hours_index' %}
+{% extends 'ReportBundle::layout.html.twig' %}
+
+{% block nav_block %}
+{% endblock %}
+
+{% block pagebar %}
+	<input id="datepicker1" type="hidden" value="{{ view_date1|date('Y-m-d') }}" />
+	<input id="datepicker2" type="hidden" value="{{ view_date2|date('Y-m-d') }}" />
+	<ul>
+		<li>
+			<span class="dp-title">
+				Viewing agent hours for
+			</span>
+			<span class="dp-nav-btn datepicker datepicker1"><a>{{ view_date|date('jS F Y') }}</a><em class="drop"></em><span class="hidden"></span></span>
+			&nbsp;
+			<span id="set_range_btn" class="dp-title" {% if view_date2 %}style="display: none;"{% endif %}>
+				<em style="cursor: pointer;">(click to set end range)</em>
+			</span>
+			<span id="set_range_ctrl" {% if not view_date2 %}style="display: none;"{% endif %}>
+				<span class="dp-title">
+					To
+				</span>
+				<span class="dp-nav-btn datepicker datepicker2"><a>{{ view_date2|date('jS F Y') }}</a><em class="drop"></em><span class="hidden"></span></span>
+				<button class="btn update-range-btn" style="padding: 1px 5px">Update</button>
+			</span>
+		</li>
+	</ul>
+{% endblock %}
+
+{% block page %}
+<div class="reports_agent_hours_section">
+{% set blocks_in_hour = (60 / block_size) %}
+{% set blocks_in_day = blocks_in_hour * 24 %}
+<style type="text/css">
+
+#dp_admin_pagebar {
+	overflow: visible;
+}
+
+#dp_admin_pagebar .datepicker > a > em {
+	height: 6px;
+	margin-left: 8px;
+}
+
+#dp_admin_pagebar .datepicker > span {
+	font-size: 100%;
+	line-height: 100%;
+	text-shadow: none;
+}
+
+.time_cell {
+    width: 4px;
+    vertical-align: middle;
+    padding: 0px;
+	margin: 0;
+	overflow: hidden;
+}
+
+.time_cell.active .bar {
+    background-color: #90ee90;
+    height: 8px;
+    border-bottom-style: solid;
+    border-bottom-color: #999999;
+    border-bottom-width: 1px;
+    border-top-style: solid;
+    border-top-color: #999999;
+    border-top-width: 1px;
+	position: relative;
+	z-index: 1;
+}
+
+.time_cell.active.first .bar {
+    border-left-style: solid;
+    border-left-color: #999999;
+    border-left-width: 1px;
+}
+
+.time_cell.active.last .bar {
+    border-right-style: solid;
+    border-right-color: #999999;
+    border-right-width: 1px;
+}
+
+.left_panel {
+    padding: 4px;
+	width: 225px !important;
+}
+
+.left_panel.agent_total {
+    border-right-style: solid;
+    border-right-color: #CCCCCC;
+    border-right-width: 1px;
+}
+
+.hour_title.first {
+    border-left-style: solid;
+    border-left-color: #CCCCCC;
+    border-left-width: 1px;
+}
+
+.chart_container {
+    padding: 0px;
+    width: {{ 4*blocks_in_day }}px;
+    height: 100%;
+}
+
+.chart_container > div {
+    position: relative;
+}
+
+.chart_container > div > table {
+    position: absolute;
+}
+
+.border_table {
+    height: 100%;
+	position: relative;
+	left: 1px;
+	border-collapse: collapse;
+}
+
+.border_table td {
+    padding: 0px;
+	width: 4px;
+	border-right: 1px solid transparent;
+	padding: 0;
+	margin: 0;
+	height: {{ (26 * agents|length) + 5 }}px;
+}
+
+.border_table td.hour {
+	border-right: 1px solid #CCCCCC;
+}
+
+.date_today {
+    padding: 8px;
+    text-align: center;
+}
+
+.hour_title {
+    text-align: center;
+    border-right-style: solid;
+    border-right-color: #CCCCCC;
+    border-right-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #CCCCCC;
+    border-bottom-width: 1px;
+    border-top-style: solid;
+    border-top-color: #CCCCCC;
+    border-top-width: 1px;
+    padding: 0px;
+    width: {{ (4 * blocks_in_hour) -1 }}px;
+}
+{% if times and use_days %}
+.time_cell.active .bar {
+	border: none !important;
+}
+
+table.chart_parent_table td {
+	width: 48px;
+	overflow: hidden;
+}
+
+.time_cell {
+	width: 2px !important;
+	overflow: hidden !important;
+}
+
+#dp_page_wrap {
+	min-width: {{ (num_days * 50) + (num_days) }}px;
+	max-width: none;
+}
+{% endif %}
+
+</style>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+		function refreshRange() {
+			var date1 = $('#datepicker1').val();
+			var date2 = $('#datepicker2').val();
+
+			if (date2 && !$('#set_range_ctrl').is(':hidden')) {
+				document.location = "{{ path('report_agent_hours_list_date', {'date':''}) }}/" + date1 + '/' + date2;
+			} else {
+				document.location = "{{ path('report_agent_hours_list_date', {'date':''}) }}/" + date1;
+			}
+		}
+
+		$('.update-range-btn').on('click', function(ev) {
+			ev.preventDefault();
+			refreshRange();
+		});
+
+        $('.datepicker1 > span').datepicker(
+                {
+                    'onSelect': function(dateText) {
+						$('#datepicker1').val(dateText);
+						if ($('#set_range_ctrl').is(':hidden')) {
+							refreshRange();
+						} else {
+							$('.datepicker1 > a').text(dateText);
+						}
+                    },
+                    'dateFormat': 'yy-mm-dd',
+                    'minDate': new Date({{ min_date|date('Y') }}, {{ min_date|date('m') }} -1, {{ min_date|date('d') }}),
+                    'maxDate': new Date({{ max_date|date('Y') }}, {{ max_date|date('m') }} -1, {{ max_date|date('d') }}),
+                    'defaultDate': new Date({{ view_date|date('Y') }}, {{ view_date|date('m') }} -1, {{ view_date|date('d') }})
+                }
+        );
+		$('.datepicker2 > span').datepicker(
+			{
+				'onSelect': function(dateText) {
+					$('#datepicker2').val(dateText);
+					$('.datepicker2 > a').text(dateText);
+				},
+				'dateFormat': 'yy-mm-dd',
+				'minDate': new Date({{ min_date|date('Y') }}, {{ min_date|date('m') }} -1, {{ min_date|date('d') }}),
+				'maxDate': new Date({{ max_date|date('Y') }}, {{ max_date|date('m') }} -1, {{ max_date|date('d') }}),
+				'defaultDate': new Date({{ view_date|date('Y') }}, {{ view_date|date('m') }} -1, {{ view_date|date('d') }})
+			}
+		);
+        $('.datepicker1 > a').on('click', function(){
+            if($('.datepicker1 > span').hasClass('hidden')) {
+                $('.datepicker1 > span').removeClass('hidden');
+                $('.reports-popup-page-overlay').removeClass('hidden');
+            }
+            else {
+                $('.datepicker1 > span').addClass('hidden');
+                $('.reports-popup-page-overlay').addClass('hidden');
+            }
+        });
+		$('.datepicker2 > a').on('click', function(){
+            if($('.datepicker2 > span').hasClass('hidden')) {
+                $('.datepicker2 > span').removeClass('hidden');
+                $('.reports-popup-page-overlay').removeClass('hidden');
+            }
+            else {
+                $('.datepicker2 > span').addClass('hidden');
+                $('.reports-popup-page-overlay').addClass('hidden');
+            }
+        });
+		$('.reports-popup-page-overlay').on('click', function() {
+			$('.datepicker1 > span').addClass('hidden');
+			$('.datepicker2 > span').addClass('hidden');
+			$('.reports-popup-page-overlay').addClass('hidden');
+		});
+        function resize()
+        {
+            $('.agent_row').each(function(i , element) {
+                element = $(element);
+                $('#agent_time_row-' + element.attr('id').split('-')[1]).css('height', element.height()+"px");
+            });
+        }
+
+		$('#set_range_btn').on('click', function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+
+			$(this).hide();
+			$('#set_range_ctrl').show();
+			$('.datepicker2 > a').click();
+		});
+
+        $(window).on('resize', resize);
+        resize();
+    });
+
+</script>
+
+{% if times and use_days %}
+	<div class="chart-wrapper" style="position:relative;">
+		<table class="chart_parent_table">
+			<tr>
+				<td class="left_panel empty">&nbsp;</td>
+				{% for year,months in use_days %}
+					{% set is_first = false %}
+					{% if loop.first %}{% set is_first = true %}{% endif %}
+					{% for month,days in months %}
+						{% for day in days %}
+							<td class="hour_title {% if is_first %}first{% endif %}">
+								<span style="font-size: 9px;">
+								{% if month == 1 %}Jan
+								{% elseif month == 2 %}Feb
+								{% elseif month == 3 %}March
+								{% elseif month == 4 %}April
+								{% elseif month == 5 %}May
+								{% elseif month == 6 %}June
+								{% elseif month == 7 %}July
+								{% elseif month == 8 %}August
+								{% elseif month == 9 %}Sept
+								{% elseif month == 10 %}Oct
+								{% elseif month == 11 %}Nov
+								{% elseif month == 12 %}Dec
+								{% endif %}
+								</span>
+								<br/>
+								{{ day }}
+							</td>
+						{% endfor %}
+					{% endfor %}
+				{% endfor %}
+			</tr>
+			{% for agent in agents %}
+				<tr>
+					<td class="left_panel empty" style="text-align: right;">
+						{{ agent.name }}
+						<em style="font-style: normal; font-size: 10px;">({{ totals[agent.id].hours }}hrs, {{ totals[agent.id].minutes }}mins)</em>
+					</td>
+					{% for year,months in use_days %}
+					{% set is_first = false %}
+					{% if loop.first %}{% set is_first = true %}{% endif %}
+					{% for month,days in months %}
+						{% for day in days %}
+							<td class="hour_title {% if loop.first %}first{% endif %}">
+								&nbsp;
+							</td>
+						{% endfor %}
+					{% endfor %}
+				{% endfor %}
+				</tr>
+			{% endfor %}
+		</table>
+		<table class="chart_parent_table" style="position:absolute; top:0; left:0;">
+			<tr>
+				<td class="left_panel empty">&nbsp;</td>
+				{% for year,months in use_days %}
+					{% for month,days in months %}
+						{% for day in days %}
+							<td>
+								<span style="font-size: 9px;">&nbsp;</span><br/>
+								&nbsp;
+							</td>
+						{% endfor %}
+					{% endfor %}
+				{% endfor %}
+			</tr>
+			{% for agent in agents %}
+				{% set last_active = 0 %}
+				<tr id="agent_row-{{ agent.id }}" class="agent_row">
+					<td class="left_panel">&nbsp;</td>
+					{% if loop.first %}
+					<td class="chart_container" colspan="{{ num_days }}" rowspan="{{ agents|length }}">
+						<div><table>
+							{% for agent in agents %}
+							<tr id="agent_time_row-{{ agent.id }}" class="time_row {% if loop.last %}last{% endif %}">
+								{% for year,months in use_days %}
+									{% for month,days in months %}
+										{% for day in days %}
+											{% for i in range(0, 23) %}
+												<td class="time_cell
+													{% if times_hour[agent.id][year][month][day][i] %}
+														{% if loop.first or not last_active %}first{% endif %}
+														{% if loop.last or not times_hour[agent.id][year][month][day][i][i + 1] is defined %}last{% endif %}
+														{% set last_active = 1 %}
+														active
+													{% else %}
+													{% set last_active = 0 %}
+												{% endif %}
+												"><div class="bar"></div></td>
+											{% endfor %}
+										{% endfor %}
+									{% endfor %}
+								{% endfor %}
+							</tr>
+							{% endfor %}
+						</table></div>
+					</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% elseif times %}
+	<div class="chart-wrapper" style="position:relative;">
+		<table class="chart_parent_table">
+			<tr>
+				<td class="left_panel empty">&nbsp;</td>
+				{% for i in range(0, 23) %}
+					<td class="hour_title {% if loop.first %}first{% endif %}">
+						{{ '%02d'|format(i) }}:00
+					</td>
+				{% endfor %}
+			</tr>
+			{% for agent in agents %}
+				<tr>
+					<td class="left_panel empty" style="text-align: right;">
+						{{ agent.name }}
+						<em style="font-style: normal; font-size: 10px;">({{ totals[agent.id].hours }}hrs, {{ totals[agent.id].minutes }}mins)</em>
+					</td>
+					{% for i in range(0, 23) %}
+						<td class="hour_title {% if loop.first %}first{% endif %}">
+							&nbsp;
+						</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</table>
+		<table class="chart_parent_table" style="position:absolute; top:0; left:0;">
+			<tr>
+				<td class="left_panel empty">&nbsp;</td>
+				{% for i in range(0, 23) %}
+					<td>
+						&nbsp;
+					</td>
+				{% endfor %}
+			</tr>
+			{% for agent in agents %}
+				{% set last_active = 0 %}
+				<tr id="agent_row-{{ agent.id }}" class="agent_row">
+					<td class="left_panel">&nbsp;</td>
+					{% if loop.first %}
+					<td class="chart_container" colspan="24" rowspan="{{ agents|length }}">
+						<div><table>
+							{% for agent in agents %}
+							<tr id="agent_time_row-{{ agent.id }}" class="time_row {% if loop.last %}last{% endif %}">
+								{% for i in range(0, blocks_in_day - 1) %}
+								<td class="time_cell
+										{% if times[agent.id][year_start][month_start][day_start][i] is defined %}
+											{% if loop.first or not last_active %}first{% endif %}
+											{% if loop.last or not times[agent.id][year_start][month_start][day_start][i + 1] is defined %}last{% endif %}
+											{% set last_active = 1 %}
+											active
+										{% else %}
+										{% set last_active = 0 %}
+										{% if ((i + 1) % blocks_in_hour) == 0 %}hour{% endif %}
+									{% endif %}
+									"><div class="bar"></div></td>
+								{% endfor %}
+							</tr>
+							{% endfor %}
+						</table></div>
+					</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% else %}
+	No data for selected time period.
+{% endif %}
+
+
+<div class="reports-popup-page-overlay hidden"></div>
+</div>
+{% endblock %}

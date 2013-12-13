@@ -1,0 +1,15 @@
+{##
+ # The feedback voting widget displayed in result listings as well as the full view page.
+ ##}
+
+<div
+	data-element-handler="DeskPRO.User.ElementHandler.FeedbackAgreeBtn"
+	class="with-handler dp-feedback-vote {% if feedback.status == 'closed' %}dp-feedback-closed{% endif %} {% if has_voted_ids[feedback.id] or has_voted_this %}dp-voted{% endif %}"
+	data-vote-url="{{ path('user_feedback_vote', {'feedback_id': feedback.id}) }}"
+>
+	<div class="dp-feedback-count"><i class="dp-arrow-outer"></i><i class="dp-arrow-inner"></i><em>{{ feedback.total_rating|default(0) }}</em></div>
+	<span class="dp-feedback-btn">
+		{% if feedback.status == 'closed' %}{{ phrase('user.feedback.voting_closed') }}
+		{% else %}<i class="dp-icon-thumbup"></i><span>{{ phrase('user.feedback.voting_button-yes') }}</span>{% endif %}
+	</span>
+</div>

@@ -1,0 +1,28 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagetitle %}
+	<h1>{{ phrase('admin.products.delete_product') }}</h1>
+	<nav>
+		<a class="clean-white" href="{{ path('admin_products') }}">&larr; {{ phrase('admin.products.back_to_products') }}</a>
+	</nav>
+{% endblock %}
+{% block page %}
+
+{% if category.children|length %}
+	<p>{{ phrase('admin.products.confirm_delete_product', {'title':product.title}) }}</p>
+
+	<ul class="bullet-list">
+		{% for c in product.children %}
+			<li>{{ c.title }}</li>
+		{% endfor %}
+	</ul>
+
+	<p>{{ phrase('admin.products.notice_products_will_be_removed') }}</p>
+{% else %}
+	<p>{{ phrase('admin.products.confirm_delete_product_top_level', {'title':product.title}) }}</p>
+
+	<p>{{ phrase('admin.products.notice_product_will_be_removed') }}</p>
+{% endif %}
+
+<a class="btn" href="{{ path('admin_products_dodel', {'product_id': product.id, 'security_token': security_token('delete_product')}) }}">{{ phrase('admin.general.confirm_delete') }}</a>
+
+{% endblock %}

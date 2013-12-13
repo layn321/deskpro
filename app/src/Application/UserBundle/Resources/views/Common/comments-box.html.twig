@@ -1,0 +1,73 @@
+{##
+ # The standard comments box at the bottom of content pages.
+ # The 'type' variable will define which page is calling: article, news, feedback or download
+ ##}
+{% if (comments|length or app.user.hasPerm(check_perm)) and app.getSetting('user.publish_comments') %}
+	<a name="comments"></a>
+	<section class="dp-comments-box dp-well">
+		<header>
+			<h4>{{ phrase('user.general.count_comments', {'count': comments|length}) }}</h4>
+		</header>
+		<article class="dp-well dp-well-light">
+			{% if comments_widget %}
+				{{comments_widget|raw}}
+			{% else %}
+				<ul>
+					{% for comment in comments %}
+						{% include 'UserBundle:Common:comment-row.html.twig' %}
+					{% else %}
+						<li class="dp-no-comments">
+							{{ phrase('user.general.comments_no_comments') }}
+						</li>
+					{% endfor %}
+					{% if not no_comment_form %}
+						{% if not app.user.id and app.getSetting('core.interact_require_login') %}
+							<li class="new-comment no-nav">
+								{{ phrase('user.general.comments-login-or-register', {'login_link':path('user_login'),'register_link':path('user_register')}) }}
+							</li>
+						{% elseif app.user.hasPerm(check_perm) %}
+						<li class="new-comment {% if not app.user.is_guest %}no-nav{% endif %}" id="comments_login_info">
+							{% if app.getSession().getFlash('comment_error') %}
+								<div class="dp-alert dp-alert-error">
+									{% for type,x in app.getSession().getFlash('comment_error') %}
+										{% if type == 'email.invalid' %}- {{ phrase('user.general.form_fix_email') }}<br />{% endif %}
+										{% if type == 'name.short' %}- {{ phrase('user.general.please_enter_your_name') }}{% endif %}
+										{% if type == 'captcha.invalid' %}- {{ phrase('user.tickets.form_error_captcha_invalid') }}{% endif %}
+									{% endfor %}
+								</div>
+							{% endif %}
+							<form action="{{ form_action }}" method="post" class="with-form-validator">
+								{{ form_token() }}
+
+								<div class="dp-its-a-trap">
+									{# Spam trap: If these fields contain values when submitted, the system knows a bot submitted the form #}
+									<input type="text" name="first_name" value="" />
+									<input type="text" name="last_name" value="" />
+									<input type="text" name="email" value="" />
+								</div>
+
+								<div class="login-area">
+									<div class="inner-wrap">
+										<div>
+											<textarea name="new_comment[content]" cols="120" rows="5" placeholder="{{ phrase('user.general.comments_add-comment') }}"></textarea>
+										</div>
+										<div id="comments_form_login_area" data-element-handler="DeskPRO.User.ElementHandler.CommentFormLogin" class="with-handler">{% include 'UserBundle:Common:comments-login-form.html.twig' %}</div>
+										{% if (not app.user.id or app.getSetting('user.always_show_captcha')) and app.getSetting('user.publish_captcha') %}
+											<div style="padding: 8px 0 8px 0">
+												{{ captcha_html('new_comment') }}
+											</div>
+										{% endif %}
+										<div style="padding-top: 0">
+											<button class="dp-btn dp-primary" style="margin-top: 10px;">{{ phrase('user.general.post_comment_btn') }}</button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</li>
+						{% endif %}
+					{% endif %}
+				</ul>
+			{% endif %}
+		</article>
+	</section>
+{% endif %}

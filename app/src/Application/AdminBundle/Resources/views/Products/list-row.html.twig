@@ -1,0 +1,42 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+
+{% if not is_sub %}
+	<div class="department-group">
+{% endif %}
+
+{% if product.children|length %}
+	{{ design.dpgrid_content({class: 'top parent' ~ ' category-' ~ product.id, extra: "data-category-id='#{product.id}'"}) }}
+{% elseif is_sub %}
+	{% if is_last %}
+		{{ design.dpgrid_content({class: 'child last' ~ ' category-' ~ product.id, extra: "data-category-id='#{product.id}'"}) }}
+	{% else %}
+{{ design.dpgrid_content({class: 'child' ~ ' category-' ~ product.id, extra: "data-category-id='#{product.id}'"}) }}
+	{% endif %}
+{% else%}
+	{{ design.dpgrid_content({class: 'top' ~ ' category-' ~ product.id, extra: "data-category-id='#{product.id}'"}) }}
+{% endif %}
+
+{{ design.dpgrid_col({ class: 'l r', style: "width: 890px; cursor: move;"}) }}
+	<span class="field-id" style="float:right">ID: {{ product.id }}</span>
+	{% if app.getSetting('core.use_product_fields') %}
+		<h2><a href="{{ path('admin_products_edit', {product_id: product.id}) }}">{{product.getRealTitle()}}</a></h2>
+	{% else %}
+		<h2><a class="edit-trigger">{{product.getRealTitle()}}</a></h2>
+	{% endif %}
+{{ design.dpgrid_col_end() }}
+
+{{ design.dpgrid_col({ class: 'l r l-margin alt with-icon-only', style: "width: 16px"}) }}
+	<a href="{{ path('admin_products_del', {'product_id': product.id}) }}" class="delete"></a>
+{{ design.dpgrid_col_end() }}
+
+{{ design.dpgrid_content_end() }}
+
+{% if product.children|length %}
+	{% for sub_prod in product.children %}
+		{% include 'AdminBundle:Products:list-row.html.twig' with {'product': sub_prod, 'is_sub': true, 'depth': depth|default(0) + 1, is_last: loop.last } %}
+	{% endfor %}
+{% endif %}
+
+{% if not is_sub %}
+	</div>
+{% endif %}

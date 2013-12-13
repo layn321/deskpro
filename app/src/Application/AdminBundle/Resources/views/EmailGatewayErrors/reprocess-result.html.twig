@@ -1,0 +1,43 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_emailgateway_errors') }}">{{ phrase('admin.general.gateway_error_logs') }}</a></li>
+		{% if type == 'errors' %}<li><a href="{{ path('admin_emailgateway_errors') }}">Errors</a></li>
+		{% else %}<li><a href="{{ path('admin_emailgateway_rejections') }}">Rejections</a></li>{% endif %}
+		<li>{{ phrase('admin.general.gateway_source_id', {id: source.id}) }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<tbody>
+			<tr>
+				<td class="title on" width="200"><strong>{{ phrase('agent.general.id') }}</strong></td>
+				<td>
+					{{source.id}}
+				</td>
+			</tr>
+
+			<tr>
+				<td class="title on">Status</td>
+				<td>
+					{% if source.error_code %}
+						<strong style="color: #C2001C;">{{ source.error_code_title }}</strong>
+					{% else %}
+						<strong style="color: #009E15;">Success</strong>
+					{% endif %}
+				</td>
+			</tr>
+
+			<tr>
+				<td class="title on"><strong>Log</strong></td>
+				<td>
+					<textarea style="width:98%; height:200px; font-size: 11px; font-family:Monaco, 'Courier New', courier, monospace;">{{source.getSourceInfoAsString()}}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

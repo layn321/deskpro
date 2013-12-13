@@ -1,0 +1,18 @@
+<?php return array(
+	'user.error.attach_ext-allowed'                                        => 'فقط انواع فایل های زیر را می توانید آپلود کنید: {{error_detail}}',
+	'user.error.attach_ext-not-allow'                                      => 'نوع فایل آپلود شده شما مجاز نمی باشد.',
+	'user.error.attach_no-file'                                            => 'لطفا یک فایل برای آپلود انتخاب کنید',
+	'user.error.error_code'                                                => 'کد خطا',
+	'user.error.error_title'                                               => 'خطا',
+	'user.error.form_choice_invalid'                                       => 'لطفا یک گزینه از لیست انتخاب کنید',
+	'user.error.form_date_invalid'                                         => 'لطفا یک تاریخ معتبر وارد کنید',
+	'user.error.form_required'                                             => 'این فیلد الزامی است',
+	'user.error.form_text_regex'                                           => 'لطفا مقدار صحیح را وارد کنید',
+	'user.error.invalid_email'                                             => 'آدرس ایمیل نامعتبر است',
+	'user.error.invalid_email-code'                                        => 'لینک اعتبار به نظر می رسد نامعتبر است.',
+	'user.error.not-found'                                                 => 'صفحه مورد نظر شما که دنبال آن هستید یافت نشد .',
+	'user.error.not-found-title'                                           => 'یافت نشد',
+	'user.error.permission-denied'                                         => 'با عرض پوزش ، اقدام شما در حالا انجام برای شما مجاز نمی باشد.',
+	'user.error.permission-denied-title'                                   => 'انجام این کار برای شما امکان پذیر نیست',
+	'user.error.server-error'                                              => 'یک خطای سرور وجود دارد که مانع از صفحه در حال بارگذاری می شود. لطفا دوباره سعی کنید.',
+);

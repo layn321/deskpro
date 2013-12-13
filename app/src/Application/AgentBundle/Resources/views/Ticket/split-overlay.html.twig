@@ -1,0 +1,61 @@
+{% macro message_row(ticket, message, is_single, message_num) %}
+	<article
+		class="content-message message {% if not is_single %}message-unselected{% endif %} {% if message.is_agent_note %}note-message{% elseif message.person.is_agent %}agent-message{% else %}user-message{% endif %}"
+	>
+		<div class="content" style="margin-left: 0">
+			<header>
+				{% if not is_single %}
+					<input type="checkbox" class="message-id-checkbox" name="message_ids[]" value="{{ message.id }}" style="float: left; position: relative; top: 5px; margin-left: 5px" />
+					<span class="message-counter message-counter-{{ message.id }}" data-message-id="{{ message.id }}">#{{ message_num }}</span>
+				{% endif %}
+				{% if message.person.is_agent %}<h4	class="agent-link" data-agent-id="{{ message.person.id }}">{{message.person.display_name}} <span class="email-part">&lt;{{ message.person.getPrimaryEmailAddress() }}&gt;</span></h4>
+				{% else %}<h4>{{message.person.getNameWithTitle()}} <span class="email-part">&lt;{{ message.person.getPrimaryEmailAddress() }}&gt;</span></h4>
+				{% endif %}
+				<time class="full-time">{{message.date_created|date('fulltime')}}</time>
+				<time class="timeago" datetime="{{message.date_created|date('c', 'UTC')}}">{{message.date_created|date('fulltime')}}</time>
+			</header>
+			<div class="body-text" style="cursor: pointer">
+				<div class="body-text-message unreset" style="max-height: 70px; overflow: hidden" {% if ticket.language and ticket.language.is_rtl %}dir="rtl"{% endif %}>
+					{{message.message_html|safe_link_urls_html }}
+				</div>
+				<div class="fade-bar" style="display: block; height: 25px"></div>
+			</div>
+		</div>
+	</article>
+
+{% endmacro %}
+<div class="extended-merge split-overlay overlay">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.tickets.split_messages_into_ticket') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+		<form action="{{ path('agent_ticket_split_save', {'ticket_id': ticket.id}) }}" method="post" class="dp-form">
+
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('agent.tickets.new_ticket_subject') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="subject" value="" />
+				</div>
+			</div>
+
+			<div class="ticket-messages">
+				{% if message %}
+					{{ _self.message_row(ticket, message, true) }}
+					<input type="hidden" name="message_ids[]" value="{{ message.id }}" />
+				{% else %}
+					{% for message in ticket.messages %}
+						{{ _self.message_row(ticket, message, false, loop.index) }}
+					{% endfor %}
+				{% endif %}
+			</div>
+
+			<div style="text-align: center">
+				<span class="is-not-loading"><button type="submit" class="clean-white">{% if message %}{{ phrase('agent.tickets.split_message_btn') }}{% else %}{{ phrase('agent.tickets.split_selected_messages_btn') }}{% endif %}</button></span>
+				<span class="is-loading"><img src="{{ asset('images/spinners/loading-small.gif') }}" /></span>
+			</div>
+		</form>
+	</div>
+</div>

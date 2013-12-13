@@ -1,0 +1,45 @@
+<article
+	class="row-item article article-{{article.id}} articles-{{article.id}} related-is-linkable"
+	data-content-type="articles"
+	data-content-id="{{ article.id }}"
+	data-route="article:{{ path('agent_kb_article', {'article_id': article.id}) }}"
+	data-route-title="@selector(a.row-title)"
+	data-route-openclass="open"
+>
+	{#<input class="item-select" type="checkbox" value="{{article.id}}" />#}
+	<div class="top-row">
+		<div class="top-row-left">
+			<h3>
+				<a class="row-title click-through">{{ article.title }}</a>
+			</h3>
+		</div>
+		<div class="top-row-right visible-ticket-controls">
+			<div class="bound-faded"></div>
+			<a href="javascript:" class="tipped kb-insert-link" title="{{ phrase('agent.general.insert_link') }}" data-article-id="{{ article.id }}"></a>
+			<a href="javascript:" class="tipped kb-insert-content" title="{{ phrase('agent.general.insert_content') }}" data-article-id="{{ article.id }}"></a>
+		</div>
+		<div class="top-row-right visible-related-content-controls">
+			<div class="bound-faded"></div>
+			<span class="tipped related-link" title="{{ phrase('agent.general.add_as_related') }}"></span>
+			<span class="tipped related-unlink" title="{{ phrase('agent.general.remove_as_related') }}"></span>
+		</div>
+	</div>
+	<hr class="clear-top" />
+		<div class="extra-fields">
+			<ul>
+				<li>
+					<span class="prop-title">{{ phrase('agent.general.category') }}</span>
+					<span class="prop-val">{{ article.category_names }}</span>
+				</li>
+				<li>
+					<span class="prop-title">{{ phrase('agent.general.author') }}</span>
+					<span class="prop-val">{{ article.by_line }}</span>
+				</li>
+				<li>
+					<span class="prop-title">{{ phrase('agent.general.date_created') }}</span>
+					<span class="prop-val">{{ article.date_created|date('day')}}</span>
+				</li>
+			</ul>
+		</div>
+	<br class="clear" />
+</article>

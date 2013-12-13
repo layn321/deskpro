@@ -1,0 +1,25 @@
+{##
+ # The message textarea of the new ticket form
+ ##}
+
+<div class="dp-control-group {% if error_fields['ticket.message'] %}dp-error{% endif %} dp-control-group-ticket_message" style="position:relative;">
+	<div class="dp-drop-file-zone"><h1>{{ phrase('user.general.upload-drag') }}</h1></div>
+	<div class="dp-control-label">
+		<label><strong>{{ phrase('user.tickets.lbl_what_is_your_question') }} *</strong></label>
+	</div>
+	<div class="dp-controls dp-fill">
+		{{ form_widget(form.ticket.message, {
+			'attr': {
+				'class': 'dp-message',
+				'data-field-validators': 'DeskPRO.Form.LengthValidator',
+				'data-min-len': 10,
+				'placeholder': phrase('user.tickets.message'),
+				'class': addclass,
+				'rows': 10
+			}
+		}) }}
+		<div class="dp-help-inline dp-error-explain">
+			{{ phrase('user.tickets.form_error_message') }}
+		</div>
+	</div>
+</div>

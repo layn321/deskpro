@@ -1,0 +1,39 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_userreg_options') }}">{{ phrase('admin.user_registration.registration_options') }}</a></li>
+	<li><a href="{{ path('admin_userreg_usersource_edit', {id: usersource.id}) }}">{{ usersource.title }}</a></li>
+	<li>Test</li>
+</ul>
+{% endblock %}
+{% block page %}
+<div class="check-grid item-list">
+	<table width="100%">
+		<tbody>
+			<tr>
+				<td>Result</td>
+				<td>
+					{% if is_valid %}
+						Login was <strong style="color: #139300;">VALID</strong>
+					{% else %}
+						Login was <strong style="color: #f00;">INVALID</strong>
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>Raw Data</td>
+				<td>
+					<textarea style="width: 98%; height: 120px; font-family: Monaco, Consolas, 'Courier New', monospace; font-size: 11px;">{{ raw_user_data|raw }}</textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>Log</td>
+				<td>
+					<textarea style="width: 98%; height: 120px; font-family: Monaco, Consolas, 'Courier New', monospace; font-size: 11px;">{{ log }}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+{% endblock %}

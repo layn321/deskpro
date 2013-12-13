@@ -1,0 +1,74 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.AgentChatTranscript';
+pageMeta.title         = '{{ phrase('agent.chat.chat_transcript') }}';
+pageMeta.conversation_id = {{convo.id}};
+</script>
+{{ agentui.scroll_containers('agentchat-page') }}
+	<header class="page-header">
+		<h1>
+			{{ phrase('agent.chat.between_members') }}
+			{% for p in convo.participants %}
+				{% if loop.last %} and {% endif %}{{ p.display_name }}{% if not loop.last and convo.participants|length > 2 %},{% endif %}
+			{% endfor %}
+		</h1>
+		<time class="timeago" datetime="{{ convo.date_created|date('c', 'UTC') }}">{{ convo.date_created|date('day_short') }}</time>
+	</header>
+
+	<div class="profile-box-container">
+		<header>
+			<h4>{{ phrase('agent.chat.chat_transcript') }}</h4>
+		</header>
+		<section class="chat-transcript">
+			<div class="messages chat-transcript {% if convo.status == 'ended' %}chat-ended{% endif %}" id="{{baseId}}_messages_box">
+				{% for message in convo_messages|reverse %}
+					<div class="row {% if message.metadata.new_user_track %}user-track{% endif %} {% if message.is_sys %}sys{% elseif message.author.id == app.user.id %}agent with-avatar{% else %}user with-avatar{% endif%} message-{{ message.id }}">
+						{% if message.is_sys %}
+							<div class="message-content">
+								<div class="message">
+									{{message.content_html|raw}}
+								</div>
+								<time>{{ message.date_created|date('g:ia') }}</time>
+							</div>
+						{% elseif message.author.id == app.user.id %}
+							<div class="avatar tipped"><span class="tipped" title="{{ message.author.display_name }}" style="background-image: url({{ message.author.getPictureUrl(25) }})"></span></div>
+							<div class="message-content">
+								<div class="chatSend">
+									<div class="chatMsgSend">
+										{{message.content_html|raw}}
+										<span class="bubbleLeft"></span>
+									</div>
+								</div>
+								<time>{{ message.date_created|date('g:ia') }}</time>
+							</div>
+						{% else %}
+							<div class="avatar"><span class="tipped" title="{{ message.author.display_name }}" style="background-image: url({{ message.author.getPictureUrl(25) }})"></span></div>
+							<div class="message-content">
+								<div class="chatRecieve">
+									<div class="chatMsgRecieve">
+										{{message.content_html|raw}}
+										<span class="bubbleRight"></span>
+									</div>
+								</div>
+								<time>{{ message.date_created|date('g:ia') }}</time>
+							</div>
+						{% endif %}
+						<br class="clear" />
+					</div>
+				{% endfor %}
+				<div class="row user-typing" style="display: none" id="{{baseId}}_user_typing">
+					<div class="message-content">
+						<div class="chatRecieve">
+							<div class="chatMsgRecieve">
+								<label>{{ phrase('agent.chat.user_typing') }}: </label>
+								<div class="prop-msg"></div>
+								<span class="bubbleRight"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<br class="clear" />
+		</section>
+	</div>
+{{ agentui.scroll_containers_end() }}

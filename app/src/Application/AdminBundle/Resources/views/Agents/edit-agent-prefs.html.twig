@@ -1,0 +1,137 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		<li><a href="{{ path('admin_agents_edit', {person_id: agent.id}) }}">{{ agent.display_name }}</a></li>
+		<li>Edit Preferences</li>
+	</ul>
+{% endblock %}
+{% block page %}
+{% if did_save %}
+	<div class="alert-message block-message success">
+		Agent was saved successfully.
+	</div>
+{% endif %}
+
+<form action="{{ path('admin_agents_edit_prefs', {person_id: agent.id}) }}" method="post" id="agent_form">
+
+<div class="dp-form">
+	<div class="dp-form-section">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Timezone</label>
+			</div>
+			<div class="dp-form-input">
+				<select name="agent[timezone]">
+					<option value=""></option>
+					{% for tz in timezone_options %}
+						<option value="{{ tz }}" {% if agent.getRealTimezone() == tz %}selected="selected"{% endif %}>{{ tz }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-section">
+		<div class="dp-form-row new-picture">
+			<div class="dp-form-label">
+				<label>{{ phrase('agent.general.label_picture') }}</label>
+			</div>
+			<div class="dp-form-input">
+				<table cellspacing="0" cellpadding="0"><tr>
+					<td style="padding-right: 15px;"><img src="{{ agent.getPictureUrl(80) }}" /><br /><em class="desc">Current picture</em></td>
+				<td>
+					<input type="file" name="file-upload" />
+					<div class="files"></div>
+				</td>
+				</tr></table>
+			</div>
+			<script class="template-upload" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				<p>{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</p>
+				{{ '{% } %}' }}
+			</script>
+			<script class="template-download" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				{{ '{% if (file.error) { %}'}}
+				<div class="error">
+					{{ '{%=file.error%}' }}
+				</div>
+				{{ '{% } else { %}'}}
+				<div>
+					<input type="hidden" name="new_blob_id" class="new_blob_id" value="{{ '{%=file.blob_auth_id%}' }}" />
+					<img src="{{ '{%=file.download_url%}' }}?s=60" class="pic-new" data-setted-size="{{ '{%=file.download_url%}' }}?s=60" />
+				</div>
+				{{ '{% } %}' }}
+				{{ '{% } %}' }}
+			</script>
+		</div>
+	</div>
+
+	<div class="dp-form-section">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('agent.settings.ticket_signature') }}</label>
+			</div>
+			<div class="dp-form-input">
+				<div style="width: 70%" class="unreset">
+					<textarea name="ticket_signature" id="agent_settings_signature" data-rte="1"></textarea>
+					<div class="drop-file-zone drop-file-zone-rte"><h1>{{ phrase('agent.settings.drop_here_insert_signature') }}</h1></div>
+				</div>
+				<em class="desc">{{ phrase('agent.settings.ticket_signature_desc') }}</em>
+				<input type="hidden" id="agent_settings_is_html_signature" name="is_html_signature" value="0" />
+				<input type="hidden" value="{{ signature }}" id="agent_settings_signature_text" />
+				<input type="hidden" value="{{ signature_html }}" id="agent_settings_signature_html" />
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<footer class="controls" id="save_control">
+	<div class="is-not-loading">
+		<button class="clean-white">Save</button>
+	</div>
+	<div class="is-loading">
+		<div class="loading-icon-flat">&nbsp;</div>
+	</div>
+</footer>
+
+</form>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var form = $('#agent_form');
+
+
+
+	DeskPRO_Window.util.fileupload(form.find('.dp-form-row.new-picture'));
+	form.find('.dp-form-row.new-picture').bind('fileuploadadd', function() {
+		$('.files', form).empty();
+	});
+
+
+
+	var textarea = $('#agent_settings_signature');
+
+	if (textarea.data('rte') == 1) {
+		textarea.val($('#agent_settings_signature_html').val());
+		DeskPRO_Window.initRteAgentReply(textarea, {
+			defaultIsHtml: true,
+			inlineHiddenPosition: $('#agent_settings_is_html_signature'),
+			minHeight: 100
+		});
+		$('#agent_settings_is_html_signature').val(1);
+	} else {
+		textarea.val($('#agent_settings_signature_text').val());
+	}
+
+	form.on('submit', function(ev) {
+		if (textarea.syncCode) {
+			textarea.syncCode();
+		}
+	});
+})
+</script>
+{% endblock %}

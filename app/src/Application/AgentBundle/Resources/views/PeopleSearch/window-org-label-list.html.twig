@@ -1,0 +1,18 @@
+{% if org_tag_index|length %}
+	<table>
+		{% for letter,labels in org_tag_index %}
+			<tr>
+				<td class="letter">{{ letter }}</td>
+				<td class="labels">
+					<ul>
+						{% for label in labels %}
+							<li id="org_label_cloud_{{label|slugify}}" class="is-nav-item"><span data-route="listpane:{{ path('agent_orgsearch_customfilter') }}?terms[0][type]=org_label&amp;terms[0][op]=is&amp;terms[0][label]={{label}}">{{label}}</span></li>
+						{% endfor %}
+					</ul>
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% else %}
+    <aside class="source-info-explain">{{ phrase('agent.general.no_org_labels') }}</aside>
+{% endif %}

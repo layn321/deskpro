@@ -1,0 +1,66 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_products') }}">{{ phrase('agent.general.products') }}</a></li>
+		{% if product.id %}
+			<li>{{ phrase('admin.products.edit_product') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.products.new_product') }}</li>
+		{% endif %}
+	</ul>
+
+	{% if product.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_products_del', {'product_id': product.id}) }}">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_products_edit', {'product_id': product.id|default(0)}) }}" method="post">
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.title') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="title" value="{{ product.title }}" />
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.products.parent_product') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<select name="parent_id">
+				<option value="0">No parent</option>
+				{% for p in all_products if p.id != product.id %}
+					<option value="{{ p.id }}">{{ p.title }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	{% for f in custom_fields %}
+		{% if f.field_def.isFormField() %}
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ f.title }}</label>
+				</div>
+				<div class="dp-form-input">
+					{{ render_custom_field_form(f) }}
+				</div>
+			</div>
+		{% endif %}
+	{% endfor %}
+</div>
+
+<button class="btn primary save-trigger">{{ phrase('agent.general.save') }}</button>
+</form>
+{% endblock %}

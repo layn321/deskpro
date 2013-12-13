@@ -1,0 +1,122 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% macro agentteam_selector(for_id, app, selected_agents, agents, selected_agents_assign) %}
+	<div class="optionbox {{ selected_agents_assign is iterable ? 'two-column' : ''}}" id="optionbox_dep_{{ for_id }}_{{ app }}">
+		<section data-section-name="agents">
+			<header style="min-width: 190px;">
+				{% if selected_agents_assign is iterable %}
+					<h3 class="tipped" title="If selected, provides the agent full access to the department's tickets.">Full Access</h3>
+				{% else %}
+					<h3>{{ phrase('agent.general.agents') }}</h3>
+				{% endif %}
+				<span class="toggle-btn btn" style="padding: 1px; margin: 0 0 0 3px; font-size: 9px;">Toggle All</span>
+				<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+			</header>
+			<ul>
+				{% for agent in agents %}
+					<li><input type="checkbox" value="{{ agent.id }}" {% if agent.id in selected_agents %}checked="checked"{% endif %} /><label>{{ agent.display_name }}</label></li>
+				{% endfor %}
+			</ul>
+		</section>
+		{% if selected_agents_assign is iterable %}
+			<section data-section-name="agents_assign">
+				<header style="min-width: 190px;">
+					<h3 class="tipped" title="If full access is not provided, this controls whether agents can create or assign tickets to this department.">Assignment</h3>
+					<span class="toggle-btn btn" style="padding: 1px; margin: 0 0 0 3px; font-size: 9px;">Toggle All</span>
+					<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+				</header>
+				<ul>
+					{% for agent in agents %}
+						<li><input type="checkbox" value="{{ agent.id }}" {% if agent.id in selected_agents_assign %}checked="checked"{% endif %} /><label>{{ agent.display_name }}</label></li>
+					{% endfor %}
+				</ul>
+			</section>
+		{% endif %}
+	</div>
+{% endmacro %}
+
+{% if not is_sub %}
+	<div class="department-group">
+{% endif %}
+
+{% if department.children|length %}
+	{{ design.dpgrid_content({class: 'top parent' ~ ' department-' ~ department.id, extra: "data-department-id='#{department.id}'"}) }}
+{% elseif is_sub %}
+	{% if is_last %}
+		{{ design.dpgrid_content({class: 'child last' ~ ' department-' ~ department.id, extra: "data-department-id='#{department.id}'"}) }}
+	{% else %}
+{{ design.dpgrid_content({class: 'child' ~ ' department-' ~ department.id, extra: "data-department-id='#{department.id}'"}) }}
+	{% endif %}
+{% else%}
+	{{ design.dpgrid_content({class: 'top' ~ ' department-' ~ department.id, extra: "data-department-id='#{department.id}'"}) }}
+{% endif %}
+
+	{{ design.dpgrid_col({ class: 'l r', style: "width: 480px; cursor: move;"}) }}
+		<span class="field-id" style="float:right">ID: {{ department.id }}</span>
+		<h2>
+			<a
+				class="edit-trigger"
+				data-user-title="{{ department.getRealUserTitle() }}"
+				data-linked-gateway-id="{{ department.email_gateway.id|default(0) }}"
+				data-linked-gateway-title="{{ department.email_gateway.title|default(0) }}"
+			>{{department.getRealTitle()}} {% if department.getRealUserTitle() %}<span style="color: #666; font-size: 11px; font-weight: normal; padding-left: 10px;">User title: {{ department.getRealUserTitle() }}</span>{% endif %}</a>
+		</h2>
+	{{ design.dpgrid_col_end() }}
+
+	{% if type == 'tickets' %}
+		{{ design.dpgrid_col({ class: 'l r alt l-margin', style: "width: 275px;"}) }}
+			<select class="change-linked-gateway" style="width: 256px;" data-department-id="{{ department.id }}">
+				<option value="0" {% if not department.email_gateway %}selected="selected"{% endif %}>None</option>
+				<option value="-1">Create a new email account &rarr;</option>
+				<optgroup label="Email Accounts">
+					{% for gateway in gateway_accounts if gateway.gateway_type == 'tickets' %}
+						<option value="{{ gateway.id }}" {% if department.email_gateway.id == gateway.id %}selected="selected"{% endif %}>{{ gateway.getPrimaryEmailAddress() }}</option>
+					{% endfor %}
+				</optgroup>
+			</select>
+		{{ design.dpgrid_col_end() }}
+
+		{{ design.dpgrid_col({ class: 'l r alt l-margin r-margin', style: "width: 125px;"}) }}
+			{% if is_sub or not department.children|length %}
+				<button class="clean-white small label-tickets-perms" data-element-handler="DeskPRO.Admin.Departments.AgentSelector" data-app="tickets" data-register-handler="true" data-department-id="{{ department.id }}" {% if not department.is_tickets_enabled %}style="display: none"{% endif %}>
+					{% if not current_options_tickets[department.id] %}
+					{{ phrase('admin.departments.no_agents') }}
+					{% else %}
+						{{ phrase('admin.departments.count_agents', {'count':current_options_tickets[department.id]|length}) }}
+					{% endif %}
+				</button>
+				{{ _self.agentteam_selector(department.id, 'tickets', current_options_tickets[department.id], agents, current_options_tickets_assign[department.id]|default({})) }}
+			{% else %}
+				&nbsp;
+			{% endif %}
+		{{ design.dpgrid_col_end() }}
+	{% else %}
+		{{ design.dpgrid_col({ class: 'l r alt l-margin r-margin', style: "width: 125px;"}) }}
+			{% if is_sub or not department.children|length %}
+				<button class="clean-white small label-chat-perms" data-element-handler="DeskPRO.Admin.Departments.AgentSelector" data-app="chat" data-register-handler="true" data-department-id="{{ department.id }}" {% if not department.is_chat_enabled %}style="display: none"{% endif %}>
+					{% if not current_options_chat[department.id] %}
+						{{ phrase('admin.departments.no_agents') }}
+					{% else %}
+						{{ phrase('admin.departments.count_agents', {'count':current_options_chat[department.id]|length}) }}
+					{% endif %}
+				</button>
+				{{ _self.agentteam_selector(department.id, 'chat', current_options_chat[department.id], agents) }}
+			{% else %}
+				&nbsp;
+			{% endif %}
+		{{ design.dpgrid_col_end() }}
+	{% endif %}
+
+	{{ design.dpgrid_col({ class: 'l r alt with-icon-only', style: "width: 16px"}) }}
+		<a href="{{ path('admin_departments_del', {'department_id': department.id}) }}" class="delete"></a>
+	{{ design.dpgrid_col_end() }}
+{{ design.dpgrid_content_end() }}
+
+{% if department.children|length %}
+	{% for sub_dep in department.getChildrenOrdered() %}
+		{% include 'AdminBundle:Departments:list-row.html.twig' with {'department': sub_dep, 'is_sub': true, 'depth': depth|default(0) + 1, is_last: loop.last } %}
+	{% endfor %}
+{% endif %}
+
+{% if not is_sub %}
+	</div>
+{% endif %}

@@ -1,0 +1,136 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/WorkHoursEdit.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+	function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.WorkHoursEdit();
+	}
+</script>
+{% endblock %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_features') }}">{{ phrase('admin.tickets.ticket_features_settings') }}</a></li>
+	<li>Working Hours</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_features_work_hours_save') }}" method="post" class="dp-form">
+
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+		<div class="dp-form-row">
+			<div class="dp-form-input">
+				<div class="dp-input-group {% if work_hours.active_time == 'all' or not work_hours.active_time %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="active_time" value="all" {% if work_hours.active_time == 'all' or not work_hours.active_time %}checked="checked"{%endif%} />
+						24x7</label>
+				</div>
+				<div class="dp-input-group {% if work_hours.active_time == 'work_hours' %}on{% endif %}">
+					<label><input type="radio" class="option-trigger" name="active_time" value="work_hours" {% if work_hours.active_time == 'work_hours' %}checked="checked"{%endif%} />
+						Set working hours
+					</label>
+					<ul class="dp-group-options sla-work-hours" style="display: none">
+						<li class="sla-work-time">
+							<label>Time</label>
+							<div>
+								<select name="start_hour">
+								{% for i in 0..23 %}
+									<option value="{{ i }}" {% if i == work_hours.start_hour %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select>:<select name="start_minute">
+								{% for i in 0..59 %}
+									<option value="{{ i }}" {% if i == work_hours.start_minute %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select>
+								<span class="sla-to">to</span>
+								<select name="end_hour">
+								{% for i in 0..23 %}
+									<option value="{{ i }}" {% if i == work_hours.end_hour %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select>:<select name="end_minute">
+								{% for i in 0..59 %}
+									<option value="{{ i }}" {% if i == work_hours.end_minute %}selected="selected"{% endif %}>{{ '%02d'|format(i) }}</option>
+								{% endfor %}
+								</select></div>
+						</li>
+
+						<li class="sla-timezone">
+							<label>Time Zone</label>
+							<div>
+								<select name="timezone">
+								{% for tz in timezones %}
+									<option value="{{ tz }}" {% if work_hours.timezone == tz %}selected="selected"{% endif %}>{{ tz }}</option>
+								{% endfor %}
+								</select>
+							</div>
+						</li>
+
+						<li class="sla-work-days">
+							<label>Working Days</label>
+							<div>
+								<label><input type="checkbox" name="days[]" value="1" {% if work_hours.days[1] %}checked="checked"{% endif %} /> Mon</label>
+								<label><input type="checkbox" name="days[]" value="2" {% if work_hours.days[2] %}checked="checked"{% endif %} /> Tue</label>
+								<label><input type="checkbox" name="days[]" value="3" {% if work_hours.days[3] %}checked="checked"{% endif %}/> Wed</label>
+								<label><input type="checkbox" name="days[]" value="4" {% if work_hours.days[4] %}checked="checked"{% endif %} /> Thu</label>
+								<label><input type="checkbox" name="days[]" value="5" {% if work_hours.days[5] %}checked="checked"{% endif %} /> Fri</label>
+								<label><input type="checkbox" name="days[]" value="6" {% if work_hours.days[6] %}checked="checked"{% endif %} /> Sat</label>
+								<label><input type="checkbox" name="days[]" value="0" {% if work_hours.days[0] %}checked="checked"{% endif %} /> Sun</label>
+							</div>
+						</li>
+
+						<li class="sla-work-holidays" id="holidays">
+							<label>Holidays</label>
+							<div class="sla-holiday-years">
+								<select id="holiday_year">
+								{% for year in years %}
+									<option value="{{ year }}">{{ year }}</option>
+								{% endfor %}
+								</select>
+							</div>
+
+							<ul class="sla-holidays" id="holiday_options" data-count="{{ work_hours.holidays|length }}" data-months="{{ months|json_encode }}">
+								<li id="holiday_template" style="display:none">
+									<span class="remove delete-icon"></span>
+									<span class="date">[date]</span>
+									-
+									<span class="name">[name]</span>
+									<span class="repeat">(repeats annually)</span>
+								</li>
+							{% for key,holiday in holidays_sorted %}
+								<li {% if holiday.year %}data-year="{{ holiday.year }}"{% endif %}
+									data-month="{{ holiday.month }}"
+									data-day="{{ holiday.day }}"
+								>
+									<span class="remove delete-icon"></span>
+									<span class="date">{{ holiday.day }} {{ months[holiday.month] }}{% if holiday.year %} {{ holiday.year }}{% endif %}</span>
+									-
+									<span class="name">{{ holiday.name }}</span>
+									{% if not holiday.year %}<span class="repeat">(repeats annually)</span>{% endif %}
+									<input type="hidden" name="work_holidays[{{ key }}][name]" value="{{ holiday.name }}" />
+									<input type="hidden" name="work_holidays[{{ key }}][day]" value="{{ holiday.day }}" />
+									<input type="hidden" name="work_holidays[{{ key }}][month]" value="{{ holiday.month }}" />
+									<input type="hidden" name="work_holidays[{{ key }}][year]" value="{{ holiday.year }}" />
+								</li>
+							{% endfor %}
+							</ul>
+
+							<div class="sla-holiday-add">
+								<input class="date" id="holiday_date" type="text" placeholder="Date" style="width: 75px" />
+								<input class="name" id="holiday_name" type="text" placeholder="Name" style="width: 150px" />
+								<label><input id="holiday_repeat" type="checkbox" value="1" /> Repeats annually</label>
+								<button id="holiday_add" class="btn small">Add</button>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<div class="setting_field_row" style="text-align: center; border-top: none">
+	<button class="btn primary">{{ phrase('admin.general.save_changes') }}</button>
+</div>
+
+</form>
+{% endblock %}

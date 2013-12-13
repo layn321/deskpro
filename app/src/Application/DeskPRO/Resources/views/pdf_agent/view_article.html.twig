@@ -1,0 +1,78 @@
+{% include 'DeskPRO:pdf_agent:header.html.twig' %}
+
+<sethtmlpageheader name="deskproHeader" page="ALL" value="on" show-this-page="1" />
+
+{% include 'DeskPRO:pdf_agent:footer.html.twig' %}
+
+<sethtmlpagefooter name="deskproFooter" page="ALL" value="on" show-this-page="1" />
+
+<style type="text/css">
+    #article_properties th {
+        text-align: left;
+    }
+
+    body {
+        font-family: DejaVuSans;
+    }
+
+    .ticket_list_table {
+        page-break-inside: avoid;
+    }
+</style>
+
+<h1>{{ article.title }}</h1>
+<hr />
+<table id="article_properties" width="100%">
+    <tr>
+        <th>{{ phrase('agent.publish.article_id') }}:</th>
+        <td>{{ article.id }}</td>
+    </tr>
+    <tr>
+        <th>{{ phrase('agent.general.status') }}:</th>
+        <td>{{ phrase('agent.publish.status_' ~ article.status_code|replace({'.':'_'})) }}</td>
+    </tr>
+    {% if labals|length %}
+        <tr>
+            <th>
+                {{ phrase('agent.general.labels') }}:
+            </th>
+            <td>
+                <ul>
+                    {% for label in article.labels %}
+                        <li>
+                            {{label.label}}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    {% endif %}
+    <tr>
+        <th>{{ phrase('agent.general.categories') }}:</th>
+        <td>
+            {% for cat in article.categories %}
+                {{ cat.full_title }}
+                {% if not loop.last %}, {% endif%}
+            {% endfor %}
+        </td>
+    </tr>
+    {% if app.getSetting('core.use_product') %}
+        <tr>
+            <th>{{ phrase('agent.general.products') }}</th>
+            <td>
+                <ul>
+                    {% for prod in article.products %}
+                        {{ prod.full_title }}
+                        {% if not loop.last %}, {% endif%}
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    {% endif %}
+</table>
+
+<hr />
+
+<div>
+	{{ content|raw }}
+</div>

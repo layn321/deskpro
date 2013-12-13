@@ -1,0 +1,11 @@
+<header class="list-selection-bar">
+	<input type="checkbox" class="selection-control" />
+	{{ phrase('agent.general.x_selected', {'num_placeholder': '<span class="selected-count">0</span>'}, true) }}
+	<a class="perform-action perform-actions-trigger disabled menu-fitted">
+		<span>{{ phrase('agent.general.perform_actions') }}</span>
+	</a>
+	<ul class="actions-menu" style="display: none">
+		<li data-action="publish">{{ phrase('agent.general.publish') }}</li>
+		<li data-action="delete">{{ phrase('agent.general.delete') }}</li>
+	</ul>
+</header>

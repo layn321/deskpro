@@ -1,0 +1,43 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		<li>{{ agent.display_name }}</li>
+		<li>Delete Agent</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="alert-message block-message info">
+	<h1>Convert to user</h1>
+	<form action="{{ path('admin_agents_convertuser', {agent_id: agent.id}) }}" method="post">
+		{{ form_token() }}
+		<ul>
+			<li>Converts the agent into a regular user.</li>
+			<li>Immediately unassigns all tickets assigned to the agent.</li>
+			<li>You can turn the user back into an agent later, but some settings such assigned tickets will be lost.</li>
+			<li>Ideal if you want the person to still have access to helpdesk (e.g., to submit tickets as an end-user).</li>
+		</ul>
+		<br />
+		<button class="clean-white">Convert the agent into a user</button>
+	</form>
+</div>
+
+<div class="alert-message block-message info">
+	<h1>Mark As Deleted</h1>
+	<form action="{{ path('admin_agents_setdeleted', {person_id: agent.id, set_to: '1'}) }}" method="post">
+		{{ form_token() }}
+		<ul>
+			<li>Marks the account as deleted.</li>
+			<li>The agent won't be able to log in to either the user or agent interfaces.</li>
+			<li>Tickets assigned to this agent will remain assigned until they become awaiting agent, then they will be unassigned.</li>
+			<li>You are able to restore the agent later.</li>
+			<li>Ideal if you want to keep reports for the agent based on their assigned tickets.</li>
+		</ul>
+		<br/>
+		<button class="clean-white">Mark the account as deleted</button>
+	</form>
+</div>
+
+{% endblock %}

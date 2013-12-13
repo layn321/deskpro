@@ -1,0 +1,18 @@
+{% set field_rendered %}
+	{% block field_rendered %}
+		{% if field_handler_name == 'Date' %}
+			{{ data.value|date('full') }}
+		{% elseif field_handler_name == 'Toggle' %}
+			{% if data.value == 1 %}
+				{{ field_def.getOption('label_text')|default('Checked') }}
+			{% else %}
+				None
+			{% endif %}
+		{% else %}
+			{{ data.value }}
+		{% endif %}
+	{% endblock %}
+{% endset %}
+{% block content %}
+	<div class="{{field_type}}_{{field_def.id}} {{field_handler_name}} customfield rendered" id="{{elId}}_rendered_wrap">{{ field_rendered|smart_wrap }}{{ field_def.getHtmlOption()|raw }}</div>
+{% endblock %}

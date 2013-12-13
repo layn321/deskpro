@@ -1,0 +1,28 @@
+<div class="optionbox reply-agent-team-ob" id="{{baseId}}_org_assign_ob">
+    	<header>
+			<h4>{{ phrase('agent.general.assignments') }}</h4>
+			<span class="close close-trigger"></span>
+		</header>
+    	<div class="col">
+		<section data-section-name="agents">
+			<header>
+				<h3>{{ phrase('agent.general.organizations') }}</h3>
+				<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+			</header>
+			<ul>
+				{% for org in organizations %}
+                                        <li {% if org.id in participant_org_ids %}class="on"{% endif %}>
+                                                <input type="radio" name="{{bsaeId}}_org" value="{{ org.id }}" {% if org.id in participant_ids %}checked="checked"{% endif %} />
+                                                <label><span class="agent-pic agent-label-{{ org.id }}" style="background-image: url({{ org.getPictureUrl(16) }})">{{ org.name }}</span></label>
+                                                <div class="bound-fade"></div>
+                                        </li>
+				{% endfor %}
+			</ul>
+		</section>
+	</div>
+
+    	<br class="clear" />
+    	<footer>
+           <button class="save-trigger">{{ phrase('agent.general.apply') }}</button>
+        </footer>
+</div>

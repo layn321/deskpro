@@ -1,0 +1,126 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+     <ul>
+         <li><a href="{{ path('admin_usergroups') }}">{{ phrase('agent.general.usergroups') }}</a></li>
+		 {% if usergroup.id %}
+		 	<li>{{ phrase('admin.user_groups.edit_usergroup') }}</li>
+		 {% else %}
+		 	<li>{{ phrase('admin.user_groups.new_usergroup') }}</li>
+		 {% endif %}
+     </ul>
+	{% if usergroup.id and usergroup.id != 1 %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_usergroups_delete', {'id': usergroup.id, 'auth': security_token('delete_usergroup') }) }}" onclick="return confirm('{{ phrase('admin.user_groups.confirm_delete_usergroup') }}');">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block html_head %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('input.everyone-on').each(function() {
+				var toggle = $(this).next('.jquery-checkbox');
+				if (!toggle[0]) return;
+
+				toggle.css('opacity', 0.5).off('click').on('click', function(ev) {
+					ev.preventDefault();
+					ev.stopImmediatePropagation();
+					ev.stopPropagation();
+					alert('This permission is granted through the "Everyone" usergroup. Disable it from the "Everyone" usergroup first if you want to fine-tune access.');
+					return false;
+				});
+			});
+
+			$('#permgroup_tickets, #permgroup_chat').each(function() {
+				var row = $(this);
+				var masterCheck = row.find('input.master-check');
+				var depChecks   = row.find('input.dep-check');
+
+				masterCheck.on('change', function() {
+					if (this.checked) {
+						if (!depChecks.filter(':checked')[0]) {
+							depChecks.prop('checked', true);
+						}
+					} else {
+						depChecks.prop('checked', false);
+					}
+				});
+
+				depChecks.on('change', function() {
+					if (!depChecks.filter(':checked')[0]) {
+						masterCheck.prop('checked', false);
+					} else {
+						masterCheck.prop('checked', true);
+					}
+				});
+			});
+		});
+	</script>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_usergroups_edit', {'id': usergroup.id|default(0)}) }}" method="post" class="with-form-validator">
+{{ form_token('edit_usergroup') }}
+
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form">
+	<div class="dp-form-section">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('agent.general.title') }}</label>
+			</div>
+			<div class="dp-form-input  dp-form-row">
+				{{ form_widget(form.title, { attr: {
+					'data-field-validators': 'DeskPRO.Form.LengthValidator',
+					'data-min-len': 1
+				}}) }}
+				<div class="dp-error-explain dp-error-len_too_short">Please enter a title</div>
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>{{ phrase('admin.user_groups.note_description') }}</label>
+			</div>
+			<div class="dp-form-input">
+				{{ form_widget(form.note, {'attr': {'style': 'height: 50px'}}) }}
+			</div>
+		</div>
+
+		{% if usergroup.id and not usergroup.sys_name %}
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('agent.general.number_of_members') }}</label>
+				</div>
+				<div class="dp-form-input">
+					{{ member_count|default('0') }} {% if member_count %}(<a href="{{ app.getRequest().getBaseUrl() }}/agent/#app.people,usergroup:{{ usergroup.id }}">{{ phrase('admin.user_groups.browse') }}</a>){% endif %}
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	<div class="dp-form-section">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.permissions') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{% include 'AdminBundle:Usergroups:edit-permtable.html.twig' %}
+		</div>
+	</div>
+</div>
+
+<footer class="controls">
+	<div class="is-not-loading">
+		<button class="clean-white">{{ phrase('admin.user_groups.save_usergroup') }}</button>
+	</div>
+	<div class="is-loading">
+		<div class="loading-icon-flat">&nbsp;</div>
+	</div>
+</footer>
+
+<br class="clear" />
+</form>
+{% endblock %}

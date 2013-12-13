@@ -1,0 +1,39 @@
+{##
+ # An item in the search results
+ ##}
+
+<li {% if is_sticky %}class="sticky"{% endif %}>
+	<section class="dp-content-post">
+		<header>
+			{% if res.type == 'article' %}
+				<h3><a class="title" data-content-type="{{ res.type }}" data-content-id="{{ res.object.id }}" href="{{ path('user_articles_article', {'slug': res.object.url_slug}) }}">{{ res.object.title }}</a></h3>
+				<ul class="dp-post-info">
+					<li class="dp-type"><i class="dp-icon-list-alt"></i> <a href="{{ path('user_articles') }}">{{ phrase('user.knowledgebase.type_article') }}</a></li>
+					<li class="dp-category"><i class="dp-icon-folder-open"></i> <a href="{{ path('user_articles', {'slug': res.object.getPrimaryCategory().url_slug}) }}">{{ res.object.getPrimaryCategory().full_title }}</a></li>
+					<li class="dp-date"><i class="dp-icon-calendar"></i> {{ res.object.date_created|date('full') }}</li>
+				</ul>
+			{% elseif res.type == 'download' %}
+				<h3><a class="title" data-content-type="{{ res.type }}" data-content-id="{{ res.object.id }}" href="{{ path('user_downloads_file', {'slug': res.object.url_slug}) }}">{{ res.object.title }}</a></h3>
+				<ul class="dp-post-info">
+					<li class="dp-type"><i class="dp-icon-list-alt"></i> <a href="{{ path('user_downloads') }}">{{ phrase('user.downloads.noun') }}</a></li>
+					<li class="dp-category"><i class="dp-icon-folder-open"></i> <a href="{{ path('user_downloads', {'slug': res.object.category.url_slug}) }}">{{res.object.category.full_title}}</a></li>
+					<li class="dp-date"><i class="dp-icon-calendar"></i> {{ res.object.date_created|date('full') }}</li>
+				</ul>
+			{% elseif res.type == 'feedback' %}
+				<h3><a class="title" data-content-type="{{ res.type }}" data-content-id="{{ res.object.id }}" href="{{ path('user_feedback_view', {'slug': res.object.url_slug}) }}">{{ res.object.title }}</a></h3>
+				<ul class="dp-post-info">
+					<li class="dp-type"><i class="dp-icon-list-alt"></i> <a href="{{ path('user_feedback') }}">{{ phrase('user.feedback.type_feedback') }}</a></li>
+					<li class="dp-category"><i class="dp-icon-folder-open"></i> <a href="{{ path('user_feedback', {'slug': res.object.category.url_slug}) }}">{{res.object.category.full_title}}</a></li>
+					<li class="dp-date"><i class="dp-icon-calendar"></i> {{ res.object.date_created|date('full') }}</li>
+				</ul>
+			{% elseif res.type == 'news' %}
+				<h3><a class="title" data-content-type="{{ res.type }}" data-content-id="{{ res.object.id }}" href="{{ path('user_news_view', {'slug': res.object.url_slug}) }}">{{ res.object.title }}</a></h3>
+				<ul class="dp-post-info">
+					<li class="dp-type"><i class="dp-icon-list-alt"></i> <a href="{{ path('user') }}">{{ phrase('user.news.type_news') }}</a></li>
+					<li class="dp-category"><i class="dp-icon-folder-open"></i> <a href="{{ path('user_news', {'slug': res.object.category.url_slug}) }}">{{res.object.category.full_title}}</a></li>
+					<li class="dp-date"><i class="dp-icon-calendar"></i> {{ res.object.date_created|date('full') }}</li>
+				</ul>
+			{% endif %}
+		</header>
+	</section>
+</li>

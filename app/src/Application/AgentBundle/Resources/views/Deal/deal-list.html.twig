@@ -1,0 +1,34 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+    pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.DealList';
+    pageMeta.owner_type = '{{ owner_type }}';
+    pageMeta.deal_status = '{{ deal_status }}';
+    pageMeta.refreshUrl = '{{path('agent_deal_list', {'owner_type': owner_type, 'deal_status': deal_status, 'deal_type_id': deal_type_id })}}';
+    pageMeta.viewType = 'list';
+    
+    {% set baseId = el_uid() %}
+    pageMeta.baseId = '{{ baseId }}';
+</script>
+{{ agentui.scroll_containers('page-deal-list') }}
+<article>
+    {% include 'AgentBundle:Deal:filter-display-options.html.twig' %}
+    {% include 'AgentBundle:Deal:deal-list-bar.html.twig' %}
+    {% if deal_group_info|length > 0%}
+        {% include 'AgentBundle:Deal:filter-grouping-bar.html.twig' %}
+    {%endif%}
+</article>
+<section class="list-listing  deal-simple-list">
+  <article class="row-item item-list">
+    <div class="extra-fields">
+        <ul >
+            <li><span class="prop-val email_address">{{ phrase('agent.deal.pending_review') }} 8</span></li>
+            <li><span class="prop-val email_address">{{ phrase('agent.deal.closing') }} 5</span></li>            
+        </ul>
+        <br class="clear">
+    </div>
+  </article>
+ {% for deal in deals%}
+    {% include 'AgentBundle:Deal:deal-list-row.html.twig' %}    
+ {% endfor %}
+</section>
+{{ agentui.scroll_containers_end() }}

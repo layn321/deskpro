@@ -1,0 +1,154 @@
+%startScript%
+{% block pagemeta %}{% endblock %}
+%endScript%
+<div class="ticket-snippets-overlay snippets-overlay">
+	<nav>
+		<header>
+			<span class="new-category trigger-newcat"></span>
+			<h4>{{ phrase('agent.general.categories') }}</h4>
+		</header>
+		{# Page Containers #}
+		<div class="layout-content with-scrollbar" style="top: 21px">
+		<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+		<div class="scroll-viewport"><div class="scroll-content" data-extra-height="21">
+		{# /Page Containers #}
+			<ul id="%baseId%_catlist">
+				<li class="category category-0" data-category="0">
+					<a>
+						<span class="label">{{ phrase('agent.snippets.all_snippets') }}</span>
+					</a>
+				</li>
+				{% for category in snippet_cats %}
+					<li class="category category-{{ category.id }}" data-category-id="{{ category.id }}" {% if category.is_global %}data-is-global="1"{% endif %}>
+						<a>
+							<span class="label">{{ category.title }}</span>
+						</a>
+						<span class="trigger-edit-cat"><i class="icon-cog"></i></span>
+					</li>
+				{% endfor %}
+			</ul>
+	 	{# Page Containers #}
+        </div></div>
+        </div>
+        {# /Page Containers #}
+	</nav>
+	<div class="snippet-sections-wrap">
+		<div class="snippet-filter-options">
+			<div style="float: right; margin: 3px 4px 0 0;">
+				<button class="dp-btn dp-btn-small trigger-new-snippet">{{ phrase('agent.snippets.add_snippet') }}</button>
+			</div>
+			<input type="text" id="%baseId%_filter" placeholder="Filter" />
+			{% if app.languages.getAll()|length > 1 %}
+				<select name="show_language_id" id="%baseId%_show_language_id">
+					<option value="0">{{ phrase('agent.general.any_language') }}</option>
+					{% for lang in app.languages.getAll() %}
+						<option value="{{ lang.id }}">{{ phrase_object(lang) }}</option>
+					{% endfor %}
+				</select>
+			{% endif %}
+		</div>
+		{# Page Containers #}
+		<div class="layout-content with-scrollbar">
+		<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+		<div class="scroll-viewport"><div class="scroll-content snippet-sections" id="%baseId%_snippet_list">
+		{# /Page Containers #}
+
+        {# Page Containers #}
+        </div></div>
+        </div>
+        {# /Page Containers #}
+	</div>
+
+	<div id="%baseId%_edit_snippet" class="snippet-editor-overlay" style="width: 720px; height: 420px; display: none;">
+		<div class="overlay-title">
+			<span class="close-overlay"></span>
+			<h4 class="is-edit-snippet">{{ phrase('agent.snippets.edit_snippet') }}</h4>
+		</div>
+		<div class="overlay-content">
+
+			{% for lang in app.languages.getAll() %}
+				<input class="lang-bound-title lang-{{ lang.id }} title" type="hidden" name="title[{{ lang.id }}]" value="" data-language-id="{{ lang.id }}" />
+				<input class="lang-bound-snippet lang-{{ lang.id }} snippet" type="hidden" name="snippet[{{ lang.id }}]" value="" data-language-id="{{ lang.id }}" />
+			{% endfor %}
+
+			<div style="padding-bottom: 4px; vertical-align: middle;">
+				{{ phrase('agent.general.category') }}: <select name="category_id" class="category_id" id="%baseId%_editsnippet_category_select">
+					{% for category in snippet_cats %}
+						<option value="{{ category.id }}">{{ category.title }}</option>
+					{% endfor %}
+				</select>
+
+				<div style="{% if app.languages.getAll()|length == 1 %}display: none;{% else %}display: inline;{% endif %}">
+					{{ phrase('agent.general.language') }}: <select name="language_id" class="language_id" id="%baseId%_editsnippet_category_select">
+						{% for lang in app.languages.getAll() %}
+							<option value="{{ lang.id }}" {% if lang.id == app.user.language.id %}selected="selected"{% endif %}>{{ lang.title }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+
+			<input type="hidden" name="snippet_id" value="0" />
+			<input id="%baseId%_title_input" type="text" name="title_input" value="" placeholder="{{ phrase('agent.general.title') }}" style="width: 100%; box-sizing: border-box; -moz-box-sizing: border-box" />
+
+			<div style="width: 100%">
+				<textarea id="%baseId%_snippet_input" name="snippet_input" placeholder="{{ phrase('agent.general.snippet_text_placeholder') }}" style="width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; height: 190px"></textarea>
+			</div>
+			<div style="float:left; font-size: 11px;">
+				{% block edit_snippet_bottomleft %}
+					<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.snippets.shortcut_code_info') }}"></span>
+					{{ phrase('agent.snippets.shortcut_code') }}: <span class="snippet-code-wrap">%<input type="text" name="shortcut_code" class="shortcut_code" value="" placeholder="Enter a shortcut" />%</span>
+				{% endblock %}
+			</div>
+			<div style="float:right; text-align: right; font-size:  11px;">
+				{% block edit_snippet_bottomright %}{% endblock %}
+			</div>
+		</div>
+		<div class="overlay-footer">
+			<div class="is-not-loading">
+				<button class="clean-white small save-snippet-trigger is-edit-snippet">{{ phrase('agent.general.save') }}</button>
+				<span class="delete-link-wrap">
+					&mdash;
+					<span class="faux-link delete-snippet-trigger">{{ phrase('agent.general.delete') }}</span>
+				</span>
+			</div>
+			<div class="is-loading">
+				<img src="{{ asset('images/spinners/loading-small-flat.gif') }}" />
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-popover snippet-category-edit" id="%baseId%_edit_snippet_cat" style="display: none;">
+		<div class="dp-popover-inner">
+			<section>
+				<header>
+					<span class="trigger-close"><i class="icon-remove"></i></span>
+					<strong>{{ phrase('agent.general.category') }}</strong>
+				</header>
+				<article>
+					<p class="no-cats-notice" style="display: none; font-size: 115%; text-align: center; padding-bottom: 9px;">
+						{{ phrase('agent.snippets.must_create_cat') }}
+					</p>
+
+					<input type="text" name="title" class="input_title" value="" placeholder="Category Title" />
+					<input type="hidden" name="id" class="input_id" value="" />
+
+					{{ phrase('agent.snippets.cat_can_be_used_by') }}
+					<label><input type="radio" class="perm-type-opt" name="perm_type" value="me" checked="checked" /> {{ phrase('agent.general.just_me') }}</label>
+					<label><input type="radio" class="perm-type-opt" name="perm_type" value="global" /> {{ phrase('agent.general.usergroup_everyone') }}</label>
+				</article>
+				<footer>
+					<div class="dp-not-loading">
+						<button class="dp-btn dp-btn-small trigger-save">{{ phrase('agent.general.save') }}</button>
+						<span class="delete-link-wrap">
+							&mdash;
+							<span class="faux-link delete-cat-trigger">{{ phrase('agent.general.delete') }}</span>
+						</span>
+					</div>
+					<div class="dp-is-loading">
+						<img src="{{ asset('images/spinners/loading-small-flat.gif') }}" />
+					</div>
+				</footer>
+			</section>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,16 @@
+{% for message in ticket_messages %}
+<div class="ticket_message">
+    <hr />
+    <table class="ticket_list_table" width="100%" border="0" cellspacing="0">
+
+        <tr>
+            <td>{{ phrase('agent.tickets.message_number', {'number':loop.index}) }}</td>
+            <td align="right">{{ phrase('agent.general.by_person_at_date', {'person':message.person.name,'date':message.date_created|date('fulltime')}) }}</td>
+        </tr>
+    </table>
+    <hr />
+    <span class="ticket_content "{% if ticket.language and ticket.language.is_rtl %}dir="rtl"{% endif %}>
+        {{ message.message_html|safe_link_urls_html }}
+    </span>
+</div>
+{% endfor %}

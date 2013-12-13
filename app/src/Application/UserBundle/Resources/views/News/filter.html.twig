@@ -1,0 +1,82 @@
+{##
+ # The main news page. Usually news is presented on the home page, but if a user clicks through to a category,
+ # then this full listing is displayed with more navigation controls.
+ ##}
+
+{% set this_section = 'news' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+	{% if category %}
+		<link rel="alternate" type="application/rss+xml" title="{{ app.getSetting('core.deskpro_name') }}: {{ cagegory.full_title }}" href="{{ url('user_news', {slug: category.url_slug, _format: 'rss'}) }}" />
+	{% else %}
+		<link rel="alternate" type="application/rss+xml" title="{{ app.getSetting('core.deskpro_name') }}" href="{{ url('user_news_home', {_format: 'rss'}) }}" />
+	{% endif %}
+{% endblock %}
+{% macro cat_row(cat, status, selected_cat) %}
+	<li {% if cat.id == selected_cat.id %}class="on"{% endif %}>
+		<a href="{{ path('user_feedback', {'status': status, 'slug': cat.url_slug}) }}">{{ cat.title }}</a>
+		{% if cat.children|length %}
+			<ul>
+				{% for subcat in cat.children %}
+					{{ _self.cat_row(subcat, status) }}
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</li>
+{% endmacro %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_news') }}">{{ phrase('user.news.title') }}</a></li>
+	{% if category %}
+		{% for cat in category.getTreeParents() %}
+			<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_news', {'slug': cat.url_slug}) }}">{{ cat.title }}</a></li>
+		{% endfor %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_news', {'slug': category.url_slug}) }}">{{ category.title }}</a></li>
+	{% endif %}
+{% endblock %}
+{% block page_title %}
+	{{ phrase('user.news.title') }}
+	{% if category %}
+		{% for cat in category.getTreeParents() %}
+			- {{ cat.title }}
+		{% endfor %}
+		- {{ category.title }}
+	{% endif %}
+{% endblock %}
+{% block content %}
+
+<section class="dp-portal-section dp-new-feedback-section">
+	<header>
+		<h1>{{ phrase('user.news.title') }}</h1>
+	</header>
+</section>
+
+<section class="dp-portal-section dp-feedback-section">
+	<div class="dp-content-block dp-articles-block">
+		<div class="dp-content-wrapper">
+			<div style="float:{% if is_rtl() %}right{% else %}left{% endif %}; width: 100%;">
+				{% include 'UserBundle:News:filter-nav.html.twig' %}
+			</div>
+			<br style="clear:{% if is_rtl() %}right{% else %}left{% endif %};height: 1px;" />
+
+			<ul class="dp-content-list">
+				{% for news in news_entries %}
+					{% include 'UserBundle:News:filter-list-item.html.twig' %}
+				{% endfor %}
+			</ul>
+
+			{% if pageinfo.last != 1 %}
+				{% set page_url = path('user_news', {'slug': category.url_slug}) ~ '?p=' %}
+				<div class="dp-pagination">
+					<ul>
+						{% if pageinfo.prev %}<li><a href="{{ page_url ~ pageinfo.prev }}">{{ language_arrow('left') }} {{ phrase('user.general.page_prev') }}</a></li>{% endif %}
+						{% for p in pageinfo.pages %}
+							<li class="{% if pageinfo.cursor == p %}dp-active{% endif %}"><a href="{{ page_url ~ p }}">{{ p }}</a>
+						{% endfor %}
+						{% if pageinfo.next %}<li><a href="{{ page_url ~ pageinfo.next }}">{{ phrase('user.general.next') }} {{ language_arrow('right') }}</a></li>{% endif %}
+					</ul>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+</section>
+{% endblock %}

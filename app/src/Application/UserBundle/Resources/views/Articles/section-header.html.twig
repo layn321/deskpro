@@ -1,0 +1,14 @@
+{##
+ # This template is included at the top of the knowledgebase section.
+ ##}
+<section class="dp-portal-section dp-title-section">
+	<header>
+		{% if category %}
+			<h1>
+				<h1>{{ phrase('user.knowledgebase.knowledgebase') }}: {{ category.title }}</h1>
+			</h1>
+		{% else %}
+			<h1>{{ phrase('user.knowledgebase.knowledgebase') }}</h1>
+		{% endif %}
+	</header>
+</section>

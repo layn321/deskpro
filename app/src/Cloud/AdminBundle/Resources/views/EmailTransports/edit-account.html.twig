@@ -1,0 +1,55 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailTransportPage.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_emailtrans_list') }}">{{ phrase('admin.gateway.outgoing_email') }}</a></li>
+		{% if is_setup %}
+			<li>{{ phrase('admin.gateway.setup_default_mail_server') }}</li>
+		{% else %}
+			{% if transport.id %}
+				<li>{{ phrase('admin.gateway.edit_server') }}</li>
+			{% else %}
+				<li>{{ phrase('admin.gateway.new_server') }}</li>
+			{% endif %}
+		{% endif %}
+	</ul>
+	{% if transport.id and transport.match_type != 'all' %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_emailtrans_del', {id: transport.id, security_token: security_token('delete_transport') }) }}" onclick="return confirm('{{ phrase('admin.gateway.ask_delete_transport') }}');">{{ phrase('admin.gateway.delete_transport') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block page %}
+
+{% if is_setup %}
+	{{ design.helpbox() }}
+		<p>
+            {{ phrase('admin.gateway.notice_1') }}
+		</p>
+
+		<p>
+            {{ phrase('admin.gateway.notice_2') }}
+		</p>
+	{{ design.helpbox_end() }}
+{% endif %}
+
+<div class="alert-message block-message error errors-box" id="page_error_box" style="display: none;">
+	<strong>Please correct the following errors:</strong>
+	<ul>
+		<li class="error-item error_default_email">Please enter a valid email address for the default email</li>
+		<li class="error-item error_smtp_host">Please enter a host for your SMTP server</li>
+		<li class="error-item error_smtp_port">Please enter a valid connection port for your SMTP server</li>
+		<li class="error-item error_smtp_username">You indicated your SMTP server requires authentication. You need to enter a username and password.</li>
+		<li class="error-item error_gapps_username">Please enter your Gmail / Google Apps email address</li>
+		<li class="error-item error_gapps_password">Please enter your Gmail / Google Apps password</li>
+	</ul>
+</div>
+
+{% include 'AdminBundle:EmailTransports:edit-account-form.html.twig' %}
+
+{% endblock %}

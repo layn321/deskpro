@@ -1,0 +1,28 @@
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.database_dsn') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.db_dsn) }}
+		<br />
+        <small>{{ phrase('admin.user_registration.enter_dsn_mysql') }}</small>
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.database_user') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.db_username) }}
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('admin.user_registration.database_password') }}</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.db_password) }}
+	</div>
+</div>

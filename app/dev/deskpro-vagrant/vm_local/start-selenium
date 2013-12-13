@@ -1,0 +1,31 @@
+#!/bin/bash
+
+sudo touch /var/log/Xvfb.log
+sudo touch /var/log/firefox.log
+sudo touch /var/log/selenium-hub.log
+sudo touch /var/log/selenium-node.log
+
+sudo chmod 0777 /var/log/Xvfb.log
+sudo chmod 0777 /var/log/firefox.log
+sudo chmod 0777 /var/log/selenium-hub.log
+sudo chmod 0777 /var/log/selenium-node.log
+
+
+echo "Starting Xvfb..."
+sudo /usr/bin/Xvfb :99 -ac -screen 0 1280x800x8 > /var/log/Xvfb.log 2>&1 &
+echo "--> Done"
+
+echo "Starting Firefox..."
+export DISPLAY=":99"
+/usr/local/bin/firefox/firefox > /var/log/firefox.log 2>&1 &
+echo "--> Done"
+
+echo "Starting Selenium Hub..."
+java -jar /usr/local/bin/selenium/selenium-server-standalone-2.31.0.jar -role hub > /var/log/selenium-hub.log 2>&1 &
+sleep 2
+echo "--> Done"
+
+echo "Starting Selenium Node..."
+java -jar /usr/local/bin/selenium/selenium-server-standalone-2.31.0.jar -role node -hub http://localhost:4444/grid/register > /var/log/selenium-node.log 2>&1 &
+sleep 2
+echo "--> Done"

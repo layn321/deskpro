@@ -1,0 +1,75 @@
+<table class="dp-props-table" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+		<td class="dp-td-heading" colspan="2">
+			{{ phrase('agent.emails.view_ticket_online') }}: <a href="{{ url_full('agent') }}#app.tickets,t:{{ ticket.id }}" title="(#{{ tac.access_code }})">{{ url_full('agent') }}#app.tickets,t:{{ ticket.id }}</a>
+		</td>
+	</tr>
+	<tr>
+		<td class="dp-td-heading">{{ phrase('agent.general.id') }}</td>
+		<td>{{ ticket.id }}</td>
+	</tr>
+	{% if app.getSetting('core.tickets.use_ref') %}
+		<tr>
+			<td class="dp-td-heading">{{ phrase('agent.general.ref') }}</td>
+			<td>{{ ticket.ref }}</td>
+		</tr>
+	{% endif %}
+	<tr>
+		<td class="dp-td-heading">{{ phrase('agent.general.status') }}</td>
+		<td>
+			{{ phrase( 'agent.tickets.status_' ~ ticket.status) }}
+		</td>
+	</tr>
+	<tr>
+		<td class="dp-td-heading">{{ phrase('agent.general.agent') }}</td>
+		<td>{{ticket.agent.display_name|default(phrase('agent.general.unassigned'))}}</td>
+	</tr>
+	{% if ticket.agent_team %}
+	<tr>
+		<td class="dp-td-heading">{{ phrase('agent.general.team') }}</td>
+		<td>{{ticket.agent_team.name|default(phrase('agent.general.none'))}}</td>
+	</tr>
+	{% endif %}
+
+	{% for item in page_display %}
+		{% if item.field_type == 'ticket_department' %}
+			<tr>
+				<td class="dp-td-heading">{{ phrase('agent.general.department') }}</td>
+				<td>{{ticket.department.full_title|default(phrase('agent.general.none'))}}</td>
+			</tr>
+		{% elseif item.field_type == 'ticket_category' and ticket.category %}
+			<tr>
+				<td class="dp-td-heading">{{ phrase('agent.general.category') }}</td>
+				<td>{{ticket.category.full_title|default(phrase('agent.general.none'))}}</td>
+			</tr>
+		{% elseif item.field_type == 'ticket_product' and ticket.product %}
+			<tr>
+				<td class="dp-td-heading">{{ phrase('agent.general.product') }}</td>
+				<td>{{ticket.product.title|default(phrase('agent.general.none'))}}</td>
+			</tr>
+		{% elseif item.field_type == 'ticket_priority' and ticket.priority %}
+			<tr>
+				<td class="dp-td-heading">{{ phrase('agent.general.priority') }}</td>
+				<td>{{ticket.priority.title|default(phrase('agent.general.none'))}}</td>
+			</tr>
+		{% elseif item.field_type == 'ticket_workflow' and ticket.workflow %}
+			<tr>
+				<td class="dp-td-heading">{{ phrase('agent.general.workflow') }}</td>
+				<td>{{ticket.workflow.title|default(phrase('agent.general.none'))}}</td>
+			</tr>
+		{% else %}
+				{% for f in custom_fields %}
+					{% if item.field_type == 'ticket_field' and item.field_id == f.id %}
+						{% if ticket.hasCustomField(f.field_def.id) %}
+							<tr>
+								<td class="dp-th-heading">{{ f.title }}</td>
+								<td>
+									{{ render_custom_field(f) }}
+								</td>
+							</tr>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+		{% endif %}
+	{% endfor %}
+</table>

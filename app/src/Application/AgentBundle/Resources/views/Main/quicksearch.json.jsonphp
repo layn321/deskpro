@@ -1,0 +1,149 @@
+<?php
+$OUTPUT = array();
+
+$render_ticket = function($r) use ($router) {
+	$tid = $r->id;
+	if (isset($result_meta['ticket_deleted']) && $result_meta['ticket_deleted'] == $tid) {
+		$tid = $result_meta['ticket_deleted_oldid'];
+	}
+
+	$org_str = '';
+	if ($r->person->organization) {
+		if ($r->person->organization_position) {
+			$org_str = htmlspecialchars($r->person->organization_position) . ' ';
+		}
+
+		$org_str .= ' ' . htmlspecialchars($r->person->organization);
+	}
+	$user_name = htmlspecialchars($r->person->getDisplayName()) . ($r->person->getPrimaryEmailAddress() ? ' &lt;' . $r->person->getPrimaryEmailAddress() . '&gt;' : '') . $org_str;
+
+	return array(
+		'id' => $tid,
+		'type' => 'ticket',
+		'title' => htmlspecialchars($r->subject),
+		'subtitle' => $user_name,
+		'route' => 'ticket:' . $router->generate('agent_ticket_view', array('ticket_id' => $tid))
+	);
+};
+
+if ($results['ticket']) {
+	$OUTPUT['ticket'] = array();
+	foreach ($results['ticket'] as $r) {
+		$OUTPUT['ticket'][] = $render_ticket($r);
+	}
+}
+
+if ($results['person']) {
+	$OUTPUT['person'] = array();
+	foreach ($results['person'] as $r) {
+		$org_str = '';
+		if ($r->organization) {
+			if ($r->organization_position) {
+				$org_str = $r->organization_position . ' ';
+			}
+
+			$org_str .= ' ' . $r->organization;
+		}
+
+		$subs = array();
+		if (isset($results['person_related'][$r->getId()])) {
+			foreach ($results['person_related'][$r->getId()] as $sub_r) {
+				$subs[] = $render_ticket($sub_r);
+			}
+		}
+
+		$OUTPUT['person'][] = array(
+			'id' => $r->id,
+			'type' => 'person',
+			'title' => htmlspecialchars($r->getDisplayName()) . ($r->getPrimaryEmailAddress() ? ' &lt;' . $r->pickEmailAddress($q) . '&gt;' : ''),
+			'icon' => $r->getPictureUrl(16),
+			'subtitle' => $org_str ? htmlspecialchars($org_str) : null,
+			'route' => 'person:' . $router->generate('agent_people_view', array('person_id' => $r->id)),
+			'subs' => $subs ?: null,
+		);
+	}
+}
+
+if ($results['organization']) {
+	$OUTPUT['organization'] = array();
+	foreach ($results['organization'] as $r) {
+		$OUTPUT['organization'][] = array(
+			'id' => $r->id,
+			'type' => 'organization',
+			'title' => htmlspecialchars($r->name),
+			'route' => 'page:' . $router->generate('agent_org_view', array('organization_id' => $r->id))
+		);
+	}
+}
+
+if ($results['chat']) {
+	$OUTPUT['chat'] = array();
+	foreach ($results['chat'] as $r) {
+		$OUTPUT['chat'][] = array(
+			'id' => $r->id,
+			'type' => 'chat',
+			'title' => htmlspecialchars($r->getSubjectLine()),
+			'route' => 'page:' . $router->generate('agent_userchat_view', array('conversation_id' => $r->id))
+		);
+	}
+}
+
+if ($results['article']) {
+	$OUTPUT['article'] = array();
+	foreach ($results['article'] as $r) {
+		$OUTPUT['article'][] = array(
+			'id' => $r->id,
+			'type' => 'article',
+			'title' => htmlspecialchars($r->title),
+			'route' => 'page:' . $router->generate('agent_kb_article', array('article_id' => $r->id))
+		);
+	}
+}
+
+if ($results['feedback']) {
+	$OUTPUT['feedback'] = array();
+	foreach ($results['feedback'] as $r) {
+		$OUTPUT['feedback'][] = array(
+			'id' => $r->id,
+			'type' => 'feedback',
+			'title' => htmlspecialchars($r->title),
+			'route' => 'page:' . $router->generate('agent_feedback_view', array('feedback_id' => $r->id))
+		);
+	}
+}
+
+if ($results['download']) {
+	$OUTPUT['download'] = array();
+	foreach ($results['download'] as $r) {
+		$OUTPUT['download'][] = array(
+			'id' => $r->id,
+			'type' => 'download',
+			'title' => htmlspecialchars($r->title),
+			'route' => 'page:' . $router->generate('agent_downloads_view', array('download_id' => $r->id))
+		);
+	}
+}
+
+if ($results['news']) {
+	$OUTPUT['news'] = array();
+	foreach ($results['news'] as $r) {
+		$OUTPUT['news'][] = array(
+			'id' => $r->id,
+			'type' => 'news',
+			'title' => htmlspecialchars($r->title),
+			'route' => 'page:' . $router->generate('agent_news_view', array('news_id' => $r->id))
+		);
+	}
+}
+
+if ($people_top && !empty($OUTPUT['person'])) {
+	$people = $OUTPUT['person'];
+	unset($OUTPUT['person']);
+
+	\Orb\Util\Arrays::unshiftAssoc($OUTPUT, 'person', $people);
+	unset($people);
+}
+
+if (!empty($results['twitter'])) {
+	$OUTPUT['twitter'] = $results['twitter'];
+}

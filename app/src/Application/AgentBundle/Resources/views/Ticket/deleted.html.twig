@@ -1,0 +1,39 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Basic';
+pageMeta.title = '{{ phrase('agent.tickets.ticket_is_deleted') }}';
+</script>
+{# Page Containers #}
+<div class="profile layout-content with-scrollbar {% if not perms.edit %}perm-no-edit{% endif %} {% if not perms.delete %}perm-no-delete{% endif %}">
+	<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+	<div class="scroll-viewport"><div class="scroll-content">
+{# /Page Containers #}
+
+<div class="ticket-hidden-bar deleted">
+	<article>
+		{% if delete_log.new_ticket_id %}
+			{{ phrase('agent.tickets.deleted_merged_info', {
+				old_ticket_id: delete_log.ticket_id,
+				new_ticket_id: delete_log.new_ticket_id,
+				date: delete_log.date_created|date('fulltime'),
+				agent: delete_log.by_person.getDisplayContact()|default(phrase('agent.general.unknown_agent'))
+			}) }}
+			<br />
+
+			<a class="clean-white" data-route="ticket:{{ path('agent_ticket_view', {ticket_id: delete_log.new_ticket_id}) }}">{{ phrase('agent.tickets.view_ticket_id', {id: delete_log.new_ticket_id}) }}</a>
+		{% else %}
+			{{ phrase('agent.tickets.deleted_merged_info', {
+				old_ticket_id: delete_log.ticket_id,
+				date: delete_log.date_created|date('fulltime'),
+				agent: delete_log.by_person.getDisplayContact()|default(phrase('agent.general.unknown_agent'))
+			}) }}
+			{% if delete_log.reason %}
+				<br /><br />
+				{{ phrase('agent.tickets.deleted_reason', {reason: delete_log.reason}) }}
+			{% endif %}
+		{% endif %}
+	</article>
+</div>
+
+{# Page Containers #}
+</div></div></div>
+{# /Page Containers #}

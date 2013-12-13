@@ -1,0 +1,37 @@
+{##
+ # Standard macros used when rendering forms
+ ##}
+
+{% macro select_options_hierarchy(cat, selected, depth) %}
+	{% if not depth %}{% set depth = 0 %}{% endif %}
+	{% set indent = ' '|repeat(depth) %}
+	{% if cat.children|length %}
+		<optgroup label="{{ indent|raw }}{% if cat['user_title'] is defined %}{{ phrase_object(cat, 'user') }}{% else %}{{ phrase_object(cat) }}{% endif %}">
+			{% set children = cat['children_ordered'] %}
+			{% if not children %}{% set children = cat.children %}{% endif %}
+			{% for child in children %}
+				{{ _self.select_options_hierarchy(child, selected, depth+1) }}
+			{% endfor %}
+		</optgroup>
+	{% else %}
+		<option value="{{ cat.id }}" {% if selected == cat.id %}selected="selected"{% endif %}>{{ indent|raw }}{% if cat['user_title'] is defined %}{{ phrase_object(cat, 'user') }}{% else %}{{ phrase_object(cat) }}{% endif %}</option>
+	{% endif %}
+{% endmacro %}
+
+{% macro custom_field_errors(error_fields, field, prefix) %}
+	{% if error_fields[prefix ~ '.required'] %}
+		{{ phrase('user.error.form_required') }}
+	{% elseif field.getTypeName() == 'date' %}
+		{% if error_fields[prefix ~ '.invalid_input'] %}{{ phrase('user.error.form_date_invalid') }}{% endif %}
+		{% if error_fields[prefix ~ '.invalid_date_dow'] %}{{ phrase('user.error.form_date_invalid_dow') }}{% endif %}
+		{% if error_fields[prefix ~ '.invalid_date_range'] %}{{ phrase('user.error.form_date_invalid_range') }}{% endif %}
+	{% elseif field.getTypeName() == 'choice' %}
+		{% if error_fields[prefix ~ '.invalid_choice'] %}{{ phrase('user.error.form_choice_invalid') }}{% endif %}
+		{% if error_fields[prefix ~ '.min_length'] %}{{ phrase('user.error.form_choice_min', {count: field.getOption('min_length')}) }}{% endif %}
+		{% if error_fields[prefix ~ '.max_length'] %}{{ phrase('user.error.form_choice_max', {count: field.getOption('max_length')}) }}{% endif %}
+	{% else %}
+		{% if error_fields[prefix ~ '.min_length'] %}{{ phrase('user.error.form_text_min', {count: field.getOption('min_length')}) }}{% endif %}
+		{% if error_fields[prefix ~ '.max_length'] %}{{ phrase('user.error.form_text_max', {count: field.getOption('max_length')}) }}{% endif %}
+		{% if error_fields[prefix ~ '.regex_fail'] %}{{ phrase('user.error.form_text_regex') }}{% endif %}
+	{% endif %}
+{% endmacro %}

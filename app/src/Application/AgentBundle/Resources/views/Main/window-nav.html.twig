@@ -1,0 +1,81 @@
+<!-- BEGIN NAVIGATION -->
+<div id="dp_nav">
+	<div id="dp_nav_sections" class="deskproPane">
+		<ul>
+			{% if app.user.hasPerm('agent_tickets.use') %}
+				<li class="active" id="tickets_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.Tickets">
+					<span class="count-badge" style="display: none"><span></span></span>
+					<a title="{{ phrase('agent.chrome.nav_tickets') }}"><span class="ticketNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.getSetting('core.apps_chat') and app.user.hasPerm('agent_chat.use') %}
+				<li  id="chat_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.UserChat">
+					<span class="count-badge" style="display: none"><span></span></span>
+					<a title="{{ phrase('agent.chrome.nav_userchat') }}"><span class="chatNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.user.hasPerm('agent_people.use') %}
+				<li id="people_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.People">
+					<span class="count-badge" style="display: none"><span></span></span>
+					<a title="{{ phrase('agent.chrome.nav_people') }}"><span class="peopleNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.getSetting('core.apps_feedback')  %}
+				<li id="feedback_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.Feedback">
+					<span class="count-badge" style="display: none"><span></span></span>
+					<a title="{{ phrase('agent.chrome.nav_feedback') }}"><span class="feedbackNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.getSetting('core.apps_kb') or app.getSetting('core.apps_news') or app.getSetting('core.apps_downloads') %}
+				<li id="publish_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.Publish">
+					<span class="count-badge" style="display: none"><span></span></span>
+					<a title="{{ phrase('agent.chrome.nav_publish') }}"><span class="publishNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.getSetting('core.apps_tasks')  %}
+				<li id="tasks_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.Tasks">
+					<span class="count-badge" style="display: none"><span></span></span>
+					<a title="{{ phrase('agent.chrome.nav_tasks') }}"><span class="tasksNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.getConfig('enable_twitter') and app.user.getTwitterAccountIds()|length %}
+				<li id="twitter_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.Twitter">
+					<span class="count-badge" style="display: none"><span></span></span>
+					<a title="{{ phrase('agent.interface.app-twitter') }}"><span class="twitterNavIcon"></span></a>
+				</li>
+			{% endif %}
+		</ul>
+
+		<ul class="bottom">
+			{% if app.user.can_reports %}
+				<li id="reports_section" class="no-click-switch {% if app.user.can_admin %}with-can-admin{% endif %}">
+					<a title="{{ phrase('agent.chrome.nav_reports') }}" target="_blank" href="{{ app.request.getBaseUrl() }}/reports/"><span class="reportsNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.user.can_billing %}
+				<li id="billing_section" class="no-click-switch {% if app.user.can_admin %}with-can-admin{% endif %}">
+					<a title="{{ phrase('agent.interface.app-billing') }}" target="_blank" href="{{ app.request.getBaseUrl() }}/billing/"><span class="billingNavIcon"></span></a>
+				</li>
+			{% endif %}
+
+			{% if app.user.can_admin %}
+				<li id="settings_section" class="no-click-switch">
+					<a title="{{ phrase('agent.chrome.nav_admin_settings') }}" target="_blank" href="{{ app.request.getBaseUrl() }}/admin/login?dpsid-agent={{ app.getSession().getId() }}"><span class="settingsNavIcon"></span></a>
+				</li>
+			{% endif %}
+			<li id="agent_chat_section" data-section-handler="DeskPRO.Agent.WindowElement.Section.AgentChat" class="no-click-switch">
+				{# <span id="chat_online_count">0</span> #}
+				<span class="count-badge" style="display: none"><span></span></span>
+				<a title="{{ phrase('agent.chrome.nav_agentchat') }}"><span class="agentchatNavIcon"></span></a>
+			</li>
+		</ul>
+	</div>
+</div>
+<!-- END NAVIGATION -->

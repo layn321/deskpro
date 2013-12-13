@@ -1,0 +1,9 @@
+<tbody>
+	<tr data-item-id="{{ cat.id }}" class="depth-0 status status-{{cat.id}}" data-status-id="{{status.id}}">
+		<td class="title">
+			<a href="{{ path('admin_feedback_statuses_edit', {'category_id': cat.id}) }}" class="edit-title">
+				{{cat.title}}
+			</a>
+		</td>
+	</tr>
+</tbody>

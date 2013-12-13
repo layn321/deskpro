@@ -1,0 +1,41 @@
+<div style="width: 800px; height: 600px;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('agent.general.comparing_revisions') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div class="revision-compare">
+			{% if new_blob %}
+			<div class="batch">
+					{{ phrase('agent.publish.label_old_file') }}: {% if not old_blob %}{{ phrase('agent.general.na') }}
+					{% else %}
+						<a href="{{ old_blob.getDownloadUrl() }}">{{ old_blob.filename }}</a> ({{ old_blob.readable_filesize }})
+					{% endif %}
+					<br />
+					{{ phrase('agent.publish.label_new_file') }}: {% if not new_blob %}{{ phrase('agent.general.na') }}
+					{% else %}
+						<a href="{{ new_blob.getDownloadUrl() }}">{{ new_blob.filename }}</a> ({{ new_blob.readable_filesize }})
+					{% endif %}
+			<div class="batch">
+			{% endif %}
+
+			{% if rendered_title_diff %}
+			<div class="batch">
+				<div class="diff-box">{{ rendered_title_diff|raw }}</div>
+			</div>
+			{% endif %}
+
+			{% if rendered_content_diff %}
+			<div class="batch">
+				<div class="diff-box">{{ rendered_content_diff|raw }}</div>
+			</div>
+			{% endif %}
+
+			{% if not rendered_title_diff and not rendered_content_diff %}
+			<div class="batch">
+				{{ phrase('agent.publish.no_changes') }}
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>

@@ -1,0 +1,39 @@
+<!-- DeskPRO Helpdesk Embed -->
+<div id="dp_helpdesk" style="display: none;"></div>
+<script type="text/javascript">
+	var DpHelpdesk_Options = DpHelpdesk_Options || {};
+
+	// When this option is enabled, the sidebar and frame of the portal are hidden
+	// Comment this line out if you want the entire helpdesk (including your logo etc) to display
+	DpHelpdesk_Options.simpleMode = true;
+
+	// Change this line to the default path to open on your helpdesk.
+	// Here are a few examples:
+	//DpHelpdesk_Options.loadPath = '/kb';
+	//DpHelpdesk_Options.loadPath = '/news';
+	//DpHelpdesk_Options.loadPath = '/feedback';
+	//DpHelpdesk_Options.loadPath = '/new-ticket';
+
+	/**
+     * The Language ID to load for users with no language preference
+     */
+    DpHelpdesk_Options.languageId = 0;
+
+	DpHelpdesk_Options.protocol = ('https:' == document.location.protocol ? 'https' : 'http');
+	DpHelpdesk_Options.deskproUrl = DpHelpdesk_Options.protocol + '://{{ url('user')|url_trim_scheme }}';
+	DpHelpdesk_Options.initialHeight = 700;
+	DpHelpdesk_Options.containerId = 'dp_helpdesk';
+
+	if (document.getElementsByTagName) {
+		(function() {
+			var scr   = document.createElement('script');
+			scr.type  = 'text/javascript';
+			scr.async = true;
+			scr.src   = DpHelpdesk_Options.protocol + '://{{ asset_url('javascripts/DeskPRO/User/HelpdeskWidget/HelpdeskWidget.js')|url_trim_scheme|replace({('/web'~constant('DPC_SITE_BUILD_NUM')~'/'):'/web/'}) }}';
+			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(scr);
+		})();
+	}
+</script>
+<!-- /DeskPRO Helpdesk Embed -->
+
+{% include 'AdminBundle:Portal:widget-code-chat.txt.twig' %}

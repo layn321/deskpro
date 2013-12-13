@@ -1,0 +1,23 @@
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.TemplateEditList' %}
+{% import 'AdminBundle:Templates:macros.html.twig' as tplmacro %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_templates_user') }}">{{ phrase('admin.general.templates') }}</a></li>
+	<li>{{ phrase('admin.general.email_templates') }}</li>
+</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TemplateEditList.js') }}"></script>
+{% endblock %}
+{% block page %}
+
+{% for bundle_name,dirs in list %}
+	{% for dirname,dirinfo in dirs %}
+		{{ tplmacro.render_dir(bundle_name, dirname, dirinfo, {open:true}) }}
+	{% endfor %}
+{% endfor %}
+
+{{ tplmacro.render_editor_overlay(false, true) }}
+
+{% endblock %}

@@ -1,0 +1,20 @@
+<{{ scriptWord|default('script') }} {% if upload_id %}id="{{ upload_id }}"{% endif %} class="template-upload" type="text/x-tmpl">
+	{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+	<li class="uploading">{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</li>
+	{{ '{% } %}' }}
+</{{ scriptWord|default('script') }}>
+<{{ scriptWord|default('script') }} {% if download_id %}id="{{ download_id }}"{% endif %} class="template-download" type="text/x-tmpl">
+	{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+	{{ '{% if (file.error) { %}'}}
+	<li class="error">
+		{{ '{%=file.error%}' }}
+	</li>
+	{{ '{% } else { %}'}}
+	<li>
+		<input type="hidden" name="{{ formname|default('attach') }}" value="{{ '{%=file.blob_id%}' }}" />
+		{% if not noremove %}<em class="remove-attach-trigger"></em>{% endif %}
+		<label><a href="{{ '{%=file.download_url%}' }}" target="_blank">{{ '{%=file.filename%}' }}</a><span>{{ '{%=file.filesize_readable%}' }}</span></label>
+	</li>
+	{{ '{% } %}' }}
+	{{ '{% } %}' }}
+</{{ scriptWord|default('script') }}>

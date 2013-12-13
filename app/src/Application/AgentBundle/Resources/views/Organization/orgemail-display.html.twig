@@ -1,0 +1,28 @@
+{% if org_email_domains|length or app.user.hasPerm('agent_org.edit') %}
+<div>
+	<div class="profile-box-container email-assoc">
+		<header>
+			{% if app.user.hasPerm('agent_org.edit') %}<span class="edit-gear email-assoc-edit"></span>{% endif %}
+			{{ dp_widget_tabs_header(baseId, 'organization', 'email_assoc', {
+				(baseId ~ '_email_assoc_body'): phrase('agent.organizations.email_domain_assoc')
+			}) }}
+		</header>
+		<section id="{{baseId}}_email_assoc_body">
+			{% if not org_email_domains|length %}
+				<p>
+					{{ phrase('agent.organizations.email_domain_assoc_none') }}
+				</p>
+			{% else %}
+				<p>
+					{{ phrase('agent.organizations.email_domain_assoc_explain') }}
+					{% for domain in org_email_domains %}{{ domain }}{% if not loop.last %}, {% endif %}{% endfor %}
+				</p>
+			{% endif %}
+		</section>
+		{{ dp_widget_tabs(baseId, 'organization', 'email_assoc', 'section', org_api) }}
+	</div>
+	<div class="email-assoc-overlay-wrapper" style="display: none">
+		{% include 'AgentBundle:Organization:orgemail-overlay.html.twig' %}
+	</div>
+</div>
+{% endif %}

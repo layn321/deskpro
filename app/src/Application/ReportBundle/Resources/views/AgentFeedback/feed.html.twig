@@ -1,0 +1,153 @@
+{% set this_page = 'report_agent_feedback_feed' %}
+{% extends 'ReportBundle::layout.html.twig' %}
+
+{% block nav_block %}
+    {% include 'ReportBundle:AgentFeedback:nav.html.twig' %}
+{% endblock %}
+
+{% block page_js_exec %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    $(document).ready(
+            function() {
+                $('.timeago').timeago();
+            }
+    );
+</script>
+{% endblock %}
+
+{% block pagebar %}
+{% endblock %}
+
+{% block page %}
+<style type="text/css">
+	.feedback-table {
+		margin-bottom: 25px;
+		width: 800px;
+	}
+    .feedback-table > table > thead > tr > th {
+		text-align: left;
+		padding: 8px !important;
+		padding-top: 10px !important;
+	}
+
+	.feedback-table > table > thead > tr > th .timeago {
+		font-size: 11px;
+		font-weight: normal;
+	}
+
+	.feedback-table > table > thead > tr > th > h3 {
+		font-size: 12pt;
+		font-weight: normal;
+	}
+
+	.feedback-table a.user-link {
+		display: block;
+		padding-left: 29px;
+		line-height: 31px;
+	}
+
+	.user-message {
+		margin: 0px 30px 0 29px;
+		font-size: 11px;
+		padding: 6px;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+	}
+
+	.user-message i {
+		font-size: 15pt;
+		font-weight: normal;
+		font-style: normal;
+		display: inline;
+		text-align: center;
+		line-height: 10px;
+		position: relative;
+		top: 2px;
+	}
+
+	.user-message.rating-up {
+		background-color: #D2FCD5;
+	}
+
+	.user-message.rating-neutral {
+		background-color: #E8E8E8;
+	}
+
+	.user-message.rating-down {
+		background-color: #FFE7DF;
+	}
+</style>
+
+{% if feedback is empty %}
+	<p>There is no feedback.</p>
+{% else %}
+	{% for f in feedback %}
+		<div class="feedback-table check-grid item-list">
+			<table cellspacing="0" cellpadding="0" width="100%">
+				<thead>
+					<tr>
+						<th>
+							<span style="float:right">
+								<time class="timeago" datetime="{{ f.date_created|date('c') }}"></time>
+							</span>
+
+							<h3>
+								Ticket #{{ f.ticket.id }}:
+								<a href="{{ app.request.getBaseUrl() }}/agent/#app.tickets,t:{{f.ticket.id}}">{{ f.ticket.subject }}</a>
+							</h3>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<table cellspacing="0" cellpadding="0" width="100%">
+								<tr>
+									<td width="70%" style="padding: 0">
+										<a
+											class="user-link"
+											style="background-image: url({{ f.ticket.person.getPictureUrl(24) }})"
+											href="{{ app.request.getBaseUrl() }}/agent/#app.people,p:{{f.ticket.person.id}}"
+										>{{ f.ticket.person.name }} &lt;{{ f.ticket.person.email_address }}&gt;</a>
+										<div class="user-message rating-{% if f.rating == 1 %}up{% elseif f.rating == -1 %}down{% else %}neutral{% endif %}">
+												<i>
+													{% if f.rating == 1 %}
+														☺
+													{% elseif f.rating == -1 %}
+														☹
+													{% else %}
+														&mdash;
+													{% endif %}
+												</i>
+											{% if not f.message %}<em>User did not leave a message.</em>{% else %}{{ f.message }}{% endif %}
+										</div>
+									</td>
+									<td width="30%">
+										<strong>Agent:</strong><br />
+										<a
+											class="user-link"
+											style="background-image: url({{ f.ticket_message.person.getPictureUrl(24) }})"
+											href="{{ app.request.getBaseUrl() }}/agent/#app.people,p:{{f.ticket_message.person.id}}"
+										>{{ f.ticket_message.person.name }}</a>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	{% endfor %}
+
+	Showing Page: {{page + 1}} &nbsp;&nbsp;
+	{% set has_next = (page + 1) * 20 < count %}
+	{% if page != 0 %}
+		<a href="{{ path('report_agent_feedback_feed', {'page':page - 1}) }}">Previous Page</a>{% if has_next %},{%endif %}
+	{% endif %}
+
+	{% if has_next %}
+		<a href="{{ path('report_agent_feedback_feed', {'page':page + 1}) }}">Next Page</a>
+	{% endif %}
+{% endif %}
+{% endblock %}

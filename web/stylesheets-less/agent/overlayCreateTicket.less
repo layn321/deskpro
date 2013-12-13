@@ -1,0 +1,205 @@
+@import "lib.less";
+
+.popover-inner {
+	position: absolute;
+	top: 38px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.page-new-content .section {
+	border-top: 1px solid #E4E4E4;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	clear: both;
+}
+
+.page-new-content .section.error {
+	background-color: #FFEEF0;
+}
+
+.page-new-content .section .error-message {
+	color: #981413;
+	display: none;
+}
+
+.page-new-content .section .error-message-on {
+	display: block;
+}
+
+.page-new-content .section.error .step .num {
+	background-color: #F2E0DA;
+	color: #FE2923;
+	border: 1px solid #FE2923;
+}
+
+.page-new-content .section.first {
+	border-top: none;
+	margin-top: none;
+}
+
+.page-new-content .section .content {
+	margin-left: 10px;
+}
+
+.page-new-content h4.light {
+    font-weight: normal;
+}
+
+.page-new-content .section .col {
+    float: left;
+    min-width: 50px;
+    margin-right: 25px;
+    margin-bottom: 15px;
+}
+
+.page-new-content .section .menu-trigger {
+	color: @body-text-color;
+	background-color: #FEFEFE;
+	.rounded(3px);
+	padding: 0 3px 0 3px;
+	border: 1px solid #DEDEDE;
+	font-size: 11px;
+	box-shadow: 0 1px 0px 0 rgba(0, 0, 0, 0.1);
+}
+
+.page-new-content .section .content h4 {
+	font-size: 13px;
+}
+
+.page-new-content .user-section .more {
+    display: none;
+}
+
+.page-new-content .user-section.more-on .more {
+    display: block;
+}
+
+.page-new-content .user-section .more-fields {
+    clear: both;
+    float:left;
+    margin: 4px 0 10px 110px;
+}
+
+.page-new-content .user-section .user-search {
+	width: 400px;
+}
+
+.page-new-content .user-section .switch-user {
+	float: right;
+	margin: -4px 5px 0 0;
+}
+
+.page-new-content dl dt {
+	clear: left;
+	float: left;
+	width: 100px;
+
+	margin-bottom: 3px;
+}
+
+.page-new-content dl dd {
+	margin-left: 110px;
+	margin-bottom: 3px;
+}
+
+.page-new-content dl dd.prop select {
+	min-width: 200px;
+	font-size: 11px;
+	line-height: 100%;
+}
+
+.page-new-content .message-section .ticket-message {
+	width: 80%;
+	height: 100px;
+}
+
+.page-new-content .message-section .type-wrap {
+    margin: 3px 0 3px 0;
+    width: 80%;
+}
+
+.page-new-content .other-section {
+	padding-right: 30px !important;
+}
+
+.page-new-content .other-section > div.content {
+	width: 80%;
+}
+
+.page-new-content .other-section nav {
+    height: 22px;
+    border: 1px solid #ACB6BF;
+    .border-radius(4px, 4px, 4px, 4px);
+
+    .gradient(#F0F1F3, #DADBDE);
+	position: relative;
+	overflow: hidden;
+}
+
+.page-new-content .other-section nav.on {
+    .border-radius(4px, 4px, 0px, 0px);
+}
+
+.page-new-content .other-section {
+    padding-right: 12px;
+}
+
+.page-new-content .other-section nav li {
+    border-right: 1px solid #CBD4DF;
+    padding: 0 17px 0 8px;
+    height: 22px;
+    float: left;
+    cursor: pointer;
+    background: #EBEEF1 url("../../images/agent/icons/bullet_arrow_down.png") no-repeat 100% 50%;
+    font-weight: bold;
+
+	overflow: hidden;
+	line-height: 22px;
+
+	display: block;
+	float: left;
+
+	font-size: 10px;
+	font-weight: bold;
+	color: #738699;
+	padding: 0px 17px 0 8px;
+
+	font-family: @heading-font;
+	text-shadow: 0 1px 0 #FFFFFF;
+
+	text-transform:uppercase;
+	cursor: pointer;
+
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+.page-new-content .other-section nav.on li.on {
+    color: #404040;
+    background: #C7CFD5 url("../../images/agent/icons/bullet_arrow_up.png") no-repeat 100% 50%;
+}
+
+.page-new-content .other-section .tab-container .content-wrapper {
+    background-color: #fff;
+    border: 1px solid #CBD4DF;
+    border-top: none;
+    padding: 6px;
+	.border-radius(0px, 0px, 4px, 4px);
+}
+
+.page-new-content .foot {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+
+.page-new-content input.fill {
+	width: 80%;
+}

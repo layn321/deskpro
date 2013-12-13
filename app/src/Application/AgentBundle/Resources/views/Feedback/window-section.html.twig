@@ -1,0 +1,148 @@
+{% extends 'AgentBundle::source-pane-layout.html.twig' %}
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+{% block pane_main_tab %}
+	<li class="tab active" data-tab-id="pane-content-main"><i class="icon-dp-feedback"></i> {{ phrase('agent.chrome.nav_feedback') }}</li>
+{% endblock %}
+{% block pane_content %}
+	<div class="pane-content pane-content-main">
+
+		{% if app.user.hasPerm('agent_publish.validate') %}
+			<section class="pane-section">
+				<header>
+					<h1>{{ phrase('agent.general.pending') }}</h1>
+				</header>
+				<article>
+					<ul class="nav-list">
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_feedback_validatingcontent') }}">
+								<h3>{{ phrase('agent.feedback.feedback_to_validate') }}</h3>
+								<em class="counter list-counter" id="feedback_validating_count">{{ counts.feedback_awaiting_validation|default(0) }}</em>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_feedback_validatingcomments') }}">
+								<h3>{{ phrase('agent.publish.comments_to_validate') }}</h3>
+								<em class="counter list-counter" id="feedback_comments_validating_count">{{ counts.comments_awaiting_validation|default(0) }}</em>
+							</div>
+						</li>
+					</ul>
+				</article>
+			</section>
+
+			<section class="pane-section with-tabs last">
+				<nav class="pane-section-tabs" id="feedback_outline_tabstrip">
+					<ul>
+						<li style="width:33%;" data-tab-for="#feedback_outline_status"><span>{{ phrase('agent.general.status') }}</span></li>
+						<li style="width:33%;" data-tab-for="#feedback_outline_category"><span>{{ phrase('agent.general.type') }}</span></li>
+						<li style="width:33%;" data-tab-for="#feedback_outline_labels"><span>{{ phrase('agent.general.labels') }}</span></li>
+					</ul>
+				</nav>
+
+				<section id="feedback_outline_status" class="deskpro-tab-item">
+					<ul class="nav-list nav-list-small">
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': 'new'}) }}">
+								<h3>{{ phrase('agent.feedback.status_new') }}</h3>
+								<em class="counter list-counter" id="feedback_status_new_count">{{ status_counts.new|default(0) }}</em>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': 'active'}) }}">
+								<h3>{{ phrase('agent.feedback.status_active') }}</h3>
+								<em class="counter list-counter" id="feedback_status_active_0_count">{{ status_counts.active[0]|default(0) }}</em>
+							</div>
+							<ul class="nav-list-small indented">
+								{% for cat in active_status_cats %}
+									<li class="is-nav-item">
+										<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': cat.id}) }}">
+											<h3>{{ cat.title }}</h3>
+											<em class="counter list-counter" id="feedback_status_active_{{cat.id}}_count">{{ status_counts.active[cat.id]|default(0) }}</em>
+										</div>
+									</li>
+								{% endfor %}
+							</ul>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': 'closed'}) }}">
+								<h3>{{ phrase('agent.tickets.status_closed') }}</h3>
+								<em class="counter list-counter" id="feedback_status_closed_0_count">{{ status_counts.closed[0]|default(0) }}</em>
+							</div>
+							<ul class="nav-list-small indented">
+								{% for cat in closed_status_cats %}
+									<li class="is-nav-item">
+										<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': cat.id}) }}">
+											<h3>{{ cat.title }}</h3>
+											<em class="counter list-counter" id="feedback_status_closed_{{cat.id}}_count">{{ status_counts.closed[cat.id]|default(0) }}</em>
+										</div>
+									</li>
+								{% endfor %}
+							</ul>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': 'hidden'}) }}">
+								<h3>{{ phrase('agent.general.hidden') }}</h3>
+								<em class="counter list-counter" id="feedback_status_hidden_hidden_count">{{ status_counts.hidden.hidden|default(0) }}</em>
+							</div>
+							<ul class="nav-list-small indented">
+								<li class="is-nav-item">
+									<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': 'hidden.deleted'}) }}">
+										<h3>{{ phrase('agent.general.deleted') }}</h3>
+										<em class="counter list-counter" id="feedback_status_hidden_deleted_count">{{ status_counts.hidden.deleted|default(0) }}</em>
+									</div>
+								</li>
+								<li class="is-nav-item">
+									<div class="item" data-route="listpane:{{ path('agent_feedback_status', {'status': 'hidden.spam' }) }}">
+										<h3>{{ phrase('agent.general.spam') }}</h3>
+										<em class="counter list-counter" id="feedback_status_hidden_spam_count">{{ status_counts.hidden.spam|default(0) }}</em>
+									</div>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section id="feedback_outline_category" class="deskpro-tab-item" data-tab-trigger="#feedback_outline_tabstrip li.categroies">
+					<ul class="nav-list nav-list-small">
+						{% for cat in feedback_cats %}
+							<li
+								class="is-nav-item"
+								data-usergroup-ids="{{ feedback_cats_usergroups[cat.id]|default([])|join(',') }}"
+							>
+								<div class="item" {% if cat.depth %}style="padding-left: {{ (12 + (10 * cat.depth-1)) }}px"{% endif %} data-route="listpane:{{ path('agent_feedback_category', {'category_id':cat.id}) }}">
+									<h3>{{ cat.title }}</h3>
+									<em class="counter list-counter" id="feedback_cat_{{cat.id}}_count">{{ category_counts[cat.id]|default(0) }}</em>
+								</div>
+							</li>
+						{% endfor %}
+					</ul>
+				</section>
+				<section id="feedback_outline_labels" class="deskpro-tab-item" data-tab-trigger="#feedback_outline_tabstrip li.labels">
+					<section class="labels-list" style="border-top:none;">
+						{% if feedback_tag_index|length %}
+							<table>
+								{% for letter,labels in feedback_tag_index %}
+									<tr>
+										<td class="letter">{{ letter }}</td>
+										<td class="labels">
+											<ul>
+												{% for label in labels %}
+													<li class="is-nav-item"><span data-route="listpane:{{ path('agent_feedback_label', {'label': label}) }}">{{label}}</span></li>
+												{% endfor %}
+											</ul>
+										</td>
+									</tr>
+								{% endfor %}
+							</table>
+						{% else %}
+						<aside class="source-info-explain">{{ phrase('agent.feedback.no_labels_explain') }}</aside>
+						{% endif %}
+					</section>
+				</section>
+
+			</section>
+		{% endif %}
+	</div>
+
+	<div class="pane-content pane-content-search" style="display: none;">
+		{% include 'AgentBundle:Feedback:window-search.html.twig' %}
+	</div>
+{% endblock %}

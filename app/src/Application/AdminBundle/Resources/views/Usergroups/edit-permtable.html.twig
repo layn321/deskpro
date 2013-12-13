@@ -1,0 +1,248 @@
+<nav class="check-grid-tabs">
+	<ul data-element-handler="DeskPRO.ElementHandler.SimpleTabs" data-trigger-elements="> li">
+		<li class="on" data-tab-for="#permgroup_tickets"><span>{{ phrase('agent.general.tickets') }}</span></li>
+		{% if app.getSetting('core.apps_chat') %}<li data-tab-for="#permgroup_chat"><span>{{ phrase('agent.general.chat') }}</span></li>{% endif %}
+		<li data-tab-for="#permgroup_feedback"><span>{{ phrase('agent.general.feedback') }}</span></li>
+		<li data-tab-for="#permgroup_articles"><span>{{ phrase('agent.general.articles') }}</span></li>
+		<li data-tab-for="#permgroup_downloads"><span>{{ phrase('agent.general.downloads') }}</span></li>
+		<li data-tab-for="#permgroup_news"><span>{{ phrase('agent.general.news') }}</span></li>
+	</ul>
+</nav>
+
+<div id="permgroup_tickets" style="display: none" class="dp-form-box">
+	<!-- PERMISSION:tickets.use --><input class="onoff-slider master-check {% if permissions_everyone['tickets.use'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['tickets.use'] or permissions_everyone['tickets.use'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[tickets.use]" value="1" /> {{ phrase('admin.user_groups.can_use_tickets') }}
+	<div class="check-grid" style="margin-top: 10px;">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left;">{{ phrase('admin.general.permission') }}</th>
+					<th width="60">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="title">Can re-open resolved tickets</td>
+					<!-- PERMISSION:tickets.reopen_resolved -->
+					<td class="prop">
+						<input
+							class="onoff-slider {% if permissions_everyone['tickets.reopen_resolved'] %}everyone-on{% endif %}"
+							type="checkbox"
+							{% if permissions['tickets.reopen_resolved'] or permissions_everyone['tickets.reopen_resolved'] or not usergroup.id %}checked="checked"{% endif %}
+							name="permissions[tickets.reopen_resolved]"
+							value="1"
+							onchange="if (this.checked) $('#tickets_reopen_resolved_createnew_row').hide(); else $('#tickets_reopen_resolved_createnew_row').show();"
+						/>
+					</td>
+				</tr>
+				<tr id="tickets_reopen_resolved_createnew_row" style="{% if permissions['tickets.reopen_resolved'] or permissions_everyone['tickets.reopen_resolved'] or not usergroup.id %}display: none;{% endif %}">
+					<td class="title" colspan="2">
+						<!-- PERMISSION:tickets.reopen_resolved_createnew -->
+						<div style="margin-left: 30px;">
+							How should the helpdesk handle an email reply to a resolved ticket?<br/>
+							<select name="permissions[tickets.reopen_resolved_createnew]" class="dp-select">
+								<option value="0" {% if not (permissions['tickets.reopen_resolved_createnew'] or permissions_everyone['tickets.reopen_resolved_createnew']) %}selected="selected"{% endif %}>REJECT &middot; Reject the message and send an auto-reply to the user</option>
+								<option value="1" {% if permissions['tickets.reopen_resolved_createnew'] or permissions_everyone['tickets.reopen_resolved_createnew'] %}selected="selected"{% endif %}>NEW TICKET &middot; Accept the new message as a new ticket</option>
+							</select>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="check-grid" style="margin-top: 10px">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left;">{{ phrase('admin.general.departments') }}</th>
+					<th width="60">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+					<tr>
+						{% if dep.children|length %}
+							<td class="title title-group">{{ dep.title }}</td>
+							<td class="prop">&nbsp;</td>
+						{% else %}
+							<td class="title">{{ dep.title }}</td>
+							<td class="prop"><input class="dep-check onoff-slider {% if ug_deps_everyone[dep.id].tickets %}everyone-on{% endif %}" type="checkbox" {% if ug_deps[dep.id].tickets or ug_deps_everyone[dep.id].tickets or not usergroup.id %}checked="checked"{% endif %} name="department_permissions[{{ dep.id }}][tickets]" value="1" /></td>
+						{% endif %}
+					</tr>
+					{% if dep.children %}
+						{% for subdep in dep.children %}
+							<tr>
+								<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; {{ subdep.title }}</td>
+								<td class="prop"><input class="dep-check onoff-slider {% if ug_deps_everyone[subdep.id].tickets %}everyone-on{% endif %}" type="checkbox" {% if ug_deps[subdep.id].tickets or ug_deps_everyone[subdep.id].tickets or not usergroup.id %}checked="checked"{% endif %} name="department_permissions[{{ subdep.id }}][tickets]" value="1" /></td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+{% if app.getSetting('core.apps_chat') %}
+	<div id="permgroup_chat" style="display: none" class="dp-form-box">
+		<!-- PERMISSION:chat.use --><input class="onoff-slider master-check {% if permissions_everyone['chat.use'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['chat.use'] or permissions_everyone['chat.use'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[chat.use]" value="1" /> {{ phrase('admin.user_groups.can_use_chat') }}
+		<div class="check-grid">
+			<table width="100%">
+				<thead>
+					<tr>
+						<th style="text-align: left;">{{ phrase('admin.general.departments') }}</th>
+						<th width="60">&nbsp;</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% set with_chat = false %}
+					{% for dep in app.departments.getRootNodes() if dep.is_chat_enabled %}
+						{% set with_chat = true %}
+						<tr>
+							{% if dep.children|length %}
+								<td class="title title-group">{{ dep.title }}</td>
+								<td class="prop">&nbsp;</td>
+							{% else %}
+								<td class="title">{{ dep.title }}</td>
+								<td class="prop"><input class="dep-check onoff-slider {% if ug_deps_everyone[dep.id].chat %}everyone-on{% endif %}" type="checkbox" {% if ug_deps[dep.id].chat or ug_deps_everyone[dep.id].chat or not usergroup.id %}checked="checked"{% endif %} name="department_permissions[{{ dep.id }}][chat]" value="1" /></td>
+							{% endif %}
+						</tr>
+						{% if dep.children %}
+							{% for subdep in dep.children %}
+								<tr>
+									<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; {{ subdep.title }}</td>
+									<td class="prop"><input class="dep-check onoff-slider {% if ug_deps_everyone[subdep.id].chat %}everyone-on{% endif %}" type="checkbox" {% if ug_deps[subdep.id].chat or ug_deps_everyone[subdep.id].chat or not usergroup.id %}checked="checked"{% endif %} name="department_permissions[{{ subdep.id }}][chat]" value="1" /></td>
+								</tr>
+							{% endfor %}
+						{% endif %}
+					{% endfor %}
+					{% if not with_chat %}
+						You have no chat departments. Users will not be able to create chats until you
+						create at least one. <a href="{{ path('admin_departments') }}">Click here to manage departments</a>.
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endif %}
+
+<div id="permgroup_feedback" style="display: none" class="dp-form-box">
+	<!-- PERMISSION:feedback.use --><input class="onoff-slider {% if permissions_everyone['feedback.use'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['feedback.use'] or permissions_everyone['feedback.use'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[feedback.use]" value="1" /> {{ phrase('admin.user_groups.can_use_feedback') }}
+	<div class="check-grid">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left;">{{ phrase('admin.general.permission') }}</th>
+					<th width="60">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="title">{{ phrase('admin.user_groups.can_submit_new_feedback') }}</td>
+					<!-- PERMISSION:feedback.submit --><td class="prop"><input class="onoff-slider {% if permissions_everyone['feedback.submit'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['feedback.submit'] or permissions_everyone['feedback.submit'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[feedback.submit]" value="1" /></td>
+				</tr>
+				<tr>
+					<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; Do not require agent validation</td>
+					<!-- PERMISSION:feedback.no_submit_validate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['feedback.no_submit_validate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['feedback.no_submit_validate'] or permissions_everyone['feedback.no_submit_validate'] %}checked="checked"{% endif %} name="permissions[feedback.no_submit_validate]" value="1" /></td>
+				</tr>
+				<tr>
+					<td class="title">{{ phrase('admin.user_groups.can_vote_on_feedback') }}</td>
+					<!-- PERMISSION:feedback.rate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['feedback.rate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['feedback.rate'] or permissions_everyone['feedback.rate'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[feedback.rate]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">{{ phrase('admin.user_groups.submit_feedback_comments') }}</td>
+					<!-- PERMISSION:feedback.comment --><td class="prop"><input class="onoff-slider {% if permissions_everyone['feedback.comment'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['feedback.comment'] or permissions_everyone['feedback.comment'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[feedback.comment]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; Do not require agent validation</td>
+					<!-- PERMISSION:feedback.no_comment_validate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['feedback.no_comment_validate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['feedback.no_comment_validate'] or permissions_everyone['feedback.no_comment_validate'] %}checked="checked"{% endif %} name="permissions[feedback.no_comment_validate]" value="1" /></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div id="permgroup_articles" style="display: none" class="dp-form-box">
+	<!-- PERMISSION:articles.use --><input class="onoff-slider {% if permissions_everyone['articles.use'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['articles.use'] or permissions_everyone['articles.use'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[articles.use]" value="1" /> {{ phrase('admin.user_groups.can_use_knowledgebase') }}
+	<div class="check-grid">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left;">{{ phrase('admin.general.permission') }}</th>
+					<th width="60">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="title">{{ phrase('admin.user_groups.can_rate_articles') }}</td>
+					<!-- PERMISSION:articles.rate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['articles.rate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['articles.rate'] or permissions_everyone['articles.rate'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[articles.rate]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">{{ phrase('admin.user_groups.submit_article_comments') }}</td>
+					<!-- PERMISSION:articles.comment --><td class="prop"><input class="onoff-slider {% if permissions_everyone['articles.comment'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['articles.comment'] or permissions_everyone['articles.comment'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[articles.comment]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; Do not require agent validation</td>
+					<!-- PERMISSION:articles.no_comment_validate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['articles.no_comment_validate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['articles.no_comment_validate'] or permissions_everyone['articles.no_comment_validate'] %}checked="checked"{% endif %} name="permissions[articles.no_comment_validate]" value="1" /></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div id="permgroup_downloads" style="display: none" class="dp-form-box">
+	<!-- PERMISSION:downloads.use --><input class="onoff-slider {% if permissions_everyone['downloads.use'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['downloads.use'] or permissions_everyone['downloads.use'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[downloads.use]" value="1" />
+	{{ phrase('admin.user_groups.can_use_downloads') }}
+	<div class="check-grid">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left;">{{ phrase('admin.general.permission') }}</th>
+					<th width="60">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="title">{{ phrase('admin.user_groups.can_rate_downloads') }}</td>
+					<!-- PERMISSION:downloads.rate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['downloads.rate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['downloads.rate'] or permissions_everyone['downloads.rate'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[downloads.rate]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">{{ phrase('admin.user_groups.submit_download_comments') }}</td>
+					<!-- PERMISSION:downloads.comment --><td class="prop"><input class="onoff-slider {% if permissions_everyone['downloads.comment'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['downloads.comment'] or permissions_everyone['downloads.comment'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[downloads.comment]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; Do not require agent validation</td>
+					<!-- PERMISSION:downloads.no_comment_validate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['articles.no_comment_validate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['downloads.no_comment_validate'] or permissions_everyone['articles.no_comment_validate'] %}checked="checked"{% endif %} name="permissions[downloads.no_comment_validate]" value="1" /></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div id="permgroup_news" style="display: none" class="dp-form-box">
+	<!-- PERMISSION:news.use --><input class="onoff-slider {% if permissions_everyone['news.use'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['news.use'] or permissions_everyone['news.use'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[news.use]" value="1" />
+	{{ phrase('agent.general.news') }}
+	<div class="check-grid">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th style="text-align: left;">{{ phrase('admin.general.permission') }}</th>
+					<th width="60">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="title">{{ phrase('admin.user_groups.can_rate_news_posts') }}</td>
+					<!-- PERMISSION:news.rate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['news.rate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['news.rate'] or permissions_everyone['news.rate'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[news.rate]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">{{ phrase('admin.user_groups.submit_new_post_comments') }}</td>
+					<!-- PERMISSION:news.comment --><td class="prop"><input class="onoff-slider {% if permissions_everyone['news.comment'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['news.comment'] or permissions_everyone['news.comment'] or not usergroup.id %}checked="checked"{% endif %} name="permissions[news.comment]" value="1" /></td>
+				</tr>
+				<tr {% if not app.getSetting('user.publish_comments') %}style="display: none;"{% endif %}>
+					<td class="title">&nbsp;&nbsp;&nbsp;&nbsp; Do not require agent validation</td>
+					<!-- PERMISSION:news.no_comment_validate --><td class="prop"><input class="onoff-slider {% if permissions_everyone['articles.no_comment_validate'] %}everyone-on{% endif %}" type="checkbox" {% if permissions['news.no_comment_validate'] or permissions_everyone['news.no_comment_validate'] %}checked="checked"{% endif %} name="permissions[news.no_comment_validate]" value="1" /></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

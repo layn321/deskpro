@@ -1,0 +1,101 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.KbList';
+		pageMeta.baseId = '{{ tplvars.baseId }}';
+	</script>
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<h1><i class="icon-dp-article"></i> {{ phrase('agent.publish.kb_list_title', {count: num_results}) }}</h1>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+	<section class="kb-simple-list list-listing">
+		<section class="search-reuslts page-set" data-page="{{ page }}">
+			{% for article in results %}
+				<article
+					class="row-item article article-{{article.id}} articles-{{article.id}} related-is-linkable"
+					data-content-type="articles"
+					data-content-id="{{ article.id }}"
+					data-route="page:{{ path('agent_kb_article', {'article_id': article.id}) }}"
+					data-route-title="@selector(a.row-title)"
+					data-route-openclass="open"
+				>
+					<div class="top-row">
+						<div class="top-row-left">
+							<h3>
+								<a class="row-title click-through"><span class="obj-title-article_{{ article.id }}">{{ article.title }}</span></a>
+							</h3>
+						</div>
+						<div class="top-row-right">
+							<div class="bound-fade"></div>
+						</div>
+						<div class="top-row-right visible-content-link-control">
+							<div class="bound-fade"></div>
+							<span class="tipped insert-content-link" title="Insert a link to this article" data-link="{{ article.getLink() }}" data-link-title="{{ article.getTitle() }}"></span>
+						</div>
+						<div class="top-row-right visible-ticket-controls">
+							<div class="bound-fade"></div>
+							<a href="javascript:" class="tipped kb-insert-link" title="{{ phrase('agent.general.insert_link') }}" data-article-id="{{ article.id }}"></a>
+							<a href="javascript:" class="tipped kb-insert-content" title="{{ phrase('agent.general.insert_content') }}" data-article-id="{{ article.id }}"></a>
+						</div>
+						<div class="top-row-right visible-related-content-controls">
+							<div class="bound-fade"></div>
+							<span class="tipped related-link" title="{{ phrase('agent.general.add_as_related') }}"></span>
+							<span class="tipped related-unlink" title="{{ phrase('agent.general.remove_as_related') }}"></span>
+						</div>
+					</div>
+					<hr class="clear-top" />
+					<div class="extra-fields">
+						<ul>
+							<li>
+								<span class="prop-title">{{ phrase('agent.general.category') }}</span>
+								<span class="prop-val">{{ article.category_names }}</span>
+							</li>
+							<li>
+								<span class="prop-title">{{ phrase('agent.general.author') }}</span>
+								<span class="prop-val">{{ article.by_line }}</span>
+							</li>
+							<li>
+								<span class="prop-title">{{ phrase('agent.general.date_created') }}</span>
+								<span class="prop-val">{{ article.date_created|date('day')}}</span>
+							</li>
+						</ul>
+						<br class="clear" />
+					</div>
+				</article>
+			{% endfor %}
+		</section>
+
+		{% if num_results %}
+			<footer class="results-nav">
+				<div class="cursor">
+					{{ phrase('agent.general.page_x_of_y', {page: page, num_pages: pageinfo.last}) }}
+				</div>
+				{% if num_results > per_page %}
+					<ul class="pagenav {% if not pageinfo.prev %}no-prev{% endif %} {% if not pageinfo.next %}no-next{% endif %}">
+						<li class="prev" {% if pageinfo.prev %}data-route="listpane:{{ path('agent_publish_search', {content_type: 'articles', p: pageinfo.prev, cache_id: cache_id}) }}"{% endif %}></li>
+						<li class="next" {% if pageinfo.next %}data-route="listpane:{{ path('agent_publish_search', {content_type: 'articles', p: pageinfo.next, cache_id: cache_id}) }}"{% endif %}></li>
+					</ul>
+				{% endif %}
+			</footer>
+		{% endif %}
+	</section>
+{% endblock pane_content %}

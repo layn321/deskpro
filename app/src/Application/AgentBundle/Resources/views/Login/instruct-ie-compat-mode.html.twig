@@ -1,0 +1,20 @@
+{% set is_popup = true %}
+{% extends 'AgentBundle:Login:layout.html.twig' %}
+{% block content %}
+	<div class="title">
+		IE Compatibility Mode
+	</div>
+	<div class="content">
+		<div class="text-info">
+			<p>
+				{{ phrase('agent.login.ie_compat_mode_explain') }}
+			</p>
+			<ol>
+				<li>{{ phrase('agent.login.ie_compat_mode_step1') }}</li>
+				<li>{{ phrase('agent.login.ie_compat_mode_step2') }}<br /><img src="{{ asset('images/instructions/iecompat-menu.png') }}" /></li>
+				<li>{{ phrase('agent.login.ie_compat_mode_step3') }}<br /><img src="{{ asset('images/instructions/iecompat-win.png') }}" /></li>
+				<li>{{ phrase('agent.login.ie_compat_mode_step4') }}</li>
+			</ol>
+		</div>
+	</div>
+{% endblock %}

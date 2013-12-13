@@ -1,0 +1,12 @@
+<dp:subject>{{ phrase('user.email_subjects.feedback_new-disapproved') }}</dp:subject>
+{{ phrase('user.emails.feedback_thank-you', {'title':feedback.title}) }}
+
+<br /><br />
+
+{% if reason %}
+	{{ phrase('user.emails.feedback_disapproved-reason', {name: agent.display_name_user}) }}
+	<br /><br />
+	{{ reason }}
+{% else %}
+	{{ phrase('user.emails.feedback_disapproved') }}
+{% endif %}

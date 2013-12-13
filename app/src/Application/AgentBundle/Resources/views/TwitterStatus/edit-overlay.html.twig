@@ -1,0 +1,17 @@
+<div class="overlay twitter-message-overlay">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.twitter.edit_long_tweet') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+		<textarea name="text" style="display: block; width: 100%; height: 70px; box-sizing: border-box; -moz-box-sizing: border-box;">{{ long.text }}</textarea>
+		<div style="text-align: center; margin-top: 5px;">
+			<span class="is-not-loading">
+				<button class="clean-white small save-trigger">{{ phrase('agent.general.save') }}</button>
+			</span>
+			<span class="is-loading">
+				{{ phrase('agent.general.saving') }}
+			</span>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,10 @@
+<dp:subject>{{ phrase('user.email_subjects.comment-confirmation') }}</dp:subject>
+{% set phrase_link %}<a href="{{ comment.object.permalink }}">{{ comment.object.title }}</a>{% endset %}
+{{ phrase('user.emails.comment_thank-you', {'link':phrase_link}) }}
+
+<br /><br />
+
+{% if validating %}
+	{{ phrase('user.emails.comment_validate-email') }}
+	{{ url_full('user_validate_email', {'id': email_validating.id, 'auth': email_validating.auth }) }}
+{% endif %}

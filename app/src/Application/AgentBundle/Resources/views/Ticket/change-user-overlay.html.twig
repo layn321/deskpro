@@ -1,0 +1,70 @@
+<div class="ticket-merge overlay">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.tickets.change_user') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+		<form>
+			<div
+				class="person-finder"
+				data-element-handler="DeskPRO.Agent.ElementHandler.PersonSearchBox"
+				data-search-url="{{ path('agent_peoplesearch_performquick', {'format': 'json', 'limit': 10, 'start_with': 'a'}) }}"
+				data-highlight-term="1"
+				data-touch-focus="1"
+				data-search-param="term"
+			>
+				<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+					<li><a>
+						<span class="user-name"></span>
+						<address>&lt;<span class="user-email"></span>&gt;</address>
+						<div class="bound-fade"></div>
+					</a></li>
+				</script>
+				<div class="input-wrapper">
+					<input type="text" style="width: 98%" class="term" placeholder="Find person..." class="user-input" />
+				</div>
+				<input type="hidden" name="person_id" class="person-id" value="" />
+				<div class="person-search-box" style="display: none">
+					<section>
+						<ul class="results-list">
+
+						</ul>
+						<footer>
+							<span class="create-user">{{ phrase('agent.general.create_a_new_person') }}</span>
+						</footer>
+					</section>
+				</div>
+			</div>
+		</form>
+
+		<div class="person-preview-content"></div>
+
+		<div class="new-user-fields dp-form" style="display: none; margin-top: 1em">
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('agent.general.email') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="email" value="" class="email" />
+				</div>
+			</div>
+
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('agent.general.name') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="name" value="" class="name" />
+				</div>
+			</div>
+		</div>
+
+		<div class="submit-row" style="display:none; margin-top: 1em">
+			<div><label><input type="checkbox" class="participant-check" checked="checked" /> {{ phrase('agent.tickets.send_cc_to') }} {{ ticket.person.name }}</label></div>
+
+			<div style="text-align: center; margin-top: 1em">
+				<button class="clean-white change-user-trigger">{{ phrase('agent.tickets.change_user') }}</button>
+			</div>
+		</div>
+	</div>
+</div>

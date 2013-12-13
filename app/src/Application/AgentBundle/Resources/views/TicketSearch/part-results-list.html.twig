@@ -1,0 +1,195 @@
+{% include 'AgentBundle:TicketSearch:part-results-list-thead.html.twig' %}
+<tbody class="search-results page-set" data-page="{{page}}">
+{% for ticket in tickets %}
+	<tr
+		class="row-item ticket-{{ticket.id}} {% if ticket.worst_sla_status %}sla-status-{{ ticket.worst_sla_status }}{% endif %} {% if ticket.status == 'awaiting_agent' %}urgency-{{ticket.urgency}}{% endif %} {% if ticket.is_locked %}locked{% endif %}"
+		data-ticket-id="{{ticket.id}}"
+		data-route="ticket:{{ path('agent_ticket_view', {'ticket_id': ticket.id}) }}"
+		data-route-title="@selector(.subject-link span)"
+		data-route-openclass="open"
+	>
+		<td class="check-all" style="vertical-align: middle;" width="20">
+			<input type="checkbox" value="{{ticket.id}}" class="ticket item-select" style="margin: 0; margin-rght: 4px; padding: 0;"/>
+		</td>
+		{% for field in display_fields %}
+			{% if field == 'subject' %}
+				<td class="subject">
+					<a class="subject-link"><span>{{ticket.subject}}</span></a>
+				</td>
+			{% elseif field == 'id' %}
+				<td class="subject">
+					{{ticket.id}}
+				</td>
+			{% elseif field == 'status' %}
+				<td class="subject">
+					{{ phrase('agent.tickets.status_' ~ ticket.status_code|replace({'.': '_'})) }}
+				</td>
+			{% elseif field == 'user' %}
+				<td>
+					<a data-route="person:{{ path('agent_people_view', {'person_id': ticket.person.id|default('0')}) }}" data-route-title="@text">
+						{{ticket.person.getDisplayName()}}
+					</a>
+				</td>
+			{% elseif field == 'ref' %}
+				<td>
+					{{ ticket.ref }}
+				</td>
+			{% elseif field == 'date_created' %}
+				<td class="{{field}}">
+					<span class="timestamp timeago" title="{{ticket.date_created|date('c', 'UTC')}}">{{ticket.date_created|date('day')}}</span>
+				</td>
+			{% elseif field == 'deleted_reason' %}
+				<td class="{{field}}">
+					{% if deleted_tickets[ticket.id] %}
+						{{ phrase('agent.general.deleted_by', {name: deleted_tickets[ticket.id].by_person.display_name}) }}
+						{% if deleted_tickets[ticket.id].reason %}
+							({{ phrase('agent.general.reason') }}: {{ deleted_tickets[ticket.id].reason }})
+						{% endif %}
+					{% endif %}
+				</td>
+			{% elseif field == 'person' %}
+				<td class="{{field}}">
+					{{ticket.person.display_name}}
+				</td>
+			{% elseif field == 'department' %}
+				<td class="{{field}}">
+					<span class="prop-val department_id" data-prop-value="{{ticket.department.id}}">
+						{{ticket.department.title}}
+					</span>
+				</td>
+			{% elseif field == 'category' %}
+				<td class="{{field}}">
+					<span class="prop-val category_id" data-prop-value="{{ticket.category.id}}">
+					{% if ticket.category %}
+						{{ticket.category.title}}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</td>
+			{% elseif field == 'product' %}
+				<td class="{{field}}">
+					<span class="prop-val product_id" data-prop-value="{{ticket.product.id}}">
+					{% if ticket.product %}
+						{{ticket.product.title}}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</td>
+			{% elseif field == 'priority' %}
+				<td class="{{field}}">
+					<span class="prop-val priority_id" data-prop-value="{{ticket.priority.id}}">
+					{% if ticket.priority %}
+						{{ticket.priority.title}}
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</td>
+			{% elseif field == 'organization' %}
+				<td class="{{field}}">
+					<span class="prop-val organization_id" data-prop-value="{{ticket.organization.id}}">
+					{% if ticket.organization %}
+						<a data-route="page:{{ path('agent_org_view', {'organization_id': ticket.organization.id}) }}" data-route-title="@text">{{ticket.organization.name}}</a>
+					{% else %}
+						{{ phrase('agent.general.none') }}
+					{% endif %}
+					</span>
+				</td>
+			{% elseif field == 'date_user_waiting' %}
+				<td class="{{field}}">
+					{% if ticket.date_user_waiting %}
+						<time class="timestamp timeago" data-timeago-no-ago="1" datetime="{{ ticket.date_user_waiting|date('c', 'UTC') }}">{{ticket.date_user_waiting|date('day')}}</time>
+					{% else %}
+						{{ phrase('agent.tickets.na') }}
+					{% endif %}
+				</td>
+			{% elseif field == 'total_user_waiting' %}
+				<td class="{{field}}">
+					{% if ticket.real_total_user_waiting %}
+						<time class="timeago" data-timeago-no-ago="1" datetime="{{ ("- " ~ ticket.real_total_user_waiting ~ " seconds")|date('c', 'UTC') }}"></time>
+					{% else %}
+						{{ phrase('agent.tickets.na') }}
+					{% endif %}
+				</td>
+			{% elseif field == 'date_last_agent_reply' %}
+				<td class="{{field}}">
+					{% if ticket.date_last_agent_reply %}
+						<time class="timestamp timeago" datetime="{{ ticket.date_last_agent_reply|date('c', 'UTC') }}">{{ticket.date_last_agent_reply|date('day')}}</time>
+					{% else %}
+						{{ phrase('agent.tickets.na') }}
+					{% endif %}
+				</td>
+			{% elseif field == 'date_last_user_reply' %}
+				<td class="{{field}}">
+					{% if ticket.date_last_user_reply %}
+						<time class="timestamp timeago" datetime="{{ ticket.date_last_user_reply|date('c', 'UTC') }}">{{ticket.date_last_user_reply|date('day')}}</time>
+					{% else %}
+						{{ phrase('agent.tickets.na') }}
+					{% endif %}
+				</td>
+			{% elseif field == 'date_resolved' %}
+				<td class="{{field}}">
+					{% if ticket.date_resolved %}
+						<time class="timestamp timeago" datetime="{{ ticket.date_resolved|date('c', 'UTC') }}">{{ticket.date_resolved|date('day')}}</time>
+					{% else %}
+						{{ phrase('agent.tickets.na') }}
+					{% endif %}
+				</td>
+			{% elseif field == 'agent' %}
+				<td class="{{field}}">
+					<span class="prop-val agent_id" data-prop-value="{{ticket.agent.id}}">
+					{% if ticket.agent %}
+						{{ticket.agent.display_name}}
+					{% else %}
+						{{ phrase('agent.general.unassigned') }}
+					{% endif %}
+					</span>
+				</td>
+			{% elseif field == 'agent_team' %}
+				<td class="{{field}}">
+					<span class="prop-val agent_team_id" data-prop-value="{{ticket.agent_team.name}}">
+					{% if ticket.agent %}
+						{{ticket.agent_team.name}}
+					{% else %}
+						{{ phrase('agent.general.no_team') }}
+					{% endif %}
+					</span>
+				</td>
+			{% elseif field == 'labels' %}
+				<td class="{{field}}">
+					<span class="prop-val labels">
+						{% for label in ticket_display.getTicketLabels(ticket) %}
+							<span class="listing-tag">{{ label }}</span>
+						{% endfor %}
+					</span>
+				</td>
+			{% else %}
+				{% for f in all_custom_fields[ticket.id] %}
+					{% if field == 'ticket_fields['~f.id~']' %}
+						<td class="ticket-field">
+							<div class="prop-val ticket_fields_{{f.id}}">
+								{% if ticket.hasCustomField(f.id) %}
+									{{ render_custom_field(f) }}
+								{% endif %}
+							</div>
+						</td>
+					{% endif %}
+				{% endfor %}
+				{% for f in user_all_custom_fields[ticket.person.id] %}
+					{% if field == 'person_fields['~f.id~']' %}
+						<td class="person-field">
+							<div class="prop-val person_fields_{{f.id}}">
+								{% if person.hasCustomField(f.id) %}
+									{{ render_custom_field(f) }}
+								{% endif %}
+							</div>
+						</td>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	</tr>
+{% endfor %}
+</tbody>

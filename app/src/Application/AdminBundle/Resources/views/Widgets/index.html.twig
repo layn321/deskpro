@@ -1,0 +1,72 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/WidgetList.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+	function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.WidgetList();
+	}
+</script>
+{% endblock %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li class="add"><a href="{{ path('admin_widgets_new') }}">Add Widget</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>Widgets</li>
+</ul>
+{% endblock %}
+{% block prepage %}
+<div style="padding: 10px 10px 0 10px;">
+	{{ design.helpbox() }}
+	<p>
+		Widgets allow you to add pieces of HTML to various locations within the DeskPRO Agent Interface. This may be used to link your helpdesk with your own CRM system or get data from an external provider.
+		Refer to the <a href="https://support.deskpro.com/kb/articles/84">widget documentation</a> for more information about widgets and how they work.
+	</p>
+	{{ design.helpbox_end() }}
+</div>
+{% endblock %}
+{% block page %}
+{% if widgetsGrouped %}
+<form action="{{ path('admin_widgets_toggle') }}" method="post" class="check-grid item-list" id="widget-list">
+	<table width="100%">
+	<thead>
+		<tr>
+			<th>&nbsp;</th>
+			<th style="text-align: left">Widget</th>
+			<th style="text-align: left">Page</th>
+			<th style="text-align: left">Plugin</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for page, widgets in widgetsGrouped %}
+	{% for widget in widgets %}
+		<tr>
+			<td><input
+				class="onoff-slider widget-toggle"
+				type="checkbox"
+				name="widgets[{{widget.id}}]"
+				value="1"
+				{% if widget.enabled %}checked="checked"{% endif %}
+			/></td>
+			<td><a href="{{ path('admin_widgets_edit', {'widget_id': widget.id} )}}">{{widget.description}}</a></td>
+			<td>{{ pages[widget.page] }}</td>
+			<td>{% if widget.plugin %}{{widget.plugin.title}}{% else %}&nbsp;{% endif %}</td>
+			<td style="text-align: right; padding-right: 5px;"><a href="{{ path('admin_widgets_delete', {'widget_id': widget.id} )}}" class="delete-icon">Delete</a></td>
+		</tr>
+	{% endfor %}
+	{% endfor %}
+	</tbody>
+	</table>
+
+	{{ form_token() }}
+</form>
+{% else %}
+	<div class="note-box new-arrow">You have not created any widgets yet. Click the "Add Widget" button to create one now.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailTransportPage.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/CloudEmailGatewayEditAccount.js') }}"></script>
+<style type="text/css">
+	ul.small-detail-list {
+		margin: 0 0 0 20px;
+		padding: 0;
+	}
+
+	ul.small-detail-list li {
+		font-size: 11px;
+		list-style: square;
+		pading: 0 0 0 5px;
+		margin: 0;
+	}
+
+	#email_forward_list input[type="text"] {
+		width: 70%;
+	}
+
+	.select2-container .select2-choice span {
+		text-align: left;
+	}
+</style>
+<script type="text/javascript">
+
+//######################################################################################################################
+// Creating new account
+//######################################################################################################################
+
+$(document).ready(function() {
+	var overlay = new DeskPRO.UI.Overlay({
+		triggerElement: $('#newcat_trigger'),
+		contentElement: $('#newcat_overlay')
+	});
+	$('#newcat_savebtn').on('click', function(ev) {
+		ev.preventDefault();
+		var form = $('#newcat_overlay form');
+
+		$('#newcat_err').hide();
+		$('#newcat_savebtn_wrap').hide();
+		$('#newcat_loading_wrap').show();
+		$.ajax({
+			url: form.attr('action'),
+			data: form.serializeArray(),
+			dataType: 'json',
+			type: 'POST',
+			success: function(data) {
+				if (data.error) {
+					$('#newcat_err').find('> div').hide();
+					$('#newcat_err').show().find('.' + data.error_code).show();
+
+					$('#newcat_loading_wrap').hide();
+					$('#newcat_savebtn_wrap').show();
+					return;
+				}
+
+				window.location.reload(false);
+			}
+		});
+	});
+});
+
+//######################################################################################################################
+// Changing departments
+//######################################################################################################################
+
+$(document).ready(function() {
+
+	var sels = $('select.change-linked-dep');
+
+	sels.data('select-width', '300');
+
+	DP.select(sels);
+
+	$('select.change-linked-dep').on('change', function() {
+		var gateway_id = $(this).data('gateway-id');
+		var dep_id = $(this).val();
+		var el = $(this);
+		var me = this;
+
+		if (dep_id != '0') {
+			$('select.change-linked-dep').each(function() {
+				if (this != me && $(this).val() == dep_id) {
+					$(this).select2('val', '0');
+					DeskPRO_Window.util.showSavePuff($(this).prev());
+				}
+			});
+		}
+
+		$.ajax({
+			url: '{{ path('admin_emailgateways_setlinkeddep') }}',
+			data: {
+				gateway_id: gateway_id,
+				department_id: dep_id
+			},
+			type: 'POST',
+			success: function() {
+				DeskPRO_Window.util.showSavePuff(el.prev());
+			}
+		});
+	});
+});
+
+//######################################################################################################################
+// Edit an account
+//######################################################################################################################
+
+$(document).ready(function() {
+	$('.open-edit-email').on('click', function(ev) {
+		ev.preventDefault();
+		var overlay = new DeskPRO.UI.Overlay({
+			contentMethod: 'ajax',
+			contentAjax: {
+				url: $(this).data('url'),
+				type	: 'GET',
+				dataType: 'html'
+			},
+			destroyOnClose: true,
+			onAjaxDone: function() {
+				DeskPRO.ElementHandler_Exec(overlay.elements.wrapper);
+			}
+		});
+
+		overlay.open();
+	});
+});
+
+</script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li style="margin-right: 8px;"><a href="{{ path('admin_emailgateway_rejections') }}">View Rejections ({{ rejection_count|default('0') }})</a></li>
+			<li class="add"><a href="#" id="newcat_trigger">Add Email Account</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li><a href="{{ path('admin_emailgateways') }}">Email Accounts</a></li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{{ design.helpbox() }}
+	<p>
+		Your users send email to these email accounts and those emails are processed into tickets and replies in your helpdesk.
+		You can add as many email accounts as you want.
+	</p>
+{{ design.helpbox_end() }}
+
+<div class="check-grid item-list" id="by_address">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left" colspan="2">{{ phrase('agent.general.email_address') }}</th>
+				<th style="text-align: left">Custom Email Address</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for gateway in all_gateways %}
+				<tr>
+					<td style="vertical-align:top;">
+						<a href="{{ path('admin_emailgateways_del', {id: gateway.id, security_token: security_token('delete_gateway') }) }}" onclick="return confirm('{{ phrase('admin.gateway.ask_delete_gateway') }}');" style="position:relative;top:1px;"><span class="btn-remove"></span></a>
+					</td>
+					<td style="vertical-align: top;">
+						<strong>{{ gateway.title }}</strong>
+						<br/>
+						<select class="change-linked-dep" data-gateway-id="{{ gateway.id }}">
+							<option value="0" {% if not gateway.department %}selected="selected"{% endif %}>No linked department</option>
+							{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+								{% if dep.children|length %}
+									<optgroup label="{{ dep.title }}">
+										{% for subdep in dep.children %}
+											<option data-full-title="{{ dep.title }} &gt; {{ subdep.title }}" value="{{subdep.id}}" {% if gateway.department.id == subdep.id %}selected="selected"{% endif %}>{{subdep.title}}</option>
+										{% endfor %}
+									</optgroup>
+								{% else %}
+									<option value="{{dep.id}}" {% if gateway.department.id == dep.id %}selected="selected"{% endif %}>{{dep.title}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</td>
+					<td style="vertical-align: top">
+						{% if gateway.getAliasEmailAddress() %}
+							<strong><span class="open-edit-email editable-link" data-url="{{ path('admin_emailgateways_cloud_editaccount', {gateway_id: gateway.id}) }}"><span>{{ gateway.getAliasEmailAddress() }}</span></strong>
+						{% else %}
+							<strong><span class="open-edit-email editable-link" data-url="{{ path('admin_emailgateways_cloud_editaccount', {gateway_id: gateway.id}) }}"><span>Use a custom email address</span></span></strong>
+						{% endif %}
+
+						{% if gateway.addresses|length > 2 %}
+							<div style="padding-top: 5px;">
+								Additional custom email addresses:<br/>
+								<ul class="small-detail-list">
+									{% for addr in gateway.addresses %}
+										{% if loop.index > 2 %}
+											<li>{{ addr.match_pattern }}</li>
+										{% endif %}
+									{% endfor %}
+								</ul>
+							</div>
+						{% endif %}
+
+						{% if gateway.linked_transport and gateway.linked_transport.transport_type != 'mail' %}
+							<div style="padding-top: 5px;">
+								Custom SMTP account:<br/>
+								<ul class="small-detail-list">
+									<li>
+										<span class="open-edit-email editable-link" data-url="{{ path('admin_emailgateways_cloud_editaccount', {gateway_id: gateway.id}) }}"><span>
+											{% if gateway.linked_transport and gateway.linked_transport.transport_type != 'mail' %}
+												{{ gateway.linked_transport.title }}
+											{% else %}
+												None
+											{% endif %}
+										</span></span>
+									</li>
+								</ul>
+							</div>
+						{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<div id="newcat_overlay" style="width: 400px; height: 180px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>New Email Address</h4>
+	</div>
+	<div class="overlay-content">
+		<form class="dp-form" method="POST" action="{{ path('admin_emailgateways_newcloud') }}">
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>Email Address</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="name" value="" style="width: 150px;" /><span style="font-size: 10pt; margin-left: 6px;">@{{ constant('DPC_SITE_DOMAIN') }}</span>
+					<div id="newcat_err" style="display: none; padding: 6px; color: #f00;">
+						<div class="empty_name">Please enter an email address</div>
+						<div class="dupe">You already have an email address with that name</div>
+						<div class="invalid_name">You can only enter letters, numbers, underscores and hyphens.</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="overlay-footer">
+		<div id="newcat_savebtn_wrap">
+			<button class="clean-white" id="newcat_savebtn">Create Email Address</button>
+		</div>
+		<div id="newcat_loading_wrap" style="display: none;">
+			<img src="{{ asset('images/spinners/loading-small-flat.gif') }}" />
+		</div>
+	</div>
+</div>
+
+{% endblock %}

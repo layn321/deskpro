@@ -1,0 +1,80 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TicketPriorityList.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a href="{{ path('admin_userrules_new') }}">{{ phrase('admin.user_rules.add_new_rule') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.user_rules.user_rules') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{{ design.helpbox() }}
+	<p>
+		User rules are run against <strong><em>new users</em></strong> to automatically add them to usergroups or organizations.
+	</p>
+{{ design.helpbox_end() }}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left">&nbsp; {{ phrase('admin.user_rules.match') }}</th>
+				<th style="text-align:center" width="180">{{ phrase('agent.general.actions') }}</th>
+				<th style="text-align:left" width="50">&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Every user</td>
+				<td nowrap="nowrap" style="white-space: nowrap"><div style="white-space: nowrap">Add to usergroup: <a href="{{ path('admin_usergroups_edit', {id: reg_ug.id}) }}">{{ reg_ug.title }}</a></div></td>
+			</tr>
+			{% for rule in rules %}
+				<tr>
+					<td>
+						{% if rule.email_patterns|length > 50 %}<textarea style="width:95%; height: 100px; font-family: Monaco, Consolas, monospace; font-size: 9pt;">{% endif %}{% for p in rule.email_patterns %}{{ p }}{% if not loop.last %}, {% endif %}{% endfor %}{% if rule.email_patterns|length > 50 %}</textarea>{% endif %}
+					</td>
+					<td style="vertical-align: top; white-space: nowrap; text-align: right;" nowrap="nowrap">
+						{% if rule.add_usergroup %}{{ phrase('admin.user_rules.add_to_usergroup') }}: <a href="{{ path('admin_usergroups_edit', {id: rule.add_usergroup.id}) }}">{{ rule.add_usergroup.title }}</a><br />{% endif %}
+						{% if rule.add_organization %}{{ phrase('admin.user_rules.add_to_organization') }}: {{ rule.add_organization.title }}{% endif %}
+					</td>
+					<td style="padding: 3px 3px 0 0; text-align: right; vertical-align: top;">
+						<a href="{{ path('admin_userrules_edit', {rule_id:rule.id}) }}"><span class="btn-edit-gear"></span></a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div><br /><br />
+
+{% if org_domains|length %}
+	<p>{{ phrase('admin.user_rules.notice_organisation_domains') }}</p>
+	<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left">&nbsp; {{ phrase('agent.general.organization') }}</th>
+				<th style="text-align:left">{{ phrase('admin.user_rules.domains') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for info in org_domains %}
+				<tr>
+					<td>{{ info[0].name }}</td>
+					<td>
+						{% for d in info %}{{ d.domain }}{% if not loop.last %}, {% endif %}{% endfor %}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+{% endblock %}

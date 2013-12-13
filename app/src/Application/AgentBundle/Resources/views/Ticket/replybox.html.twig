@@ -1,0 +1,331 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as tools %}
+{% set replyBaseId = el_uid() %}
+<form
+	class="ticket-reply-form {% if not ticket_perms.reply %}dp-note-on{% endif %}"
+	id="{{replyBaseId}}_reply_form"
+	method="post"
+	action="{{ path('agent_ticket_ajaxsavereply', {'ticket_id': ticket.id}) }}"
+
+	data-element-handler="DeskPRO.Agent.ElementHandler.TicketReplyBox"
+	data-upload-url="{{ path('agent_accept_upload') }}"
+	data-base-id="{{replyBaseId}}"
+    {% if app.user.getPref('agent.ticket_close_reply') %}data-close-reply="1"{% endif %}
+    {% if app.user.getPref('agent.ticket_close_note') %}data-close-note="1"{% endif %}
+	{% if app.user.getPref('agent.ticket_reverse_order') %}data-is-top-order="1"{% endif %}
+	{% if app.getSetting('core_tickets.resolve_auto_close_tab') %}data-resolve-auto-close="1"{% endif %}
+	{% if draft and draft.extras.is_note %}
+		data-default-is-note="1"
+	{% endif %}
+	data-dp-lang="{{ {
+		'attach_btn': phrase('agent.general.attach'),
+		'snippets_btn': phrase('agent.general.snippets')
+	}|json_encode }}"
+>
+
+<input type="hidden" id="{{replyBaseId}}_is_note" name="options[is_note]" value="0" />
+
+<input type="hidden" id="{{replyBaseId}}_exist_agent_id" value="{{ ticket.agent.id|default(0) }}" />
+<input type="hidden" id="{{replyBaseId}}_exist_agent_team_id" value="{{ ticket.agent_team.id|default(0) }}" />
+<input type="hidden" id="{{replyBaseId}}_action" name="options[action]" value="" />
+
+<div class="dp-menu replybox" id="{{ replyBaseId }}_status_menu" style="min-width: 225px;">
+	<section>
+		<div class="dp-menu-area small">
+			<input type="text" class="label-input macro-filter" placeholder="{{ phrase('agent.tickets.reply_and_apply_macro') }}" />
+			<ul class="macro-list">
+				{% for macro in app.user.getHelper('Agent').getMacros() %}
+					<li class="res-ticketmacro-{{ macro.id }}" data-type="macro:{{ macro.id }}" id="{{replyBaseId}}_res_ticketmacro_{{ macro.id }}" data-macro-title="{{ macro.title }}" data-macro-id="{{ macro.id }}" data-label="{{ phrase('agent.tickets.send_reply_and_apply_x', {name: macro.title}) }}" data-get-macro-url="{{ path('agent_ticket_ajax_get_macro', {ticket_id: ticket.id, macro_id: macro.id, macro_reply_context: 1 }) }}">
+						<div class="on-icon"><i class="icon-ok"></i></div>
+						<span class="macro-title">{{ macro.title }}</span>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</section>
+	<section>
+		<div class="dp-menu-area dp-menu-area-primary">
+			<label>{{ phrase('agent.tickets.reply_and_set_status') }}</label>
+			<ul>
+				<li data-type="awaiting_user" data-label="{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_awaiting_user')}) }}">
+					<div class="on-icon"><i class="icon-ok"></i></div>
+					{{ phrase('agent.tickets.kbd_awaiting_user') }}
+				</li>
+				<li data-type="awaiting_agent" data-label="{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_awaiting_agent')}) }}">
+					<div class="on-icon"><i class="icon-ok"></i></div>
+					{{ phrase('agent.tickets.kbd_awaiting_agent') }}
+				</li>
+				{% if ticket_perms.modify_set_resolved %}
+					<li data-type="resolved" data-label="{{ phrase('agent.tickets.send_reply_as_x', {status: phrase('agent.tickets.status_resolved')}) }}">
+						<div class="on-icon"><i class="icon-ok"></i></div>
+						{{ phrase('agent.tickets.kbd_resolved') }}
+					</li>
+				{% endif %}
+			</ul>
+		</div>
+	</section>
+</div>
+
+<div class="profile-box-container reply-box-wrap" style="position: relative">
+	<div class="drop-file-zone drop-file-zone-file" id="{{ replyBaseId }}_file_drop_zone"><h1>{{ phrase('agent.general.drop_here_to_attach') }}</h1></div>
+	<div class="ticket-errors-overlay">
+		<strong>
+			{{ phrase('agent.tickets.error_reply_badfields') }}
+		</strong>
+	</div>
+	<div class="ticket-sending-overlay" style="display: none;">
+		<strong><span class="hide-note">{{ phrase('agent.tickets.sending_your_message') }}</span><span class="hide-reply" style="display: none">{{ phrase('agent.tickets.adding_your_note') }}</span></strong>
+	</div>
+	<header>
+		{% if app.isPluginInstalled('MicrosoftTranslator') %}
+			<div class="translate-controls">
+				<div class="dp-not-loading">
+					<div class="dp-btn-group dp-dropdown">
+						<a class="dp-btn dp-btn-primary trans-trigger">
+							<i class="icon-globe"></i>&nbsp;
+							{{ phrase('agent.tickets.translate_into') }}
+							<span class="translate-lang" data-locale="{{ ticket.language.locale|default(app.languages.getDefault().locale) }}">
+								{% if ticket.language %}{{ phrase_object(ticket.language) }}{% else %}{{ phrase_object(app.languages.getDefault()) }}{% endif %}
+							</span>
+						</a>
+						<a class="dp-btn dp-btn-primary dp-dropdown-toggle">
+							<select class="language_id">
+								{% for code in app.getPluginService('MicrosoftTranslator.tr_api').getLanguagesForTranslate() %}
+									{% set name = app.getPluginService('MicrosoftTranslator.tr_api').getSingleLanguageName(code) %}
+									<option value="{{ code }}">{{ name }}</option>
+								{% endfor %}
+							</select>
+							<span class="dp-caret dp-caret-down"></span>
+						</a>
+					</div>
+				</div>
+				<div class="dp-is-loading" style="padding: 2px 4px 0 0;">
+					<i class="spinner-flat"></i>
+				</div>
+			</div>
+		{% endif %}
+		<nav>
+			<ul>
+				{% if ticket_perms.reply %}<li id="{{replyBaseId}}_replybox_replytab_btn" class="on">{{ phrase('agent.general.reply') }}</li>{% endif %}
+				{% if ticket_perms.modify_notes %}<li id="{{replyBaseId}}_replybox_notetab_btn" class="note-type {% if not ticket_perms.reply %}on{% endif %}">{{ phrase('agent.general.note') }}</li>{% endif %}
+			</ul>
+		</nav>
+	</header>
+	<section class="ticketreply">
+		<article>
+			<section>
+				<div class="option-rows">
+					<ul id="{{replyBaseId}}_option_rows">
+						<li class="to-row hide-note">
+							<label>
+	                            {% if ticket_perms.modify_cc or user_parts|length %}
+								    <span class="expander {% if user_parts|length %}expanded{% endif %}" data-target="#{{replyBaseId}}_cc_row">+/-</span>
+	                            {% endif %}
+								{{ phrase('agent.general.to') }}:
+							</label>
+							<div>
+								{{ ticket.person.display_name }}
+								{% if ticket.person_email %}
+									&lt;{{ ticket.person_email.email }}&gt;
+								{% elseif ticket.person.primary_email %}
+									&lt;{{ ticket.person.primary_email.email }}&gt;
+								{% endif %}
+							</div>
+						</li>
+						{% if not app.user.getPref('agent.ticket_reverse_order') %}
+							{% if ticket_perms.modify_cc or user_parts|length %}
+								<li id="{{replyBaseId}}_cc_row" class="cc-row hide-note {% if not user_parts|length %}is-hidden{% endif %}" {% if not user_parts|length %}style="display: none;"{% endif %}>
+									<label>{{ phrase('agent.tickets.cc') }}:</label>
+									<div class="cc-container">
+										<div id="{{replyBaseId}}_newcc" style="display: none;"></div>
+										<div id="{{replyBaseId}}_delcc" style="display: none;"></div>
+
+										<div class="user-rows" id="{{replyBaseId}}_cc_user_rows">
+											<ul class="cc-row-list">
+												{% for p in user_parts %}
+													{% include 'AgentBundle:Ticket:view-user-cc-row.html.twig' with {'person': p.person, 'ticket_perms':ticket_perms } %}
+												{% endfor %}
+											</ul>
+										</div>
+										<script class="email-row-tpl" type="text/x-deskpro-tmpl">
+											<div class="cc-user-row">
+												<span class="btn-small-remove remove-row-trigger"></span>
+												<span class="user-email"></span>
+											</div>
+										</script>
+										<div class="addrow noedit-hide">
+											<input type="text" class="user-part cc-people-search-trigger" placeholder="Choose a person" />
+											<div class="person-search-box" style="display: none">
+												<section>
+													<ul class="results-list">
+
+													</ul>
+												</section>
+											</div>
+											<button class="clean-white small cc-saverow-trigger">{{ phrase('agent.general.add') }}</button>
+											<script class="user-row-tpl" type="text/x-deskpro-tmpl">
+												<li>
+													<a>
+														<span class="user-name"></span>
+														<address>&lt;<span class="user-email"></span>&gt;</address>
+														<div class="bound-fade"></div>
+													</a>
+												</li>
+											</script>
+										</div>
+									</div>
+								</li>
+							{% endif %}
+						{% endif %}
+						{% if app.getSetting('core_tickets.enable_billing') and app.getSetting('core_tickets.billing_on_reply') %}
+							<li id="{{replyBaseId}}_billing_reply">
+								<label>{{ phrase('agent.tickets.charge') }}:</label>
+								<div>
+									<label><input type="checkbox" name="charge_time" value="0" checked="checked" /> {{ phrase('agent.tickets.charge_time') }}: <span id="{{replyBaseId}}_billing_reply_time"></span></label>
+								</div>
+							</li>
+						{% endif %}
+						<li id="{{replyBaseId}}_attach_row" {% if draft_attachments %}class="attach-row"{% else %}class="attach-row is-hidden" style="display: none"{% endif %}>
+							<label><span>{{ phrase('agent.general.attachments') }}</span></label>
+							<div>
+								<ul class="files" style="margin-left:75px;">
+								{%- for blob in draft_attachments -%}
+									<li>
+										<input type="hidden" name="attach[]" value="{{ blob.id }}" />
+										<em class="remove-attach-trigger"></em>
+										<label><a href="{{ blob.download_url }}" target="_blank">{{ blob.filename }}</a><span>{{ blob.readable_filesize }}</span></label>
+									</li>
+								{%- endfor -%}
+								</ul>
+								<br class="clear"/>
+							</div>
+						</li>
+						<li id="{{replyBaseId}}_actions_row" class="actions-row" style="display: none;">
+							<label><span>{{ phrase('agent.general.actions') }}</span></label>
+							<ul></ul>
+							<br class="clear"/>
+						</li>
+					</ul>
+				</div>
+				<div class="input-wrap unreset editor-row">
+					<textarea placeholder="" id="{{replyBaseId}}_replybox_txt" name="message" {% if ticket.language and ticket.language.is_rtl %}dir="rtl"{% endif %}></textarea>
+					<textarea id="{{replyBaseId}}_signature_value" class="signature-value" style="display: none;">{{ agent_signature }}</textarea>
+					<textarea id="{{replyBaseId}}_signature_value_html" class="signature-value-html" style="display: none;">{{ agent_signature_html }}</textarea>
+					{% if draft %}
+						<textarea id="{{replyBaseId}}_draft_html" class="draft-html" style="display: none;">{{ draft.message }}</textarea>
+					{% endif %}
+					<input type="hidden" id="{{replyBaseId}}_is_html_reply" name="is_html_reply" value="0" />
+					{% if draft and draft.extras.blob_inline_ids %}
+						{% for blob_inline_id in draft.extras.blob_inline_ids %}
+							<input type="hidden" name="blob_inline_ids[]" value="{{ blob_inline_id }}" />
+						{% endfor %}
+					{% endif %}
+					<div class="drop-file-zone drop-file-zone-rte"><h1>{{ phrase('agent.general.drop_here_to_insert_image') }}</h1></div>
+				</div>
+				{% if app.isPluginInstalled('MicrosoftTranslator') %}
+					<div class="input-wrap unreset translate-row" style="display: none;">
+						<input type="hidden" name="reply_is_trans" id="{{ replyBaseId }}_reply_is_trans" value="" />
+						<textarea placeholder="" id="{{replyBaseId}}_replybox_txt2" name="message_original" {% if ticket.language and ticket.language.is_rtl %}dir="rtl"{% endif %}></textarea>
+					</div>
+				{% endif %}
+			</section>
+		</article>
+	</section>
+	<footer>
+		<table cellpadding="0" cellspacing="0" border="0"><tr>
+			<td valign="middle" style="vertical-align: middle;">
+				<div class="hide-note">
+					<div class="dp-btn-group dp-dropup" id="{{ replyBaseId }}_reply_btn_group" style="position: relative; z-index: 50;">
+						<a class="dp-btn dp-btn-primary submit-trigger">
+							<i class="icon-share-alt"></i>&nbsp;
+							{% if app.getSetting('core_tickets.reply_status') == 'awaiting_user' or (ticket.status == 'awaiting_user' and not app.getSetting('core_tickets.reply_status')) %}
+								<span id="{{ replyBaseId }}_reply_as_type" data-type="awaiting_user">{{ phrase('agent.tickets.kbd_send_awaiting_user') }}</span>
+							{% elseif app.getSetting('core_tickets.reply_status') == 'awaiting_agent' or (ticket.status == 'awaiting_agent' and not app.getSetting('core_tickets.reply_status')) %}
+								<span id="{{ replyBaseId }}_reply_as_type" data-type="awaiting_agent">{{ phrase('agent.tickets.kbd_send_awaiting_agent') }}</span>
+							{% elseif app.getSetting('core_tickets.reply_status') == 'resolved' or (ticket.status == 'resolved' and not app.getSetting('core_tickets.reply_status')) %}
+								<span id="{{ replyBaseId }}_reply_as_type" data-type="resolved">{{ phrase('agent.tickets.kbd_send_resolved') }}</span>
+							{% else %}
+								<span id="{{ replyBaseId }}_reply_as_type" data-type="awaiting_user">{{ phrase('agent.tickets.kbd_send_awaiting_user') }}</span>
+							{% endif %}
+						</a>
+						<a class="dp-btn dp-btn-primary dp-dropdown-toggle status-menu-trigger"><span class="dp-caret dp-caret-up"></span></a>
+					</div>
+				</div>
+				<div class="hide-reply" style="display: none">
+					<a class="dp-btn dp-btn-primary submit-trigger" style="position: relative; z-index: 50;">
+						<i class="icon-share"></i>&nbsp;
+						{{ phrase('agent.tickets.add_note') }}
+					</a>
+				</div>
+			</td><td valign="middle" style="vertical-align: middle;">
+				<div class="cell">
+					{% if ticket.agent %}
+						{% set assign_opt = 'core_tickets.reply_assign_assigned' %}
+					{% else %}
+						{% set assign_opt = 'core_tickets.reply_assign_unassigned' %}
+					{% endif %}
+					<div class="inner-cell" style="padding-left: 11px;">
+						<input type="checkbox" name="options[do_assign_agent]" id="{{replyBaseId}}_agent_sel_check" {% if app.getSetting(assign_opt) %}checked="checked"{% endif %} />
+						<label for="{{replyBaseId}}_agent_sel_check">{{ phrase('agent.general.agent') }}:&nbsp;</label>
+					</div><div class="inner-cell" style="position: relative;">
+						<span style="cursor: pointer;"><span id="{{ replyBaseId }}_agent_sel_text" style="padding-left: 17px; background-repeat: no-repeat; background-position: 0 50%;"></span> <i class="icon-sort-down" style="color: #888; position: relative; top: -2px;"></i></span>
+						<select name="options[agent_id]" id="{{replyBaseId}}_agent_sel" class="dpe_select" data-style-type="icons" data-select-icon-size="22" style="min-width: 170px;" {% if app.getSetting('core_tickets.reassign_auto_change_status') %}data-auto-switch-status="awaiting_agent"{% endif %} data-invisible-trigger-right="1">
+							<option value="{{ app.user.id }}" data-icon="{{ app.user.getPictureUrl(15) }}" data-name-short="Me">{{ phrase('agent.general.me') }}</option>
+							{% for agent in agents if agent.id != app.user.id %}
+								<option {% if (not app.getSetting(assign_opt) and agent.id == ticket.agent.id) or (app.getSetting(assign_opt) == 'assign' and agent.id == app.user.id) %}selected="selected"{% endif %} data-icon="{{ agent.getPictureUrl(15) }}" data-name-short="{{ agent.getDisplayContactShort(3) }}" value="{{ agent.id }}">
+									{{ agent.display_name }}
+								</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+
+				<div class="cell">
+					<div class="inner-cell" style="padding-left: 11px;">
+						{% if ticket.agent_team %}
+							{% set assign_opt = 'core_tickets.reply_assignteam_assigned' %}
+						{% else %}
+							{% set assign_opt = 'core_tickets.reply_assignteam_unassigned' %}
+						{% endif %}
+						<input type="checkbox" name="options[do_assign_team]" id="{{ replyBaseId }}_agent_team_sel_check" {% if app.getSetting(assign_opt) %}checked="checked"{% endif %} />
+						<label for="{{ replyBaseId }}_agent_team_sel_check">{{ phrase('agent.general.team') }}:&nbsp;</label>
+					</div><div class="inner-cell" style="position: relative;">
+						<span style="cursor: pointer;"><span id="{{ replyBaseId }}_agent_team_sel_text" ></span> <i class="icon-sort-down" style="color: #888; position: relative; top: -2px;"></i></span>
+						<select name="options[agent_team_id]" id="{{replyBaseId}}_agent_team_sel" class="dpe_select" data-select-nogrouptitle="1" style="min-width: 170px;" {% if app.getSetting('core_tickets.reassign_auto_change_status') %}data-auto-switch-status="awaiting_agent"{% endif %} data-invisible-trigger-right="1">
+							{% if app.user.getAgent().getTeams()|length and (ticket_perms.modify_assign_self or (ticket.agent_team.id == team.id)) %}
+							<optgroup label="{% if app.user.getAgent().getTeams()|length > 1 %}Your Teams{% else %}Your Team{% endif %}">
+								{% for team in app.user.getAgent().getTeams() %}
+									<option value="{{ team.id }}" {% if app.getSetting(assign_opt) == 'assign' and (app.user.getPref('agent.ticket_default_team_id') == team.id or not app.user.getPref('agent.ticket_default_team_id')) %}selected="selected"{% endif %}>{{ team.name }}</option>
+								{% endfor %}
+							</optgroup>
+							{% endif %}
+
+							{% for team in agent_teams %}
+								{% if (ticket_perms.modify_assign_team or ticket.agent_team.id == team.id) and team.id not in app.user.getAgent().getTeamIds() %}
+									<option value="{{ team.id }}" {% if (not app.getSetting(assign_opt) and team.id == ticket.agent_team.id) %}selected="selected"{% endif %}>{{ team.name }}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+
+				<div class="cell">
+					<div class="inner-cell" style="padding-left: 11px;">
+						<input type="checkbox" id="{{ replyBaseId }}_close_tab_opt" name="options[close_tab]" {% if app.user.getPref('agent.ticket_close_reply', true) %}checked="checked"{% endif %} />
+						<label for="{{ replyBaseId }}_close_tab_opt">{{ phrase('agent.general.close_tab') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.tickets.close_tab_tip') }}"></span></label>
+					</div>
+				</div>
+
+				<div class="cell hide-note">
+					<div class="inner-cell" style="padding-left: 11px;">
+						<input type="checkbox" id="{{ replyBaseId }}_email_user" name="options[notify_user]" {% if app.getSetting('core_tickets.default_send_user_notify') %}checked="checked"{% endif %} />
+						<label for="{{ replyBaseId }}_email_user">{{ phrase('agent.general.email_user') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.tickets.email_user_tip') }}"></span></label>
+					</div>
+				</div>
+			</td>
+		</tr></table>
+	</footer>
+</div>
+
+{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'attach[]'} %}
+
+</form>

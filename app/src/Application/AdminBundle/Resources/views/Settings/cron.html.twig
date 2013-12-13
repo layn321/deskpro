@@ -1,0 +1,108 @@
+{% set is_cron_page = 1 %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('admin.settings.configure_scheduled_tasks') }}</li>
+	</ul>
+{% endblock %}
+{% block content %}
+
+<div class="dp-page-box">
+	<div class="page-content">
+
+		{{ phrase('admin.settings.cron_explain') }}
+		<br /><br />
+
+		<br />
+
+		{% if not get_instance_ability('is_windows') %}
+
+		{% if not found_php_path %}
+		<div class="alert-message block-message error">
+			{{ phrase('admin.settings.cron_notice_php_path_not_found') }}
+		</div>
+		{% endif %}
+
+		<br />
+
+		<div class="content-table template-dir">
+			<table width="100%">
+				<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<h1 class="noexpand">{{ phrase('admin.settings.cron_setup_linux') }}</h1>
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>
+						{{ phrase('admin.settings.cron_setup_linux_edit_file') }}
+						<code class="code-box nowrap">* * * * * exampleuser {{ php_path|default('/path/to/php') }} -q {{ constant('DP_WEB_ROOT') }}/cron.php</code>
+						<div class="small-note-box">
+							{{ phrase('admin.settings.cron_setup_linux_edit_file_user') }}
+							{% if not php_path %}
+								<br />
+								<strong>{{ phrase('agent.general.note_attn') }}:</strong>
+								{{ phrase('admin.settings.could_not_find_php_use_real') }}
+							{% endif %}
+						</div>
+						<br />
+						<p>
+							<a href="{{ get_service_url('dp.kb.install.cron') }}">{{ phrase('admin.settings.cron_detailed_instructions') }}</a>
+						</p>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<br />
+		{% endif %}
+
+		{% if get_instance_ability('is_windows') %}
+		<div class="content-table template-dir">
+			<table width="100%">
+				<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<h1 class="noexpand">{{ phrase('admin.settings.cron_setup_windows') }}</h1>
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>
+						<h2>Option 1:</h2>
+						<ol class="number-list">
+							<li>Open the folder where you have installed DeskPRO: {{ constant('DP_WEB_ROOT') }}</li>
+							<li>Run the file called schedule.bat</li>
+							<li>You will need to enter the path to the php-win.exe file found on your system</li>
+						</ol>
+
+						<h2>Option 2:</h2>
+						<ol class="number-list">
+							<li>Manually open Windows Scheduled Tasks</li>
+							<li>Create a scheduled task for php-win.exe to run {{ constant('DP_WEB_ROOT') }}/cron.php every minute.</li>
+						</ol>
+						<p>
+							<!-- <a href="{{ get_service_url('dp.kb.install.cron') }}">{{ phrase('admin.settings.cron_detailed_instructions') }}</a> -->
+						</p>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<br />
+		{% endif %}
+
+		<br />
+
+		{% if show_complete_form %}
+		<footer class="controls">
+			<a class="clean-white" href="{{ path('admin_settings_cron', {complete: '1'}) }}">{{ phrase('admin.settings.confirm_configured_scheduled_tasks') }} &rarr;</a>
+		</footer>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}

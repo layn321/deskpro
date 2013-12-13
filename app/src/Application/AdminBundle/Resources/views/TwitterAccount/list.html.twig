@@ -1,0 +1,60 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<nav>
+	<ul>
+		{% if not app.getConfig('twitter.agent_consumer_key') and not app.isCloud() %}<li style="margin-right: 5px"><a href="{{ path('admin_twitter_apps') }}">Setup Applications</a></li>{% endif %}
+		<li class="add"><a href="{{ path('admin_twitter_accounts_new', {'start': 1}) }}">{{ phrase('admin.twitter.create_new_account') }}</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>Twitter Accounts</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+	{{ design.helpbox() }}
+		<p>
+			<strong style="color: #FF5500;">BETA</strong>: Twitter is currently in beta. Please report bug reports and feedback to <a href="mailto:support@deskpro.com">support@deskpro.com</a> or
+			submit a ticket on our helpdesk at <a href="https://support.deskpro.com/">https://support.deskpro.com</a>.
+		</p>
+	{{ design.helpbox_end() }}
+
+<ul class="item-list">
+	{% for account in accounts %}
+		{% include 'AdminBundle:TwitterAccount:list-row.html.twig' %}
+	{% else %}
+		<li>
+			{{ phrase('admin.twitter.no_accounts_defined') }}
+		</li>
+	{% endfor %}
+</ul>
+
+<form action="{{ path('admin_twitter_set_cleanup') }}" method="post" style="padding: 10px">
+	How long until Tweets that aren't directed specifically to your accounts are removed?
+	<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="General timeline, search, and user profile tweets will be removed with this. Any tweets that appear under &quot;All Tweets&quot; will not be automatically removed."></span>
+	{% set options = {
+		86400: "1 day",
+		259200: "3 days",
+		432000: "5 days",
+		604800: "1 week",
+		1209600: "2 weeks",
+		1814400: "3 weeks",
+		2419000: "1 month",
+		4838000: "2 months",
+		7257000: "3 months",
+		14514000: "6 months",
+		21771000: "9 months",
+		29028000: "1 year",
+		58056000: "2 years",
+	} %}
+	<select name="time">
+		{% for k,v in options %}
+			<option value="{{ k }}" {% if app.getSetting('core.twitter_auto_remove_time') == k %}selected="selected"{% endif %}>{{ v }}</option>
+		{% endfor %}
+	</select>
+	<button class="clean-white">Update</button>
+
+	{{ form_token() }}
+</form>
+
+{% endblock %}

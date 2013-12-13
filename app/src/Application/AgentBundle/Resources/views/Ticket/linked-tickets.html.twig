@@ -1,0 +1,81 @@
+<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table th-la sla-table">
+	<tbody>
+		{% if linked_tickets.parent %}
+			<tr>
+				<th colspan="5" style="background: #eee;">Parent Ticket</th>
+			</tr>
+			<tr>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.subject') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.department') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.person') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.agent') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.status') }}</th>
+			</tr>
+			<tr>
+				{% set t = linked_tickets.parent %}
+				<td width="100%" style="overflow:hidden; text-overflow: ellipsis;"><a data-route="page:{{ path('agent_ticket_view', {ticket_id: t.id}) }}">{{ t.subject }}</a></td>
+				<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">{{ t.department.full_title }}</td>
+				<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;"><a data-route="page:{{ path('agent_people_view', {person_id: t.person.id}) }}">{{ t.person.getDisplayContact() }}</a></td>
+				<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">{{ t.agent.display_name|default(phrase('agent.general.unassigned')) }}</td>
+				<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">
+					<div class="status-pill status {% if t.status == 'awaiting_agent' %}urgency-{{ t.urgency }}{% endif %} {{ t.status }}" style="float: none; top: 0; text-shadow: none !important;">
+						{{ phrase('agent.tickets.status_' ~ t.status_code) }}
+						{% if t.status == 'awaiting_agent' %}<i class="ticket-urgency">{{ t.urgency }}</i>{% endif %}
+					</div>
+				</td>
+			</tr>
+		{% endif %}
+		{% if linked_tickets.children|length %}
+			<tr>
+				<th colspan="5" style="background: #eee;">Sub-Tickets</th>
+			</tr>
+			<tr>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.subject') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.department') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.person') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.agent') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.status') }}</th>
+			</tr>
+			{% for t in linked_tickets.children %}
+				<tr>
+					<td width="100%" style="overflow:hidden; text-overflow: ellipsis;"><a data-route="page:{{ path('agent_ticket_view', {ticket_id: t.id}) }}">{{ t.subject }}</a></td>
+					<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">{{ t.department.full_title }}</td>
+					<td><div style="white-space: nowrap; text-wrap: none; overflow: hidden; text-overflow: ellipsis; min-width: 60px;"><a data-route="page:{{ path('agent_people_view', {person_id: t.person.id}) }}">{{ t.person.getDisplayContact() }}</a></div></td>
+					<td nowrap="nowrap">{{ t.agent.display_name|default(phrase('agent.general.unassigned')) }}</td>
+					<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">
+						<div class="status-pill status {% if t.status == 'awaiting_agent' %}urgency-{{ t.urgency }}{% endif %} {{ t.status }}" style="float: none; top: 0; text-shadow: none !important;">
+							{{ phrase('agent.tickets.status_' ~ t.status_code) }}
+							{% if t.status == 'awaiting_agent' %}<i class="ticket-urgency">{{ t.urgency }}</i>{% endif %}
+						</div>
+					</td>
+				</tr>
+			{% endfor %}
+		{% endif %}
+		{% if linked_tickets.siblings|length %}
+			<tr>
+				<th colspan="5" style="background: #eee;">Other tickets with the same parent</th>
+			</tr>
+			<tr>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.subject') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.department') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.person') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.agent') }}</th>
+				<th style="font-size: 11px; padding: 1px 4px;">{{ phrase('agent.general.status') }}</th>
+			</tr>
+			{% for t in linked_tickets.siblings %}
+				<tr>
+					<td width="100%" style="overflow:hidden; text-overflow: ellipsis;"><a data-route="page:{{ path('agent_ticket_view', {ticket_id: t.id}) }}">{{ t.subject }}</a></td>
+					<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">{{ t.department.full_title }}</td>
+					<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;"><a data-route="page:{{ path('agent_people_view', {person_id: t.person.id}) }}">{{ t.person.getDisplayContact() }}</a></td>
+					<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">{{ t.agent.display_name|default(phrase('agent.general.unassigned')) }}</td>
+					<td nowrap="nowrap" style="overflow:hidden; text-overflow: ellipsis;">
+						<div class="status-pill status {% if t.status == 'awaiting_agent' %}urgency-{{ t.urgency }}{% endif %} {{ t.status }}" style="float: none; top: 0; text-shadow: none !important;">
+							{{ phrase('agent.tickets.status_' ~ t.status_code) }}
+							{% if t.status == 'awaiting_agent' %}<i class="ticket-urgency">{{ t.urgency }}</i>{% endif %}
+						</div>
+					</td>
+				</tr>
+			{% endfor %}
+		{% endif %}
+	</tbody>
+</table>

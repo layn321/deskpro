@@ -1,0 +1,41 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_twitter_accounts') }}">Twitter Accounts</a></li>
+	<li>Edit Twitter Account</li>
+</ul>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_twitter_accounts_edit', {'account_id': account.id}) }}" method="post" class="dp-form">
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Twitter Account</label>
+		</div>
+		<div class="dp-form-input">
+			@{{ account.user.screen_name }}
+		</div>
+	</div>
+
+	<div class="dp-form-row" >
+		<div class="dp-form-label">
+			<label>Agents with Access</label>
+		</div>
+		<div class="dp-form-input">
+			<ul>
+			{% for agent in agents %}
+				<li><label><input type="checkbox" name="agents[]" value="{{ agent.id }}" {% if account.hasPerson(agent) %}checked="checked"{% endif %} /> {{ agent.display_name }}</label></li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Save Account</button>
+	</footer>
+
+	{{ form_token() }}
+	<input type="hidden" name="process" value="1" />
+</form>
+{% endblock %}

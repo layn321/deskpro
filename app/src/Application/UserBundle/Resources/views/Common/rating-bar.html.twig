@@ -1,0 +1,24 @@
+{##
+ # The bar in content pages where a user can rate the page as helpful or unhelpful
+ ##}
+<div class="dp-user-vote dp-hide-print dp-well dp-well-small">
+	{% if rating.rating %}
+		{% if rating.rating >= 1 %}
+			<button class="dp-btn dp-good dp-no-btn" value="1" name="rating"><span>{{ phrase('user.general.marked_as_helpful') }}</span></button>
+		{% else %}
+			<button class="dp-btn dp-bad dp-no-btn" value="-1" name="rating"><span>{{ phrase('user.general.marked_as_unhelpful') }}</span></button>
+		{% endif %}
+	{% else %}
+		<form action="{{ path('user_saverating', { 'object_type': content_object.content_type, 'object_id': content_object.id}) }}" method="post">
+			{{ form_token() }}
+			<input type="hidden" name="log_search_id" value="{{ rating_log_search_id }}" />
+			<button class="dp-btn dp-good" value="1" name="rating"><span>{{ phrase('user.general.set_as_helpful') }}</span></button>
+			<button class="dp-btn dp-bad" value="-1" name="rating"><span>{{ phrase('user.general.set_as_unhelpful') }}</span></button>
+		</form>
+	{% endif %}
+	{% if app.getSetting('user.show_ratings') and content_object.num_ratings >= app.getSetting('user.show_ratings') %}
+		<div class="dp-show-ratings">
+			{{ phrase('user.general.rating_x_of_y_found_helpful', {'vote_up': content_object.up_votes, 'vote_count': content_object.num_ratings}) }}
+		</div>
+	{% endif %}
+</div>

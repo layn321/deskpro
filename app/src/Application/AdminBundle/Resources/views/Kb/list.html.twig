@@ -1,0 +1,127 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<style type="text/css">
+	ul.small-detail-list {
+		margin: 0 0 0 20px;
+		padding: 0;
+	}
+
+	ul.small-detail-list li {
+		font-size: 11px;
+		list-style: square;
+		pading: 0 0 0 5px;
+		margin: 0;
+	}
+
+	#email_forward_list input[type="text"] {
+		width: 50%;
+	}
+</style>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var sels = $('select.category_id');
+
+	sels.each(function() {
+		$(this).width($(this).width() + 100);
+	});
+
+	DP.select(sels);
+
+	sels.on('change', function() {
+		var gateway_id = $(this).data('gateway-id');
+		var category_id = $(this).val();
+		var el = $(this);
+		var me = this;
+
+		$.ajax({
+			url: '{{ path('admin_kb_gateways_set_category') }}',
+			data: {
+				gateway_id: gateway_id,
+				category_id: category_id
+			},
+			type: 'POST',
+			success: function() {
+				DeskPRO_Window.util.showSavePuff(el.prev());
+			}
+		});
+	});
+});
+</script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li style="margin-right: 8px;"><a href="{{ path('admin_emailgateway_errors', {object_type: 'article'}) }}">View Errors ({{ error_count|default('0') }})</a></li>
+			<li style="margin-right: 8px;"><a href="{{ path('admin_emailgateway_rejections', {object_type: 'article'}) }}">View Rejections ({{ rejection_count|default('0') }})</a></li>
+			<li class="add"><a href="{{ path('admin_kb_gateways_new') }}">{{ phrase('admin.gateway.add_email_gateway') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>Article Email Gateways</a></li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{{ design.helpbox() }}
+	<p>An article email gateway reads email from an email account you control and converts those emails into draft knowledgebase articles in DeskPRO. Only email from a known agent's email address is accepted.</p>
+{{ design.helpbox_end() }}
+
+<div class="check-grid item-list" id="by_address">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left; padding-left:0;" colspan="2">{{ phrase('agent.general.email_address') }}</th>
+				<th style="text-align:left" width="50">Category</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pattern,gateway in all_gateways_byemail %}
+				<tr>
+					<td style="vertical-align: top;" width="10">
+						<a href="{{ path('admin_kb_gateways_del', {id: gateway.id, security_token: security_token('delete_gateway') }) }}" onclick="return confirm('{{ phrase('admin.gateway.ask_delete_gateway') }}');" style="position:relative;top:1px;"><span class="btn-remove"></span></a>
+					</td>
+					<td>
+						<strong>{{ pattern }}</strong>
+						<div style="position:relative; top: -2px; display: inline">
+							<input
+								type="checkbox"
+								class="onoff-slider gateway-toggle-{{ gateway.id }}"
+								{% if gateway.is_enabled %}checked="checked"{% endif %}
+								data-element-handler="DeskPRO.ElementHandler.CheckboxCallUrl"
+								data-url="{{ path('admin_kb_gateways_quicktoggle', {'id': gateway.id}) }}"
+								data-state-property="is_enabled"
+							/>
+						</div>
+						<ul class="small-detail-list">
+							<li>
+								Incoming Account:
+								<a class="editable-link" href="{{ path('admin_kb_gateways_edit', { 'id': gateway.id }) }}"><span>
+									{{ gateway.title }}
+								</span></a>
+							</li>
+						</ul>
+					</td>
+					<td>
+						{% include 'AgentBundle:Common:select-standard.html.twig' with {
+							'name': '',
+							'add_classname': 'category_id',
+							'add_attr': 'data-gateway-id="' ~ gateway.id ~ '"',
+							'with_blank': 1,
+							'blank_title': phrase('agent.general.none'),
+							'categories': article_categories,
+							'selected': gateway.processor_extras.category_id
+						} %}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+
+<br />
+
+{% include 'AdminBundle:EmailGateways:list-fwd-list.html.twig' with {'redirect_route': 'admin_kb_gateways'} %}
+
+{% endblock %}

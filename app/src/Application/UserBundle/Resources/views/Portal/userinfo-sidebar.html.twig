@@ -1,0 +1,121 @@
+{##
+ # The sidebar block that shows the currently logged in user, or the login form if the user isn't logged in.
+ ##}
+
+{% if app.user.id %}
+	<section class="dp-sidebar-block dp-userinfo">
+		<header>
+			<a href="{{ path('user_profile') }}" class="dp-profile-image"><img src="{{ app.user.getPictureUrl(16) }}" alt="" title="{{ phrase('user.general.click_to_change_picture') }}" /></a>
+			<h3>{{ phrase('user.portal.sidebar_welcome-user', {name: app.user.first_name|default(app.user.display_name_user)}) }}</h3>
+		</header>
+		<article class="dp-written">
+			<ul>
+				<li>
+					<i class="dp-icon-user"></i>
+					<a href="{{ path('user_profile') }}">{{ phrase('user.profile.edit_your_profile') }}</a>
+				</li>
+				{% if ticket_count %}
+					<li>
+						<i class="dp-icon-inbox"></i>
+						<a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.view_your_x_tickets', {count: ticket_count })}}</a>
+					</li>
+				{% endif %}
+				{% if org_ticket_count %}
+					<li>
+						<i class="dp-icon-inbox"></i>
+						<a href="{{ path('user_tickets_organization') }}">{{ phrase('user.tickets.view_organization_x_tickets', {organization: app.user.organization.name, count: org_ticket_count })}}</a>
+					</li>
+				{% endif %}
+				{% if chat_count %}
+					<li>
+						<i class="dp-icon-comment"></i>
+						<a href="{{ path('user_chatlogs') }}">{{ phrase('user.chat.log_nav-view-chats', {count: chat_count })}}</a>
+					</li>
+				{% endif %}
+				{% if app.user.is_agent and app.user.can_agent %}
+					<li>
+						<i class="dp-icon-asterisk"></i>
+						<a href="{{ app.request.getBaseUrl() }}/agent/">{{ phrase('agent.general.agent_interface') }}</a>
+					</li>
+				{% endif %}
+				{% if app.user.is_agent and app.user.can_admin %}
+					<li>
+						<i class="dp-icon-certificate"></i>
+						<a href="{{ app.request.getBaseUrl() }}/admin/">{{ phrase('agent.general.admin_interface') }}</a>
+					</li>
+				{% endif %}
+				<li>
+					<i class="dp-icon-off"></i>
+					<a href="{{ path('user_logout', {'auth': static_security_token('user_logout', 0) }) }}">{{ phrase('user.general.log_out') }}</a>
+				</li>
+			</ul>
+		</article>
+	</section>
+{% else %}
+	<!--DP_OFFLINE_CACHE_REMOVE_START-->
+	<section class="dp-sidebar-block">
+		<header>
+			<h3>
+				{% if app.getSetting('core.user_mode') != 'closed' %}
+					{{ phrase('user.profile.register_or_login_below', {'url': path('user_register')}) }}
+				{% else %}
+					{{ phrase('user.general.login_below') }}
+				{% endif %}
+			</h3>
+		</header>
+		<article class="dp-written">
+			<div id="dp_login_box" class="with-handler" data-element-handler="DeskPRO.User.ElementHandler.LoginBox">
+				<form action="{{ path('user_login_authenticate_local') }}" method="post">
+					<input type="hidden" name="return" value="{{ app.getRequest().getRequestUri() }}" />
+					{{ form_token('user_login') }}
+					<div class="dp-login-box-inner">
+						<dl>
+							<dt>{{ phrase('user.general.email_address') }}</dt>
+							<dd>
+								<input type="text" value="" name="email" id="dp_login_email" size="40" />
+							</dd>
+						</dl>
+						<div class="dp-login-section">
+							<dl>
+								<dt>{{ phrase('user.profile.password') }} {% if app.getSetting('core.deskpro_source_enabled') %}<em class="forgot"><a href="{{ path('user_login_resetpass') }}">{{ phrase('user.profile.lost_qm') }}</a></em>{% endif %}</dt>
+								<dd><input type="password" value="" name="password" id="dp_login_password" size="20" /></dd>
+							</dl>
+							<div class="dp-btn-row">
+								<label class="dp-remember-me-row"><input type="checkbox" name="remember_me" value="1" /> {{ phrase('user.general.remember_me') }}</label>
+								<input class="dp-btn" type="submit" value="{{ phrase('user.general.log_in') }}" />
+							</div>
+							{% if app.usersourceManager.getWithCapability('tpl_login_pull_btn') %}
+								<div class="dp-usersource-list">
+									{{ phrase('user.profile.or_connect_with') }}
+									{% for usersource in app.usersourceManager.getWithCapability('tpl_login_pull_btn') %}
+										{{ render_usersource(usersource, 'login_pull_btn') }}
+									{% endfor %}
+								</div>
+							{% endif %}
+						</div>
+						<div class="dp-reset-section" style="display: none">
+							<div class="dp-reset-desc">
+								{{ phrase('user.profile.lost_password_explain') }}
+								<br />
+								<div class="dp-btn-row">
+									<div class="not-loading">
+										<button class="dp-btn dp-do-send">{{ phrase('user.profile.lost_password_send_btn') }}</button>
+										<br /><a class="back">{{ phrase('user.portal.login-box_cancel-button') }}</a>
+									</div>
+									<div class="is-loading">
+										{{ phrase('user.general.loading') }}
+									</div>
+								</div>
+							</div>
+							<div class="dp-reset-sent" style="display: none">
+								{{ phrase('user.profile.lost_password_sent') }}
+								<center><br /><br /><a class="back">{{ phrase('user.profile.lost_password_back_btn') }}</a></center>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</article>
+	</section>
+	<!--DP_OFFLINE_CACHE_REMOVE_END-->
+{% endif %}

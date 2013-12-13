@@ -1,0 +1,45 @@
+{##
+ # The full article view page
+ ##}
+{% extends 'UserBundle::layout-simple-iframe.html.twig' %}
+{% block content %}
+
+<section class="dp-article-post dp-content-post dp-content-page" style="margin: 0">
+
+	<article id="dp_article_content">
+		{{ article.real_content|raw }}
+	</article>
+</section>
+
+{% if glossary_words|length %}
+<script src="{{ asset('javascripts/DeskPRO/WordHighlighter.js') }}"></script>
+<script type="text/javascript">
+	var dp_glossary_words = {
+		{% for w in glossary_words %}
+			{{ w|json_encode|raw }}: {{ word_defs[w]|json_encode|raw }},
+		{% endfor %}
+		'': null
+	};
+	$(document).ready(function() {
+		DeskPRO.WordHighlighter.highlight(
+			document.getElementById('dp_article_content'),
+			{{ glossary_words|json_encode|raw }},
+			false,
+			true
+		);
+
+		$('.dp-highlight-word').on('mouseover.dp_init_hl', function() {
+			$(this).off('mouseover.dp_init_hl');
+
+			$(this).popover({
+				placement: 'top',
+				title: $(this).data('word'),
+				content: dp_glossary_words[$(this).data('word')] || '',
+				delay: {show: 250, hide: 250}
+			}).popover('show');
+		});
+	});
+</script>
+{% endif %}
+
+{% endblock %}

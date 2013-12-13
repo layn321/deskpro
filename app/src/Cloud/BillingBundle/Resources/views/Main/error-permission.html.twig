@@ -1,0 +1,251 @@
+{% if app.getSetting('core.setup_initial') %}{% set is_post_install = false %}{% else %}{% set is_post_install = true %}{% endif %}
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+	<title>Billing Interface</title>
+	<meta charset="utf-8" />
+	<meta name="robots" content="noindex,nofollow" />
+	<link rel="shortcut icon" id="favicon" href="{{ asset('images/admin/favicon-admin.ico') }}" />
+
+	<script type="text/javascript">
+		{% if constant('DP_DEBUG') %}
+			DP_DEBUG = true;
+		{% else %}
+			DP_DEBUG = false;
+		{% endif %}
+	</script>
+
+	{{ dp_asset_html('agent_vendors_css') }}
+	{{ dp_asset_html('agent_interface_css1') }}
+	{{ dp_asset_html('agent_interface_css2') }}
+	{{ dp_asset_html('admin_interface_css') }}
+
+	<script type="text/javascript" src="{{ asset('vendor/html5shiv.min.js') }}"></script>
+	{{ dp_asset_html('agent_vendors') }}
+	{{ dp_asset_html('agent_common') }}
+	{{ dp_asset_html('agent_deskpro_ui') }}
+    {{ dp_asset_html('admin_admin_ui') }}
+    {{ dp_asset_html('admin_admin_handlers') }}
+
+    <script type="text/javascript" charset="utf-8">
+		var DP_TINYMCE_URL = '{{ asset('javascripts/tiny_mce/tiny_mce.js') }}';
+		var BASE_URL = '{{ app.request.getBaseUrl() }}/';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		if (!window.DESKPRO_URL_REGISTRY) window.DESKPRO_URL_REGISTRY = {};
+
+		window.DeskPRO_Window = new DeskPRO.Admin.Window();
+
+		function _win_exec() {
+			window.DeskPRO_Window.initPage();
+
+			if (window._page_exec) {
+				_page_exec();
+			}
+
+			if (window.DeskPRO_Page) {
+				DeskPRO_Page.initPage();
+			}
+		}
+
+		{% block html_headjs_load %}{% endblock %}
+
+		$(document).ready(function() {
+			_win_exec();
+		});
+	</script>
+	{% block html_head %}{% endblock %}
+	{% block page_js_exec %}{% endblock %}
+
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+
+	{% if app.isDebug() %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?nocache=1&v={{ security_token('lang') }}"></script>
+	{% else %}
+		<script src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/agent-lang-{{ app.language.id }}.js?v={{ app.getSetting('core.deskpro_build') }}"></script>
+	{% endif %}
+</head>
+<body class="dp">
+
+{% block header %}
+<!-- BEGIN HEADER BAR -->
+<div id="dp_header">
+	{% if is_post_install %}
+		<h3>Administration</h3>
+	{% else %}{# else not post install #}
+		{# User Logo #}
+		<div id="dp_header_user">
+			<div class="button-wrap" id="userSetting_trigger">
+				<h1>
+					<cite style="background-image: url({{ app.user.getPictureUrl(24) }});"></cite>
+					<span class="drop"></span>
+				</h1>
+			</div>
+		</div>
+		<!-- Header - User Control Dropdown -->
+		<div id="userSetting" style="display:none;">
+			<div class="userProfileDropdown" >
+				<div class="userProfileDropdownHeader">
+					<a><em style="background-image: url({{ app.user.getPictureUrl(24) }});"></em></a>
+					<span class="drop"></span>
+				</div>
+				<ul>
+					<li class="currentUsername"><p>{{ app.user.display_name }}</p></li>
+					<li class="help"><a href="http://support.deskpro.com/">{{ phrase('agent.general.help') }}</a></li>
+					<li class="logout"><a href="{{ path('user_logout', {'auth': static_security_token('user_logout', 0)}) }}?to=admin">{{ phrase('agent.general.log_out') }}</a></li>
+				</ul>
+			</div>
+		</div>
+
+
+		{# DeskPRO Logo #}
+		<div id="dp_logo_wrap">
+			<div class="button-wrap">
+				<h1>
+					{{ phrase('agent.general.deskpro') }}
+					<span class="drop"></span>
+				</h1>
+			</div>
+		</div>
+		<div id="dp_logo_expand_wrap">
+			<div class="dropdown-header">
+				<h1>
+					{{ phrase('agent.general.deskpro') }}
+					<span class="drop"></span>
+				</h1>
+			</div>
+			<div class="dropdown-content">
+				<a href="http://www.deskpro.com/" target="_blank">{{ phrase('agent.interface.powered_by') }} <span>{{ phrase('agent.interface.deskpro_website_host') }}</span></a>
+			</div>
+		</div>
+
+		<!-- BEGIN INTERFACE SECTION -->
+		<div id="DP-InterfaceSwitcher">
+			<div class="DP-adminSwitch">
+				<div class="adminSwitcher">
+					<a class="admin">{{ phrase('agent.general.billing_interface') }}<span class="dropdownIcon"></span></a>
+				</div>
+			</div>
+			<!-- Header - Switch Button Interfaces- Dropdown -->
+			<div id="interfacesToggle" style="display:none;">
+				<div class="dropdownSwitcherWrap">
+					<div class="switcherHeader">
+						<a class="admin"><span>{{ phrase('agent.general.billing_interface') }}</span></a>
+					</div>
+					<ul>
+						{% if app.user.can_admin %}<li><a class="admin" href="{{ app.request.getBaseUrl() }}/admin/"><span class="check">{{ phrase('agent.general.admin_interface') }}</span></a></li>{% endif %}
+						{% if app.user.can_agent %}<li><a class="agent" href="{{ app.request.getBaseUrl() }}/agent/"><span class="check">{{ phrase('agent.general.agent_interface') }}</span></a></li>{% endif %}
+						{% if app.user.can_billing %}<li><a class="billing" href="{{ app.request.getBaseUrl() }}/billing" style="margin-right: -3px;"><span class="check">{% if app.isCloud() %}{{ phrase('agent.general.billing_interface') }}{% else %}{{ phrase('agent.general.license_interface') }}{% endif %}</span></a></li>{% endif %}
+						{% if app.user.can_reports %}<li><a class="reports" href="{{ app.request.getBaseUrl() }}/reports"><span class="check">{{ phrase('agent.general.reports_interface') }}</span></a></li>{% endif %}
+						{% if app.getSetting('user.portal_enabled') %}<li><a class="user" href="{{ app.request.getBaseUrl() }}/"><span class="check">{{ phrase('agent.general.user_interface') }}</span></a></li>{% endif %}
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- END INTERFACE SECTION -->
+	{% endif %}{# /endif not post install #}
+</div>
+<!-- /BEGIN HEADER BAR -->
+
+<!-- BEGIN NAV BAR -->
+<div id="dp_admin_nav">
+	<div id="dp_admin_nav_sections" class="deskproPane">
+		<ul class="start-ul">
+			<li>
+				<a href="{{ path('billing') }}"><span class="start">Billing</span></a>
+			</li>
+		</ul>
+		<div class="sep">-</div>
+	</div>
+</div>
+
+{% endblock %}
+
+<!-- /BEGIN NAV BAR -->
+<div id="dp_page_wrap">
+
+	{% if app.isCloud() and constant('DPC_BILL_OVERDUE') %}
+		<section class="demo-notice failed-bill">
+			<article>
+				We failed to renew your DeskPRO Cloud subscription for another month of service.
+			</article>
+		</section>
+	{% endif %}
+
+<div id="dp_admin_page" class="dp_admin_page with-pagetabs">
+	<div id="dp_admin_page_inner" class="dp_admin_page_inner">
+		<div class="dp-page-box">
+			<div class="page-content">
+				<h3 style="padding-bottom: 5px;">You do not have permission to use the billing interface</h3>
+				<p>
+					Your agent account does not have permission to use the billing interface.
+				</p>
+
+				<p>
+					Try contacting one of the following agents who are configured to handle billing for your helpdesk:
+				</p>
+
+				<div class="dp-icon-list" style="padding: 3px; padding-bottom: 0;">
+					<ul>
+						{% for agent in billing_agents %}
+							<li style="line-height: 40px;">
+								<div style="background: url({{ agent.getPictureUrl(35) }}) no-repeat 0 50%; padding-left: 40px;">
+									{{ agent.display_name }}
+									&lt;<a href="mailto:{{ agent.email_address }}">{{ agent.email_address }}</a>&gt;
+								</div>
+							</li>
+						{% endfor %}
+					</ul>
+					<br class="clear" />
+				</div>
+
+				<div style="margin-top: 35px;  background-color: #D0E8F4; padding: 8px; border-radius: 6px; -webkit-border-radius: 6px;">
+					<strong>Still need help?</strong><br />
+					If you have any questions, just submit this form and we'll get back to you at {{ app.user.email_address }}.
+					You can also email us directly at <a href="mailto:sales@deskpro.com">sales@deskpro.com</a>.
+
+					<div class="email-form">
+						<textarea style="width: 98%; height: 120px; font-family: sans-serif; padding: 5px; margin: 5px 0 5px 0; border-radius: 3px; border: 1px solid #aaa;" placeholder="Enter your question here" name="message"></textarea><br />
+						<div style="padding-top: 5px;">
+							<button	class="send-btn btn btn-primary">Send Message</button>
+							<img class="send-loading" src="https://www.deskpro.com/wp-content/themes/dpstyle/assets/images/loading-small-flat.gif" width="16" height="11" style="margin-top: 4px; display: none;" />
+						</div>
+					</div>
+					<div class="email-form-sent" style="display:none; margin: 20px;">
+						Thank you for your message. Our agents will respond to you as soon as they can.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var emailform = $('.email-form');
+	var emailsent = $('.email-form-sent');
+
+	emailform.find('button.send-btn').on('click', function() {
+		var message = emailform.find('textarea').val();
+
+		emailform.find('.send-btn').hide();
+		emailform.find('.send-loading').show();
+		$.ajax({
+			url: '{{ path('billing_sendq') }}',
+			data: { message: message },
+			type: 'POST',
+			dataType: 'json',
+			success: function() {
+				emailform.hide();
+				emailsent.show();
+			}
+		});
+	});
+});
+</script>
+
+</body>
+</html>

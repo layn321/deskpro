@@ -1,0 +1,17 @@
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for download in results %}
+		<article class="download download-{{download.id}}">
+			<div class="title">
+				<a class="with-route" data-route="page:{{ path('agent_downloads_view', {'download_id': download.id}) }}">{{ download.title }}</a>
+			</div>
+			<div class="info">
+				<ul>
+					<li>{{ download.category.full_title }}</li>
+					{% if download.person %}<li>{{ download.person.display_name }}</li>{% endif %}
+					<li>{{ download.filename }}</li>
+				</ul>
+			</div>
+			<time class="timeago" datetime="{{ download.date_created|date('c', 'UTC') }}">{{ download.date_created|date('day_short') }}</time>
+		</article>
+	{% endfor %}
+</section>

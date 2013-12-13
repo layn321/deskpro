@@ -1,0 +1,21 @@
+{% if message is defined %}
+<p>{{message}}</p>
+{% endif %}
+
+<ul>
+    <li><a href="{{ path('dev_lang_spell_check') }}">Export for Spell check</a></li>
+    <hr />
+    <li><a href="{{ path('dev_lang_find_problems') }}">Find problems</a></li>
+    <hr />
+    <li><a href="{{ path('dev_lang_show_useful') }}">Show debugging information</a></li>
+    <hr />
+    <li><a href="{{ path('dev_lang_word_count') }}">Count words in translation files</a></li>
+    <hr />
+    <li><a href="{{ path('dev_lang_export_all_po') }}">Export all to PO files</a></li>
+    <hr />
+    <li><a href="{{ path('dev_lang_reformat_langfiles') }}">Reformat language files</a></li>
+    <hr />
+    <li><a href="{{ path('dev_lang_mass_replace') }}">Mass Replace</a></li>
+	<hr />
+	<li><a href="{{ path('dev_lang_phrase_user_context') }}">Show Phrase Context for User Interface</a></li>
+</ul>

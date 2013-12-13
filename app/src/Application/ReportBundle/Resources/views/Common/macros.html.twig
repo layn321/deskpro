@@ -1,0 +1,22 @@
+{% macro difference_class(value, difference_meaning) %}
+	{% set class = 'direction' %}
+	{% if value > 0 %}
+		{% if difference_meaning == 'good' %}
+			direction-up-green
+		{% elseif difference_meaning == 'bad' %}
+			direction-up-red
+		{% else %}
+			direction-up-grey
+		{% endif %}
+	{% elseif value < 0 %}
+		{% if difference_meaning == 'good' %}
+			direction-down-red
+		{% elseif difference_meaning == 'bad' %}
+			direction-down-green
+		{% else %}
+			direction-down-grey
+		{% endif %}
+	{% else %}
+
+	{% endif %}
+{% endmacro %}

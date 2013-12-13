@@ -1,0 +1,373 @@
+{##
+ # The main layout for all pages in the user portal.
+ ##}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html id="dp_html" xmlns="http://www.w3.org/1999/xhtml" class="{% if is_rtl() %}rtl{% endif %}" {{ language_html_attr() }}>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+	<meta name="viewport" content="width=device-width" />
+
+	{% if page_noindex %}<meta name="robots" content="noindex,nofollow" />{% endif %}
+
+	{{ dp_asset_html('user_helpdeskwin') }}
+
+	{% if app.getSetting('core.favicon_blob_url') %}
+		{% if 'http' in app.getSetting('core.favicon_blob_url') %}
+			<link rel="shortcut icon" id="favicon" href="{{ app.getSetting('core.favicon_blob_url') }}" />
+		{% else %}
+			<link rel="shortcut icon" id="favicon" href="{{ app.request.getBaseUrl()|replace({'/index.php': ''}) }}/{{ app.getSetting('core.favicon_blob_url') }}" />
+		{% endif %}
+	{% endif %}
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>
+		{% if app.is_homepage %}
+			{{ app.getSetting('core.deskpro_name') }}
+		{% else %}
+			{% block page_title %}{% endblock %} - {{ app.getSetting('core.deskpro_name') }}
+		{% endif  %}
+	</title>
+
+	<meta property="og:site_name" content="{{ app.getSetting('core.site_name')|default(app.getSetting('core.core.helpdesk_name')) }}" />
+	{% if app.getSetting('core.facebook_admins') %}<meta property="fb:admins" content="{{ app.getSetting('core.facebook_admins') }}" />{% endif %}
+
+	{% if app.admin_portal_controls %}
+		<script type="text/javascript">var IS_ADMIN_CONTROLS = true;</script>
+		{{ dp_asset_html('agent_vendors') }}
+		{{ dp_asset_html('agent_common') }}
+		{{ dp_asset_html('user_portaladmin') }}
+		{{ dp_asset_html('user_portaladmin_css') }}
+	{% endif %}
+
+	{% include 'UserBundle::layout-resources.html.twig' %}
+
+	{% block head %}{% endblock %}
+	{% include 'UserBundle::custom-headinclude.html.twig' %}
+</head>
+<body>
+<div id="fb-root"></div>
+<script type="text/javascript">document.body.className += " dp-with-js";</script>
+
+{# Processing #}
+{% set breadcrumb %}{% block breadcrumb %}{% endblock %}{% endset %}
+{% if not breadcrumb|trim %}{% set breadcrumb = false %}{% endif %}
+{% set sidebar %}
+	{% block sidebar %}
+		{{ portal_section('sidebar') }}
+		{% if app.admin_portal_controls %}
+			<div id="dp_custom_sidebar_add_simple">
+				<a>Add sidebar block</a>
+			</div>
+			<div id="dp_custom_sidebar_add">
+				<a>Add sidebar HTML</a>
+			</div>
+		{% endif %}
+	{% endblock %}
+{% endset %}
+{% if not sidebar|trim %}{% set sidebar = false %}{% endif %}
+
+{% if app.admin_portal_controls %}
+	<div id="dp_custom_head_wrap" class="dp-portal-block" style="display: none">
+		<div id="dp_custom_head" class="dp-portal-block-content"></div>
+	</div>
+	<div id="dp_custom_head_placeholder" class="dp-portal-placeholder dp-portal-placeholder-head {% if app.custom_templates['UserBundle::custom-headinclude.html.twig'] %}dp-portal-placeholder-highlight{% endif %}" data-portal-block="head_include" data-portal-for="#dp_custom_head" data-mode="head">
+		<em>{{ phrase('admin.designer.edit_page_head') }}</em>
+	</div>
+	<div id="dp_custom_header_wrap" class="dp-portal-block" {% if not app.custom_templates['UserBundle::custom-header.html.twig'] %}style="display: none"{% endif %}>
+		<div id="dp_custom_header" class="dp-portal-block-content">
+			{% include 'UserBundle::custom-header.html.twig' %}
+		</div>
+	</div>
+	<div id="dp_custom_header_placeholder" class="dp-portal-placeholder dp-portal-placeholder-header" data-portal-block="header" data-portal-for="#dp_custom_header" {% if app.custom_templates['UserBundle::custom-header.html.twig'] %}style="display: none"{% endif %}>
+		<em>{{ phrase('admin.designer.edit_header_section') }}</em>
+	</div>
+{% else %}
+	{% include 'UserBundle::custom-header.html.twig' %}
+{% endif %}
+
+<div id="dp">
+	<div id="dp_main">
+
+		{% if app.languages.isMultiLang() %}
+			<!--DP_OFFLINE_CACHE_REMOVE_START-->
+			<div id="dp_lang_chooser">
+				<form id="dp_lang_chooser_form" action="{{ path('user_profile_setlang') }}" method="POST">
+					<input type="hidden" name="return" value="{{ app.getReturnUrl() }}" />
+					{{ form_token('lang_chooser') }}
+					<label>{{ phrase('user.portal.language_chooser') }}</label>
+					<select name="language_id" onchange="$('#dp_lang_chooser_form').submit();">
+						{% for lang in app.languages.getAll() %}
+							<option value="{{ lang.id }}" data-flag="{{ lang.flag_image }}" {% if lang.id == app.session.getLanguage().getId() %}selected="selected"{% endif %}>{{ lang.title }}</option>
+						{% endfor %}
+					</select>
+				</form>
+			</div>
+			<!--DP_OFFLINE_CACHE_REMOVE_END-->
+		{% endif %}
+
+	<div id="dp_main_inner">
+
+		{% if app.admin_portal_controls %}
+			<div id="dp_header" class="{% if app.getLogoBlob() %}dp-with-logo{% endif %} {% if not app.getSetting('user.portal_simpleheader') %}disabled{% endif %}">
+				<a href="{{ path('user') }}"><img class="logo" {% if app.getLogoBlob() %}src="{{ app.getLogoBlob().getDownloadUrl() }}"{% endif %} /></a>
+
+				<h1><a href="{{ path('user') }}">{{ app.getSetting('user.portal_header') }}</a></h1>
+				<h2 {% if not app.getSetting('user.portal_tagline') %}style="display: none"{% endif %}>{{ app.getSetting('user.portal_tagline') }}</h2>
+				{% if app.admin_portal_controls %}
+					<div id="dp_header_portal_off" style="float:{% if is_rtl() %}right{% else %}left{% endif %}">
+						{{ phrase('admin.designer.reenable_simple_header') }}
+					</div>
+				{% endif %}
+				<br style="clear:both;height: 1px;overflow: hidden;" />
+			</div>
+		{% else %}
+			{% if app.getSetting('user.portal_simpleheader') %}
+				{% if app.getLogoBlob() %}
+					<div id="dp_header" class="dp-with-logo">
+						<a href="{{ path('user') }}"><img class="logo" src="{{ app.getLogoBlob().getDownloadUrl() }}" /></a>
+					</div>
+				{% else %}
+					<h1><a href="{{ path('user') }}">{{ app.getSetting('user.portal_header') }}</a></h1>
+					<h2 {% if not app.getSetting('user.portal_tagline') %}style="display: none"{% endif %}>{{ app.getSetting('user.portal_tagline') }}</h2>
+					<br style="clear:both; height: 1px;overflow: hidden;" />
+				{% endif %}
+			{% endif %}
+		{% endif %}
+
+		<div id="dp_header_bar">
+			<section id="dp_header_title">
+				<h1>{{ app.getSetting('user.portal_title') }}</h1>
+			</section>
+			<!--DP_OFFLINE_CACHE_REMOVE_START-->
+			<section id="dp_header_search" class="with-handler" data-element-handler="DeskPRO.User.ElementHandler.OmniSearch">
+				<form action="{{ path('user_search') }}" class="dp-form-search" id="dp_omnisearch">
+					<input type="text" name="q" id="dp_search" value="{{ query }}" autocomplete="off" />
+					<button class="dp-btn" type="submit">{{ phrase('user.portal.search') }}</button>
+				</form>
+			</section>
+			<!--DP_OFFLINE_CACHE_REMOVE_END-->
+		</div>
+
+		<div id="dp_page_wrapper" {% if not any_tabs and not app.admin_portal_controls %}class="dp-no-tabs"{% endif %}>
+
+			{% if portal_hasblock('sidebar', 'userinfo') %}
+				<div class="dp-device-small">
+					{% include 'UserBundle:Portal:userinfo-topbar.html.twig' %}
+				</div>
+			{% endif %}
+
+			<div id="dp_sidebar_wrapper">
+				<section id="dp_sidebar">
+					{{ sidebar }}
+				</section>
+			</div>
+			<div id="dp_content_wrapper">
+				{% if app.getVariable('portal_tabs_order')|length %}
+					<nav id="dp_content_tabs">
+						<ul>
+							{% for tabtype in app.getVariable('portal_tabs_order') %}
+								{% if tabtype == 'news' %}
+									<li data-tabtype="news" class="dp-tab-news {% if this_section == 'news' %}on{% endif %} {% if not app.getSetting('user.portal_tab_news') %}disabled{% endif %}" data-tab="news">
+										<a href="{% if loop.index == 1 %}{{ path('user') }}{% else %}{{ path('user_news') }}{% endif %}">
+											<i class="dp-icon-tasks"></i> <h3>{{ phrase('user.portal.tab_news') }}</h3>
+											<label>{{ phrase('user.portal.tab_news-description') }}</label>
+										</a>
+									</li>
+								{% endif %}
+								{% if tabtype == 'articles' %}
+									<li data-tabtype="articles" class="dp-tab-articles {% if this_section == 'articles' %}on{% endif %} {% if not app.getSetting('user.portal_tab_articles') %}disabled{% endif %}" data-tab="articles">
+										<a href="{% if loop.index == 1 %}{{ path('user') }}{% else %}{{ path('user_articles') }}{% endif %}">
+											<i class="dp-icon-folder-open"></i> <h3>{{ phrase('user.portal.tab_knowledgebase') }}</h3>
+											<label>{{ phrase('user.portal.tab_knowledgebase-description') }}</label>
+										</a>
+									</li>
+								{% endif %}
+								{% if tabtype == 'feedback' %}
+									<li data-tabtype="feedback" class="dp-tab-feedback {% if this_section == 'feedback' %}on{% endif %} {% if not app.getSetting('user.portal_tab_feedback') %}disabled{% endif %}" data-tab="feedback">
+										<a href="{% if loop.index == 1 %}{{ path('user') }}{% else %}{{ path('user_feedback') }}{% endif %}">
+											<i class="dp-icon-pencil"></i> <h3>{{ phrase('user.portal.tab_feedback') }}</h3>
+											<label>{{ phrase('user.portal.tab_feedback-description') }}</label>
+										</a>
+									</li>
+								{% endif %}
+								{% if tabtype == 'downloads' %}
+									<li data-tabtype="downloads" class="dp-tab-downloads {% if this_section == 'downloads' %}on{% endif %} {% if not app.getSetting('user.portal_tab_downloads') %}disabled{% endif %}" data-tab="downloads">
+										<a href="{% if loop.index == 1 %}{{ path('user') }}{% else %}{{ path('user_downloads_home') }}{% endif %}">
+											<i class="dp-icon-file"></i> <h3>{{ phrase('user.portal.tab_downloads') }}</h3>
+											<label>{{ phrase('user.portal.tab_downloads-description') }}</label>
+										</a>
+									</li>
+								{% endif %}
+								{% if tabtype == 'newticket' %}
+									<li data-tabtype="newticket" class="dp-tab-contact {% if this_section == 'tickets' %}on{% endif %} {% if not app.getSetting('user.portal_tab_tickets') %}disabled{% endif %}" data-tab="tickets">
+										<a href="{% if loop.index == 1 %}{{ path('user') }}{% else %}{{ path('user_tickets_new') }}{% endif %}">
+											<i class="dp-icon-inbox"></i> <h3>{{ phrase('user.portal.tab_tickets') }}</h3>
+											<label>{{ phrase('user.portal.tab_tickets-description') }}</label>
+										</a>
+									</li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</nav>
+				{% endif %}
+                <section id="dp_content">
+					{% if breadcrumb and not app.getVariable('is_homepage') %}
+						<nav id="dp_breadcrumb_wrap">
+							<div class="dp-breadcrumb-fade"></div>
+							<ul class="dp-breadcrumb">
+								<li>
+									<a href="{{ path('user') }}"><i class="dp-icon-home"></i></a>
+								</li>
+								{{ breadcrumb }}
+							</ul>
+						</nav>
+					{% endif %}
+
+					{% include 'UserBundle::layout-flashes.html.twig' %}
+
+					<!--DP_OFFLINE_CACHE_PAGE_NOTE-->
+
+					{% if app.getVariable('is_homepage') %}
+						{% if app.admin_portal_controls %}
+							{% set welcome_block %}{% include 'UserBundle:Portal:welcome-block.html.twig' %}{% endset %}
+							{% set welcome_block = welcome_block|trim %}
+							<div id="dp_custom_welcome_wrap" class="dp-portal-block" {% if not welcome_block %}style="display: none"{% endif %}>
+								<div id="dp_custom_welcome" class="dp-portal-block-content">
+									{{ welcome_block|raw }}
+								</div>
+							</div>
+							<div id="dp_custom_welcome_placeholder" class="dp-portal-placeholder dp-portal-placeholder-header" data-portal-block="welcome" data-portal-for="#dp_custom_welcome" {% if welcome_block %}style="display: none"{% endif %}>
+								<em>{{ phrase('admin.designer.edit_header_section') }}</em>
+							</div>
+						{% else %}
+							{% set welcome_block %}{% include 'UserBundle:Portal:welcome-block.html.twig' %}{% endset %}
+							{% if welcome_block|trim %}{{ welcome_block|raw }}{% else %}<br/>{% endif %}
+						{% endif %}
+					{% endif %}
+
+					{% if app.getVariable('is_homepage') and not breadcrumb %}<br/>{% endif %}
+
+					{% block content %}{% endblock %}
+				</section>
+			</div>
+			<footer id="dp_footer">
+				{{ dp_copyright() }}
+			</footer>
+		</div>
+	</div>
+	</div>
+
+	<div id="dp_search_assist" style="display: none;">
+		<div class="results"></div>
+		<div class="foot">
+			<div class="dp-more-link">
+				<button class="dp-btn dp-btn-success">{{ phrase('user.portal.search_more-results')}} {{ language_arrow('right') }}</button>
+			</div>
+			<h4>{{ phrase('user.portal.search.no_matches') }}</h4>
+			<ul>
+				<li class="ticket"><a href="{{ path('user_tickets_new') }}">{{ phrase('user.portal.search.new-ticket') }}</a></li>
+				<li class="feedback"><a href="{{ path('user_feedback_new') }}">{{ phrase('user.portal.search.new-feedback') }}</a></li>
+				{% if not app.getSetting('user.disable_chat_element') and not app.admin_portal_controls and app.user.hasPerm('chat.use') %}
+					<li class="chat no-omni-trigger"><a href="#" class="dp-chat-trigger">{{ phrase('user.portal.search.new-chat') }}</a></li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
+
+	<div style="display:none" id="auto-sign-in-overlay" class="dp-overlay-outer">
+		<div class="dp-overlay dp-with-title">
+			<div class="dp-title"><h3>{{ phrase('user.general.signing_in') }}</h3></div>
+			<div class="dp-content">
+				<div class="dp-loading-msg">{{ phrase('user.general.signing_in_please_wait') }}</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if app.admin_portal_controls %}
+	<div id="dp_custom_footer_wrap" class="dp-portal-block" {% if not app.custom_templates['UserBundle::custom-footer.html.twig'] %}style="display: none"{% endif %}>
+		<div id="dp_custom_footer" class="dp-portal-block-content">
+			{% include 'UserBundle::custom-footer.html.twig' %}
+		</div>
+	</div>
+	<div id="dp_custom_footer_placeholder" class="dp-portal-placeholder dp-portal-placeholder-footer" data-portal-block="footer" data-portal-for="#dp_custom_footer" {% if app.custom_templates['UserBundle::custom-footer.html.twig'] %}style="display: none"{% endif %}>
+		<em>{{ phrase('admin.designer.edit_footer_section') }}</em>
+	</div>
+{% else %}
+	{% include 'UserBundle::custom-footer.html.twig' %}
+{% endif %}
+
+{% if app.admin_portal_controls %}
+	<script type="text/javascript" src="{{ asset('vendor/less/less.min.js') }}"></script>
+{% endif %}
+
+{% if not app.getSetting('user.disable_chat_element') and not app.admin_portal_controls and app.user.hasPerm('chat.use') and not app.getRequest().query.has('nochat') %}
+	<!--DP_OFFLINE_CACHE_REMOVE_START-->
+	<!-- DeskPRO Chat Loader -->
+	<script type="text/javascript">
+	if (!DpChatWidget_Options) {
+		var DpChatWidget_Options = DpChatWidget_Options || {};
+		DpChatWidget_Options.protocol        = 'https:' == document.location.protocol ? 'https' : 'http';
+		DpChatWidget_Options.deskproUrl      = DpChatWidget_Options.protocol + '://{{ url('user')|url_trim_scheme }}';
+		{% if constant('DP_DEBUG') %}var DpChatWidget_EnableDebug = true;{% endif %}
+
+		DpChatWidget_Options.startPhrase = {{ phrase('user.chat.window_start-button')|json_encode|raw }};
+		DpChatWidget_Options.resumePhrase = {{ phrase('user.chat.window_resume-button')|json_encode|raw }};
+		DpChatWidget_Options.offlinePhrase = {{ phrase('user.chat.window_offline-button')|json_encode|raw }};
+		DpChatWidget_Options.openInWindowPhrase = {{ phrase('user.chat.window_open-new')|json_encode|raw }};
+
+		(function() {
+			var scr = document.createElement('script');
+			scr.src = '//{{ asset_url('javascripts/DeskPRO/User/ChatWidget/ChatWidget.js')|url_trim_scheme }}';
+			scr.setAttribute('async', 'true');
+			document.documentElement.firstChild.appendChild(scr);
+		})();
+	}
+	</script>
+	<!-- /DeskPRO Chat Loader -->
+	<!--DP_OFFLINE_CACHE_REMOVE_END-->
+{% else %}
+	<script type="text/javascript" src="{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/dp.php/vis.js"></script>
+{% endif %}
+
+{% if app.getSetting('core.ga_property_id') %}
+	<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', '{{ app.getSetting('core.ga_property_id') }}']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+	</script>
+{% endif %}
+
+{% if app.getSetting('core.show_share_widget') and not app.admin_portal_controls %}
+	{% if app.getRequest().isSecure() %}
+		<script type="text/javascript" src="https://ws.sharethis.com/button/buttons.js" id="share-this-js"></script>
+	{% else %}
+		<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js" id="share-this-js"></script>
+	{% endif %}
+	<script type="text/javascript">stLight.options({publisher: "ur-b3c949e0-ec53-eea-51a4-2f4f16925438"}); </script>
+{% endif %}
+
+{% if not app.user.id %}
+	{{ dp_js_sso_loader() }}
+{% else %}
+	<!-- SHARE -->
+	{{ dp_js_sso_share() }}
+{% endif %}
+<script type="text/javascript">
+(function() {
+	if (window.self !== window.top) {
+		return;
+	}
+	var els = document.getElementsByClassName('dp_website_url');
+	for (var i = 0; i < els.length; i++) {
+		els[i].value = 'DP_UNSET';
+	}
+})();
+</script>
+</body>
+</html>

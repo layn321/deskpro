@@ -1,0 +1,21 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>
+	{% if success %}
+		{{ phrase('agent.emails.alert_successful_login') }}
+	{% else %}
+		{{ phrase('agent.emails.alert_failed_login') }}
+	{% endif %}
+</dp:subject>
+{% if success %}
+	{{ phrase('agent.emails.notice_account_login') }}<br />
+{% else %}
+	{{ phrase('agent.emails.notice_login_attempt') }}<br />
+{% endif %}
+
+{% if session.visitor %}
+	{{ phrase('agent.emails.user_ip') }}: {{ session.visitor.visit_track.ip_address }}<br />
+	{{ phrase('agent.general.user_agent') }}: {{ session.visitor.visit_track.user_agent }}<br />
+	{{ phrase('agent.emails.referring_page') }}: {{ session.visitor.visit_track.ref_page_url|default('n/a') }}<br />
+	{{ phrase('agent.general.landing_page') }}: {{ session.visitor.visit_track.page_url|default('n/a') }}<br />
+	{{ phrase('agent.emails.first_seen') }}: {{ session.visitor.date_created|date('fulltime') }}<br />
+{% endif %}

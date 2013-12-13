@@ -1,0 +1,120 @@
+<div style="padding:15px;">
+	<table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="middle" style="vertical-align: middle; padding: 0; border: none;" width="100%">
+		<div class="task-row row-item" style="margin: 0;" id="{{ baseId }}_task_row">
+			<span class="btn-remove remove-row-trigger"></span>
+			<div class="task-input">
+				<input type="text"   class="input-title" name="newtask[0][title]" value="" id="{{ baseId }}_newtask_title" class="task-title" placeholder="{{ phrase('agent.tasks.task_description') }}" />
+				<input type="hidden" class="input-date-due" name="newtask[0][date_due]" value="" />
+				<input type="hidden" class="input-agent" name="newtask[0][assigned_agent]" value="agent:{{ app.user.id }}" />
+				<input type="hidden" class="input-vis" name="newtask[0][visibility]" value="1" />
+				<input type="hidden" class="input-ticket-id" name="newtask[0][ticket_id]" value="{{ ticket.id }}" />
+			</div>
+			<div class="task-info">
+				<ul>
+					<li class="noval opt-trigger date_due"><label>{{ phrase('agent.tasks.no_due_date') }}</label><span class="drop-icon"></span></li>
+					<li class="noval opt-trigger visibility"><label>{{ phrase('agent.general.public') }}</label><span class="drop-icon"></span></li>
+					<li class="noval opt-trigger assigned_agent" style="overflow:hidden; height: 18px; width: 120px; position: relative;">
+						<label>{{ phrase('agent.general.me') }}</label><span class="drop-icon"></span>
+						<select class="agents_sel dpe_select"  style="min-width: 170px;" data-invisible-trigger="1">
+							<optgroup label="{{ phrase('agent.general.agents') }}">
+								{% for agent in app.agents.getAgents() %}
+									<option {% if agent.id == app.user.id %}selected="selected"{% endif %} data-icon="{{ agent.getPictureUrl(20) }}" value="agent:{{ agent.id }}">{{ agent.display_name }}</option>
+								{% endfor %}
+							</optgroup>
+							{% if app.agent_teams.getTeams()|length %}
+								<optgroup label="{{ phrase('agent.general.teams') }}">
+									{% for team in app.agent_teams.getTeams() %}
+										<option value="agent_team:{{ team.id }}">{{ team.name }}</option>
+									{% endfor %}
+								</optgroup>
+							{% endif %}
+						</select>
+					</li>
+				</ul>
+				<div class="linked-container" style="display:none">
+					<span class="linked-ticket" style="display:none">
+						<span class="btn-small-delete remove-link-trigger"></span>
+						{% set phrase_part %}<label></label>{% endset %}
+						{{ phrase('agent.tasks.task_has_ticket_x', {'label':phrase_part}, true) }}
+					</span>
+
+					 <span class="linked-deal" style="display:none">
+						<span class="btn-small-delete remove-link-trigger"></span>
+						 {% set phrase_part %}<label></label>{% endset %}
+						{{ phrase('agent.tasks.task_has_deal_x', {'label':phrase_part}, true) }}
+					</span>
+				</div>
+			</div>
+		</div>
+	</td><td valign="middle" style="vertical-align: middle; padding-left: 8px; padding-right: 8px; border: none;">
+		<button class="clean-white" id="{{ baseId }}_task_save">{{ phrase('agent.general.add') }}</button>
+	</td></tr></table>
+
+	<div id="{{ baseId }}_task_list" {% if not tasks|length %}style="display: none;"{% endif %}>
+		{% for task in tasks %}
+			{% include 'AgentBundle:Task:task-list-row.html.twig' with {task: task, noShowLinked: true} %}
+		{% endfor %}
+	</div>
+
+	<ul id="{{baseId}}_task_menu_vis" style="display: none">
+		<li data-vis="0">{{ phrase('agent.general.private') }}</li>
+		<li data-vis="1">{{ phrase('agent.general.public') }}</li>
+	</ul>
+
+	<div class="optionbox reply-agent-team-ob single-option-type" id="{{baseId}}_task_assign_ob" style="display: none">
+		<div class="col">
+			<section data-section-name="agents">
+				<header>
+					<h3>{{ phrase('agent.general.agents') }}</h3>
+					<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+				</header>
+				<ul>
+					<li class="me last-me">
+						<input type="radio" name="{{baseId}}_asignedto" value="{{ app.user.id }}" />
+						<label><span class="agent-pic agent-label-{{ app.user.id }}" style="background-image: url({{ app.user.getPictureUrl(16) }})">{{ phrase('agent.general.me') }}</span></label>
+					</li>
+
+					{% for agent in agents %}
+						{% if agent.id != app.user.id %}
+							<li>
+								<input type="radio" name="{{baseId}}_asignedto" value="{{ agent.id }}" />
+								<label><span class="agent-pic agent-label-{{ agent.id }}" style="background-image: url({{ agent.getPictureUrl(16) }})">{{ agent.display_name }}</span></label>
+								<div class="bound-fade"></div>
+							</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</section>
+		</div>
+		{% if app.getSetting('core.use_agent_team') %}
+		<div class="col">
+			<section data-section-name="teams">
+				<header>
+					<h3>{{ phrase('agent.general.teams') }}</h3>
+					<input type="text" class="filter-box" placeholder="{{ phrase('agent.general.filter') }}" />
+				</header>
+				<ul>
+					{% for team in app.user.getAgent().getTeams() %}
+						<li class="me {% if loop.last %}last-me{% endif %}">
+							<input type="radio" name="{{baseId}}_asignedto" value="{{ team.id }}" />
+							<label class="agent-team-label-{{ team.id }}">{{ team.name }}</label>
+							<div class="bound-fade"></div>
+						</li>
+					{% endfor %}
+
+					{% for team in agent_teams %}
+						{% if team.id not in app.user.getAgent().getTeamIds() %}
+							<li>
+								<input type="radio" name="{{baseId}}_asignedto" value="{{ team.id }}" />
+								<label class="agent-team-label-{{ team.id }}">{{ team.name }}</label>
+								<div class="bound-fade"></div>
+							</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</section>
+		</div>
+		{% endif %}
+		<br class="clear" />
+	</div>
+</div>

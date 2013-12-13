@@ -1,0 +1,17 @@
+{##
+ # This template is used with the embeddable ticket iframe. It includes the required scripts just like the full
+ # layout, but it does not include any of the other page elements like the header and sidebar.
+ ##}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html id="dp_html" xmlns="http://www.w3.org/1999/xhtml" class="dp-simple-iframe {% if is_rtl() %}rtl{% endif %}" {{ language_html_attr() }}>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>{{ phrase('user.general.deskpro') }}</title>
+	{% include 'UserBundle::layout-resources.html.twig' %}
+	{% block head %}{% endblock %}
+</head>
+<body class="dp-simple-iframe">
+<script type="text/javascript">document.body.className += " with-js";</script>
+<div id="dp">{% block content %}{% endblock %}</div>
+</body>
+</html>

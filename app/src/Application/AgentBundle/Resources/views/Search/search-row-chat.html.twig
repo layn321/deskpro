@@ -1,0 +1,27 @@
+<article
+	class="row-item convo-{{ convo.id }} without-selection"
+	data-convo-id="{{ convo.id }}"
+	data-route="page:{{ path('agent_userchat_view', {'conversation_id': convo.id}) }}" data-route-title="@selector(a.subject)" data-route-openclass="open">
+	<div class="top-row">
+		<div class="top-row-left">
+			<h3>
+				<a class="subject click-through">
+					{{ convo.subjectLine }}
+				</a>
+			</h3>
+		</div>
+	</div>
+	<div class="userinfo general">
+		{{ phrase('agent.search.by') }} {% if convo.person %}
+			<a
+				class="user-link as-popover"
+				data-route="person:{{ path('agent_people_view', {'person_id': convo.person.id}) }}"
+			>{{ convo.person.display_name }}</a> &lt;{{ convo.person.primary_email_address }}&gt;</a>
+		{% elseif convo.person_name or convo.person_email %}
+			{{ convo.person_name }} {% if convo.person_email %} &lt;{{ convo.person_email }}&gt;{% endif %}
+		{% else %}
+			{{ phrase('agent.general.anonymous') }}
+		{% endif %}
+		, <time class="timeago" datetime="{{ convo.date_created|date('c', 'UTC') }}">{{ convo.date_created|date('day_short') }}</time>
+	</div>
+</article>

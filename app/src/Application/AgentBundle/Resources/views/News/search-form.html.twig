@@ -1,0 +1,29 @@
+<section class="list-top-area news">
+	{% if not hide_terms_summary %}
+	<div class="summary">
+		<span class="edit" title="{{ phrase('agent.general.ucfirst_edit') }} search terms">{{ phrase('agent.general.add_a_new_term') }}</span>
+		{% for line in terms_summary %}
+			{{line}}{% if not loop.last %},{% endif %}
+		{% else %}
+			{{ phrase('agent.publish.all_news') }}
+		{% endfor %}
+	</div>
+	{% endif %}
+	<div class="form-panel" {% if not show_search_form %}style="display: none"{% endif %}>
+		<form action="{{ path('agent_news_list') }}" method="post" class="news-search-form">
+			<div class="row" style="margin-top: 0;">
+				<div class="search-form" id="criteria_list">
+					<div class="search-terms"></div>
+					<div class="term"><span class="add-term">+</span> {{ phrase('agent.general.add_a_new_term') }}</div>
+				</div>
+				{% include 'DeskPRO:Common:news-search-criteria.html.twig' with { 'classname': 'search-builder-tpl', 'term_options': news_options } %}
+			</div>
+			<div style="text-align: center;"><button class="dp-button x-small">{{ phrase('agent.general.search') }}</button></div>
+		</form>
+	</div>
+
+	{% if search_form %}
+	<script type="text/x-deskpro-plain" class="search-form-data">{{ search_form|json_encode|raw }}</script>
+	{% endif %}
+
+</section>

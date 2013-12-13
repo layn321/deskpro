@@ -1,0 +1,127 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TicketPriorityList.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a id="newcat_open">{{ phrase('admin.tickets.add_new_priority') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.general.ticket_priorities') }}</li>
+	</ul>
+{% endblock %}
+{% block content %}
+<div class="dp-page-box">
+<div
+	class="page-content"
+	data-element-handler="DeskPRO.Admin.ElementHandler.TicketPriorityList"
+>
+
+	{% if all_priorities|length %}
+		{{ design.dpgrid({class: 'dep-list pri-list'}) }}
+			{{ design.dpgrid_headerrow() }}
+				{{ design.dpgrid_headercol({ class: 'l r tl tr', style: "width: 810px;"}) }}
+					<h1>{{ phrase('agent.general.title') }}</h1>
+				{{ design.dpgrid_headercol_end() }}
+				{{ design.dpgrid_headercol({ class: 'l r tl tr l-margin r-margin', style: "width: 80px"}) }}
+					<h1>{{ phrase('agent.general.priority') }}</h1>
+				{{ design.dpgrid_headercol_end() }}
+			{{ design.dpgrid_headerrow_end() }}
+
+			{% for priority in all_priorities %}
+				{% include 'AdminBundle:TicketPriorities:list-row.html.twig' %}
+			{% endfor %}
+		{{ design.dpgrid_end() }}
+	{% else %}
+		<div class="note-box new-arrow">
+			You have not created any ticket priorities yet. Click the "{{ phrase('admin.tickets.add_new_priority') }}" button to create one now.
+		</div>
+
+	{% endif %}
+
+	<div id="editcat_overlay" style="width: 400px; height: 250px; display: none;">
+		<div class="overlay-title">
+			<span class="close-overlay"></span>
+			<h4>{{ phrase('admin.tickets.edit_priority') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<form class="dp-form" method="POST" action="{{ path('admin_ticketpris_savetitle') }}">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.title') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="hidden" name="priority_id" id="editcat_catid" value="" />
+						<input type="text" name="title" id="editcat_title" value="" />
+					</div>
+				</div>
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.priority') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="text" name="priority" id="editcat_pri" value="" style="width:30px" />
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white" id="editcat_savebtn">{{ phrase('agent.general.save') }}</button>
+		</div>
+	</div>
+
+	<div id="newcat_overlay" style="width: 400px; height: 250px; display: none;">
+		<div class="overlay-title">
+			<span class="close-overlay"></span>
+			<h4>{{ phrase('admin.tickets.new_priority') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<form class="dp-form" method="POST" action="{{ path('admin_ticketpris_savenew') }}">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.title') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="text" name="title" id="newcat_title" value="" />
+					</div>
+				</div>
+
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.priority') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="text" name="priority" id="newcat_pri" value="" style="width:30px" />
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="overlay-footer">
+			<button class="clean-white" id="newcat_savebtn">{{ phrase('agent.general.add') }}</button>
+		</div>
+	</div>
+</div>
+
+{% if all_priorities %}
+<div style="padding: 0 10px 10px 15px;">
+	<form action="{{ path('admin_ticketpris_setdefault') }}" method="POST">
+		<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="This is the value selected by default on new ticket forms."></span> Default priority:
+		<select name="default_value">
+			<option></option>
+			{% for itm in all_priorities %}
+				<option value="{{ itm.id }}" {% if app.getSetting('core.default_ticket_pri') == itm.id %}selected="selected"{% endif %}>{{ itm.title }}</option>
+			{% endfor %}
+		</select>
+		<button class="clean-white">Update</button>
+	</form>
+</div>
+
+{% include 'AdminBundle:TicketFeatures:field-cat-validation-options.html.twig' with {field_id: 'ticket_pri'} %}
+{% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.NewArticle';
+
+pageMeta.title = '{{ phrase('agent.general.new_article') }}';
+pageMeta.uploadAttachUrl              = '{{ path('agent_accept_upload') }}';
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{% set dropzonehtml %}<div class="drop-file-zone"><h1>{{ phrase('agent.publish.drop_file_to_add') }}</h1></div>{% endset %}
+{{ agentui.scroll_containers('page-new-article page-new-content', dropzonehtml) }}
+
+<a class="tab-anchor" href="#">&nbsp;</a>
+
+<div class="form-header-error" style="display: none">
+	{{ phrase('agent.publish.no_kb_cats_error') }}
+</div>
+<div class="form-outer">
+
+<form id="{{baseId}}_newarticle" class="keybound-submit">
+<input type="hidden" name="pending_article_id" id="{{baseId}}_pending_article_id" value="0" />
+
+<div class="pending-info" style="display: none;" style="display: none;">
+	<h3>{{ phrase('user.knowledgebase.creating_pending_article') }} ({{ phrase('agent.general.added_by', {name: '<span class="person-name"></span>'}, true) }})</h3>
+	<div class="pending-item pending-ticket">
+		<div class="about">
+			<div class="pending-ticket" style="display: none">
+				{{ phrase('agent.publish.for_ticket') }}: <a data-route="" class="with-route ticket-link"></a>
+			</div>
+			<div class="pending-reason" style="display: none"></div>
+		</div>
+	</div>
+</div>
+
+<div class="first section cat-section" id="{{baseId}}_cat_section">
+	<div class="content">
+		<div class="col">
+			<h4>{{ phrase('agent.general.category') }}</h4>
+			{% include 'AgentBundle:Common:select-standard.html.twig' with {
+				'name': 'newarticle[category_id]',
+				'id': baseId ~ '_cat',
+				'add_classname': 'category_id',
+				'add_attr': '',
+				'with_blank': 0,
+				'blank_title': '',
+				'categories': article_categories,
+				'allow_parent_sel': true,
+				'selected': state.newarticle.category_id|default(0)
+			} %}
+			<div class="error-message category_id">{{ phrase('agent.publish.please_select_category') }}</div>
+		</div>
+		<div class="col">
+			<h4>{{ phrase('agent.general.status') }}</h4>
+			<select name="newarticle[status]">
+				{% if app.user.hasPerm('agent_publish.validate') %}
+					<option value="published">{{ phrase('agent.publish.status_published') }}</option>
+				{% endif %}
+				{% if constant('DP_DEBUG') or not app.user.hasPerm('agent_publish.validate') %}
+					<option value="hidden.validating" selected="selected">{{ phrase('agent.publish.status_published') }} ({{ phrase('agent.general.requires_validation') }})</option>
+				{% endif %}
+				<option value="hidden.unpublished">{{ phrase('agent.publish.status_hidden_unpublished') }}</option>
+				<option value="hidden.draft">{{ phrase('agent.publish.status_hidden_draft') }}</option>
+			</select>
+		</div>
+		<br class="clear" />
+	</div>
+</div>
+
+<div class="section title-section" id="{{baseId}}_title_section">
+	<div class="content">
+		<h4>{{ phrase('agent.general.title') }}</h4>
+		<input type="text" name="newarticle[title]" id="{{baseId}}_title" value="{{ state.newarticle.title }}" style="width: 80%;" />
+		<div class="error-message title">{{ phrase('agent.publish.please_enter_title') }}</div>
+	</div>
+</div>
+
+<div class="section article-section" id="{{baseId}}_news_section">
+	<div class="content">
+		<h4>{{ phrase('agent.general.article') }}</h4>
+		<div style="width: 98%">
+			<textarea type="text" name="newarticle[content]" id="{{baseId}}_content">{{ state.newarticle.content }}</textarea>
+		</div>
+		{% if app.languages.isMultiLang() %}
+			<div style="float: right; padding-right: 18px; padding-top: 4px;">
+				<span class="small-light-icon tipped" title="{{ phrase('agent.publish.primary_lang_explain') }}"></span>
+				{{ phrase('agent.general.language') }}: <select name="newarticle[language_id]">
+					{% for lang in app.languages.getAll() %}
+						<option value="{{ lang.id }}" {% if lang.id == app.user.language.id %}selected="selected"{% endif %}>{{ lang.title }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<br class="clear" />
+		{% endif %}
+	</div>
+</div>
+
+
+<div class="section other-section" id="{{baseId}}_other_section">
+	<div class="content">
+		{# Tab Container #}
+		<div class="tab-container">
+			<nav id="{{baseId}}_other_props_tabs_wrap">
+				<ul id="{{baseId}}_other_props_tabs">
+					<li data-tab-for="> .tab-properties">{{ phrase('agent.general.properties') }}</li>
+					<li data-tab-for="> .tab-attach">{{ phrase('agent.general.attachments') }}</li>
+				</ul>
+			</nav>
+			<div class="content-wrapper" id="{{baseId}}_other_props_tabs_content" style="display: none">
+				{# Tab Properties #}
+				<div class="tab-properties" style="display: none">
+					<dl>
+						<dt class="prop">{{ phrase('agent.general.labels') }}</dt>
+						<dd class="prop">
+							<div class="tags-wrap article-tags">
+								<input type="text" value="{% for label in state.newarticle.labels %}{{label}},{% endfor %}" />
+							</div>
+						</dd>
+					</dl>
+				</div>
+				{# /Tab Properties #}
+
+				{# Tab Attach #}
+				<div class="tab-attach" style="display: none">
+					{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'newarticle[attach][]'} %}
+					<h6>{{ phrase('agent.general.attachments') }}</h6>
+					<div class="file-input">
+						<input type="file" name="file-upload" multiple="multiple" /> <button class="clean-gray xxx-small">{{ phrase('agent.general.upload') }}</button>
+					</div>
+					<ul class="files file-list"></ul>
+				</div>
+				{# /Tab Attach #}
+			</div>
+		</div>
+		{# /Tab Container #}
+	</div>
+</div>
+
+
+<footer class="pop-footer">
+	<div class="is-not-loading">
+		<button class="submit-trigger clean-white">{{ phrase('agent.general.create_article') }} <kbd>{{ phrase('agent.general.altc') }}</kbd></button>
+	</div>
+	<div class="is-loading" style="padding-top: 9px;">
+		<img src="{{ asset('images/spinners/loading-small.gif') }}" />
+	</div>
+</footer>
+
+</form>
+
+</div>
+{{ agentui.scroll_containers_end() }}

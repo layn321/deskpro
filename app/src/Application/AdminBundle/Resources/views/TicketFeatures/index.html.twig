@@ -1,0 +1,668 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li>{{ phrase('admin.tickets.ticket_features_settings') }}</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+{% if app.getSession().getFlash('saved_settings') %}
+	<div class="alert-message block-message success">
+		Settings were saved successfully.
+	</div>
+{% endif %}
+
+<form action="{{ path('admin_settings_saveform', {type: 'ticket_features', auth: security_token('settings_ticket_features') }) }}" method="post" id="settings_form">
+<input type="hidden" name="return" value="{{ path('admin_features') }}" />
+
+<input type="hidden" name="set_settings[]" value="core.tickets.enable_feedback" />
+<input type="hidden" name="set_settings[]" value="core.tickets.feedback_agents_read" />
+<input type="hidden" name="set_settings_falseable[]" value="core.show_ticket_suggestions" />
+<input type="hidden" name="set_settings[]" value="core.ref_pattern" />
+<input type="hidden" name="set_settings[]" value="core.tickets.use_ref" />
+<input type="hidden" name="set_settings[]" value="core_tickets.use_archive" />
+<input type="hidden" name="set_settings[]" value="core_tickets.auto_archive_time" />
+<input type="hidden" name="set_settings[]" value="core_tickets.reply_status" />
+<input type="hidden" name="set_settings[]" value="core_tickets.reply_assign_unassigned" />
+<input type="hidden" name="set_settings[]" value="core_tickets.reply_assign_assigned" />
+<input type="hidden" name="set_settings[]" value="core_tickets.reply_assignteam_unassigned" />
+<input type="hidden" name="set_settings[]" value="core_tickets.reply_assignteam_assigned" />
+<input type="hidden" name="set_settings[]" value="core_tickets.new_status" />
+<input type="hidden" name="set_settings[]" value="core_tickets.new_assign" />
+<input type="hidden" name="set_settings[]" value="core_tickets.new_assignteam" />
+<input type="hidden" name="set_settings[]" value="core_tickets.reassign_auto_change_status" />
+<input type="hidden" name="set_settings[]" value="core_tickets.resolve_auto_close_tab" />
+<input type="hidden" name="set_settings[]" value="core_tickets.default_send_user_notify" />
+<input type="hidden" name="set_settings[]" value="core_tickets.new_default_send_user_notify" />
+<input type="hidden" name="set_settings[]" value="core_tickets.default_ticket_reverse_order" />
+<input type="hidden" name="set_settings_falseable[]" value="core_tickets.default_ticket_reverse_order" />
+
+<div class="setting_field_row">
+	<h4>{{ phrase('agent.general.feedback') }}</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[core.tickets.enable_feedback]" {% if app.getSetting('core.tickets.enable_feedback') %}checked="checked"{% endif %} />
+				{{ phrase('admin.tickets.enable_ticket_feedback') }}</label>
+		</div>
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[core.tickets.feedback_agents_read]" {% if app.getSetting('core.tickets.feedback_agents_read') %}checked="checked"{% endif %} />
+				{{ phrase('admin.tickets.choice_agents_read_ticket_feedback') }}</label>
+		</div>
+	</div>
+</div>
+
+{% include 'AdminBundle:TicketFeatures:message-templates-bit.html.twig' %}
+
+<div class="setting_field_row">
+	<h4>Ticket Defaults</h4>
+	<div class="setting_fields">
+		<strong>Ticket Replies</strong>
+		<table cellpadding="0" cellspacing="0" border="0">
+			<tr>
+				<td width="200">Default Status</td>
+				<td>
+					<select name="settings[core_tickets.reply_status]">
+						<option {% if not app.getSetting('core_tickets.reply_status') %}selected="selected"{% endif %} value="0">Do not change status</option>
+						<option {% if app.getSetting('core_tickets.reply_status') == 'awaiting_user' %}selected="selected"{% endif %} value="awaiting_user">Awaiting User</option>
+						<option {% if app.getSetting('core_tickets.reply_status') == 'awaiting_agent' %}selected="selected"{% endif %} value="awaiting_agent">Awaiting Agent</option>
+						<option {% if app.getSetting('core_tickets.reply_status') == 'resolved' %}selected="selected"{% endif %} value="resolved">Resolved</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Default Agent - Unassigned</td>
+				<td>
+					<select name="settings[core_tickets.reply_assign_unassigned]">
+						<option {% if not app.getSetting('core_tickets.reply_assign_unassigned') %}selected="selected"{% endif %} value="0">Keep unassigned</option>
+						<option {% if app.getSetting('core_tickets.reply_assign_unassigned') == 'assign' %}selected="selected"{% endif %} value="assign">Assign to self</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Default Agent - Assigned</td>
+				<td>
+					<select name="settings[core_tickets.reply_assign_assigned]">
+						<option {% if not app.getSetting('core_tickets.reply_assign_assigned') %}selected="selected"{% endif %} value="0">Keep assignment</option>
+						<option {% if app.getSetting('core_tickets.reply_assign_assigned') == 'assign' %}selected="selected"{% endif %} value="assign">Reassign to self</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Default Team - No Team</td>
+				<td>
+					<select name="settings[core_tickets.reply_assignteam_unassigned]">
+						<option {% if not app.getSetting('core_tickets.reply_assignteam_unassigned') %}selected="selected"{% endif %} value="0">Keep no team</option>
+						<option {% if app.getSetting('core_tickets.reply_assignteam_unassigned') == 'assign' %}selected="selected"{% endif %} value="assign">Assign to own team</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Default Team - With Team</td>
+				<td>
+					<select name="settings[core_tickets.reply_assignteam_assigned]">
+						<option {% if not app.getSetting('core_tickets.reply_assignteam_assigned') %}selected="selected"{% endif %} value="0">Keep team</option>
+						<option {% if app.getSetting('core_tickets.reply_assignteam_assigned') == 'assign' %}selected="selected"{% endif %} value="assign">Reassign to own team</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Send User Notification</td>
+				<td>
+					<select name="settings[core_tickets.default_send_user_notify]">
+						<option {% if app.getSetting('core_tickets.default_send_user_notify') %}selected="selected"{% endif %} value="1">Default on - user notifications are sent</option>
+						<option {% if not app.getSetting('core_tickets.default_send_user_notify') %}selected="selected"{% endif %} value="0">Default off - no user notifications are sent</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<div class="field_row" style="margin-top: 10px;">
+			<label>
+				<input type="checkbox" name="settings[core_tickets.reassign_auto_change_status]" value="1" {% if app.getSetting('core_tickets.reassign_auto_change_status') %}checked="checked"{% endif %} />
+				When changing the assigned agent from the reply box, automatically set the status to Awaiting Agent
+			</label>
+			<label>
+				<input type="checkbox" name="settings[core_tickets.resolve_auto_close_tab]" value="1" {% if app.getSetting('core_tickets.resolve_auto_close_tab') %}checked="checked"{% endif %} />
+				When changing the status to Resolved from the reply box, automatically check the "close tab after reply" option
+			</label>
+		</div>
+		<div class="field_row" style="margin-top: 10px;">
+			<strong>Ticket Message Ordering</strong>
+			<label>
+				<input type="checkbox" name="settings[core_tickets.default_ticket_reverse_order]" value="1" {% if app.getSetting('core_tickets.default_ticket_reverse_order') %}checked="checked"{% endif %} />
+				Show newest messages first (reverse chronological order) with the replybox at the top. This setting can be overriden by each agent from their profile settings.
+			</label>
+		</div>
+		<div class="field_row" style="margin-top: 10px;">
+			<strong>New Ticket</strong>
+			<table cellpadding="0" cellspacing="0" border="0">
+				<tr>
+					<td width="200">Default Status</td>
+					<td>
+						<select name="settings[core_tickets.new_status]">
+							<option {% if app.getSetting('core_tickets.new_status') == 'awaiting_user' %}selected="selected"{% endif %} value="awaiting_user">Awaiting User</option>
+							<option {% if app.getSetting('core_tickets.new_status') == 'awaiting_agent' %}selected="selected"{% endif %} value="awaiting_agent">Awaiting Agent</option>
+							<option {% if app.getSetting('core_tickets.new_status') == 'resolved' %}selected="selected"{% endif %} value="resolved">Resolved</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td width="200">Default Agent</td>
+					<td>
+						<select name="settings[core_tickets.new_assign]">
+							<option {% if not app.getSetting('core_tickets.new_assign') %}selected="selected"{% endif %} value="0">Unassigned</option>
+							<option {% if app.getSetting('core_tickets.new_assign') == 'assign' %}selected="selected"{% endif %} value="assign">Assign to self</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td width="200">Default Team</td>
+					<td>
+						<select name="settings[core_tickets.new_assignteam]">
+							<option {% if not app.getSetting('core_tickets.new_assignteam') %}selected="selected"{% endif %} value="0">Unassigned</option>
+							<option {% if app.getSetting('core_tickets.new_assignteam') == 'assign' %}selected="selected"{% endif %} value="assign">Assign to own team</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td width="200">Send User Notification</td>
+					<td>
+						<select name="settings[core_tickets.new_default_send_user_notify]">
+							<option {% if app.getSetting('core_tickets.new_default_send_user_notify') %}selected="selected"{% endif %} value="1">Default on - user notification is sent</option>
+							<option {% if not app.getSetting('core_tickets.new_default_send_user_notify') %}selected="selected"{% endif %} value="0">Default off - no user notification is sent</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Ticket Billing</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[core_tickets.enable_billing]" {% if app.getSetting('core_tickets.enable_billing') %}checked="checked"{% endif %} id="billing_enable" />
+				Enable ticket billing</label>
+		</div>
+		<div id="billing_dependencies" style="{% if not app.getSetting('core_tickets.enable_billing') %}display: none;{% endif %}">
+			<div class="field_row">
+				<label>
+					<input type="checkbox" name="settings[core_tickets.billing_auto_timer]" {% if app.getSetting('core_tickets.billing_auto_timer') %}checked="checked"{% endif %} id="bill_auto_opt" />
+					Automatically start billing timer when viewing a ticket
+				</label>
+
+				<div id="show_reply_bill" style="margin-left: 15px; {% if not app.getSetting('core_tickets.billing_auto_timer') %}display: none;{% endif %}">
+					<label><input type="checkbox" name="settings[core_tickets.billing_on_reply]" {% if app.getSetting('core_tickets.billing_on_reply') %}checked="checked"{% endif %} />
+					Show billing on reply form</label>
+				</div>
+			</div>
+			<div class="field_row">
+				<label>
+					<input type="checkbox" name="settings[core_tickets.billing_on_new]" {% if app.getSetting('core_tickets.billing_on_new') %}checked="checked"{% endif %} id="billing_on_new" />
+					Show billing on new ticket
+				</label>
+
+				<div id="billing_auto_timer_new" style="margin-left: 15px; {% if not app.getSetting('core_tickets.billing_on_new') %}display: none;{% endif %}">
+					<label><input type="checkbox" name="settings[core_tickets.billing_auto_timer_new]" {% if app.getSetting('core_tickets.billing_auto_timer_new') %}checked="checked"{% endif %} />
+					Automatically start billing timer</label>
+				</div>
+			</div>
+			<div class="field_row">
+				<label>Billing currency name</label>
+				<input type="text" name="settings[core_tickets.billing_currency]" value="{{ app.getSetting('core_tickets.billing_currency') }}" />
+			</div>
+		</div>
+	</div>
+	<input type="hidden" name="set_settings[]" value="core_tickets.enable_billing" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.billing_on_reply" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.billing_currency" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.billing_auto_timer" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.billing_on_new" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.billing_auto_timer_new" />
+</div>
+
+<div class="setting_field_row">
+	<h4>Working Hours</h4>
+	<div class="setting_fields">
+		{% if work_hours.active_time == 'all' %}
+			24 hours a day, 7 days a week
+		{% else %}
+			{{ "%02d:%02d - %02d:%02d"|format(work_hours.start_hour, work_hours.start_minute, work_hours.end_hour, work_hours.end_minute) }}
+			(time zone: {{ work_hours.timezone|default(app.getSetting('core.default_timezone')) }})
+			{%- for day,null in work_hours.days -%},
+				{% if day == 0 -%}{{ phrase('agent.time.long-day_sunday') }}
+				{%- elseif day == 1 -%}{{ phrase('agent.time.long-day_monday') }}
+				{%- elseif day == 2 -%}{{ phrase('agent.time.long-day_tuesday') }}
+				{%- elseif day == 3 -%}{{ phrase('agent.time.long-day_wednesday') }}
+				{%- elseif day == 4 -%}{{ phrase('agent.time.long-day_thursday') }}
+				{%- elseif day == 5 -%}{{ phrase('agent.time.long-day_friday') }}
+				{%- elseif day == 6 -%}{{ phrase('agent.time.long-day_saturday') }}{%- endif %}
+			{%- endfor %} (excluding holidays)
+		{% endif %}
+		<div>
+			<a class="clean-white" style="padding: 1px 6px" href="{{ path('admin_features_work_hours') }}">Edit Working Hours</a>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Rich Text Editor</h4>
+	<div class="setting_fields">
+		{#
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[core_tickets.enable_agent_rte]" {% if app.getSetting('core_tickets.enable_agent_rte') %}checked="checked"{% endif %} />
+				Enable the rich text editor for agents, allowing them to format and insert inline images into messages</label>
+		</div>
+		#}
+		<div class="field_row">
+			<strong>Available Text Editor Buttons:</strong>
+			<ul>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_html]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_html') %}checked="checked"{% endif %} /> View HTML Source</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_bold]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_bold') %}checked="checked"{% endif %} /> Bold</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_italic]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_italic') %}checked="checked"{% endif %} /> Italics</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_underline]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_underline') %}checked="checked"{% endif %} /> Underline</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_strike]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_strike') %}checked="checked"{% endif %} /> Strikethrough</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_color]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_color') %}checked="checked"{% endif %} /> Change Color</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_alignment]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_alignment') %}checked="checked"{% endif %} /> Change Alignment</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_list]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_list') %}checked="checked"{% endif %} /> Insert List</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_image]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_image') %}checked="checked"{% endif %} /> Insert Image</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_link]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_link') %}checked="checked"{% endif %} /> Insert Link</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_table]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_table') %}checked="checked"{% endif %} /> Insert Table</label></li>
+				<li><label><input type="checkbox" name="settings[core_tickets.agent_rte_button_hr]" value="1" {% if app.getSetting('core_tickets.agent_rte_button_hr') %}checked="checked"{% endif %} /> Insert Horizontal Rule</label></li>
+			</ul>
+		</div>
+	</div>
+	{#<input type="hidden" name="set_settings[]" value="core_tickets.enable_agent_rte" />#}
+	{#<input type="hidden" name="set_settings_falseable[]" value="core_tickets.enable_agent_rte" />#}
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_html" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_html" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_bold" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_bold" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_italic" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_italic" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_italic" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_italic" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_underline" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_underline" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_strike" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_strike" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_color" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_color" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_list" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_list" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_image" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_image" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_link" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_link" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_alignment" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_alignment" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_table" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_table" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.agent_rte_button_hr" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.agent_rte_button_hr" />
+</div>
+
+<div class="setting_field_row">
+	<h4>Ticket Locking</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[core_tickets.lock_on_view]" {% if app.getSetting('core_tickets.lock_on_view') %}checked="checked"{% endif %} />
+				Automatically lock tickets when agents view them</label>
+		</div>
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[core_tickets.unlock_on_close]" {% if app.getSetting('core_tickets.unlock_on_close') %}checked="checked"{% endif %} />
+				Automatically unlock tickets when the lock owner stops viewing the ticket</label>
+		</div>
+		<div class="field_row">
+			{% set options = {
+				900: "15 minutes",
+				1800: "30 minutes",
+				3600: "1 hour",
+				7200: "2 hours",
+				14400: "4 hours",
+				28000: "8 hours",
+				86400: "1 day",
+				259200: "3 days",
+				432000: "5 days",
+				604800: "1 week",
+				1209600: "2 weeks"
+			} %}
+			<label>Automatically unlock tickets after:</label>
+			<select name="settings[core_tickets.lock_lifetime]">
+				{% for k,v in options %}
+					<option value="{{ k }}" {% if app.getSetting('core_tickets.lock_lifetime') == k %}selected="selected"{% endif %}>{{ v }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+	<input type="hidden" name="set_settings[]" value="core_tickets.lock_on_view" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.lock_on_view" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.unlock_on_close" />
+	<input type="hidden" name="set_settings_falseable[]" value="core_tickets.unlock_on_close" />
+	<input type="hidden" name="set_settings[]" value="core_tickets.lock_lifetime" />
+</div>
+
+<div class="setting_field_row">
+	<h4>Suggestions</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label><input type="checkbox" name="settings[core.show_ticket_suggestions]" {% if app.getSetting('core.show_ticket_suggestions') %}checked="checked"{% endif %} />
+				Show automatic article suggestions on new ticket form</label>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Ticket Refs</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<p>
+				Each ticket is given a unique numeric ID that identifies it. You may also add "ref codes" to
+				enable a reference string that your end-users will see instead of the ID. These ref codes are generally more readable
+				and user-friendly. By default, ref codes look like <em>ABCD-1234-EFGH</em> but you can customize it to include other tokens.
+			</p>
+		</div>
+		<div class="field_row">
+			<label><input id="ref_options_toggle" type="checkbox" name="settings[core.tickets.use_ref]" {% if app.getSetting('core.tickets.use_ref') %}checked="checked"{% endif %} />
+			Use ref codes
+			</label>
+
+			<div id="ref_options" {% if not app.getSetting('core.tickets.use_ref') %}style="display: none"{% endif %}>
+				<div style="padding-top: 5px; padding-bottom: 5px;">
+					<input type="text" name="settings[core.ref_pattern]" id="ref_format" value="{{ app.getSetting('core.ref_pattern') }}" placeholder="{{ '<A><A><A><A>-<#><#><#><#>-<A><A><A><A>'|e }}" style="width: 350px; font-family: 'Monaco', 'Courier New', monospaced; color: #000;" />
+					and append <select name="settings[core.ref_append_counter]" id="ref_format_digits">
+						{% for i in [0,1,2,3,4,5,6,7,8] %}
+							<option value="{{ i }}" {% if i == app.getSetting('core.ref_append_counter') %}selected="selected"{% endif %}>
+								{% if i == 1 %}1 Digit
+								{% else %}{{ i }} Digits{% endif %}
+							</option>
+						{% endfor %}
+					</select>
+					<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="This will append a counter to the end of your pattern. For example, if you based it on the year, you might choose 5 digits and get refs like 2012-00001 and 2012-00002, counting upwards.<br /><br />If your pattern has a low number of possibilities, then it is highly recommended to use a counter to avoid collisions."></span>
+				</div>
+
+				<div class="alert-message block-message error" id="ref_format_err_len" style="display: none;">
+					This ref code is too long. Remove some segments and try again.
+				</div>
+				<div class="alert-message block-message error" id="ref_format_err_regex" style="display: none;">
+					Ref codes can only contain:<br/>
+					&middot; The tokens below<br/>
+					&middot; Letters and numbers (A-Z and 0-9)<br/>
+					&middot; Dashes and underscores (- and _)
+				</div>
+
+				<p>Your pattern can use tokens surrounded by &lt;brackets&gt;. Here are the available tokens:</p>
+
+				<ul class="token-list inline">
+					<li><em>&lt;A&gt;</em> - A random letter</li>
+					<li><em>&lt;#&gt;</em> - A random number</li>
+					<li><em>&lt;?&gt;</em> - A random letter or number</li>
+					<li><em>&lt;YEAR&gt;</em> - Year as a four-digit number ({{ 'now'|date('Y') }})</li>
+					<li><em>&lt;MONTH&gt;</em> - Month as a two-digit number ({{ 'now'|date('m') }})</li>
+					<li><em>&lt;DAY&gt;</em> - Day as a two-digit number ({{ 'now'|date('d') }})</li>
+					<li><em>&lt;HOUR&gt;</em> - Hour in 24h time ({{ 'now'|date('H') }})</li>
+					<li><em>&lt;MIN&gt;</em> - Minute ({{ 'now'|date('i') }})</li>
+					<li><em>&lt;SEC&gt;</em> - Second ({{ 'now'|date('s') }})</li>
+				</ul>
+
+				<br />
+				<p>Here are some examples:</p>
+				<ul class="token-list">
+					<li><em>{{ '<YEAR>-<MONTH>'|e }}- and 3 digits</em> creates <em>{{ 'now'|date('Y') }}-{{ 'now'|date('m') }}-001</em>, then <em>{{ 'now'|date('Y') }}-{{ 'now'|date('m') }}-002</em></li>
+					<li><em>{{ '<?><?><?><?><?><?>'|e }}</em> creates <em>{{ rand() ~ rand() ~ rand() ~ rand() ~ rand() ~ rand() }}</em></li>
+					<li><em>{{ '<YEAR>-<A><A><?><?><?>'|e }}</em> creates <em>{{ 'now'|date('Y') ~ '-AB' ~ rand() ~ rand() }}</em></li>
+					<li><em>{{ 'TICKET-<A><A><?><?><?><?><?>'|e }}</em> creates <em>{{ 'TICKET' ~ '-AB' ~ rand() ~ rand() ~ rand() ~ rand() }}</em></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="set_settings[]" value="core_tickets.add_agent_ccs" />
+<input type="hidden" name="set_settings_falseable[]" value="core_tickets.add_agent_ccs" />
+<input type="hidden" name="set_settings[]" value="core_tickets.process_agent_fwd" />
+<input type="hidden" name="set_settings_falseable[]" value="core_tickets.process_agent_fwd" />
+<div class="setting_field_row">
+	<h4>Email Gateway</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label>
+				<input type="checkbox" name="settings[core_tickets.add_agent_ccs]" {% if app.getSetting('core_tickets.add_agent_ccs') %}checked="checked"{% endif %} />
+				If an agent email address is CC'd in an email to the helpdesk, add the agent as a follower.
+				<span class="small-light-icon tipped" title="When this option is disabled, any CC'd agent email addresses will be ignored. This means agents must be assigned or added as followers using triggers or manually by another agent. When this option is disabled there is no way for end-users to add specific agents to tickets."></span>
+			</label>
+		</div>
+		<div class="field_row">
+			<label>
+				<input type="checkbox" name="settings[core_tickets.process_agent_fwd]" {% if app.getSetting('core_tickets.process_agent_fwd') %}checked="checked"{% endif %} />
+				When an agent forwards an email to helpdesk, attempt to extract and process original email and add the agents reply as a reply. <a href="https://support.deskpro.com/kb/articles/106" target="_blank">Visit our helpdesk for more information</a>.
+			</label>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Archiving</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			For very large helpdesks with millions of tickets, archiving can greatly improve performance of the agent interace and filters.
+			When an old ticket is archived it is moved out of your filters and into the 'Archived' section. You can still view archived
+			tickets and agents with permission can restore archived tickets.
+			<br />
+			<br />
+
+			<label><input id="archive_toggle" type="checkbox" name="settings[core_tickets.use_archive]" {% if app.getSetting('core_tickets.use_archive') %}checked="checked"{% endif %} value="1" />
+			Use ticket archiving
+			</label>
+
+			<div id="archive_options" {% if not app.getSetting('core_tickets.use_archive') %}style="display: none"{% endif %}>
+				<div style="padding-top: 5px; padding-bottom: 5px;">
+					How long until resolved tickets are automatically sent to the archive?
+					{% set options = {
+						86400: "1 day",
+						259200: "3 days",
+						432000: "5 days",
+						604800: "1 week",
+						1209600: "2 weeks",
+						1814400: "3 weeks",
+						2419000: "1 month",
+						4838000: "2 months",
+						7257000: "3 months",
+						14514000: "6 months",
+						21771000: "9 months",
+						29028000: "1 year",
+						58056000: "2 years",
+					} %}
+					<select name="settings[core_tickets.auto_archive_time]">
+						{% for k,v in options %}
+							<option value="{{ k }}" {% if app.getSetting('core_tickets.auto_archive_time') == k %}selected="selected"{% endif %}>{{ v }}</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				{% if app.getSetting('core_tickets.use_archive') %}
+					<div class="alert-message block-message" style="margin: 4px 25px 0 25px">
+						If there has been an error and the tickets you see in the agent interface do not seem to be correct,
+						there may be a problem with your search tables containing invalid records.
+						<br /><br />
+						<a class="clean-white" href="{{ path('admin_ticketfeatures_regensearch') }}">Click here to regenerate the ticket search tables</a>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>Recycle Bin</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			When agents delete or spam a ticket, it is sent to the Recycle Bin. Tickets in the Recycle Bin can be viewed by from the Agent Interface by clicking on the button in the Tickets section.
+
+			<br />
+			<br />
+
+			<table cellspacing="0" cellpadding="2">
+				<tr>
+					<td>How long until deleted tickets are permanently purged from the system?</td>
+					<td>
+						{% set options = {
+							86400: "1 day",
+							259200: "3 days",
+							432000: "5 days",
+							604800: "1 week",
+							172800: "2 weeks",
+							1814400: "3 weeks",
+							2419000: "1 month",
+							4838000: "2 months",
+							7257000: "3 months",
+							14514000: "6 months",
+							21771000: "9 months",
+							29028000: "1 year",
+							58056000: "2 years",
+						} %}
+						<select name="settings[core_tickets.hard_delete_time]">
+							{% for k,v in options %}
+								<option value="{{ k }}" {% if app.getSetting('core_tickets.hard_delete_time') == k %}selected="selected"{% endif %}>{{ v }}</option>
+							{% endfor %}
+						</select><br />
+					</td>
+				</tr>
+				<tr>
+					<td>How long until spammed tickets are permanently purged from the system?&nbsp;&nbsp;</td>
+					<td>
+						{% set options = {
+							86400: "1 day",
+							259200: "3 days",
+							432000: "5 days",
+							604800: "1 week",
+							172800: "2 weeks",
+							1814400: "3 weeks",
+							2419000: "1 month",
+							4838000: "2 months",
+							7257000: "3 months",
+							14514000: "6 months",
+							21771000: "9 months",
+							29028000: "1 year",
+							58056000: "2 years",
+						} %}
+						<select name="settings[core_tickets.spam_delete_time]">
+							{% for k,v in options %}
+								<option value="{{ k }}" {% if app.getSetting('core_tickets.spam_delete_time') == k %}selected="selected"{% endif %}>{{ v }}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+			</table>
+
+			<div class="alert-message block-message" style="margin: 4px 25px 0 25px">
+				Click the button below to run the cleanup now to delete everything in the Recycle Bin.
+				<br /><br />
+				<a class="clean-white" href="{{ path('admin_ticketfeatures_purgetrash', {security_token: security_token('purge_trash') }) }}">Click here to permanently purge everything in the Recycle Bin</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row" style="text-align: center">
+	<button class="btn primary">{{ phrase('admin.general.save_settings') }}</button>
+</div>
+
+</form>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$('#ref_options_toggle').on('click', function() {
+		if ($(this).is(':checked')) {
+			$('#ref_options').slideDown();
+		} else {
+			$('#ref_options').slideUp();
+		}
+	});
+
+	$('#archive_toggle').on('click', function() {
+		if ($(this).is(':checked')) {
+			$('#archive_options').slideDown();
+		} else {
+			$('#archive_options').slideUp();
+		}
+	});
+
+	$('#bill_auto_opt').on('click', function() {
+		if (this.checked) {
+			$('#show_reply_bill').slideDown();
+		} else {
+			$('#show_reply_bill').slideUp();
+			$('#show_reply_bill').find(':checkbox').prop('checked', false);
+		}
+	});
+
+	$('#billing_on_new').on('click', function() {
+		if (this.checked) {
+			$('#billing_auto_timer_new').slideDown();
+		} else {
+			$('#billing_auto_timer_new').slideUp();
+			$('#billing_auto_timer_new').find(':checkbox').prop('checked', false);
+		}
+	});
+
+	$('#billing_enable').on('click', function() {
+		if (this.checked) {
+			$('#billing_dependencies').slideDown();
+		} else {
+			$('#billing_dependencies').slideUp();
+		}
+	});
+
+	function validateRefFormat()
+	{
+		if (!$('#ref_options_toggle').is(':checked')) {
+			$('#ref_format').val('');
+			return true;
+		}
+
+		var format   = $.trim($('#ref_format').val());
+		var digitLen = parseInt($('#ref_format_digits').find(':selected').val() || 0);
+
+		if (!format) {
+			$('#ref_options_toggle').prop('checked', false);
+			return true;
+		}
+
+		$('#ref_format_err_len').hide();
+		$('#ref_format_err_regex').hide();
+
+		if (format.length + digitLen > 80) {
+			console.log("Ref: Bad length");
+			$('#ref_format_err_len').show();
+			return false;
+		}
+
+		if (!format.match(/^[a-zA-Z0-9_\-<>#\?]+$/)) {
+			console.log("Ref: Bad format");
+			$('#ref_format_err_regex').show();
+			return false;
+		}
+
+		return true;
+	}
+
+	$('#ref_format').on('blur', validateRefFormat);
+	$('#ref_format_digits').on('change', validateRefFormat);
+
+	$('#settings_form').on('submit', function(ev) {
+		if (!validateRefFormat()) {
+			ev.preventDefault();
+			var offset = $('#ref_format').offset();
+			offset.top -= 30;
+
+			$('html, body').animate({
+				scrollTop: offset.top
+			});
+
+			return;
+		}
+	});
+});
+</script>
+{% endblock %}

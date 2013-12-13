@@ -1,0 +1,55 @@
+<div class="dp-overlay-container" id="settingswin" data-element-handler="DeskPRO.Agent.ElementHandler.SettingsWindow">
+	<section class="dp-overlay no-footer">
+		<header>
+			<span class="close close-trigger">{{ phrase('agent.general.close_lc') }}</span>
+			<nav>
+				<ul id="settingswin_nav">
+					<li class="tab-profile" data-tab-for="#settingswin_profile">{{ phrase('agent.general.profile') }}</li>
+					{% if app.user.getPermissionsManager().get('GeneralChecker').canSetSignature() %}<li class="tab-signature" data-tab-for="#settingswin_signature">{{ phrase('agent.settings.signature') }}</li>{% endif %}
+					{% if not app.getSetting('core_tickets.disable_agent_notifications') %}
+						<li class="tab-ticket-notify" data-tab-for="#settingswin_ticket_notifications">{{ phrase('agent.settings.title_ticket_notifs') }}</li>
+						<li class="tab-notify" data-tab-for="#settingswin_notifications">{{ phrase('agent.settings.title_other_notifs') }}</li>
+					{% endif %}
+					<li class="tab-macros" data-tab-for="#settingswin_macros">{{ phrase('agent.general.macros') }}</li>
+					<li class="tab-filters" data-tab-for="#settingswin_filters">{{ phrase('agent.general.filters') }}</li>
+					<li class="tab-ticketslas" data-tab-for="#settingswin_ticketslas">{{ phrase('agent.general.slas') }}</li>
+				</ul>
+			</nav>
+		</header>
+		<article id="settingswin_pages">
+			<section
+				id="settingswin_profile"
+				data-page-url="{{ path('agent_settings') }}"
+			><div class="page-loading"></div></section>
+			{% if app.user.getPermissionsManager().get('GeneralChecker').canSetSignature() %}
+				<section
+					id="settingswin_signature"
+					data-page-url="{{ path('agent_settings_signature') }}"
+				><div class="page-loading"></div></section>
+			{% endif %}
+			<section
+				id="settingswin_ticket_notifications"
+				data-page-url="{{ path('agent_settings_ticketnotif') }}"
+			><div class="page-loading"></div></section>
+			<section
+				id="settingswin_notifications"
+				data-page-url="{{ path('agent_settings_othernotif') }}"
+			><div class="page-loading"></div></section>
+			<section
+				id="settingswin_macros"
+				data-page-url="{{ path('agent_settings_ticketmacros') }}"
+			><div class="page-loading"></div></section>
+			<section
+				id="settingswin_filters"
+				data-page-url="{{ path('agent_settings_ticketfilters') }}"
+			><div class="page-loading"></div></section>
+			<section
+				id="settingswin_ticketslas"
+				data-page-url="{{ path('agent_settings_ticketslas') }}"
+			><div class="page-loading"></div></section>
+		</article>
+		<section id="settingswin_saved_overlay" style="display:none">
+			<h3>{{ phrase('agent.general.saved') }}</h3>
+		</section>
+	</section>
+</div>

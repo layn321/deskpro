@@ -1,0 +1,19 @@
+{% macro begin(onboard, id, title) %}
+	<li class="onboard-{{ id }} {% if onboard.isDismissed(id) %}dismissed{% elseif onboard.isFinished(id) %}finished{% endif %}" data-task-id="{{ id }}">
+		<header>
+			<div class="title">
+				<h3>I want to...</h3>
+				<h2><i></i>{{ title }}</h2>
+			</div>
+		</header>
+		<article>
+{% endmacro %}
+
+{% macro end() %}
+			<nav>
+				<button class="btn-dismiss"><span>Not Interested</span></button>
+				<button class="btn-done"><span>Done</span></button>
+			</nav>
+		</article>
+	</li>
+{% endmacro %}

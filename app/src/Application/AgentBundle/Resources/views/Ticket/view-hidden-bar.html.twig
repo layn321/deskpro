@@ -1,0 +1,36 @@
+<div class="ticket-hidden-bar {% if ticket.hidden_status == 'deleted' or ticket.hidden_status == 'spam' %}deleted{% endif %}">
+	<article>
+	{% if ticket.hidden_status == 'deleted' %}
+		{{ phrase('agent.tickets.deleted_by') }} {{ ticket_deleted.by_person.display_name }} (<time class="timeago" title="{{ ticket_deleted.date_created|date('c', 'UTC') }}">{{ ticket_deleted.date_created|date('day') }}</time>).
+		{% if ticket_deleted.reason %}
+			<br />{{ phrase('agent.general.reason') }}: {{ ticket_deleted.reason }}
+		{% endif %}
+
+		{% if ticket_perms.delete %}
+			<br />
+			<div style="padding: 5px">
+				<button class="clean-white undelete-trigger">{{ phrase('agent.general.undelete') }}</button>
+			</div>
+		{% endif %}
+		{% if hard_delete_time %}
+			{{ phrase('agent.tickets.perm_delete_note', {'time': hard_delete_time}) }}
+		{% endif %}
+	{% elseif ticket.hidden_status == 'spam' %}
+		{{ phrase('agent.tickets.ticket_is_marked_as_spam') }}<br />
+
+		{% if ticket_perms.delete %}
+			<div style="padding: 5px">
+				<button class="clean-white unspam-trigger">{{ phrase('agent.general.unspam') }}</button>
+			</div>
+		{% endif %}
+
+		{% if hard_delete_time %}
+			{{ phrase('agent.tickets.perm_delete_note', {'time': hard_delete_time}) }}
+		{% endif %}
+	{% else %}
+		{{ phrase('agent.tickets.hidden_because') }}
+		<span>{{ phrase('agent.tickets.hidden_status_' ~ ticket.hidden_status) }}</span><br />
+		{{ phrase('agent.tickets.hidden_explain') }}
+	{% endif %}
+	</article>
+</div>

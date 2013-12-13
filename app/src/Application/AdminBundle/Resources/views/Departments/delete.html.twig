@@ -1,0 +1,61 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		{% if department.is_tickets_enabled %}
+			<li><a href="{{ path('admin_departments', {type:'tickets'}) }}">Ticket Departments</a></li>
+		{% else %}
+			<li><a href="{{ path('admin_departments', {type:'chat'}) }}">Chat Departments</a></li>
+		{% endif %}
+		<li>{{ phrase('admin.departments.delete_department') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+{% if department.children|length %}
+    <p>{{ phrase('admin.agents.confirm_delete_dept_top_level', {'title':department.title}) }}</p>
+
+	<ul class="bullet-list">
+		{% for c in department.children %}
+			<li>{{ c.title }}</li>
+		{% endfor %}
+	</ul>
+{% else %}
+	<p>{{ phrase('admin.agents.confirm_delete_dept', {'title':department.title}) }}</p>
+{% endif %}
+
+<form action="{{ path('admin_departments_dodel', {'department_id': department.id, 'security_token': security_token('delete_department')}) }}" method="post">
+
+{% if ticket_count > 0 or chat_count > 0 %}
+	<p>
+        {% set phrase_params = {'tickets':phrase('admin.departments.count_tickets', {'count':ticket_count}), 'chats':phrase('admin.departments.count_chats', {'count':chat_count})} %}
+        {{ phrase('admin.departments.tickets_chats_using_dept', phrase_params) }}
+	<p>
+		{{ phrase('admin.departments.choose_destination_dept') }}:
+		<select name="move_to_department">
+			{% for d in departments if d[type_prop] and d.id != department.id %}
+				{% if d.children|length %}
+					<optgroup label="{{ d.title }}" class="dep-{{ d.id }}">
+					{% for sd in d.children %}
+						{% if sd.id != department.id %}
+							<option value="{{ sd.id }}">{{ sd.title }}</option>
+						{% endif %}
+					{% endfor %}
+					</optgroup>
+				{% else %}
+					<option value="{{ d.id }}">{{ d.title }}</option>
+				{% endif %}
+			{% endfor %}
+		</select>
+	</p>
+{% endif %}
+
+{% if department.children|length %}
+	<button class="btn">{{ phrase('admin.departments.confirm_delete_dept_and_all_subdepartments') }}</button>
+{% else %}
+	<button class="btn">{{ phrase('admin.departments.confirm_delete_dept') }}</button>
+{% endif %}
+
+</form>
+
+{% endblock %}

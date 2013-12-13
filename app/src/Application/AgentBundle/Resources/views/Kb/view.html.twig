@@ -1,0 +1,417 @@
+{% import 'AgentBundle:Common:optionbox-macros.html.twig' as optionbox %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.KbViewArticle';
+pageMeta.title = {{article.title|json_encode|raw}};
+pageMeta.article_id = {{article.id}};
+pageMeta.url_fragment  = '{{ url_fragment('agent_kb_article', {'article_id': article.id}) }}';
+pageMeta.obj_code = 'article_{{ article.id }}';
+
+pageMeta.permalink = '{{ article.permalink }}';
+pageMeta.labelsSaveUrl = '{{ path('agent_kb_ajax_labels_save', {'article_id': article.id}) }}';
+
+{% if article.hidden_status == 'validating' %}
+pageMeta.isValidating = true;
+{% endif %}
+
+pageMeta.glossaryWords = {{ glossary_words|json_encode|raw }};
+
+pageMeta.canEdit   = {% if not perms.can_edit %}false{% else %}true{% endif %};
+pageMeta.canDelete = {% if not perms.can_delete %}false{% else %}true{% endif %};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+{# scroll containers #}
+<div class="layout-content with-scrollbar page-listing page-kb-view {% if not perms.can_edit %}perm-no-edit{% endif %} {% if not perms.can_delete %}perm-no-delete{% endif %}">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /scroll containers #}
+
+<div class="delete-notice" {% if article.status_code != "hidden.deleted" %}style="display: none;"{% endif %}>
+	{{ phrase('agent.general.record_deleted') }} <button class="clean-gray xxx-small undelete">{{ phrase('agent.general.properties') }}</button>
+</div>
+
+{% if article.status_code == "hidden.validating" %}
+	{% include 'AgentBundle:Publish:view-approve-header.html.twig' %}
+{% endif %}
+
+<header class="page-header">
+	<h4 class="id-number">#{{ article.id }}</h4>
+	<div style="float:left; padding-left: 8px;">
+		<select id="{{ baseId }}_status">
+			<option {% if article.status == 'published' %}selected="selected"{% endif %} value="published">{{ phrase('agent.publish.status_published') }}</option>
+			<option {% if article.getStatusCode == 'hidden.unpublished' %}selected="selected"{% endif %} value="hidden.unpublished">{{ phrase('agent.publish.status_hidden_unpublished') }}</option>
+			<option {% if article.status == 'archived' %}selected="selected"{% endif %} value="archived">{{ phrase('agent.publish.status_archived') }}</option>
+			{% if article.person.id == app.user.id %}
+				<option value="hidden.draft">{{ phrase('agent.publish.status_hidden_draft') }}</option>
+			{% endif %}
+		</select>
+	</div>
+	<h1>
+		<span id="{{baseId}}_showname">{{ article.real_title }}</span>
+		<span id="{{baseId}}_editname" style="display: none"><input type="text" name="name" value="{{ article.real_title }}" /></span>
+		<span id="{{baseId}}_editname_start" class="edit-name-gear"></span>
+		<a id="{{baseId}}_editname_end" class="edit-name-save clean-white" style="display: none">{{ phrase('agent.general.done') }}</a>
+	</h1>
+	<br class="clear" />
+	<table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 2px;">
+		<tr>
+			<td width="100%" valign="middle" style="vertical-align: middle;">
+				<ul id="{{baseId}}_categories" class="add-remove-list flat with-select2">
+					{% for cat in article.categories %}
+						<li>
+							<span class="remove noedit-hide">{{ phrase('agent.general.remove') }}</span>
+							{% include 'AgentBundle:Common:select-standard.html.twig' with {
+								'name': 'category_ids[]',
+								'add_classname': 'category_id',
+								'add_attr': '',
+								'with_blank': 0,
+								'blank_title': '',
+								'categories': article_categories,
+								'selected': cat.id,
+								'allow_parent_sel': true
+							} %}
+						</li>
+					{% endfor %}
+					<li class="add noedit-hide" id="{{baseId}}_addcat_li">
+						<span class="add" id="{{baseId}}_addcat_trigger"></span>
+						{{ phrase('agent.general.add_category') }}
+						<script type="text/x-deskpro-plain" id="{{baseId}}_addcat_select_tpl">
+							<li>
+								<span class="remove noedit-hide">{{ phrase('agent.general.remove') }}</span>
+								{% include 'AgentBundle:Common:select-standard.html.twig' with {
+									'name': 'category_ids[]',
+									'add_classname': 'category_id',
+									'add_attr': '',
+									'with_blank': 0,
+									'blank_title': '',
+									'categories': article_categories,
+									'allow_parent_sel': true,
+									'selected': 0
+								} %}
+							</li>
+						</script>
+					</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<div class="labels-line">
+		<input
+			type="hidden"
+			id="{{baseId}}_labels_input"
+			class="dpe_select dpe_select_noborder"
+			data-select-width="auto"
+			data-placeholder="Add a label"
+			value="{% for label in article.labels %}{{ label.label }},{% endfor %}"
+		/>
+	</div>
+	<br class="clear" />
+</header>
+
+<div class="profile-box-container reply-box-wrap">
+	<header>
+		<nav  id="{{baseId}}_bodytabs">
+			<div class="controls" id="{{baseId}}_article_save">
+				<span style="display:none" class="mark-loading"></span>
+				<span style="display:none" class="mark-saved">{{ phrase('agent.general.saved') }}</span>
+			</div>
+			<ul>
+				<li class="on" data-tab-for="#{{baseId}}_tab_contents .kb-content"><span>{{ phrase('agent.general.article') }}</span></li>
+				{% if app.languages.isMultiLang() %}
+					<li data-tab-for="#{{baseId}}_tab_contents .kb-trans"><span>{{ phrase('agent.general.translations') }}</span></li>
+				{% endif %}
+				<li data-tab-for="#{{baseId}}_tab_contents .kb-props"><span>{{ phrase('agent.general.properties') }}</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .comments-tab"><span>{{ phrase('agent.general.comments') }} (<span id="{{baseId}}_count_comments">{{article_comments|length|default(0)}}</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .revisions-tab"><span>{{ phrase('agent.general.label_revisions') }} (<span id="{{baseId}}_count_revs">{{article.revisions|length|default(0)}}</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .related-content-tab"><span>{{ phrase('agent.general.related_content') }} (<span id="{{baseId}}_count_related">0</span>)</span></li>
+				<li data-tab-for="#{{baseId}}_tab_contents .search-tab"><span>{{ phrase('agent.general.search') }}</span></li>
+			</ul>
+		</nav>
+	</header>
+	<section>
+
+		{# Tab Contents #}
+		<div id="{{baseId}}_tab_contents">
+			{# Tab: Content #}
+			<div class="deskpro-tab-item kb-content on" style="display: block">
+				<nav class="sub-box-nav noedit-hide">
+					<ul class="option-buttons right" id="{{baseId}}_content_edit_btns">
+						<li class="kb-editor-edit edit" id="{{baseId}}_edit_btn"><span>{{ phrase('agent.general.ucfirst_edit') }}</span></li>
+						<li class="editor-save-trigger save" id="{{baseId}}_save_btn"><span>{{ phrase('agent.general.save') }}</span></li>
+						<li class="editor-cancel-trigger cancel" id="{{baseId}}_cancel_btn"><span>{{ phrase('agent.general.cancel') }}</span></li>
+					</ul>
+				</nav>
+				<div id="{{baseId}}_content_ed" class="content-tab-item">
+				{% include 'AgentBundle:Kb:view-content-tab.html.twig' %}
+				</div>
+			</div>
+			{# /Tab: Content #}
+
+			{% if app.languages.isMultiLang() %}
+				<div class="deskpro-tab-item kb-trans" style="display: none;">
+					{% include 'AgentBundle:Kb:view-content-trans.html.twig' %}
+				</div>
+			{% endif %}
+
+			{# Tab: Properties #}
+			<div class="deskpro-tab-item kb-props" style="display: none;">
+				<section class="description-area">
+					<dl class="info-list">
+						{% if app.getSetting('core.use_product') %}
+							<dt class="">{{ phrase('agent.general.products') }}</dt>
+							<dd>
+								<ul id="{{baseId}}_products" class="add-remove-list with-select2">
+									{% for prod in article.products %}
+										<li>
+											<span class="remove noedit-hide">{{ phrase('agent.general.remove') }}</span>
+											{% include 'AgentBundle:Common:select-standard.html.twig' with {
+												'name': 'product_ids[]',
+												'add_classname': 'product_id',
+												'add_attr': '',
+												'with_blank': 0,
+												'blank_title': '',
+												'categories': article_products,
+												'selected': prod.id
+											} %}
+										</li>
+									{% endfor %}
+									<li class="add noedit-hide" id="{{baseId}}_addprod_li">
+										<span class="add" id="{{baseId}}_addprod_trigger"></span>
+										{{ phrase('agent.general.add_product') }}
+										<script type="text/x-deskpro-plain" id="{{baseId}}_addprod_select_tpl">
+											<li>
+												<span class="remove noedit-hide">{{ phrase('agent.general.remove') }}</span>
+												{% include 'AgentBundle:Common:select-standard.html.twig' with {
+													'name': 'product_ids[]',
+													'add_classname': 'product_id',
+													'add_attr': '',
+													'with_blank': 0,
+													'blank_title': '',
+													'categories': article_products,
+													'selected': 0
+												} %}
+											</li>
+										</script>
+									</li>
+								</ul>
+							</dd>
+						{% endif %}
+
+						<dt>{{ phrase('agent.general.rating') }}</dt>
+						<dd>
+							{% set phrase_part %}
+							<span class="link-look who-voted-trigger">{{ phrase('agent.general.count_votecount_votes', {'count':article.num_ratings}) }}</span>
+							{% endset %}
+							{{ phrase('agent.general.percent_helpful_subphrase', {'percent':article.rating_percent,'subphrase':phrase_part}, true) }}<br />
+							<small>{{ phrase('agent.general.found_article_helpful_or_not', {'up_votes':article.up_votes,'down_votes':article.down_votes}) }}</small>
+						</dd>
+
+						{% if user_view_count %}
+							<dt></dt>
+							<dd>
+								{{ phrase('agent.general.registered_views') }}: <a href="{{ path('agent_publish_whoviewed', {object_type: 1, object_id: article.id}) }}" class="open-who-viewed">{{ user_view_count }}</a>
+							</dd>
+						{% endif %}
+
+						{% if article.date_created == article.date_published %}
+							<dt>{{ phrase('agent.general.created_and_published') }}:</dt>
+							<dd>
+								{% set phrase_part1 %}
+									<time class="timeago" datetime="{{article.date_created|date('c', 'UTC')}}"></time>
+								{% endset %}
+								{% set phrase_part2 %}
+									<time>{{article.date_created|date('fulltime')}}</time>
+								{% endset %}
+								{{ phrase('agent.publish.event_time_ago_by_who_at_when', {'ago':phrase_part1,'name':article.person.display_name,'date':phrase_part2}, true) }}
+							</dd>
+						{% else %}
+							<dt>{{ phrase('agent.general.date_created') }}:</dt>
+							<dd>
+								{% set phrase_part1 %}
+								<time class="timeago" datetime="{{article.date_created|date('c', 'UTC')}}"></time>
+								{% endset %}
+								{% set phrase_part2 %}
+								<time>{{article.date_created|date('fulltime')}}</time>
+								{% endset %}
+								{{ phrase('agent.publish.event_time_ago_by_who_at_when', {'ago':phrase_part1,'name':article.person.display_name,'date':phrase_part2}, true) }}
+							</dd>
+
+							{# Makes sure its not a future date, which means auto-publish sometime in the future #}
+							{% if article.date_published and article.date_published|date('U') < 'now'|date('U') %}
+								<dt>{{ phrase('agent.general.date_published') }}:</dt>
+								<dd>
+									{% set phrase_part1 %}
+									<time class="timeago" datetime="{{article.date_created|date('c', 'UTC')}}"></time>
+									{% endset %}
+									{% set phrase_part2 %}
+									<time>{{article.date_created|date('fulltime')}}</time>
+									{% endset %}
+									{{ phrase('agent.publish.event_time_ago_at_when', {'ago':phrase_part1,'date':phrase_part2}, true) }}
+								</dd>
+							{% endif %}
+						{% endif %}
+
+						<dd id="{{baseId}}_auto_unpub" {% if not (article.status == 'published') %}style="display: none"{% endif %}>
+							<span class="auto-unpublish" {% if not article.date_end %}style="display: none"{% endif %}>
+								{% set phrase_part1 %}<span class="end-action opt" data-val="{{article.end_action|default('unpublish')}}">{{article.end_action|default(phrase('agent.general.unpublish'))}}</span>{% endset %}
+								{% set phrase_part2 %}<span class="end-date opt" {% if article.date_end %}data-val="{{ article.date_end|date('U') }}"{% endif %}> {% if article.date_end %}{{ article.date_end|date('day') }}{% else %}{{ phrase('agent.publish.click_to_set_date') }}{% endif %}</span>{% endset %}
+								{{ phrase('user.knowledgebase.auto_action_on_date', {action: phrase_part1, date: phrase_part2}, true) }}
+								<input type="text" class="end-date-input" value="{{ article.date_end|date('U') }}" style="visibility: none; width: 1px; height: 1px; overflow: hidden; border: 0; margin: 0; padding: 0;" />
+								(<span class="remove-auto-unpublish options-text">{{ phrase('agent.general.remove') }}</span>)
+							</span>
+							<span class="options-text auto-unpublish-set" {% if article.date_end %}style="display: none"{% endif %}>
+								{{ phrase('agent.publish.set_auto_unpublish_date') }}
+							</span>
+							<br />
+
+							<ul class="end-action-menu" style="display: none">
+								<li data-action="unpublish">{{ phrase('agent.general.unpublish') }}</li>
+								<li data-action="archive">{{ phrase('agent.general.archive') }}</li>
+							</ul>
+						</dd>
+
+						<dd id="{{baseId}}_auto_pub" {% if not (article.hidden_status == 'unpublished') %}style="display: none"{% endif %}>
+							<span class="auto-publish" {% if not article.date_published %}style="display: none"{% endif %}>
+								{% set phrase_part1 %}{{ phrase('agent.general.publish') }}{% endset %}
+								{% set phrase_part2 %}<span class="pub-date opt" {% if article.date_published %}data-val="{{ article.date_published|date('U') }}"{% endif %}> {% if article.date_published %}{{ article.date_published|date('day') }}{% else %}{{ phrase('agent.publish.click_to_set_date') }}{% endif %}</span>{% endset %}
+								{{ phrase('user.knowledgebase.auto_action_on_date', {action: phrase_part1, date: phrase_part2}, true) }}
+								<input type="text" class="pub-date-input" value="{{ article.date_published|date('U') }}" style="visibility: none; width: 1px; height: 1px; overflow: hidden; border: 0; margin: 0; padding: 0;" />
+								(<span class="remove-auto-publish options-text">{{ phrase('agent.general.remove') }}</span>)
+							</span>
+							<span class="options-text auto-publish-set" {% if article.date_published %}style="display: none"{% endif %}>
+								{{ phrase('agent.publish.set_auto_publish_date') }}
+							</span>
+						</dd>
+					</dl>
+
+					<div class="controls" id="{{baseId}}_action_buttons">
+						<div class="showing-editing-fields" style="display: none">
+							<button class="clean-white save-fields-trigger"><span>{{ phrase('agent.general.save') }}</span></button>
+						</div>
+						<div class="showing-rendered-fields">
+							{% if custom_fields|length %}<button class="clean-white edit-fields-trigger noedit-hide"><span>{{ phrase('agent.general.edit_properties') }}</span></button>{% endif %}
+							<button class="clean-white delete nodelete-hide" {% if article.status_code == "hidden.deleted" %}style="display:none"{% endif %}>{{ phrase('agent.general.delete') }}</button>
+							<button class="clean-white permalink">{{ phrase('agent.general.copy_permalink') }}</button>
+							<button class="clean-white view-user-interface">{{ phrase('agent.general.view_in_user_interface') }}</button>
+							<a target="_blank" href="{{ path('agent_kb_article', {'article_id': article.id,'pdf': 1, '_rt': security_token('request_token', 10800)}) }}"><button class="clean-white">{{ phrase('agent.general.download_pdf') }}</button></a>
+						</div>
+					</div>
+				</section>
+			</div>
+			{# /Tab: Properties #}
+
+			{# Tab: Comments #}
+			<div class="deskpro-tab-item content-tab-item comments-tab">
+				<div class="article-comments">
+					<div class="full-deskpro-tab-item">
+						<div class="messages-wrap" id="{{baseId}}_comments_wrap">
+							{% for comment in article_comments %}
+								{% set comment_num = loop.index %}
+								{% include 'AgentBundle:Kb:view-comment.html.twig' %}
+							{% endfor %}
+						</div>
+						<div class="messages-wrap new-note">
+							<article
+								class="content-message agent-message"
+								data-comment-id="{{comment.id}}"
+								data-content-type="{{ comment.object_content_type }}"
+							>
+								<div class="avatar">
+									<img src="{{ app.user.getPictureUrl(40) }}" alt="" width="40" height="40" />
+								</div>
+								<div class="content">
+									<header>
+										<h4>{{ phrase('agent.general.new_comment') }}</h4>
+									</header>
+									<div class="body-text">
+										<textarea style="width:99%; height: 80px;"></textarea>
+									</div>
+									<div class="footer-text">
+										<div class="loading-off">
+											<button class="clean-white">{{ phrase('agent.general.add_comment') }}</button>
+										</div>
+										<div class="loading-on" style="display:none">
+											{{ phrase('agent.general.saving') }}
+										</div>
+									</div>
+								</div>
+							</article>
+						</div>
+					</div>
+				</div>
+			</div>
+			{# /Tab: Comments #}
+
+			{# Tab: Revisions #}
+			<div id="{{baseId}}_revs" class="loaded deskpro-tab-item content-tab-item revisions-tab">
+				{% include 'AgentBundle:Kb:view-revisions-tab.html.twig' %}
+			</div>
+			{# /Tab: Revisions #}
+
+			{# Tab: Related #}
+			<div id="{{baseId}}_related_content" class="deskpro-tab-item content-tab-item kb-related-content related-content-tab">
+				{% include 'AgentBundle:Common:content-related-list.html.twig' %}
+			</div>
+			{# /Tab: Related #}
+
+			{# Tab: Search #}
+			<div id="{{baseId}}_searchtab" class="deskpro-tab-item search-tab">
+				<section class="description-area sticky-search-words">
+					<dl class="info-list">
+						<dt>{{ phrase('agent.publish.sticky_words_title') }}</dt>
+						<dd class="ticket-tags tags-wrap noedit-tags">
+							<input type="text" id="{{baseId}}_stickysearch_input" value="{% for label in sticky_search_words %}{{label}},{% endfor %}" />
+							<br class="clear" />
+							<div class="explain">
+								{{ phrase('agent.publish.search_sticky_words_explain') }}
+							</div>
+						</dd>
+					</dl>
+				</section>
+
+				<br />
+
+				{% include 'AgentBundle:Publish:rated-searches.html.twig' %}
+			</div>
+			{# /Tab: Search #}
+		</div>
+		{# /Tab Contents #}
+	</section>
+</div>
+
+<div class="inline-editable" style="display:none">
+	<div class="title">
+		<input type="text" name="title" value="{{ article.real_title }}"/>
+		<input type="hidden" name="action" value="title" />
+	</div>
+</div>
+
+{% macro category_row(cat, depth) %}
+	<li
+		class="{% if not depth %}top{% else %}child{% endif %} {% if cat.children %}parent-option{% endif %} item-{{ cat.id }} depth-{{ depth }}"
+		{% if cat.parent_id %}data-parent-id="{{ cat.parent_id }}"{% endif %}
+		data-item-id="{{ cat.id }}"
+		data-full-title="{{ cat.title }}"
+	>
+		{% if depth %}<span class="elbow-end"></span>{% endif %}
+		<input type="radio" name="category_id" value="{{ cat.id }}" />
+		<label>{{ cat.title }}</label>
+	</li>
+	{% if cat.children|length %}
+		{% for subcat in cat.children %}
+			{{ _self.category_row(subcat, depth+1) }}
+		{% endfor %}
+	{% endif %}
+{% endmacro %}
+{{ optionbox.start(phrase('agent.general.add_category'), {'id': baseId ~ '_cat_ob'}) }}
+	{{ optionbox.section_start('', 'category') }}
+		{% for cat in article_categories %}
+			{{ _self.category_row(cat, 0) }}
+		{% endfor %}
+	{{ optionbox.section_end() }}
+{{ optionbox.end(phrase('agent.general.add_category')) }}
+
+{# scroll containers #}
+</div></div></div>
+{# /scroll containers #}

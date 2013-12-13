@@ -1,0 +1,15 @@
+<section class="dp-portal-simpleheader-editor">
+	<div class="overlay-title">
+		<span class="close-overlay close-trigger"></span>
+		<h4>{{ phrase('admin.portal.edit_title') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div class="text">
+			<div class="input-title"><input type="text" class="title" name="title" value="{{ app.getSetting('user.portal_title') }}" placeholder="{{ phrase('agent.general.title') }}" /></div>
+
+			<div class="save-btn-wrap">
+				<button class="clean-white save-text-trigger">{{ phrase('agent.general.save') }}</button>
+			</div>
+		</div>
+	</div>
+</section>

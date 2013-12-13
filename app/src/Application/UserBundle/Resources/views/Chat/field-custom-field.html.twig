@@ -1,0 +1,25 @@
+{##
+ # The standard custom field row of the new ticket form.
+ ##}
+{% import 'UserBundle:Common:macros-form.html.twig' as form %}
+{% if f.field_def.getTypeName() == 'hidden' %}
+	<div class="dp-control-group custom-chat-field-{{f.id}} dp-hidden-field" style="display: none;"><div style="display: none;">{{ render_custom_field_form(f) }}</div></div>
+{% else %}
+	<div class="dp-control-group custom-chat-field-{{f.id}} {% if error_fields['chat.field_' ~ f.field_def.id] %}dp-error dp-error-static{% endif %}">
+		<div class="dp-control-label">
+			<label>
+				{{f.title}} {% if f.field_def.is_required %}*{% endif %}
+				{% if f.field_def.description %}<i class="dp-help-pop dp-icon-question-sign" data-title="{{ f.title }}" data-content="{{ f.field_def.description }}"></i>{% endif %}
+			</label>
+		</div>
+		<div class="dp-controls dp-fill">
+			{{ render_custom_field_form(f) }}
+
+			{% if error_fields['chat.field_' ~ f.field_def.id] %}
+				<div class="dp-help-inline dp-error-explain">
+					{{ form.custom_field_errors(errors, f.field_def, 'chat.field_' ~ f.field_def.id) }}
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endif %}

@@ -1,0 +1,5 @@
+<dp:subject>{{ phrase('user.email_subjects.email_new-confirm') }}</dp:subject>
+{{ phrase('user.emails.profile_email-new-confirm') }}:<br />
+<a href="{{ url_full('user_validate_email', {'id': validating_email.id, 'auth': validating_email.auth}) }}">
+	{{ url_full('user_validate_email', {'id': validating_email.id, 'auth': validating_email.auth}) }}
+</a>

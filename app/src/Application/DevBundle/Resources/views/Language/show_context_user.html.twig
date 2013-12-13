@@ -1,0 +1,37 @@
+<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<style type="text/css">
+	.lfile > li { font-weight: bold;font-size:26px; }
+	.table {margin-left:6px;}
+	.table td, .table th { padding: 4px;font-size: 10px; line-height:100%}
+</style>
+{% for file, data in tree %}
+<ul class="lfile">
+	<li>{{ file }}:</li>
+</ul>
+<br/>
+<table class="table table-bordered" style="width:auto;">
+	<tr>
+		<th>Keyword</th>
+		<th>Files</th>
+		<th>Phrase</th>
+	</tr>
+	{% for id,phrase in data %}
+	<tr>
+		<td {% if phrase.files|length > 1 %}style="color:#ff4500;"{% endif %}>{{ id }}</td>
+		<td style="white-space:nowrap;">
+		{% for file in phrase.files %}
+		{{ file.filename }} <span style="color:#AAAAAA;">on line {{ file.line }}</span><br />
+		{% endfor %}
+		{% if phrase.files|length == 0 %}
+			<span style="color:#ff4500;">none</span>
+		{%endif%}
+		</td>
+		<td><div>{{ phrase.text }}</div></td>
+	</tr>
+	{% endfor %}
+</table>
+{% endfor %}
+
+<a href="{{ path('dev_lang_index') }}">Back</a>
+

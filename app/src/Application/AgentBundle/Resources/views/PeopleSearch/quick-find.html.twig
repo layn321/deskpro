@@ -1,0 +1,46 @@
+<div class="person-quick-find overlay">
+	<header class="overlay-title">
+		<nav class="mode-buttons">
+			<ul>
+				<li class="simple on"><a>{{ phrase('agent.search.simple') }}</a></li>
+				<li class="advanced"><a>{{ phrase('agent.general.advanced') }}</a></li>
+			</ul>
+		</nav>
+		<h4>{{ phrase('agent.search.find_person') }}</h4>
+	</header>
+	<div class="overlay-content no-footer">
+		<section class="search-area">
+			<form class="simple">
+				<button class="simple-search-trigger dp-button x-small" style="float:right">{{ phrase('agent.general.find_person_with_criteria') }}</button>
+
+				<input type="hidden" name="terms[0][type]" value="person_name" />
+				<input type="hidden" name="terms[0][op]" value="contains" />
+				<input type="hidden" name="terms[1][type]" value="person_email" />
+				<input type="hidden" name="terms[1][op]" value="contains" />
+
+				{{ phrase('agent.general.name') }}: <input type="text" name="terms[0][name]" value="" />
+				&nbsp;&nbsp;&nbsp;
+				{{ phrase('agent.general.email') }}: <input type="text" name="terms[1][email]" value="" />
+			</form>
+			<form class="advanced" style="display: none;">
+				<div class="row" style="margin-top: 0;">
+					<div class="search-form">
+						<div class="search-terms"></div>
+						<div class="term"><span class="add-term">+</span> {{ phrase('agent.general.add_a_new_term') }}</div>
+					</div>
+				</div>
+				<center><button class="advanced-search-trigger dp-button x-small">{{ phrase('agent.general.find_person_with_criteria') }}</button></center>
+			</form>
+		</section>
+		<section class="deskpro-results-list" style="display:none">
+		</section>
+		<section class="results-loading" style="display: none; padding: 10px; text-align: center;">
+			<img src="{{ asset('images/loading-big-circle.gif') }}" alt="" />
+		</section>
+		<section class="no-results-info" style="padding: 10px;">
+			<div class="no-search"><center>{{ phrase('agent.search.find_by_above_criteria') }}</center></div>
+			<div class="no-results" style="display: none;"><center>{{ phrase('agent.search.no_results_found') }}</center></div>
+		</section>
+		{% include 'DeskPRO:Common:people-search-criteria.html.twig' with { 'classname': 'search-builder-tpl', 'term_options': people_term_options } %}
+	</div>
+</div>

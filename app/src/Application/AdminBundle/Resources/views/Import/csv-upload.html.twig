@@ -1,0 +1,39 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li>Import Users from CSV File</li>
+</ul>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_import_csv_configure') }}" method="post" enctype="multipart/form-data" class="dp-form">
+
+	{% if error == 'no_file' %}
+		<div class="alert-message block-message error">No file was uploaded.</div>
+	{% elseif error == 'no_move' %}
+		<div class="alert-message block-message error">A server error occurred when trying to move the file. Please try again later.</div>
+	{% endif %}
+	{% if show_task_status %}
+		<div class="alert-message block-message success">
+			Your CSV import request has been started. The records will be imported in the background even if you are not connected.<br />
+			<br />
+			The current import status will be updated here periodically:
+			<span data-element-handler="DeskPRO.Admin.ElementHandler.TaskQueueStatus" data-task-group="data_import" style="font-weight: bold">Updating...</span>
+		</div>
+	{% endif %}
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>CSV File</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="file" name="upload" />
+		</div>
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Configure CSV Import</button>
+	</footer>
+
+	{{ form_token() }}
+</form>
+{% endblock %}

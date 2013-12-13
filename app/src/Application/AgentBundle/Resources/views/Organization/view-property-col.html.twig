@@ -1,0 +1,160 @@
+{# Box Contact #}
+{{ dp_widgets(baseId, 'organization', 'contact', 'above', org_api) }}
+
+<div class="profile-box-container contact">
+	<header>
+		{% if app.user.hasPerm('agent_org.edit') %}
+			<span class="edit-gear contact-edit"></span>
+		{% endif %}
+		{{ dp_widget_tabs_header(baseId, 'organization', 'contact', {
+			(baseId ~ '_contact_body'): phrase('agent.people.contact_info')
+		}) }}
+	</header>
+	<section id="{{baseId}}_contact_body">
+		<div class="table-content contact-list contact-list-wrapper">
+			{% include 'AgentBundle:Organization:view-contact-display.html.twig' %}
+		</div>
+	</section>
+	{{ dp_widget_tabs(baseId, 'organization', 'contact', 'section', org_api) }}
+</div>
+
+{{ dp_widgets(baseId, 'organization', 'contact', 'below', org_api) }}
+{# /Box Contact #}
+
+{# Properties Box #}
+{{ dp_widgets(baseId, 'organization', 'properties', 'above', org_api) }}
+
+<div class="profile-box-container properties" id="{{baseId}}_properties_box">
+	<header>
+		{% if app.user.hasPerm('agent_org.edit') %}
+			<div class="controls">
+				<span class="edit-gear prop-edit-trigger"></span>
+				<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+				<button class="cancel" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+				<button class="save" style="display: none">{{ phrase('agent.general.save') }}</button>
+			</div>
+		{% endif %}
+		{{ dp_widget_tabs_header(baseId, 'organization', 'properties', {
+			(baseId ~ '_properties_body'): phrase('agent.general.properties')
+		}) }}
+	</header>
+	<section id="{{baseId}}_properties_body">
+		{% if custom_fields|length %}
+			<dl class="table-list" id="{{baseId}}_custom_fields_rendered">
+				{% include 'AgentBundle:Organization:view-customfields-rendered-rows.html.twig' %}
+			</dl>
+			<dl class="table-list" id="{{baseId}}_custom_fields_editable" style="display: none">
+				{% include 'AgentBundle:Organization:view-customfields-edit-rows.html.twig' %}
+			</dl>
+			<br class="clear" />
+		{% endif %}
+
+		<div>
+			<dl class="table-list">
+				<dt class="type-labels">{{ phrase('agent.general.date_created') }}</dt>
+				<dd>
+					<time class="timeago" datetime="{{org.date_created|date('c', 'UTC')}}">{{ org.date_created|date('day') }}</time>
+				</dd>
+			</dl>
+			<br class="clear" />
+		</div>
+	</section>
+	{{ dp_widget_tabs(baseId, 'organization', 'properties', 'section', org_api) }}
+</div>
+
+{{ dp_widgets(baseId, 'organization', 'properties', 'below', org_api) }}
+{# /Properties Box #}
+
+{# Email Associations Box #}
+{{ dp_widgets(baseId, 'organization', 'email_assoc', 'above', org_api) }}
+
+<div id="{{baseId}}_email_assoc_box">
+	{% include 'AgentBundle:Organization:orgemail-display.html.twig' %}
+</div>
+
+{{ dp_widgets(baseId, 'organization', 'email_assoc', 'below', org_api) }}
+
+{# SLAs Box #}
+{{ dp_widgets(baseId, 'organization', 'slas', 'above', org_api) }}
+
+{% if app.getDataService('Sla').getPersonOrgAssociableSlas() %}
+	<div class="profile-box-container summary" id="{{baseId}}_sla_box">
+		<header>
+			<div class="controls">
+				<span class="edit-gear edit-trigger"></span>
+				<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+				<button class="cancel cancel-trigger" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+				<button class="save save-trigger" style="display: none">{{ phrase('agent.general.save') }}</button>
+			</div>
+			{{ dp_widget_tabs_header(baseId, 'organization', 'slas', {
+				(baseId ~ '_sla_body'): phrase('agent.general.slas')
+			}) }}
+		</header>
+		<section id="{{baseId}}_sla_body">
+			<div id="{{baseId}}_sla_display_box" class="contact-list">
+				<ul>
+				{% for sla in app.getDataService('Sla').getPersonOrgAssociableSlas() %}
+					<li class="sla-row sla-row-{{ sla.id }}" {% if not organization.hasSla(sla) %}style="display: none"{% endif %}>{{ sla.title }}</li>
+				{% endfor %}
+				<li class="no-slas" style="padding-left: 0; {% if organization.slas|length %}display: none;{% endif %}}">{{ phrase('agent.organizations.no_slas') }}</li>
+				</ul>
+			</div>
+			<div id="{{baseId}}_sla_edit_box" class="contact-list" style="display: none;">
+				<ul>
+				{% for sla in app.getDataService('Sla').getPersonOrgAssociableSlas() %}
+					<li class="sla-row">
+						<label><input type="checkbox" value="{{ sla.id }}" name="sla_ids[]" class="sla-check sla-check-{{ sla.id }}" {% if organization.hasSla(sla) %}checked="checked"{% endif %} /> {{ sla.title }}</label>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
+		</section>
+		{{ dp_widget_tabs(baseId, 'organization', 'slas', 'section', org_api) }}
+	</div>
+{% endif %}
+
+{{ dp_widgets(baseId, 'organization', 'slas', 'below', org_api) }}
+{# /SLAs Box#}
+
+{# Usergroup Box #}
+{{ dp_widgets(baseId, 'organization', 'usergroups', 'above', org_api) }}
+
+{% if app.usergroups.getUsergroupNames() %}
+	<div class="profile-box-container summary {% if org.getUsergroups()|length < 1 %}no-section{% endif %}" id="{{baseId}}_ug_box">
+		<header>
+			{% if app.user.hasPerm('agent_org.edit') %}
+			<div class="controls">
+				<span class="edit-gear edit-trigger"></span>
+				<div class="is-loading">{{ phrase('agent.general.saving') }}</div>
+				<button class="cancel cancel-trigger" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+				<button class="save save-trigger" style="display: none">{{ phrase('agent.general.save') }}</button>
+			</div>
+			{% endif %}
+			{{ dp_widget_tabs_header(baseId, 'organization', 'usergroups', {
+				(baseId ~ '_usergroups_body'): phrase('agent.general.usergroups')
+			}) }}
+		</header>
+		<section id="{{baseId}}_usergroups_body" {% if org.getUsergroups()|length < 1 %}style="display:none"{% endif %}>
+			<div id="{{baseId}}_ug_display_box" class="contact-list">
+				<ul>
+					{% for id,name in app.usergroups.getUsergroupNames() %}
+						<li class="ug-row ug-row-{{ id }}" {% if not org.usergroups[id] %}style="display: none"{% endif %}>{{ name }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+			<div id="{{baseId}}_ug_edit_box" class="contact-list" style="display: none;">
+				<ul>
+					{% for id,name in app.usergroups.getUsergroupNames() %}
+						<div>
+							<label><input type="checkbox" value="{{ id }}" name="usergroup_ids[]" class="ug-check ug-check-{{ id }}" {% if org.usergroups[id] %}checked="checked"{% endif %} /> {{ name }}</label>
+						</div>
+					{% endfor %}
+				</ul>
+			</div>
+		</section>
+		{{ dp_widget_tabs(baseId, 'organization', 'usergroups', 'section', org_api) }}
+	</div>
+{% endif %}
+
+{{ dp_widgets(baseId, 'organization', 'usergroups', 'below', org_api) }}
+{# /Usergroup Box #}

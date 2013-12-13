@@ -1,0 +1,16 @@
+{% extends 'UserBundle::layout.html.twig' %}
+{% block content %}
+
+<div style="background-color: #f8f8f8; border: 2px solid #ccc; padding: 10px; margin-bottom: 15px;">
+		<h1 style="font-size: 18px">{{ phrase('user.tickets.thank_you') }}</h1>
+		<p>
+			{{ phrase('user.tickets.thank_you_please_wait') }}
+		</p>
+
+		{% if ticket.hidden_status == 'validating' %}
+			<p>
+				{{ phrase('user.tickets.check_email', {'email':ticket.person_email.email}) }}
+			</p>
+		{% endif %}
+	</div>
+{% endblock %}

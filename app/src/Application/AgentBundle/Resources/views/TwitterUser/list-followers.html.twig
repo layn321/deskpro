@@ -1,0 +1,60 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.TwitterFollowers';
+
+pageMeta.accountId = '{{ account.id|escape }}';
+pageMeta.url_fragment = '{{ url_fragment('agent_twitter_followers_list', {'account_id': account.id}) }}';
+
+pageMeta.currentPage = {{ page }};
+pageMeta.perPage = {{ per_page }};
+pageMeta.totalCount = {{ total_count }};
+pageMeta.listUrl = '{{ path('agent_twitter_followers_list', {'account_id': account.id}) }}?partial=1';
+
+{% include 'AgentBundle:Twitter:list-urls.js.twig' %}
+</script>
+
+{# scroll containers #}
+<div class="layout-content with-scrollbar page-listing">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /scroll containers #}
+
+<div class="layout-content twitter">
+    <div class="content">
+        {% if followers|length %}
+			{% include 'AgentBundle:TwitterUser:part-followers.html.twig' with {'no_archive': true} %}
+		{% endif %}
+    </div>
+
+	<section class="list-listing no-results" id="{{baseId}}_no_results" {% if followers|length %}style="display:none"{% endif %}>
+		<article class="row-item no-results">
+			<p style="padding: 15px;">{{ phrase('agent.general.there_are_no_results') }}</p>
+		</article>
+	</section>
+
+	{% if total_count %}
+		<footer class="results-nav">
+			<div class="cursor">
+				{% set phrase_part1 %}
+				<span class="results-showing-count" id="{{baseId}}_showing_count">{{ ((page - 1) * per_page) + 1 }} - {{ showing_to }}</span>
+				{% endset %}
+				{% set phrase_part2 %}
+				<span class="results-total-count" id="{{baseId}}_total_count">{{ total_count }}</span>
+				{% endset %}
+				{{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+			</div>
+			{% if total_count > per_page %}
+				<ul class="pagenav no-prev">
+					<li class="prev"></li>
+					<li class="next"></li>
+				</ul>
+			{% endif %}
+			<div class="loading">
+
+			</div>
+		</footer>
+	{% endif %}
+</div>
+
+{# scroll containers #}
+</div></div></div>
+{# /scroll containers #}

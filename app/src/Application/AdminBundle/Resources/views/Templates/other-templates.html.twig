@@ -1,0 +1,37 @@
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.TemplateEditList' %}
+{% import 'AdminBundle:Templates:macros.html.twig' as tplmacro %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li><a href="{{ path('admin_templates_user') }}">{{ phrase('admin.general.templates') }}</a></li>
+	<li>{{ phrase('admin.templates.agent_and_admin_templates') }}</li>
+</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TemplateEditList.js') }}"></script>
+{% endblock %}
+{% block page %}
+
+<div class="content-tabs">
+	<nav data-element-handler="DeskPRO.ElementHandler.SimpleTabs">
+		<ul>
+			{% for bundle_name,dirs in list %}
+				<li data-tab-for="#tab_{{ bundle_name }}" {% if loop.first %}class="on"{% endif %}>{{ bundle_name|replace({'Bundle':''}) }}</li>
+			{% endfor %}
+		</ul>
+		<br />
+	</nav>
+	{% for bundle_name,dirs in list %}
+		<section id="tab_{{ bundle_name }}" {% if loop.first %}class="on"{% else %}style="display:none"{% endif %}>
+			<div style="padding: 10px;">
+				{% for dirname,dirinfo in dirs %}
+					{{ tplmacro.render_dir(bundle_name, dirname, dirinfo) }}
+				{% endfor %}
+			</div>
+		</section>
+	{% endfor %}
+</div>
+
+{{ tplmacro.render_editor_overlay() }}
+
+{% endblock %}

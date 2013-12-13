@@ -1,0 +1,159 @@
+{% extends 'AgentBundle::source-pane-layout.html.twig' %}
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+{% block pane_main_tab %}
+	<li class="tab active"><i class="icon-dp-twitter"></i> {{ phrase('agent.chrome.nav_twitter') }}</li>
+{% endblock %}
+{% block pane_other_tabs %}{% endblock %}
+{% block pane_content %}
+<div class="pane-content pane-content-main">
+
+	{% macro twitter_sub_grouping(type, route, account, grouping, agents, teams) %}
+		<div class="item-form" style="display: none;">
+			<div class="select-value-wrap">
+				<div class="select-value"><label id="nav_filter_group_label_{{ filter.id }}"></label> <i class="icon-caret-down"></i></div>
+				<select class="dpe_select invisible-trigger filter_grouping_select" data-filter-id="{{ filter.id }}" data-label-bound="#nav_filter_group_label_{{ filter.id }}" data-dropdown-css-class="invisible-trigger small filter-list" data-select-width="165">
+					<option value="">{{ phrase('agent.twitter.select_group_var') }}</option>
+					<option {% if group_by == 'type' %}selected="selected"{% endif %} value="type">{{ phrase('agent.general.group_by') }} {{ phrase('agent.general.type') }}</option>
+					<option {% if group_by == 'agent' %}selected="selected"{% endif %} value="agent">{{ phrase('agent.general.group_by') }} {{ phrase('agent.general.agent') }}</option>
+					<option {% if group_by == 'team' %}selected="selected"{% endif %} value="team">{{ phrase('agent.general.group_by') }} {{ phrase('agent.general.agent_team') }}</option>
+				</select>
+			</div>
+		</div>
+		{% include 'AgentBundle:Twitter:window-sub-grouping.html.twig' with {
+			'group_by': grouping.group,
+			'data': grouping.data,
+			'section_type': type
+		} %}
+	{% endmacro %}
+
+	{% for account in accounts %}
+	<section class="pane-section twitter-account-section" data-account-id="{{ account.id }}">
+		<header>
+			<h1>@{{ account.user.screen_name }} (<span id="twitter_{{ account.id }}_following_count_header">{{ account.countFollowing() }}</span> / <span id="twitter_{{ account.id }}_followers_count_header">{{ account.countFollowers() }}</span>)</h1>
+		</header>
+		<article>
+			<ul class="nav-list" id="twitter-section-counts-{{ account.id }}">
+				<li class="is-nav-item" data-type="mine" data-grouping-ignore="agent,team" data-initial-grouping="{{ groupings[account.id].mine.group }}">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_mine_list', {'account_id': account.id}) }}">
+						<i class="dp-toggle-icon {% if not groupings[account.id].mine.group %}icon-caret-right{% else %}icon-caret-down{% endif %} click-through"></i>
+						<h3>{{ phrase('agent.twitter.my_tweets') }}</h3>
+						<em class="counter list-counter twitter-mine-counter" id="twitter_{{ account.id }}_mine_count" data-count="{{ counts[account.id].mine|default(0) }}">{{ counts[account.id].mine|default(0) }}</em>
+					</div>
+					{{ _self.twitter_sub_grouping('mine', 'agent_twitter_mine_list', account, groupings[account.id].mine, agents, teams) }}
+				</li>
+
+				{% if app.getSetting('core.use_agent_team') %}
+					<li class="is-nav-item" data-type="team" data-grouping-ignore="agent" data-initial-grouping="{{ groupings[account.id].team.group }}">
+						<div class="item" data-route="listpane:{{ path('agent_twitter_team_list', {'account_id': account.id}) }}">
+							<i class="dp-toggle-icon {% if not groupings[account.id].team.group %}icon-caret-right{% else %}icon-caret-down{% endif %} click-through"></i>
+							<h3>{{ phrase('agent.twitter.my_teams_tweets') }}</h3>
+							<em class="counter list-counter twitter-team-counter" id="twitter_{{ account.id }}_team_count" data-count="{{ counts[account.id].team|default(0) }}">{{ counts[account.id].team|default(0) }}</em>
+						</div>
+						{{ _self.twitter_sub_grouping('team', 'agent_twitter_team_list', account, groupings[account.id].team, agents, teams) }}
+					</li>
+				{% endif %}
+
+				<li class="is-nav-item" data-type="unassigned" data-grouping-ignore="agent,team" data-initial-grouping="{{ groupings[account.id].unassigned.group }}">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_unassigned_list', {'account_id': account.id}) }}">
+						<i class="dp-toggle-icon {% if not groupings[account.id].unassigned.group %}icon-caret-right{% else %}icon-caret-down{% endif %} click-through"></i>
+						<h3>{{ phrase('agent.twitter.unassigned_tweets') }}</h3>
+						<em class="counter list-counter twitter-unassigned-counter" id="twitter_{{ account.id }}_unassigned_count" data-count="{{ counts[account.id].unassigned|default(0) }}">{{ counts[account.id].unassigned|default(0) }}</em>
+					</div>
+					{{ _self.twitter_sub_grouping('unassigned', 'agent_twitter_unassigned_list', account, groupings[account.id].unassigned, agents, teams) }}
+				</li>
+
+				<li class="is-nav-item" data-type="all" data-initial-grouping="{{ groupings[account.id].all.group }}">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_all_list', {'account_id': account.id}) }}">
+						<i class="dp-toggle-icon {% if not groupings[account.id].all.group %}icon-caret-right{% else %}icon-caret-down{% endif %} click-through"></i>
+						<h3>{{ phrase('agent.twitter.all_tweets') }}</h3>
+						<em class="counter list-counter twitter-all-counter" id="twitter_{{ account.id }}_all_count" data-count="{{ counts[account.id].all|default(0) }}">{{ counts[account.id].all|default(0) }}</em>
+					</div>
+					{{ _self.twitter_sub_grouping('all', 'agent_twitter_all_list', account, groupings[account.id].all, agents, teams) }}
+				</li>
+			</ul>
+		</article>
+	</section>
+
+	<section class="pane-section with-tabs twitter-tab-container">
+		<nav class="pane-section-tabs">
+			<ul>
+				<li style="width: 64px;" data-tab-for="#twitter_section_tab_people_{{ account.id }}"><span>{{ phrase('agent.twitter.people') }}</span></li>
+				<li style="width: 71px;" data-tab-for="#twitter_section_tab_tweets_{{ account.id }}"><span>{{ phrase('agent.twitter.tweets') }}</span></li>
+				<li style="width: 77px;" data-tab-for="#twitter_section_tab_searches_{{ account.id }}"><span>{{ phrase('agent.twitter.searches') }}</span></li>
+			</ul>
+		</nav>
+
+		<section id="twitter_section_tab_people_{{ account.id }}" class="deskpro-tab-item" data-account-id="{{ account.id }}">
+			<ul class="nav-list nav-list-small" style="margin-top: 4px;">
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_followers_list_new', {'account_id': account.id}) }}">
+						<h3>{{ phrase('agent.twitter.new_followers') }}</h3>
+						<em class="counter list-counter" id="twitter_{{ account.id }}_new_followers_count" data-count="{{ account.countNewFollowers() }}">{{ account.countNewFollowers() }}</em>
+					</div>
+				</li>
+
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_followers_list', {'account_id': account.id}) }}">
+						<h3>{{ phrase('agent.general.followers') }}</h3>
+						<em class="counter list-counter" id="twitter_{{ account.id }}_followers_count" data-count="{{ account.countFollowers() }}">{{ account.countFollowers() }}</em>
+					</div>
+				</li>
+
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_following_list', {'account_id': account.id}) }}">
+						<h3>{{ phrase('agent.twitter.following') }}</h3>
+						<em class="counter list-counter" id="twitter_{{ account.id }}_following_count" data-count="{{ account.countFollowing() }}">{{ account.countFollowing() }}</em>
+					</div>
+				</li>
+
+				<li class="form-row">
+					<input type="text" class="twitter-person-find-box" placeholder="{{ phrase('agent.twitter.find_person') }}" style="width: 122px" />
+					<button class="clean-white twitter-person-find-button" style="width: 60px">{{ phrase('agent.general.find') }}</button>
+				</li>
+			</ul>
+		</section>
+
+		<section id="twitter_section_tab_tweets_{{ account.id }}" class="deskpro-tab-item">
+			<ul class="nav-list" style="margin-top: 4px;">
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_timeline_list', {'account_id': account.id}) }}">
+						<h3>{{ phrase('agent.twitter.timeline') }}</h3>
+					</div>
+				</li>
+
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_sent_list', {'account_id': account.id}) }}">
+						<h3>{{ phrase('agent.twitter.sent') }}</h3>
+					</div>
+				</li>
+			</ul>
+		</section>
+
+		<section id="twitter_section_tab_searches_{{ account.id }}" class="deskpro-tab-item" data-account-id="{{ account.id }}">
+			<ul class="nav-list" style="margin-top: 4px;">
+				{% for search in account.searches %}
+					<li class="is-nav-item">
+						<div class="item" data-route="listpane:{{ path('agent_twitter_run_search', {'account_id': account.id, 'search_id': search.id}) }}">
+							<span style="float: right; margin: 7px 6px 0 0; cursor: pointer;" class="twitter-search-delete-trigger" data-confirm="{{ phrase('agent.twitter.delete-search-confirm') }}" href="{{ path('agent_twitter_search_delete', {'account_id': account.id, 'search_id': search.id, 'security_token': security_token('delete_search')}) }}"><i class="icon-trash"></i></span>
+							<h3>{{ search.term }}</h3>
+						</div>
+					</li>
+				{% endfor %}
+
+				<li class="is-nav-item twitter-delete-template" style="display:none">
+					<div class="item" data-route="listpane:{{ path('agent_twitter_new_search', {'account_id': account.id, 'search_term': '__placeholder-url__'}) }}">
+						<span style="float: right; margin: 7px 6px 0 0; cursor: pointer;" class="twitter-search-delete-trigger" data-confirm="{{ phrase('agent.twitter.delete-search-confirm') }}" href="{{ path('agent_twitter_search_delete', {'account_id': account.id, 'search_term': '__placeholder-url__', 'security_token': security_token('delete_search')}) }}"><i class="icon-trash"></i></span>
+						<h3 class="title">__placeholder__</h3>
+					</div>
+				</li>
+
+				<li class="form-row">
+					<input type="text" class="twitter-search-add-box" placeholder="{{ phrase('agent.chrome.nav_search') }}..." style="width: 122px" />
+					<button class="clean-white twitter-search-add-button" style="width: 60px">{{ phrase('agent.chrome.nav_search') }}</button>
+				</li>
+			</ul>
+		</section>
+	</section>
+	{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% set this_page = 'feedback_statuses' %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.FeedbackStatusEditPage' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/FeedbackStatusEditPage.js') }}"></script>
+{% endblock %}
+{% block pagetitle %}
+	<h1>{{ phrase('admin.feedback.edit_status') }}</h1>
+	<nav>
+		<a class="clean-white" href="{{ path('admin_feedback_statuses') }}">{{ phrase('admin.feedback.back_to_list') }}</a>
+	</nav>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_feedback_statuses_edit', {'category_id': cat.id}) }}" method="post">
+
+<div class="dp-form">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.feedback.status_type') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{% if cat.status_type == 'active' %}
+				{{ phrase('admin.feedback.active_status') }}
+			{% else %}
+				{{ phrase('admin.feedback.closed_status') }}
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.title') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="cat[title]" value="{{ cat.title }}" />
+		</div>
+	</div>
+</div>
+
+	<button class="clean-white">{{ phrase('agent.general.save') }}</button>
+</form>
+
+<div class="delete-link-wrap">
+	<a href="#" id="delete_btn">{{ phrase('admin.feedback.delete_status') }}</a>
+</div>
+
+{% if not other_cats|length %}
+	<div id="delete_status_overlay" class="no-delete" style="width: 400px; height: 165px; display: none;">
+		<form action="{{ path('admin_feedback_statuses_del', {'category_id': cat.id}) }}" method="post">
+			<div class="overlay-title">
+				<span class="close-overlay close-trigger"></span>
+				<h4>{{ phrase('admin.feedback.delete_status') }}</h4>
+			</div>
+			<div class="overlay-content">
+				<p>{{ phrase('admin.feedback.cannot_delete_last_status') }}</p>
+			</div>
+		</form>
+	</div>
+{% else %}
+	<div id="delete_status_overlay" style="width: 400px; height: 165px; display: none;">
+		<form action="{{ path('admin_feedback_statuses_del', {'category_id': cat.id}) }}" method="post">
+			<div class="overlay-title">
+				<span class="close-overlay close-trigger"></span>
+				<h4>{{ phrase('admin.feedback.delete_status') }}</h4>
+			</div>
+			<div class="overlay-content">
+				{% if count_existing %}
+					<div class="dp-form">
+						<div class="dp-form-row">
+							<div class="dp-form-label">
+								<label>Move {{ count_existing }} feedback using this status to...</label>
+							</div>
+							<div class="dp-form-input">
+								<select name="move_to_cat">
+									{% for movecat in other_cats %}
+										<option value="{{ movecat.id }}">{{ movecat.title }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+					</div>
+				{% else %}
+					<p>{{ phrase('admin.feedback.confirm_delete_this') }}</p>
+				{% endif %}
+			</div>
+			<div class="overlay-footer">
+				<button
+					id="create_status_save_btn"
+					class="clean-white"
+					data-save-url="{{ path('admin_feedback_statuses_ajaxadd') }}"
+				>{{ phrase('admin.feedback.delete_status') }}</button>
+			</div>
+		</form>
+	</div>
+{% endif %}
+
+{% endblock %}

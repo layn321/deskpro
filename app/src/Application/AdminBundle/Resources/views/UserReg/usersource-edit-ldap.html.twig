@@ -1,0 +1,69 @@
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.host') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.host) }}<br />
+			<div style="padding-top: 4px">
+				<small>{{ phrase('admin.user_registration.enter_port_here') }}:</small>
+				{{ form_widget(form.port, {attr: {style: 'width: 50px'}}) }}
+			</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.use_secure_connection') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.secure) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.base_dn') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.baseDn) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Username Attribute</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.field_username) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Email Attribute</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.field_email) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.service_account') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<div>Full DN to service account: {{ form_widget(form.username, {attr:{style:"width: 250px"}}) }}</div>
+			<div style="padding-top: 4px;">{{ phrase('agent.general.password') }}: {{ form_widget(form.password, {attr:{style:"width: 250px"}}) }}</div>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.custom_filter') }}</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.accountFilterFormat) }}
+			<br />
+			<small>{{ phrase('admin.user_registration.explain_default_filter') }}</small>
+		</div>
+	</div>

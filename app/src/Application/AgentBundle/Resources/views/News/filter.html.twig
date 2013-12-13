@@ -1,0 +1,158 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% block dp_declare %}
+	{{ set_tplvar('baseId', el_uid()) }}
+{% endblock %}
+
+{######################################################################################################################}
+{# METADATA #}
+{######################################################################################################################}
+{% block top %}
+	<script>
+		pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.NewsList';
+		pageMeta.refreshUrl = '{{ path('agent_news_list', {'category_id': category.id}) }}';
+		pageMeta.url_fragment = '{{ url_fragment('agent_news_list', {'category_id': category.id}) }}';
+		pageMeta.baseId = '{{ tplvars.baseId }}';
+	</script>
+{% endblock top %}
+
+{######################################################################################################################}
+{# HEADER #}
+{######################################################################################################################}
+
+{% block pane_header %}
+	<ul class="pane-tabs" data-element-handler="DeskPRO.ElementHandler.SimpleTabs" data-active-classname="active">
+		<li class="tab active" data-tab-for="#{{ tplvars.baseId }}_tab_main"><i class="icon-dp-article"></i> {{ phrase('agent.publish.news_list_title', {count: total_results|default(0)}) }}</li>
+
+		{% if category %}
+			<li class="tab" data-tab-for="#{{ tplvars.baseId }}_tab_cat"><i class="icon-folder-close"></i> <span>{{ category.title }}</span></li>
+		{% endif %}
+	</ul>
+{% endblock pane_header %}
+
+{######################################################################################################################}
+{# CONTENT #}
+{######################################################################################################################}
+
+{% block pane_content %}
+
+{##################################}
+{# Posts #}
+{##################################}
+
+<div id="{{ tplvars.baseId }}_tab_main">
+
+	{% include 'AgentBundle:News:filter-display-options.html.twig' %}
+	{% include 'AgentBundle:News:filter-control-bar.html.twig' %}
+
+	<section class="news-simple-list list-listing no-check">
+		{% include 'AgentBundle:News:filter-page.html.twig' %}
+	</section>
+
+	{% if not results|length %}
+		<section class="list-listing no-results">
+			<p>{{ phrase('agent.general.there_are_no_results') }}</p>
+		</section>
+	{% endif %}
+
+	{% if results|length %}
+		<footer class="results-nav">
+			<div class="cursor">
+				{% set phrase_part1 %}<span class="results-showing-count" id="{{ tplvars.baseId }}_showing_count">{{ ((cur_page - 1) * 50) + 1 }} - {{ showing_to }}</span>{% endset %}
+				{% set phrase_part2 %}<span class="results-total-count" id="{{ tplvars.baseId }}_total_count">{{ total_results }}</span>{% endset %}
+				{{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+			</div>
+			{% if total_results > 50 %}
+				<ul class="pagenav {% if cur_page == 1 %}no-prev{% endif %} {% if cur_page == num_pages %}no-next{% endif %}">
+					{% if cur_page > 1 %}
+						<li class="prev" data-route="listpane:{{ path('agent_news_list', {'category_id': category.id, p: cur_page - 1 }) }}"></li>
+					{% else %}
+						<li class="prev no-prev"></li>
+					{% endif %}
+
+					{% if cur_page < num_pages %}
+						<li class="next" data-route="listpane:{{ path('agent_news_list', {'category_id': category.id, p: cur_page + 1 }) }}"></li>
+					{% else %}
+						<li class="next no-next"></li>
+					{% endif %}
+				</ul>
+			{% endif %}
+			<div class="loading">
+
+			</div>
+		</footer>
+	{% endif %}
+
+</div>
+
+{##################################}
+{# Category #}
+{##################################}
+
+{% if category %}
+<div id="{{ tplvars.baseId }}_tab_cat" style="display: none;">
+
+	<section class="pane-section last" id="{{ tplvars.baseId }}_del_cat">
+		<header><h1>{{ phrase('agent.publish.delete_category') }}</h1></header>
+		<article style="padding: 10px;">
+			<div class="dp-not-loading">
+				<button class="dp-btn cat-del-trigger" data-save-url="{{ path('agent_publish_cats_adddel', {type: 'news', category_id: category.id}) }}">{{ phrase('agent.publish.delete_category_btn') }}</button>
+			</div>
+			<div class="dp-is-loading">
+				<i class="spinner-flat"></i>
+			</div>
+		</article>
+	</section>
+
+	<section class="pane-section">
+		<header><h1>{{ phrase('agent.publish.edit_category_btn') }}</h1></header>
+		<article>
+			<div class="pane-form">
+				<table class="pane-form-table">
+					<tbody>
+						<tr>
+							<th width="100">{{ phrase('agent.general.title') }}</th>
+							<td>
+								<input type="hidden" name="category[id]" value="{{ category.id }}" />
+								<input type="text" name="category[title]" value="{{ category.title }}" />
+							</td>
+						</tr>
+						<tr class="vtop">
+							<th>{{ phrase('agent.general.permissions') }}</th>
+							<td>
+								<ul>
+									{% for ug in app.getUsergroups().getUserUsergroups() %}
+										<li>
+											<label>
+												<input class="ug-check ug-{{ ug.id }} {% if ug.sys_name %}ug-{{ ug.sys_name }}{% endif %}" type="checkbox" name="category[usergroups][]" value="{{ ug.id }}" {% if ug.id in cat_usergroups %}checked="checked"{% endif %} />
+												{{ ug.title }}
+											</label>
+										</li>
+									{% endfor %}
+								</ul>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</article>
+	</section>
+
+	<section class="pane-section last">
+		<header><h1>{{ phrase('agent.publish.reorder_category_title') }}</h1></header>
+		<article>
+			<div style="padding: 10px;" id="{{ tplvars.baseId }}_cattree" data-treedata="{{ cat_structure_data|json_encode }}"></div>
+			<input type="hidden" id="{{ tplvars.baseId }}_cattree_struct" value="" name="category_structure" />
+		</article>
+	</section>
+
+	<footer class="pane-footer" id="{{ tplvars.baseId }}_catfoot">
+		<div class="dp-not-loading">
+			<button class="dp-btn cat-save-trigger" data-save-url="{{ path('agent_publish_savecats', {type: 'news'}) }}">{{ phrase('agent.general.save') }}</button>
+		</div>
+		<div class="dp-is-loading">
+			<i class="spinner-flat"></i>
+		</div>
+	</footer>
+</div>
+{% endif %}
+{% endblock pane_content %}

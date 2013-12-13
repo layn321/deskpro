@@ -1,0 +1,92 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>MySQL Sort Order</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_server_mysql_sorting_save') }}" method="post">
+
+	{% if pending_collation %}
+		<div class="alert-message block-message success">
+			Your sort order update has been started. The records will be imported in the background even if you are not connected.<br />
+			<br />
+			The current status will be updated here periodically:
+			<span id="pending_sort_status" data-status-url="{{ path('admin_server_mysql_sorting_status') }}" style="font-weight: bold">Updating...</span>
+		</div>
+
+		<div class="setting_field_row">
+			<h4>Pending Sort Order</h4>
+			<div class="setting_fields">
+				<div class="field_row">{{ pending_collation_name }}</div>
+			</div>
+		</div>
+	{% else %}
+		<div class="setting_field_row">
+			<h4>Current Sort Order</h4>
+			<div class="setting_fields">
+				<div class="field_row">{{ current_collation_name }}</div>
+			</div>
+		</div>
+	{% endif %}
+	<div class="setting_field_row">
+		<h4>Update Sort Order</h4>
+		<div class="setting_fields">
+			<div class="field_row">
+			<ul>
+			{% for collation,name in collations %}
+				<li style="margin-bottom: 3px"><label><input type="radio" name="collation" value="{{ collation }}" {% if selected_collation == collation %}checked="checked"{% endif %} /> {{ name }}</label></li>
+			{% endfor %}
+			</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="setting_field_row" style="text-align: center">
+		<button class="btn primary">Update Sort Order</button>
+	</div>
+
+	{{ form_token() }}
+
+</form>
+
+{% if pending_collation %}
+<script type="text/javascript">
+$(function() {
+	var statusEl = $('#pending_sort_status');
+
+	var callback = function() {
+		$.ajax({
+			url: statusEl.data('status-url'),
+			type: 'POST',
+			dataType: 'json',
+			success: function(data) {
+				if (data.status == 'not_found') {
+					statusEl.text('Completed!');
+					clearInterval(interval);
+					interval = false;
+				} else if (data.status == 'pending') {
+					statusEl.text('Waiting to start...');
+				} else if (data.status == 'table') {
+					statusEl.text('Converting table ' + data.data.message + '...');
+				} else if (data.status == 'error') {
+					statusEl.text('An error occurred: ' + data.data.message);
+					clearInterval(interval);
+					interval = false;
+				} else {
+					statusEl.text('An unknown error occurred.');
+					clearInterval(interval);
+					interval = false;
+				}
+			}
+		})
+	};
+
+	var interval = setInterval(callback, 5000);
+	callback();
+});
+</script>
+{% endif %}
+
+{% endblock %}

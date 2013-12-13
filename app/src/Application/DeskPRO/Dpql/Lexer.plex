@@ -1,0 +1,190 @@
+<?php
+/**************************************************************************\
+| DeskPRO (r) has been developed by DeskPRO Ltd. http://www.deskpro.com/   |
+| a British company located in London, England.                            |
+|                                                                          |
+| All source code and content Copyright (c) 2012, DeskPRO Ltd.             |
+|                                                                          |
+| The license agreement under which this software is released              |
+| can be found at http://www.deskpro.com/license                           |
+|                                                                          |
+| By using this software, you acknowledge having read the license          |
+| and agree to be bound thereby.                                           |
+|                                                                          |
+| Please note that DeskPRO is not free software. We release the full       |
+| source code for our software because we trust our users to pay us for    |
+| the huge investment in time and energy that has gone into both creating  |
+| this software and supporting our customers. By providing the source code |
+| we preserve our customers' ability to modify, audit and learn from our   |
+| work. We have been developing DeskPRO since 2001, please help us make it |
+| another decade.                                                          |
+|                                                                          |
+| Like the work you see? Think you could make it better? We are always     |
+| looking for great developers to join us: http://www.deskpro.com/jobs/    |
+|                                                                          |
+| ~ Thanks, Everyone at Team DeskPRO                                       |
+\**************************************************************************/
+
+/**
+ * DeskPRO
+ *
+ * @package DeskPRO
+ * @subpackage Dpql
+ */
+
+namespace Application\DeskPRO\Dpql;
+
+/**
+ * Lexer for DPQL. To be used in conjunction with the parser.
+ */
+class Lexer
+{
+	/**
+	 * Internal lexer positioning counter.
+	 *
+	 * @var integer
+	 */
+	protected $_counter = 0;
+
+	/**
+	 * String to be tokenized.
+	 *
+	 * @var string
+	 */
+	protected $_input;
+
+	/**
+	 * ID of token that is being emitted. Tokens are defined in the parser.
+	 *
+	 * @var integer
+	 */
+	public $token = null;
+
+	/**
+	 * Value for the token that is being emitted.
+	 *
+	 * @var string
+	 */
+	public $value = null;
+
+	/**
+	 * Line number currently being tokenized. This can be used to detect the
+	 * line an error is occurring on.
+	 *
+	 * @var integer
+	 */
+	public $line = 1;
+
+	/**
+	 * List of reserved keywords. These will be emitted with tokens that match
+	 * the name of the reserved word.
+	 *
+	 * @var array
+	 */
+	protected $_reserved = array(
+		'DISPLAY', 'TABLE', 'BAR', 'LINE', 'PIE', 'AREA',
+		'SELECT', 'FROM', 'WHERE',
+		'GROUP', 'ORDER', 'SPLIT', 'BY',
+		'LIMIT', 'OFFSET', 'AS', 'NULL',
+		'AND', 'OR', 'NOT', 'IN', 'LIKE', 'REGEXP',
+		'ASC', 'DESC',
+		'INTERVAL'
+	);
+
+	/**
+	 * Maps an operator string to a token name (T_OP_<value>).
+	 * Operator strings must be listed in the operator regex.
+	 *
+	 * @var array
+	 */
+	protected $_operatorMap = array(
+		'+' => 'PLUS',
+		'-' => 'MINUS',
+		'*' => 'MULTIPLY',
+		'/' => 'DIVIDE',
+		'=' => 'EQ',
+		'!=' => 'NE',
+		'<>' => 'NE',
+		'>=' => 'GTEQ',
+		'>' => 'GT',
+		'<=' => 'LTEQ',
+		'<' => 'LT',
+		'AND' => 'AND',
+		'&&' => 'AND',
+		'OR' => 'OR',
+		'||' => 'OR',
+		'!' => 'BANG',
+		'NOT' => 'NOT',
+		'IN' => 'IN',
+		'LIKE' => 'LIKE',
+		'REGEXP' => 'REGEXP'
+	);
+
+	/**
+	 * Sets the input and resets the lexer state.
+	 *
+	 * @param string $input
+	 */
+	public function setInput($input) {
+		$this->_input = $input;
+		$this->_counter = 0;
+		$this->token = null;
+		$this->value = null;
+		$this->line = 1;
+	}
+
+/*!lex2php
+%counter {$this->_counter}
+%input {$this->_input}
+%token {$this->token}
+%value {$this->value}
+%line {$this->line}
+
+whitespace = /\s+/
+quoted_string = /'([^\\']+|\\.)*'/
+operator = /\+|-|\*|\/|!=|<>|>=|<=|<|>|=|&&|\|\||!/
+number = /-?([0-9]*\.[0-9]+|[0-9]+)/
+literal = /[a-zA-Z_][a-zA-Z0-9_]*/
+column_star_ref = /[a-zA-Z_][a-zA-Z0-9_]*\.([a-zA-Z_][a-zA-Z0-9_]*(\[[a-zA-Z0-9_]+\])?\.)*\*/
+column_ref = /[a-zA-Z_][a-zA-Z0-9_]*\.([a-zA-Z_][a-zA-Z0-9_]*(\[[a-zA-Z0-9_]+\])?\.)*[a-zA-Z_][a-zA-Z0-9_]*(\[[a-zA-Z0-9_]+\])?/
+placeholder = /%[a-zA-Z0-9_:.]+%/
+*/
+/*!lex2php
+%statename INITIAL
+
+whitespace { return false; }
+
+"," { $this->token = Parser::T_COMMA; }
+"(" { $this->token = Parser::T_LEFT_PAREN; }
+")" { $this->token = Parser::T_RIGHT_PAREN; }
+";" { $this->token = Parser::T_SEMICOLON; }
+"@" { $this->token = Parser::T_AT; }
+
+quoted_string { $this->token = Parser::T_QUOTED; }
+number { $this->token = Parser::T_NUMBER; }
+placeholder { $this->token = Parser::T_PLACEHOLDER; }
+
+column_star_ref { $this->token = Parser::T_COLUMN_STAR; }
+column_ref { $this->token = Parser::T_COLUMN; }
+
+operator {
+	if (isset($this->_operatorMap[$this->value])) {
+		$this->token = constant(__NAMESPACE__ . '\\Parser::T_OP_' . $this->_operatorMap[$this->value]);
+	} else {
+		throw new Exception("Unknown operator $this->value");
+	}
+}
+
+literal {
+	$upper = strtoupper($this->value);
+
+	if (isset($this->_operatorMap[$upper])) {
+		$this->token = constant(__NAMESPACE__ . '\\Parser::T_OP_' . $this->_operatorMap[$upper]);
+	} else if (in_array($upper, $this->_reserved)) {
+		$this->token = constant(__NAMESPACE__ . '\\Parser::T_' . $upper);
+	}  else {
+		$this->token = Parser::T_LITERAL;
+	}
+}
+*/
+}

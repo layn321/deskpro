@@ -1,0 +1,17 @@
+<?php return array(
+	'user.email_subjects.chat_transcript'                                  => 'Sohbet Dökümü',
+	'user.email_subjects.comment-approved'                                 => 'Yorumunuz onaylandı',
+	'user.email_subjects.comment-confirmation'                             => 'Yorumunuz için teşekkürler',
+	'user.email_subjects.comment-deleted'                                  => 'Yorumunuz personelimiz tarafından okundu',
+	'user.email_subjects.email_new-confirm'                                => 'Eposta adresinizi doğrulayın',
+	'user.email_subjects.feedback_new'                                     => 'Geri bildirimde bulunduğunuz için teşekkürler',
+	'user.email_subjects.feedback_new-approved'                            => 'Geri bildiriminiz onaylandı',
+	'user.email_subjects.feedback_new-confirm'                             => 'geri bildirimde bulunduğunuz için teşekkür ederiz (Onaylama gerekiyor)',
+	'user.email_subjects.feedback_new-disapproved'                         => 'Geri bildiriminiz rededildi',
+	'user.email_subjects.feedback_updated'                                 => 'Geri bildiriminiz güncellendi: {{title}}',
+	'user.email_subjects.password_agent-reset'                             => 'Personelimiz parolanızı sıfırladı',
+	'user.email_subjects.password_reset'                                   => 'Parola Sıfırla',
+	'user.email_subjects.re'                                               => 'YNT: {{subject}}',
+	'user.email_subjects.ticket_new-participant'                           => 'Çağrı kaydınıza yeni bir kişi katıldı',
+	'user.email_subjects.validate-email'                                   => 'Eposta adresinizi doğrulayın',
+);

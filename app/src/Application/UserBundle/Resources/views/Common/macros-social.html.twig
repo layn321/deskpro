@@ -1,0 +1,28 @@
+{##
+ # The block used to add the social share widget under content pages
+ ##}
+
+{% macro social_block(page_url, page_title) %}
+	<div class="dp-social-block">
+		<table><tr>
+			<td class="dp-title">{{ phrase('user.portal.share_this') }}:</td>
+			<td style="direction: ltr">
+				{% if app.getSetting('core.show_share_twitter') %}
+					<span class='st_twitter_hcount' displayText='Tweet' st_url="{{ page_url }}" st_title="{{ page_title }}"></span>
+					&nbsp;
+				{% endif %}
+				{% if app.getSetting('core.show_share_facebook') %}
+					<span class='st_facebook_hcount' displayText='Facebook' st_url="{{ page_url }}" st_title="{{ page_title }}"></span>
+					&nbsp;
+				{% endif %}
+				{% if app.getSetting('core.show_share_linkedin') %}
+					<span class='st_linkedin_hcount' displayText='LinkedIn' st_url="{{ page_url }}" st_title="{{ page_title }}"></span>
+					&nbsp;
+				{% endif %}
+				{% if app.getSetting('core.show_share_gplus') %}
+					<span class='st_plusone_hcount' displayText='Google +1' st_url="{{ page_url }}" st_title="{{ page_title }}"></span>
+				{% endif %}
+			</td>
+		</tr></table>
+	</div>
+{% endmacro %}

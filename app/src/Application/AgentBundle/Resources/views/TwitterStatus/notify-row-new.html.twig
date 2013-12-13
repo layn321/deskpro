@@ -1,0 +1,21 @@
+<li
+	class="twitter inside"
+	data-type="twitter"
+	data-related="tweet:{{ account_status.id }}"
+	data-route="listpane:{{ path('agent_twitter_all_list', {'account_id': account_status.account.id}) }}"
+	data-route-notabreload="1"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time></time>
+	<big>{{ phrase('agent.twitter.tweet') }}</big>
+	<small>
+		{% if account_status.status_type == 'direct' %}
+			{{ phrase('agent.twitter.account_rec_new_dm_from', {account: '@'~account_status.account.user.screen_name, name: '@'~account_status.status.user.screen_name }) }}
+		{% elseif account_status.status_type == 'retweet' %}
+			{{ phrase('agent.twitter.account_retweeted_by', {account: '@'~account_status.account.user.screen_name, name: '@'~account_status.status.user.screen_name }) }}
+		{% else %}
+			{{ phrase('agent.twitter.account_rec_tweet_from', {account: '@'~account_status.account.user.screen_name, name: '@'~account_status.status.user.screen_name }) }}
+		{% endif %}
+		<div>{{ account_status.status.text|raw }}</div>
+	</small>
+</li>

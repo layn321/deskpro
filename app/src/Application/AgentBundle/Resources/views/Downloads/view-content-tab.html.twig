@@ -1,0 +1,22 @@
+<div class="full-tab-content">
+	<div class="download-content-wrap content-post-wrap">
+		{% if download.content_html %}
+			{{ download.content_html|raw }}
+		{% else %}
+			<em>{{ phrase('agent.general.no_content') }}</em>
+		{% endif %}
+	</div>
+	<div class="download-editor-wrap article-editor-wrap" style="display: none">
+		<div class="download-editor">
+			{% if state.download.content %}
+				<div class="revert-message-notice">
+					{{ phrase('agent.general.unsaved_changes_were_restored') }}
+					<button class="revert-default">{{ phrase('agent.publish.discard_unsaved_changes') }}</button>
+					<br />
+				</div>
+			{% endif %}
+			<textarea class="edit-content-field" name="download[content]" rows="5" cols="50">{{ state.download.content|default(download.content) }}</textarea>
+			<textarea class="edit-content-field-default" style="display: none;">{{download.content}}</textarea>
+		</div>
+	</div>
+</div>

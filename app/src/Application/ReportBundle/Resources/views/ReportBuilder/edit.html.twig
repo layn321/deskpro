@@ -1,0 +1,87 @@
+{% extends 'ReportBundle:ReportBuilder:layout.html.twig' %}
+{% block inner_page %}
+<form action="{{ path('report_builder_edit', {'report_builder_id': report.id|default(0)}) }}" method="post">
+
+	<div class="dp-form">
+		{% if errors %}
+			<ul id="errors_container">
+			{% for error in errors %}
+				<li>{{ error }}</li>
+			{% endfor %}
+			</ul>
+		{% endif %}
+
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Title</label>
+			</div>
+			<div class="dp-form-input">
+				<input type="text" name="title" value="{{report.title}}" maxlength="255" />
+			</div>
+		</div>
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Description</label>
+			</div>
+			<div class="dp-form-input">
+				<textarea name="description" rows="3">{{report.description}}</textarea>
+			</div>
+		</div>
+
+		{% include 'ReportBundle:ReportBuilder:query-editor.html.twig' %}
+
+		{% if canManageBuiltIn %}
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>Unique Key</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="unique_key" value="{{report.unique_key}}" maxlength="50" />
+					<div>If a unique key is specified, this will become a built-in report.</div>
+				</div>
+			</div>
+
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>Built-in Report Category</label>
+				</div>
+				<div class="dp-form-input">
+					<select name="category">
+						<option value="">&nbsp;</option>
+					{% for categoryId, categoryName in builtInCategories %}
+						<option value="{{categoryId}}"{{ categoryId == report.category ? ' selected="selected"' : '' }}
+							>{{categoryName}}</option>
+					{% endfor %}
+					</select>
+					<div>If this is a built-in report, select the category it applies to.</div>
+				</div>
+			</div>
+
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>Display Order</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="display_order" value="{{report.display_order|default(0)}}"  />
+				</div>
+			</div>
+		{% else %}
+			<input type="hidden" name="unique_key" value="" />
+			<input type="hidden" name="category" value="" />
+		{% endif %}
+	</div>
+
+	<button class="btn primary save-trigger">Save Report</button>
+
+	<input type="hidden" name="parent_id" value="{{report.parent ? report.parent.id : ''}}" />
+	<input type="hidden" name="process" value="1" />
+	{{ form_token() }}
+
+	<p style="margin-top: 1em; padding-top: 1em; border-top: 1px solid #DEDEDE">Further information about the report builder system is available in our knowledge base:</p>
+	<ul>
+		<li><a href="http://support.deskpro.com/kb/articles/87-using-the-report-builder" target="_blank">Using the Report Builder</a></li>
+		<li><a href="http://support.deskpro.com/kb/articles/86-dpql-reference" target="_blank">DeskPRO Query Language Reference</a></li>
+		<li><a href="http://support.deskpro.com/kb/articles/85-dpql-field-reference" target="_blank">DeskPRO Query Language Field Reference</a></li>
+	</ul>
+</form>
+{% endblock %}

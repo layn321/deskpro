@@ -1,0 +1,93 @@
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.EditPhrasesPage' %}
+{% extends 'AdminBundle:Languages:lang-layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditPhrasesPage.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+     <ul>
+		<li><a href="{{ path('admin_langs') }}">{{ phrase('admin.general.languages') }}</a></li>
+		<li>{{ language.title }}</li>
+		<li>Custom Fields</li>
+     </ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_langs_editphrases_save', {'language_id': language.id|default(0)}) }}" method="post" id="save_phrase_form">
+
+<h2>Titles</h2>
+{{ design.structure_table() }}
+	<tbody>
+		{% set phrase_prefix = lang_group ~ '.' %}
+		{% set phrase_suffix = '_title' %}
+		{% for obj in all_fields %}
+			{% set phrase_id = phrase_prefix ~ obj.getId() ~ phrase_suffix %}
+			<tr class="phrase-row {% if lang_phrases[phrase_id].phrase %}custom{% endif %}" data-phrase-id="{{ phrase_id }}">
+				<td>{{ obj.getRealTitle() }}</td>
+				<td width="350">
+					<input class="phrase-preview" type="text" style="width: 95%;" value="{% if lang_phrases[phrase_id].phrase %}{{ lang_phrases[phrase_id].phrase }}{% else %}{{ obj.getRealTitle() }}{% endif %}" />
+					<textarea style="display: none" class="master_phrase">{{ obj.getRealTitle() }}</textarea>
+					<textarea style="display: none" class="custom_phrase">{{ lang_phrases[phrase_id].phrase }}</textarea>
+				</td>
+			</tr>
+
+			{% if obj.children|length %}
+				{% for subobj in obj.children %}
+					{% set sub_phrase_id = phrase_prefix ~ subobj.getId() ~ phrase_suffix %}
+					<tr class="phrase-row {% if lang_phrases[sub_phrase_id].phrase %}custom{% endif %}" data-phrase-id="{{ sub_phrase_id }}">
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;- - {{ subobj.getRealTitle() }}</td>
+						<td width="200">
+							<input class="phrase-preview" type="text" style="width: 95%;" value="{% if lang_phrases[sub_phrase_id].phrase %}{{ lang_phrases[sub_phrase_id].phrase }}{% else %}{{ subobj.getRealTitle() }}{% endif %}" />
+							<textarea style="display: none" class="master_phrase">{{ subobj.getRealTitle() }}</textarea>
+							<textarea style="display: none" class="custom_phrase">{{ lang_phrases[sub_phrase_id].phrase }}</textarea>
+						</td>
+					</tr>
+				{% endfor %}
+			{% endif %}
+			{% if obj.getTypeName() == 'display' %}
+				{% set sub_phrase_id = phrase_prefix ~ obj.getId() ~ '_html' %}
+				<tr class="phrase-row {% if lang_phrases[sub_phrase_id].phrase %}custom{% endif %}" data-phrase-id="{{ sub_phrase_id }}">
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;- - {{ obj.getHtmlOption()|raw|truncate(80)|escape }}</td>
+						<td width="200">
+							<input class="phrase-preview" type="text" style="width: 95%;" value="{% if lang_phrases[sub_phrase_id].phrase %}{{ lang_phrases[sub_phrase_id].phrase }}{% else %}{{ obj.getRealHtmlOption() }}{% endif %}" />
+							<textarea style="display: none" class="master_phrase">{{ obj.getRealHtmlOption() }}</textarea>
+							<textarea style="display: none" class="custom_phrase">{{ lang_phrases[sub_phrase_id].phrase }}</textarea>
+						</td>
+					</tr>
+			{% endif %}
+		{% else %}
+			<tr><td>You have no defined any fields.</td></tr>
+		{% endfor %}
+	</tbody>
+{{ design.structure_table_end() }}
+
+<br /><br />
+
+{% if all_fields|length %}
+	<h2>Descriptions</h2>
+	{{ design.structure_table() }}
+		<tbody>
+			{% set phrase_prefix = lang_group ~ '.' %}
+			{% set phrase_suffix = '_description' %}
+			{% for obj in all_fields %}
+				{% set phrase_id = phrase_prefix ~ obj.getId() ~ phrase_suffix %}
+				<tr class="phrase-row {% if lang_phrases[phrase_id].phrase %}custom{% endif %}" data-phrase-id="{{ phrase_id }}">
+					<td>{{ obj.getRealTitle() }}</td>
+					<td width="350">
+						<input class="phrase-preview" type="text" style="width: 95%;" value="{% if lang_phrases[phrase_id].phrase %}{{ lang_phrases[phrase_id].phrase }}{% else %}{{ obj.getRealDescription() }}{% endif %}" />
+						<textarea style="display: none" class="master_phrase">{{ obj.getRealDescription() }}</textarea>
+						<textarea style="display: none" class="custom_phrase">{{ lang_phrases[phrase_id].phrase }}</textarea>
+					</td>
+				</tr>
+			{% else %}
+				<tr><td>You have no defined any fields.</td></tr>
+			{% endfor %}
+		</tbody>
+	{{ design.structure_table_end() }}
+{% endif %}
+
+{% include 'AdminBundle:Languages:edit-phrase-overlay.html.twig' %}
+
+</form>
+
+{% endblock %}

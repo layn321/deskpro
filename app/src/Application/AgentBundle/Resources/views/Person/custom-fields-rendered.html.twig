@@ -1,0 +1,14 @@
+<div class="wrap">
+{% for f in custom_fields %}
+	{% if f.rendered %}
+		<div class="row-table-cotent">
+			<div class="col-table-content title-col">
+				<span>{{f.title}}</span>
+			</div>
+			<div class="col-table-content prop-val">
+				{{ render_custom_field(f) }}
+			</div>
+		</div>
+	{% endif %}
+{% endfor %}
+</div>

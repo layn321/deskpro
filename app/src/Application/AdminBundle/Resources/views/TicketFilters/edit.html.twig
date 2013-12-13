@@ -1,0 +1,202 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block page_js_exec %}
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() {
+	var criteriaEditor = new DeskPRO.Form.RuleBuilder($('.criteria-tpl'));
+
+	$('.criteria-form .add-term').on('click', function() {
+		var basename = 'terms['+Orb.uuid()+']';
+		criteriaEditor.addNewRow($('.criteria-form .search-terms'), basename);
+	});
+
+	{% if filter.terms %}
+	var terms = {{filter.terms|json_encode|raw}};
+	Array.each(terms, function(info, x) {
+		var basename = 'terms[' + Orb.uuid() + ']';
+		criteriaEditor.addNewRow($('.criteria-form .search-terms'), basename, {
+			type: info.type,
+			op: info.op,
+			options: info.options
+		});
+	});
+	{% endif %}
+});
+</script>
+{% endblock %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_tickets_filters') }}">{{ phrase('admin.tickets.ticket_filters') }}</a></li>
+		<li>{% if filter.id %}Edit Filter{% else %}New Filter{% endif %}</li>
+	</ul>
+
+	{% if filter.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_tickets_filters_delete', {filter_id: filter.id, security_token: security_token('delete_ticket_filter') }) }}" onclick="return confirm('{{ phrase('agent.general.ask_delete_selected') }}');">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_tickets_filters_edit', {'filter_id': filter.id|default(0)}) }}" method="post" class="dp-form with-form-validator">
+<input type="hidden" name="process" value="1" />
+
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.tickets.agent_access') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input class="option-trigger" type="radio" name="filter_visibility" value="filter_global" {% if filter.is_global %}checked="checked"{% endif %} />
+					{{ phrase('admin.tickets.explain_global_gilter') }}
+				</label>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input class="option-trigger" type="radio" name="filter_visibility" value="filter_agent_team" {% if filter.agent_team %}checked="checked"{% endif %} />
+					{{ phrase('admin.tickets.choice_specific_team_access') }}
+				</label>
+				<div id="agent_required_group" class="dp-group-options" style="display: none">
+					{{ phrase('admin.tickets.select_team_filter_access') }}: <select name="filter[agent_team_id]">
+						{% for k,v in app.agent_teams.getTeamNames() %}
+							<option {% if filter.agent_team.id == k %}selected="selected"{% endif %} value="{{k}}">{{v}}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input class="option-trigger" type="radio" name="filter_visibility" value="filter_agent" {% if not filter.is_global and not filter.agent_team %}checked="checked"{% endif %} />
+					{{ phrase('admin.tickets.choice_specific_agent_access') }}
+				</label>
+				<div id="agent_required_group" class="dp-group-options" style="display: none">
+					{{ phrase('admin.tickets.select_agent_filter_access') }}: <select name="filter[person_id]">
+						{% for k,v in app.getDataService('Person').getAgentNames() %}
+							<option {% if filter.person.id == k %}selected="selected"{% endif %} value="{{k}}">{{v}}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>{{ phrase('agent.general.title') }}</label>
+	</div>
+	<div class="dp-form-input dp-form-row">
+		<input
+			type="text"
+			name="filter[title]"
+			value="{{filter.title}}"
+			data-field-validators="DeskPRO.Form.LengthValidator"
+			data-min-len="1"
+		/>
+		<div class="dp-error-explain dp-error-pattern_no_match">Please enter a title</div>
+	</div>
+</div>
+<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('agent.general.criteria') }}</label>
+		</div>
+
+	<div class="dp-form-input">
+		<div class="criteria-form search-form">
+			{% if app.getSetting('core_tickets.use_archive') %}
+				<div class="term">
+					{{ phrase('agent.tickets.active_tickets_term') }}
+					<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('agent.tickets.active_tickets_term_explain') }}"></span>
+				</div>
+			{% endif %}
+			<div class="search-terms"></div>
+			<div class="term"><span class="add-term">+</span> {{ phrase('agent.general.add_a_new_criteria') }}</div>
+		</div>
+	</div>
+</div>
+
+{% if filter.id %}
+	{% if filter.is_global or filter.agent_team %}
+		{% if filter_users %}
+			<div style="float: left; width: 45%; margin-right: 20px">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>
+							{{ phrase('admin.tickets.in_use_by') }}:
+						</label>
+					</div>
+
+					<div class="dp-form-input">
+						<div class="dp-icon-list-box" style="width: 98%">
+							<ul>
+								{% for agent in filter_users %}
+									<li>
+										<img src="{{ agent.getPictureUrl(20) }}" class="list-icon" />
+										{{ agent.display_name }}
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+		{% if filter_users_ignore %}
+			<div style="float: left; width: 45%; margin-right: 8px">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>
+							{{ phrase('admin.tickets.disabled_by') }}:
+						</label>
+					</div>
+
+					<div class="dp-form-input">
+						<div class="dp-icon-list-box" style="width: 98%">
+							<ul>
+								{% for agent in filter_users_ignore %}
+									<li>
+										<img src="{{ agent.getPictureUrl(20) }}" class="list-icon" />
+										{{ agent.display_name }}
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+		<br class="clear" />
+	{% else %}
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>
+					{{ phrase('admin.tickets.name_has_filter_access', {'name':filter.person.name}) }}
+				</label>
+			</div>
+			<div class="dp-form-input">
+				{% if not filter_users %}
+                    {{ phrase('admin.tickets.name_filter_disabled', {'name':filter.person.name}) }}
+				{% else %}
+					{{ phrase('admin.tickets.name_filter_enabled', {'name':filter.person.name}) }}
+				{% endif %}
+			</div>
+		</div>
+	{% endif %}
+{% endif %}
+
+<button class="clean-white save-trigger">{{ phrase('agent.general.save') }}</button>
+
+</form>
+
+{% include 'DeskPRO:Common:ticket-search-criteria.html.twig' with {
+	'classname': 'criteria-tpl',
+	'term_options': term_options,
+	'search_context': 'filter',
+	'organization_autocomplete_path': path('admin_quick_organization_search')
+} %}
+{% endblock %}

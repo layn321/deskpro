@@ -1,0 +1,301 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('admin.server.php_file_uploads') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th colspan="4">{{ phrase('admin.server.file_storage_mechanism') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if use_fs %}
+				<tr>
+					<td width="200">{{ phrase('admin.server.storage_mechanism') }}</td>
+					<td>
+						{{ phrase('admin.server.file_storage') }}
+						<div style="font-size: 11px">
+
+							{{ phrase('admin.server.notice_most_efficient_storage') }}
+                            {% set phrase_link %}<a class="switch-trigger">{{ phrase('admin.server.switch_to_database_storage') }}</a>{% endset %}
+                            {% if not moving_id %}{{ phrase('admin.server.note_recommended_link', {'link':phrase_link}, true) }}{% endif %}
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>{{ phrase('admin.server.storage_path') }}</td>
+					<td>{{ filestorage_path }}</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td>{{ phrase('admin.server.storage_mechanism') }}</td>
+					<td>
+						{{ phrase('admin.server.database_storage') }}
+						<div style="font-size: 11px">
+							{{ phrase('admin.server.databases_not_recommended') }}
+                            {% set phrase_link %}
+                            <a class="switch-trigger">{{ phrase('admin.server.switching_to_fs_storage') }}</a>
+                            {% endset %}
+                            {% if not moving_id %}{{ phrase('admin.server.recommend_fs_storage', {'link':phrase_link}, true) }}{% endif %}
+						</div>
+					</td>
+				</tr>
+			{% endif %}
+			{% if moving_id %}
+				<tr>
+					<td colspan="4">
+                        {% if use_fs %}
+                            {% set phrase_part = phrase('admin.server.db_to_fs') %}
+                        {% else %}
+                            {% set phrase_part = phrase('admin.server.fs_to_db') %}
+                        {% endif %}
+                        {{ phrase('admin.server.currently_transferring', {'subphrase':phrase_part}, true) }}
+                        {{ phrase('admin.server.files_have_been_processed', {'count_done':count_done, 'count_todo':count_todo, 'percent':count_perc}) }}
+					</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div><br />
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th colspan="10">Upload Restrictions (<a href="{{ path('admin_settings') }}">edit settings</a>)</th>
+			</tr>
+			<tr>
+				<th width="180" style="text-align: left;">Setting</th>
+				<th style="text-align: left;">Users</th>
+				<th style="text-align: left;">Agents</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Max Upload Size</td>
+				<td>
+					{{ app.getSetting('core.attach_user_maxsize')|filesize_display }}
+				</td>
+				<td>
+					{{ app.getSetting('core.attach_agent_maxsize')|filesize_display }}
+				</td>
+			</tr>
+			<tr>
+				<td>File Types</td>
+				<td>
+					{% if app.getSetting('core.attach_user_not_exts') %}
+						All file types except these are allowed:<br />{{ app.getSetting('core.attach_user_must_exts') }}
+					{% elseif app.getSetting('core.attach_user_must_exts') %}
+						Only these file types allowed:<br /{{ app.getSetting('core.attach_user_must_exts') }}
+					{% else %}
+						All file types are allowed
+					{% endif %}
+				</td>
+				<td>
+					{% if app.getSetting('core.attach_agent_not_exts') %}
+						All file types except these are allowed:<br />{{ app.getSetting('core.attach_agent_must_exts') }}
+					{% elseif app.getSetting('core.attach_agent_must_exts') %}
+						Only these file types allowed:<br /{{ app.getSetting('core.attach_agent_must_exts') }}
+					{% else %}
+						All file types are allowed
+					{% endif %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div><br />
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th colspan="10">{{ phrase('admin.server.test_a_file_upload') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if has_uploaded %}
+				<tr>
+					<td>
+						{% if failed %}
+							<h3>{{ phrase('admin.server.failed') }}</h3><br />
+
+							{% if failed == 'Please select a file to upload' %}
+								No uploaded file was detected. If you did not choose a file, you can simply <a href="{{ path('admin_server_attach') }}">try again now</a>. If you did choose a file
+								and are still seeing this message then it means the server did not to provide the helpdesk with your upload.
+								<br/><br/>
+								The two most common reasons for this are:
+								<ul style="margin-top: 3px;">
+									{% if not can_tmp_write %}
+										<li style="margin-bottom: 3px;">
+											&bull; The temporary storage directory (upload_tmp_dir in php.ini) is currently set to {{ php_vars.upload_tmp_dir_real }}. This directory
+											<strong>is not writable</strong> by the web server. This means uploads can not be saved and will always fail. Edit php.ini and specify a
+											path that is writable by the server, or change permissions on the directory so the server can write to it.
+										</li>
+									{% else %}
+										<li style="margin-bottom: 3px;">
+											&bull; The temporary storage directory defined in php.ini as displayed below is not set or is set to a directory
+											that the web server cannot write to. Correcting the directory or making it writable may solve the problem.
+										</li>
+									{% endif %}
+									<li>
+										&bull; You have chosen a file that is larger than your server configuration allows. File limits are set using the
+										options in php.ini as displayed below. In addition to these limits, your web server (such as IIS or Apache)
+										may also enforce its own limits. Limits enforced by the web server cannot be detected by the helpdesk and will need to be
+										checked manually.
+									</li>
+								</ul>
+							{% else %}
+								{{ failed }}
+							{% endif %}
+						{% else %}
+							<h3>{{ phrase('admin.server.success') }}</h3>
+							<a href="{{ attach.getDownloadUrl() }}">{{ phrase('admin.server.download_attachment') }}</a>
+						{% endif %}
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td>
+						<form action="{{ path('admin_server_attach', {test: 1}) }}" method="post" enctype="multipart/form-data">
+							<input type="file" name="file" /> <button>{{ phrase('admin.server.test_upload') }}</button>
+						</form>
+					</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
+<br />
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th>{{ phrase('admin.server.php_settings') }}</th>
+				<th width="200">{{ phrase('agent.general.value') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<h3><a href="http://www.php.net/manual/en/ini.core.php#ini.file-uploads">file_uploads</a></h3>
+					<p>{{ phrase('admin.server.required_for_upload') }}</p>
+				</td>
+				<td>{{ php_vars.file_uploads }}
+			</tr>
+
+			<tr>
+				<td>
+					<h3><a href="http://www.php.net/manual/en/ini.core.php#ini.upload-tmp-dir">upload_tmp_dir</a></h3>
+					<p>{{ phrase('admin.server.php_upload_location') }}</p>
+					{% if not php_vars.upload_tmp_dir %}
+						<p>
+							<strong>Note:</strong> There is currently no value set in php.ini for upload_tmp_dir. The value shown to the right
+							is your system temp directory which is used by default. If you are having problems uploading files, you should
+							edit php.ini and set a specific path for upload_tmp_dir.
+						</p>
+					{% endif %}
+				</td>
+				<td>{{ php_vars.upload_tmp_dir|default(php_vars.upload_tmp_dir_real) }}
+			</tr>
+
+			<tr>
+				<td>
+					<h3><a href="http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize">upload_max_filesize</a></h3>
+					<p>{{ phrase('admin.server.max_single_file_size') }}</p>
+				</td>
+				<td>{{ php_vars.upload_max_filesize }}
+			</tr>
+
+			<tr>
+				<td>
+					<h3><a href="http://www.php.net/manual/en/ini.core.php#ini.post-max-size">post_max_size</a></h3>
+					<p>{{ phrase('admin.server.max_post_size') }}</p>
+				</td>
+				<td>{{ php_vars.post_max_size }}</td>
+			</tr>
+
+			<tr>
+				<td>
+					<h3><a href="http://www.php.net/manual/en/ini.core.php#ini.memory-limit">memory_limit</a></h3>
+					<p>{{ phrase('admin.server.upload_memory_limit_explain') }}</p>
+				</td>
+				<td>
+					{% if php_vars.memory_limit_real == -1 %}No limit
+					{% else %}{{ php_vars.memory_limit_real|filesize_display }}
+					{% endif %}
+					{% if php_vars.memory_limit and php_vars.memory_limit != php_vars.memory_limit_real %}
+						<div style="font-size: 11px;">Successfully changed to {{ php_vars.memory_limit|filesize_display }} at runtime</div>
+					{% endif %}
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<h3>{{ phrase('admin.server.upload_effect_max') }}</h3>
+					<p>{{ phrase('admin.server.upload_effect_max_explain') }}</p>
+				</td>
+				<td>Approximately {{ effective_max_display }}</td>
+			</tr>
+
+			<tr>
+				<td colspan="2">
+					<p>
+						{{ phrase('admin.server.edit_php_ini_to_make_changes') }}
+						<a href="{{ get_service_url('dp.kb.editing_php_ini') }}">{{ phrase('admin.server.learn_about_editing_php_ini') }}</a>
+					<p>
+					{% if php_ini %}
+						<p>
+							{{ phrase('admin.server.we_detected_php_ini_at', {path: php_ini}) }}
+						</p>
+					{% endif %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div><br />
+
+{% if not moving_id %}
+<div id="switch_confirm" style="display: none; width: 500px; height: 300px">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.server.change_storage_mechanism') }}</h4>
+	</div>
+	<div class="overlay-content">
+		{% if use_fs %}
+			<p style="margin-bottom: 10px;">{{ phrase('admin.server.confirm_switch_to_db', {'path':filestorage_path}) }}</p>
+		{% else %}
+			<p style="margin-bottom: 10px;">{{ phrase('admin.server.confirm_switch_to_fs', {'path':filestorage_path}) }}</p>
+		{% endif %}
+
+		<p style="margin: 10px; background-color: #F5F5F5; padding: 10px;">
+            {{ phrase('admin.server.count_files_will_be_used', {'count':count_todo, 'size':total_size_readable}) }}
+			<br /><br />
+			{{ phrase('admin.server.notice_transfer_is_gradually_done') }}
+		</p>
+	</div>
+	<div class="overlay-footer">
+		<form action="{{ path('admin_server_attach_switch') }}">
+			{{ form_token() }}
+            {% if use_fs %}{% set phrase_part = phrase('admin.server.db') %}{% else %}{% set phrase_part = phrase('admin.server.fs') %}{% endif %}
+			<button class="clean-white">{{ phrase('admin.server.btn_confirm_switch', {'subphrase':phrase_part}, true) }}</button>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var overlay = new DeskPRO.UI.Overlay({
+		triggerElement: $('.switch-trigger'),
+		contentElement: $('#switch_confirm')
+	});
+});
+</script>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_sendmail_queue_index') }}">Queued Outgoing Mail</a></li>
+		<li>Confirm Mass Actions</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_sendmail_queue_massactions') }}" method="POST">
+	{% if action == 'delete' %}
+		You are about to <strong>permanantly delete</strong> {{ count }} queued messages.
+		Users WILL NOT recieve these emails and DeskPRO will never try to resend them.
+	{% elseif action == 'resend' %}
+		You are about to <strong>resend</strong> {{ count }} messages.
+	{% elseif action == 'resend_from' %}
+		You are about to <strong>resend</strong> {{ count }} messages and change the "From" account to:<br/>
+		<select name="transport_id">
+			{% for tr in email_transports if tr.match_pattern %}
+				<option value="{{ tr.id }}">{{ tr.match_pattern }}</option>
+			{% endfor %}
+		</select>
+	{% endif %}
+
+	{% for id in ids %}<input type="hidden" name="sendmail_ids[]" value="{{ id }}" />{% endfor %}
+
+	<br/><br/>
+	<input type="hidden" name="confirm" value="1" />
+	<input type="hidden" name="action" value="{{ action }}" />
+	<button class="dp-btn dp-btn-primary">Continue &rarr;</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import "AdminBundle:TicketProperties:list.html.twig" as macro %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a href="{{ path('admin_customdeftickets_new_choosetype') }}">{{ phrase('admin.tickets.add_new_field') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.general.ticket_fields') }}</li>
+	</ul>
+{% endblock %}
+{% block content %}
+<div
+	class="dp-page-box"
+	data-element-handler="DeskPRO.Admin.ElementHandler.TicketPropertiesList"
+	data-set-setting-url="{{ path('admin_settings_set', {'setting_name': '_SETTING_NAME_', 'security_token': security_token('set_setting')}) }}"
+	data-set-field-url="{{ path('admin_customdeftickets_setenabled', {'field_id': '00000'})|replace({'00000': '_FIELD_ID_'}) }}"
+>
+
+	<div class="page-content" style="margin-bottom: 0;">
+		{{ design.helpbox() }}
+			<p>
+				Customize display orders, layouts and per-department fields using the <a class="clean-white" href="{{ path('admin_tickets_editor') }}">Layout Editor &rarr;</a>
+			</p>
+		{{ design.helpbox_end() }}
+	</div>
+
+	{% macro linked_deps(name, context) %}
+		{% if context.all_pages %}
+			<div class="linked-deps">
+				<span>{% if context.field_to_dep[name]|length == context.dep_names|length %}All Departments{% else %}{{ context.field_to_dep[name]|length }} Departments{% endif %}</span>
+				<div class="list">
+					{% for id in context.field_to_dep[name] %}
+						&bull; {{ app.departments.get(id).getFullTitle() }}<br/>
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+	{% endmacro %}
+
+<ul class="field-dual-list">
+	<li>
+		<header>
+			<h3><a href="{{ path('admin_departments') }}">{{ phrase('admin.general.departments') }}</a></h3>
+			{#<div class="check-control">
+				<input type="checkbox" {% if app.getSetting('core.enable_departments') %}checked="checked"{% endif %} class="onoff-slider" data-setting-name="core.enable_departments" />
+			</div>#}
+			<br class="clear" />
+		</header>
+		<p>
+            {{ phrase('admin.tickets.explain_departments') }}
+            {{ phrase('admin.tickets.have_count_departments', {'count':counts.department}) }}
+		</p>
+	</li>
+
+	<li>
+		<header>
+			<h3><a href="{{ path('admin_products') }}">{{ phrase('agent.general.products') }}</a></h3>
+			<div class="check-control">
+				<input type="checkbox" {% if app.getSetting('core.use_product') %}checked="checked"{% endif %} class="onoff-slider" data-enable-url="{{ path('admin_products_toggle', {enable: '1'}) }}" data-disable-url="{{ path('admin_products_toggle', {enable: '0'}) }}" />
+			</div>
+			<br class="clear" />
+		</header>
+		<p>
+            {{ phrase('admin.tickets.explain_products') }}
+            {{ phrase('admin.tickets.have_count_products', {'count':counts.product}) }}
+		</p>
+		{% if app.getSetting('core.use_product') %}
+			{{ macro.linked_deps('ticket_product', _context) }}
+		{% endif %}
+	</li>
+
+	<li>
+		<header>
+			<h3><a href="{{ path('admin_ticketcats') }}">{{ phrase('admin.general.ticket_categories') }}</a></h3>
+			<div class="check-control">
+				<input type="checkbox" {% if app.getSetting('core.use_ticket_category') %}checked="checked"{% endif %} class="onoff-slider" data-enable-url="{{ path('admin_ticketcats_toggle', {enable: '1'}) }}" data-disable-url="{{ path('admin_ticketcats_toggle', {enable: '0'}) }}" />
+			</div>
+			<br class="clear" />
+		</header>
+		<p>
+            {{ phrase('admin.tickets.explain_categories') }}
+            {{ phrase('admin.tickets.have_count_categories', {'count':counts.ticket_category}) }}
+		</p>
+		{% if app.getSetting('core.use_ticket_category') %}
+			{{ macro.linked_deps('ticket_category', _context) }}
+		{% endif %}
+	</li>
+
+	<li>
+		<header>
+			<h3><a href="{{ path('admin_ticketpris') }}">{{ phrase('admin.general.ticket_priorities') }}</a></h3>
+			<div class="check-control">
+				<input type="checkbox" {% if app.getSetting('core.use_ticket_priority') %}checked="checked"{% endif %} class="onoff-slider" data-enable-url="{{ path('admin_ticketpris_toggle', {enable: '1'}) }}" data-disable-url="{{ path('admin_ticketpris_toggle', {enable: '0'}) }}" />
+			</div>
+			<br class="clear" />
+		</header>
+		<p>
+            {{ phrase('admin.tickets.explain_priorities') }}
+            {{ phrase('admin.tickets.have_count_priorities', {'count':counts.ticket_priority}) }}
+		</p>
+		{% if app.getSetting('core.use_ticket_priority') %}
+			{{ macro.linked_deps('ticket_priority', _context) }}
+		{% endif %}
+	</li>
+
+	<li>
+		<header>
+			<h3><a href="{{ path('admin_ticketworks') }}">{{ phrase('admin.general.ticket_workflows') }}</a></h3>
+			<div class="check-control">
+				<input type="checkbox" {% if app.getSetting('core.use_ticket_workflow') %}checked="checked"{% endif %} class="onoff-slider" data-enable-url="{{ path('admin_ticketworks_toggle', {enable: '1'}) }}" data-disable-url="{{ path('admin_ticketworks_toggle', {enable: '0'}) }}" />
+			</div>
+			<br class="clear" />
+		</header>
+		<p>
+            {{ phrase('admin.tickets.explain_workflows') }}
+            {{ phrase('admin.tickets.have_count_workflows', {'count':counts.ticket_workflow}) }}
+		</p>
+		{% if app.getSetting('core.use_ticket_workflow') %}
+			{{ macro.linked_deps('ticket_workflow', _context) }}
+		{% endif %}
+	</li>
+
+	{% for field in fields %}
+		<li {% if loop.index == 2 %}style="clear:left"{% endif %}>
+			<header>
+				<span class="field-id">ID: {{ field.id }}</span>
+				<h3><a class="popout-trigger" href="{{ path('admin_customdeftickets_edit', {'field_id': field.id}) }}">{{ field.title }}</a></h3>
+				<div class="check-control">
+					<input type="checkbox" {% if field.is_enabled %}checked="checked"{% endif %} class="onoff-slider" data-field-id="{{ field.id }}" />
+				</div>
+				<br class="clear" />
+			</header>
+			<p>{{ phrase(field.handler_class_phrase) }}</p>
+			{% if field.is_enabled %}
+				{{ macro.linked_deps(field.id, _context) }}
+			{% endif %}
+		</li>
+	{% endfor %}
+
+</ul>
+<br class="clear" />
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.linked-deps').on('click', function() {
+		$(this).toggleClass('open');
+	});
+})
+</script>
+
+</div>
+{% endblock %}

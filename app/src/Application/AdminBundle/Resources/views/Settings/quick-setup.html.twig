@@ -1,0 +1,147 @@
+{% set is_quick_setup = true %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.QuickSetup' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript">
+var MA_SERVER = '{{ ma_server }}';
+var INSTALL_TOKEN = '{{ install_token }}';
+</script>
+<script type="text/javascript" src="{{ asset('vendor/detect_timezone.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/QuickSetup.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailTransportPage.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailGatewayPage.js') }}"></script>
+{% endblock %}
+{% block dp_full_page %}
+	<div class="dp_admin_pagebar">
+		<ul>
+			<li>Install Software</li>
+		</ul>
+	</div>
+	<div class="dp_admin_page" id="section_install_software">
+		<div class="mega-tick"></div>
+		<div class="dp_admin_page_inner">
+			<div class="dp-page-box">
+				<div class="page-content">
+
+					<form action="{{ path('admin_settings_silent_settings') }}" method="post" id="setting_form">
+						<input type="hidden" name="timezone" id="setting_timezone" value="UTC" />
+						<input type="hidden" name="url" id="setting_url" value="" />
+					</form>
+
+					<ul class="checked-list">
+						<li>License agreement</li>
+						<li>Server checks</li>
+						<li>File integrity checks</li>
+						<li>Database installation</li>
+						<li>Initial admin account</li>
+					</ul>
+					<br />
+					<br />
+					<p>DeskPRO has been installed successfully.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+
+	{% if is_import %}
+		<div class="dp_admin_pagebar">
+			<ul>
+				<li>Import DeskPRO v3 Database</li>
+			</ul>
+		</div>
+		<div class="dp_admin_page" id="section_import_dp3">
+			<div class="mega-tick"></div>
+			<div class="dp_admin_page_inner">
+				<div class="dp-page-box">
+					<div class="page-content">
+						<ul class="checked-list">
+							<li>
+								DeskPRO v3 database: {{ app.getSetting('core.imported_db_user') }}@{{ app.getSetting('core.imported_db_host') }}/{{ app.getSetting('core.imported_db_name') }}
+							</li>
+							<li>
+								Version check
+							</li>
+							<li>
+								Import DeskPRO v3 data into new database
+							</li>
+							<li>
+								Cleanup
+							</li>
+						</ul>
+						<br />
+						<br />
+						<p>Your old DeskPRO v3 data has been imported into the new DeskPRO v4 installation.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+	{% endif %}
+
+	<div class="dp_admin_pagebar">
+		<ul>
+			<li>Enter License</li>
+		</ul>
+	</div>
+	<div class="dp_admin_page" id="section_enter_license">
+		<div class="mega-tick" {% if not license_code %}style="display: none"{% endif %}></div>
+		<div class="dp_admin_page_inner">
+			<div class="dp-page-box">
+				<div class="page-content">
+					{% include 'AdminBundle:Settings:quick-setup-license.html.twig' %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+
+	{% if not skip_cron_check %}
+		<div class="dp_admin_pagebar">
+			<ul>
+				<li>Install Scheduled Task</li>
+			</ul>
+		</div>
+		<div class="dp_admin_page" id="section_install_cron" data-check-url="{{ path('admin_settings_cron_check') }}">
+			<div class="mega-tick" {% if not last_cron_run %}style="display: none"{% endif %}></div>
+			<div class="dp_admin_page_inner">
+				<div class="dp-page-box">
+					<div class="page-content">
+						{% include 'AdminBundle:Settings:quick-setup-cron.html.twig' %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+	{% endif %}
+
+	{% if not is_import %}
+		<div class="dp_admin_pagebar">
+			<nav>
+				<ul>
+					<li class="undo-tick-trigger" id="section_config_smtp_edit" {% if not default_transport %}style="display: none"{% endif %}><a>Edit</a></li>
+				</ul>
+			</nav>
+			<ul>
+				<li>Configure Outgoing Email</li>
+			</ul>
+		</div>
+		<div class="dp_admin_page" id="section_config_smtp">
+			<div class="mega-tick" {% if not default_transport %}style="display: none"{% endif %}></div>
+			<div class="dp_admin_page_inner">
+				<div class="dp-page-box">
+					<div class="page-content">
+						{% include 'AdminBundle:Settings:quick-setup-outgoing-email.html.twig' %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+	{% endif %}
+
+	<div class="setup-done-section" id="section_done">
+		<button class="clean-white disabled" data-url="{{ path('admin_welcome', {done: 1}) }}">Continue &rarr;</button>
+		<em>We know you're keen, but you have <label>5</label> more <span class="steps">steps</span> to go!</em>
+	</div>
+{% endblock %}

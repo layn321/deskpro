@@ -1,0 +1,86 @@
+<div>
+	<nav class="section-subnav logs-type-nav" data-filter="{{ filter }}" data-page="{{ cur_page }}" data-num-pages="{{ num_pages }}">
+		<div class="dp-is-loading" style="float:right; margin: 3px 9px 0 0;">
+			<i class="spinner-flat"></i>
+		</div>
+		<ul>
+			<li class="trigger-update-filter {% if not filter or filter == 'all' %}on{% endif %}" data-typename="all"><em>{{ phrase('agent.general.all') }} ({{ counts.all|default('0') }})</em></li>
+			{% if counts.message %}<li class="trigger-update-filter {% if filter == 'message' %}on{% endif %}" data-typename="message"><em>{{ phrase('agent.tickets.messages') }} ({{ counts.message|default('0') }})</em></li>{% endif %}
+			{% if counts.note %}<li class="trigger-update-filter {% if filter == 'note' %}on{% endif %}" data-typename="note"><em>{{ phrase('agent.tickets.notes') }} ({{ counts.note|default('0') }})</em></li>{% endif %}
+			{% if counts.attach %}<li class="trigger-update-filter {% if filter == 'attach' %}on{% endif %}" data-typename="attach"><em>{{ phrase('agent.tickets.attachments') }} ({{ counts.attach|default('0') }})</em></li>{% endif %}
+			{% if counts.notif %}<li class="trigger-update-filter {% if filter == 'notif' %}on{% endif %}" data-typename="notif"><em>{{ phrase('agent.tickets.notifications') }} ({{ counts.notif|default('0') }})</em></li>{% endif %}
+			{% if counts.assign %}<li class="trigger-update-filter {% if filter == 'assign' %}on{% endif %}" data-typename="assign"><em>{{ phrase('agent.tickets.assignments') }} ({{ counts.assign|default('0') }})</em></li>{% endif %}
+			{% if counts.slas %}<li class="trigger-update-filter {% if filter == 'slas' %}on{% endif %}" data-typename="slas"><em>{{ phrase('agent.general.slas') }} ({{ counts.slas|default('0') }})</em></li>{% endif %}
+			{% if counts.triggers %}<li class="trigger-update-filter {% if filter == 'triggers' %}on{% endif %}" data-typename="triggers"><em>{{ phrase('agent.tickets.triggers') }} ({{ counts.triggers|default('0') }})</em></li>{% endif %}
+			{% if counts.status %}<li class="trigger-update-filter {% if filter == 'status' %}on{% endif %}" data-typename="status"><em>{{ phrase('agent.general.status') }} ({{ counts.status|default('0') }})</em></li>{% endif %}
+			{% if counts.other %}<li class="trigger-update-filter {% if filter == 'other' %}on{% endif %}" data-typename="other"><em>{{ phrase('agent.general.other') }} ({{ counts.other|default('0') }})</em></li>{% endif %}
+		</ul>
+	</nav>
+	<div class="logs-page" style="padding: 6px;">
+		{% if not app.user.getPref('agent.ticket_reverse_order') %}
+			{% set ticket_logs = ticket_logs|reverse %}
+		{% endif %}
+		{% for log in ticket_logs %}
+			<div class="log-batch log-batch-id-{{ log.id }}" data-log-batch-id="{{ log.id }}">
+				<div
+					class="log-row log-{{log.id}} {% if log.sla %}with-sla{% endif %} {% if log.trigger_id %}with-trigger{% endif %} {% if log.action_type == 'message_created' and log.details.is_agent_note %}type-message_note_created{% else %}type-{{ log.action_type }}"{% endif %}
+					data-log-id="{{ log.id }}"
+				>
+					<div class="info">
+						{% if log.sla %}
+							<span class="sla">{{ phrase('agent.general.sla') }} {{ log.sla.title }}{% if log.sla_status == 'warning' %} ({{ phrase('agent.general.warning') }}){% elseif log.sla_status == 'fail' %} ({{ phrase('agent.general.failed') }}){% endif %}</span>,
+						{% elseif log.trigger_id %}
+							{% if log.details.trigger_is_escalation %}
+								<span class="trigger-id">{{ phrase('agent.general.escalation') }} {{ log.trigger_id }}</span>,
+							{% else %}
+								<span class="trigger-id">{{ phrase('agent.general.trigger_x', {id: log.trigger_id}) }}</span>,
+							{% endif %}
+						{% elseif log.person %}
+							<a class="as-popover" data-route="person:{{ path('agent_people_view', {'person_id': log.person.id}) }}">{{ log.person.display_name }}</a>,
+						{% endif %}
+						<time class="timeago" title="{{ log.date_created|date('c', 'UTC') }}">{{ log.date_created|date('day') }}</time>
+					</div>
+
+					<div class="{{ log.action_type }}">
+						{% include 'AgentBundle:Ticket:ticket-log-actiontext.html.twig' %}
+					</div>
+				</div>
+
+				{% if log.grouped|length %}
+					{% for sublog in log.grouped %}
+						<div
+							class="log-row log-{{sublog.id}} {% if sublog.sla %}with-sla{% endif %} {% if sublog.trigger_id %}with-trigger{% endif %} {% if sublog.action_type == 'message_created' and sublog.details.is_agent_note %}type-message_note_created{% else %}type-{{ sublog.action_type }}"{% endif %}
+							data-log-id="{{ sublog.id }}"
+						>
+							<div class="info">
+								{% if sublog.sla %}
+									<span class="sla">{{ phrase('agent.general.sla') }} {{ sublog.sla.title }}{% if sublog.sla_status == 'warning' %} ({{ phrase('agent.general.warning') }}){% elseif sublog.sla_status == 'fail' %} ({{ phrase('agent.general.failed') }}){% endif %}</span>,
+								{% elseif sublog.trigger_id %}
+									{% if sublog.details.trigger_is_escalation %}
+										<span class="trigger-id">{{ phrase('agent.general.escalation') }} {{ sublog.trigger_id }}</span>,
+									{% else %}
+										<span class="trigger-id">{{ phrase('agent.general.trigger_x', {id: sublog.trigger_id}) }}</span>,
+									{% endif %}
+								{% elseif sublog.person %}
+									<a class="as-popover" data-route="person:{{ path('agent_people_view', {'person_id': sublog.person.id}) }}">{{ sublog.person.display_name }}</a>,
+								{% endif %}
+								<time class="timeago" title="{{ sublog.date_created|date('c', 'UTC') }}">{{ sublog.date_created|date('day') }}</time>
+							</div>
+
+							<div class="{{ sublog.action_type }}" style="padding-left: 21px; background: transparent url({{ asset('images/agent/elbow-end.gif') }}) no-repeat 0 3px;">
+								{% include 'AgentBundle:Ticket:ticket-log-actiontext.html.twig' with {log: sublog, plog: log} %}
+							</div>
+						</div>
+					{% endfor %}
+				{% endif %}
+			</div>
+		{% endfor %}
+
+		{% if cur_page < num_pages %}
+			<div class="message-page-next trigger-next-page">
+				<div class="dp-is-loading"><i class="spinner-flat"></i></div>
+				<div class="dp-not-loading"><strong>{{ phrase('agent.general.view_more') }}</strong></div>
+			</div>
+		{% endif %}
+	</div>
+</div>

@@ -1,0 +1,66 @@
+ <section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for result in display %}
+	 	{% set feedback = result.feedback %}
+		<article
+			class="row-item feedback feedback-{{feedback.id}} feedback-{{feedback.id}} related-is-linkable"
+			data-content-type="feedback"
+			data-content-id="{{ feedback.id }}"
+			data-route="feedback:{{ path('agent_feedback_view', {'feedback_id': feedback.id}) }}"
+			data-route-title="@selector(a.feedback-title)"
+			data-route-openclass="open"
+		>
+			<input class="item-select" type="checkbox" value="{{feedback.id}}" />
+			<div class="top-row">
+				<div class="top-row-left">
+					<span class="votes">
+						{{ feedback.num_ratings|default(0) }}
+					</span>
+					<h3>
+						<a class="feedback-title click-through"><span class="obj-title-feedback_{{ feedback.id }}">{{ feedback.title }}</span></a>
+					</h3>
+				</div>
+				<div class="top-row-right">
+					<div class="bound-fade"></div>
+				</div>
+				<div class="top-row-right visible-related-content-controls">
+					<div class="bound-fade"></div>
+					<span class="tipped related-link" title="{{ phrase('agent.general.add_as_related') }}"></span>
+					<span class="tipped related-unlink" title="{{ phrase('agent.general.remove_as_related') }}"></span>
+				</div>
+			</div>
+			<hr class="clear-top" />
+			{% if display_fields|length %}
+				<div class="extra-fields">
+					<ul>
+						{% for field in display_fields %}
+							{% if field == 'category' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.type') }}:</span>
+									<span class="prop-val">{{ feedback.category.full_title }}</span>
+								</li>
+							{% elseif field == 'user_cat' and result.user_category %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.category') }}:</span>
+									<span class="prop-val">{{ result.user_category.getTitle() }}</span>
+								</li>
+							{% elseif field == 'author' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.author') }}:</span>
+									<span class="prop-val">{{ feedback.person.display_name }} {% if feedback.person.primary_email_address %}({{ feedback.person.primary_email_address }}){% endif %}</span>
+								</li>
+							{% elseif field == 'date_created' %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.date_created') }}:</span>
+									<span class="prop-val">{{ feedback.date_created|date('day')}}</span>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+					<br class="clear" />
+				</div>
+			{% else %}
+				<br class="clear" />
+			{% endif %}
+		</article>
+	{% endfor %}
+ </section>

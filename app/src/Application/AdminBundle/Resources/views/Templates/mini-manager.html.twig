@@ -1,0 +1,156 @@
+<div style="width: 500px; height: 400px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.templates.edit_templates') }}</h4>
+	</div>
+	<div class="overlay-content">
+
+		{% if default_templates %}
+		<div class="content-table template-dir">
+			<table width="100%">
+				<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<h1 class="noexpand">{{ phrase('admin.templates.builtin_templates') }}</h1>
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+					{% for name,info in default_templates %}
+						<tr class="template-row" data-template-name="{{ name }}">
+							<td>
+								<em class="edit edit-tpl-trigger"></em>
+								<h3>
+									<label>
+										<input type="radio" name="tpl" value="{{ info.name }}" />
+										{{ info.name }}
+									</label>
+								</h3>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<br />
+		{% endif %}
+
+		<div class="content-table template-dir">
+			<table width="100%">
+				<thead>
+				<tr>
+					<th class="single-title" colspan="10">
+						<h1 class="noexpand">{{ phrase('admin.templates.custom_templates') }}</h1>
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				{% for info in custom_templates %}
+				<tr class="template-row" data-template-name="{{ info.name }}">
+					<td>
+						<em class="edit edit-tpl-trigger"></em>
+						<em class="delete delete-tpl-trigger"></em>
+						<h3>
+							<label>
+								<input type="radio" name="tpl" value="{{ info.name }}" />
+								{{ info.name }}
+							</label>
+						</h3>
+					</td>
+				</tr>
+				{% endfor %}
+				<tr class="custom-template-make-row">
+					<td style="text-align: center;">
+						<button class="clean-white small create-new-tpl-trigger">{{ phrase('admin.templates.create_new_custom_template') }}</button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<br />
+
+	</div>
+	<div class="overlay-footer">
+		<button class="clean-white apply-trigger">{{ phrase('admin.templates.use_selected_template') }}</button>
+	</div>
+
+	<div class="deskpro-overlay-outer dp-tpl-edit-overlay" style="display: none; position:absolute; top: 35px; right: 35px; bottom: 35px; left: 35px;">
+		<div class="deskpro-overlay" style="position:absolute; top: 0px; right: 0; bottom: 0; left: 0;">
+			<div class="overlay-title">
+				<span class="close-overlay"></span>
+				<h4 class="template-title"></h4>
+			</div>
+			<div class="overlay-content">
+				<div class="subject-field" style="display: none;">
+					<strong>Subject:</strong><br />
+					<textarea class="template-subject-code" spellcheck="false" style="height: 85px; width: 99%;"></textarea>
+					<br />
+					<strong>Email Content:</strong>
+				</div>
+				<textarea class="template-code" spellcheck="false" style="width: 99%; height: 98%; font-family: 'Monaco', monospace; font-size: 11px;"></textarea>
+			</div>
+			<div class="overlay-footer">
+				<div class="is-not-loading">
+					<button class="clean-white save-trigger">{{ phrase('admin.general.save_changes') }}</button>
+				</div>
+				<div class="is-loading">
+					<div class="loading-icon-flat"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script class="template-row-tpl" type="text/x-deskpro-plain">
+		<tr class="template-row">
+			<td>
+				<em class="edit edit-tpl-trigger"></em>
+				<em class="delete delete-tpl-trigger"></em>
+				<h3>
+					<label>
+						<input type="radio" name="tpl" value="" />
+						<span class="place-title"></span>
+					</label>
+				<?h3>
+			</td>
+		</tr>
+	</script>
+
+	<div class="dp-tpl-new-overlay" style="display: none;">
+		<div class="deskpro-overlay" style="width: 400px; height: 250px;">
+			<div class="overlay-title">
+				<span class="close-overlay"></span>
+				<h4 class="template-title">{{ phrase('admin.templates.create_custom_template') }}</h4>
+			</div>
+			<div class="overlay-content">
+				<div class="dp-form">
+					<div class="dp-form-row">
+						<div class="dp-form-label">
+							<label>{{ phrase('admin.templates.template_name') }}</label> <em>{{ phrase('admin.templates.character_range') }}</em>
+						</div>
+						<div class="dp-form-input">
+							<input type="text" name="name" class="name" data-tpl-name-prefix="DeskPRO:custom_{{ tpl_dirname }}:{{ tpl_prefix }}-" />
+						</div>
+					</div>
+					<div class="dp-form-row">
+						<div class="dp-form-label">
+							<label>{{ phrase('admin.templates.base_template_on_other') }}</label>
+						</div>
+						<div class="dp-form-input">
+							<select name="copy_tpl" class="copy_tpl">
+								<option value="">{{ phrase('admin.templates.none_blank_template') }}</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="overlay-footer">
+				<div class="is-not-loading">
+					<button class="clean-white save-trigger">{{ phrase('agent.general.create') }}</button>
+				</div>
+				<div class="is-loading">
+					<div class="loading-icon-flat"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

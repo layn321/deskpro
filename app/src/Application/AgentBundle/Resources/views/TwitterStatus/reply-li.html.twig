@@ -1,0 +1,43 @@
+<li class="twitter-reply twitter-reply-{{ reply.id }}" data-status-id="{{ reply.id }}" data-twitter-status-id="{{ reply.status.id }}">
+	{% if reply.status.user.id == reply.account.user.id and not reply.status.recipient %}
+		<i class="status-delete reply-action tipped" title="{{ phrase('agent.general.delete') }}"></i>
+	{% endif %}
+	{% if reply.status.long %}
+		<i class="status-edit status-action tipped" title="{{ phrase('agent.general.edit') }}"></i>
+	{% endif %}
+
+	<div class="photo" data-route="page:{{ path('agent_twitter_user', {'user_id': reply.status.user.id}) }}">
+		<img src="{{ reply.status.user.profile_image_url }}" width="24" height="24" border="0" />
+	</div>
+
+	<h6>
+		<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': reply.status.user.id}) }}">
+			<span class="name">{{ reply.status.user.name }}</span>
+			<span class="screen-name">@{{ reply.status.user.screen_name }}</span>
+		</span>
+		{% if reply.status.isMessage() %}
+			<span class="dm-notice">{{ phrase('agent.twitter.dm') }}</span>
+		{% endif %}
+		{% if reply.status.long %}
+			<span class="long-notice">{% if reply.status.long.is_public %}{{ phrase('agent.twitter.long_private') }}{% else %}{{ phrase('agent.twitter.long_private') }}{% endif %}</span>
+		{% endif %}
+	</h6>
+
+	<div class="status-text">
+		{{ reply.status.long ? reply.status.long.parsed_text|raw : reply.status.parsed_text|raw }}
+	</div>
+
+	<a data-route="poppage:{{ path('agent_twitter_status_tweet_overlay', {'account_status_id': reply.id}) }}" class="timeago status-time" title="{{reply.status.date_created|date('c', 'UTC')}}" data-relative-cutoff="86400">{{reply.status.date_created|date('day')}}</a>
+
+	{% if reply.status.long and reply.status.long.date_read %}
+		<div class="extra-row long-read">
+			{{ phrase('agent.twitter.long_tweet_read') }} <time class="timeago" title="{{reply.status.long.date_read|date('c', 'UTC')}}">{{reply.status.long.date_read|date('day')}}</time>
+		</div>
+	{% endif %}
+
+	{% if reply.action_agent %}
+		<div class="extra-row action-agent">
+			{{ phrase('agent.twitter.added_by_agent', {name: reply.action_agent.display_name}) }}
+		</div>
+	{% endif %}
+</li>

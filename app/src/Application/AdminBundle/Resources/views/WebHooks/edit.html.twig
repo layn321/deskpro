@@ -1,0 +1,69 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+{% if hook.id %}
+	<nav>
+		<ul>
+			<li><a href="{{ path('admin_webhooks_test', {'webhook_id': hook.id, 'security_token': security_token('webhook_test')}) }}">Test Web Hook</a></li>
+		</ul>
+	</nav>
+{% endif %}
+<ul>
+	<li><a href="{{ path('admin_webhooks') }}">Web Hooks</a></li>
+	{% if hook.id %}
+		<li>Edit Web Hook</li>
+	{% else %}
+		<li>Add Web Hook</li>
+	{% endif %}
+</ul>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_webhooks_edit', {'webhook_id': hook.id|default(0)}) }}" method="post" class="dp-form">
+
+	{% if errors %}
+	<ul id="errors_container">
+		{% for error in errors %}
+		<li>{{ error }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Title</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="title" value="{{hook.title}}" />
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>URL</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="url" value="{{hook.url}}" />
+			<p>This URL will receive a POST request with data specific to the action occurring. It will not be called unless it is associated with a trigger.</p>
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>HTTP Basic Auth</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="username" value="{{hook.username}}" placeholder="User name" style="width: 200px" autocomplete="off" />
+			<input type="password" name="password" value="{{hook.password}}" placeholder="Password" style="width: 200px" autocomplete="off" />
+		</div>
+	</div>
+
+	<footer class="controls">
+		<button class="clean-white">Save Web Hook</button>
+	</footer>
+
+	{{ form_token() }}
+	<input type="hidden" name="process" value="1" />
+
+</form>
+
+{% endblock %}

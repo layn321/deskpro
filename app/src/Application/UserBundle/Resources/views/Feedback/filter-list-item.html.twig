@@ -1,0 +1,48 @@
+{##
+ # A feedback result row listed in the feedback section.
+ ##}
+{% set feedback = result.feedback %}
+<li class="dp-feedback-row {% if has_voted_ids[feedback.id] %}dp-voted-row{% endif %}"">
+	<section class="dp-feedback-post dp-content-post">
+		<header>
+			<table class="dp-layout" cellspacing="0" cellpadding="0" width="100%"><tbody><tr>
+				<td>
+					<div class="dp-feedback-widget-wrap">
+						{% include 'UserBundle:Feedback:voting-widget.html.twig' %}
+					</div>
+				</td>
+				<td width="100%">
+					<div class="dp-feedback-info-wrap">
+						<div class="dp-fadeaway-container">
+							<h3 style="margin-bottom: 0" class="dp-fadeaway-title"><a href="{{ path('user_feedback_view', {'slug': feedback.url_slug}) }}">{{feedback.title}}</a>
+								<div class="dp-feedback-status-wrap">
+									<div class="dp-fadeaway"></div>
+									<div class="dp-feedback-status-wrap-inner dp-{{ feedback.status }}">
+										<span class="dp-feedback-status">
+											{% if feedback.status_category %}
+												{{ phrase_object(feedback.status_category) }}
+											{% else %}
+												{% if feedback.status == 'new' %}{{ phrase('user.feedback.status_new') }}
+												{% elseif feedback.status == 'active' %}{{ phrase('user.feedback.status_active') }}
+												{% elseif feedback.status == 'closed' %}{{ phrase('user.feedback.status_closed') }}
+												{% endif %}
+											{% endif %}
+										</span>
+									</div>
+								</div>
+							</h3></div>
+						<ul class="dp-post-info">
+							<li class="dp-author"><i class="dp-icon-user"></i> {{ feedback.person.display_name_user }}</li>
+							<li class="dp-category"><i class="dp-icon-book"></i> <a href="{{ path('user_feedback', {'status': status, 'slug': feedback.category.url_slug}) }}">{{ phrase_object(feedback.category) }}</a></li>
+							{% if result.user_category %}
+								<li class="dp-user-category"><i class="dp-icon-folder-close"></i> {{ result.user_category.getTitle() }}</li>
+							{% endif %}
+							<li class="dp-comments"><i class="dp-icon-comment"></i> <a href="{{ path('user_feedback_view', {'slug': feedback.url_slug}) }}#comments">{{ phrase('user.general.count_comments', {'count': comment_counts[feedback.id]|default(0)}) }}</a></li>
+						</ul>
+					</div>
+				</td>
+			</tr></tbody></table>
+		</header>
+		<div class="dp-clear"></div>
+	</section>
+</li>

@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" class="dp-simple-popup {% if is_rtl() %}rtl{% endif %}" {{ language_html_attr() }}>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>{{ phrase('user.general.deskpro') }}</title>
+
+	{% set disable_agent_bar = true %}
+
+	{{ html_js_pack('user.vendors') }}
+	{{ html_js_pack('user.common') }}
+
+	<link rel="stylesheet" href="{{ asset('javascripts/DeskPRO/UI/ui.css') }}" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="{{ asset('stylesheets/user/main.css') }}" type="text/css" media="screen, projection">
+
+	<script type="text/javascript">
+		var BASE_URL = '{{ path('user') }}';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		var DESKPRO_PERSON_ID = {{ app.user.id|default(0) }};
+	</script>
+	<script type="text/javascript">
+		window.DeskPRO_Window = new DeskPRO.User.Window();
+		$(document).ready(function() {
+			window.DeskPRO_Window.initPage();
+		});
+	</script>
+	{% block head %}{% endblock %}
+</head>
+<body class="dp-iframe">
+{% block content %}{% endblock %}
+</body>
+</html>

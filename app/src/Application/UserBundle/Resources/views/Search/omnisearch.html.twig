@@ -1,0 +1,9 @@
+{##
+ # Search results that are displayed as real-time suggestions to a user typing in the omnibox
+ ##}
+
+<ul>
+	{% for res in results %}
+		{% include 'UserBundle:Common:searchlist-simplerow.html.twig' with { type: res.type, item: res.object, q: query, count: results|length } %}
+	{% endfor %}
+</ul>

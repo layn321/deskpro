@@ -1,0 +1,556 @@
+{% set this_page = 'ticket_editor' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/TicketEditor.js') }}"></script>
+<script type="text/javascript">
+var TICKET_DISPLAY_DATA = {{ page_data|json_encode|raw }};
+</script>
+	<style type="text/css">
+		.field-agent-only {
+			margin-left: 10px;
+			background: #DBE3E8;
+			line-height: 100%;
+			padding: 1px 4px;
+			border-radius: 4px;
+			-webkit-border-radius: 4px;
+			border: 1px solid #B2B9C1;
+		}
+
+		.orange-pip {
+			background: url({{ asset('images/agent/icons/bullet_orange.png') }}) no-repeat 100% 50%;
+			padding-right: 20px;
+		}
+
+		.content-tabs ul a {
+			color: #000;
+			text-decoration: none;
+		}
+	</style>
+{% endblock %}
+{% block page_nav_inner %}
+<div class="page-nav-block" {% if is_default %}style="display: none"{% endif %}>
+	<div class="inner-shadow"></div>
+	<section class="top">
+		<header>
+			<h4>{{ phrase('admin.tickets.ticket_elements') }}</h4>
+		</header>
+		<article id="ticket_elements">
+			<ul>
+				<li class="draggable" data-item-id="ticket_department" data-edit-title="{{ phrase('admin.tickets.edit_departments') }}" data-edit-url="{{ path('admin_departments') }}"><label>{{ phrase('agent.general.department') }}</label></li>
+				{% if section == 'create' %}
+					<li class="draggable irremovable" data-item-id="message"><label>{{ phrase('admin.tickets.ticket_message') }}</label></li>
+					<li class="draggable irremovable" data-item-id="ticket_subject"><label>{{ phrase('admin.tickets.ticket_subject') }}</label></li>
+					<li class="draggable" data-item-id="attachments"><label>{{ phrase('agent.general.attachments') }}</label></li>
+				{% endif %}
+				{% if section == 'create' or section == 'modify' %}
+					<li class="draggable" data-item-id="ticket_cc_emails"><label>CC Emails</label></li>
+				{% endif %}
+				{% if section == 'modify' %}
+					<li class="draggable" data-item-id="ticket_remove_ccs"><label>Remove CCs</label></li>
+				{% endif %}
+				{% if term_options.ticket_categories_full %}<li class="draggable" data-item-id="ticket_category" data-edit-title="{{ phrase('agent.general.edit_categories') }}" data-edit-url="{{ path('admin_ticketcats') }}"><label>{{ phrase('agent.general.categories') }}</label></li>{% endif %}
+				{% if term_options.ticket_workflows %}<li class="draggable" data-item-id="ticket_workflow" data-edit-title="Edit Workflows" data-edit-url="{{ path('admin_ticketworks') }}"><label>Workflows</label></li>{% endif %}
+				{% if term_options.products %}<li class="draggable" data-item-id="ticket_product" data-edit-title="{{ phrase('admin.tickets.edit_products') }}" data-edit-url="{{ path('admin_products') }}"><label>{{ phrase('agent.general.product') }}</label></li>{% endif %}
+				{% if term_options.priorities %}<li class="draggable" data-item-id="ticket_priority" data-edit-title="{{ phrase('admin.tickets.edit_priorities') }}" data-edit-url="{{ path('admin_ticketpris') }}"><label>{{ phrase('agent.general.priority') }}</label></li>{% endif %}
+				{% for field in custom_ticket_fields %}
+				<li class="draggable" {% if field.field_def.is_agent_field %}data-is-agent-field="1"{% endif %} data-item-id="ticket_field[{{field.field_def.id}}]" data-edit-title="{{ phrase('admin.general.edit_field') }}" data-edit-url="{{ path('admin_customdeftickets_edit', {field_id: field.field_def.id}) }}">
+				<label>{{field.title}}</label>
+					</li>
+				{% endfor %}
+				{% if section == 'create' %}
+					<li class="draggable" data-item-id="person_name"><label>Your Name</label></li>
+					<li class="draggable" data-item-id="captcha"><label>{{ phrase('admin.tickets.captcha') }}</label></li>
+				{% endif %}
+			</ul>
+		</article>
+	</section>
+</div>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li><a href="{{ path('admin_tickets_editor_reset', {security_token: security_token('reset_editor') }) }}" onclick="return confirm('Are you sure you want to reset all layouts? This will revert all layouts to their defaults and any customisations you have made will be lost.');">Reset All Layouts</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.tickets.ticket_layout_editor') }}</li>
+		{% if department %}
+			<li>{{ department.full_title }}</li>
+		{% else %}
+			<li>{{ phrase('admin.tickets.default_layout') }}</li>
+		{% endif %}
+	</ul>
+{% endblock %}
+{% block content %}
+
+<div style="padding: 10px 10px 0 10px">
+{{ design.helpbox() }}
+	<p>
+        {{ phrase('admin.tickets.notice_can_edit_form') }}
+	</p>
+{{ design.helpbox_end() }}
+</div>
+
+<div class="pagetop-option">
+	<input type="checkbox" class="onoff-slider" id="per_department_check" data-update-url="{{ path('admin_tickets_editor_toggleper') }}" {% if app.getSetting('core_tickets.per_department_form') %}checked="checked"{% endif %}/> {{ phrase('admin.tickets.enable_custom_layouts_department') }}
+	{% if app.getSetting('core_tickets.per_department_form') %}
+		<div class="sub">
+			<select id="department_switcher">
+				<option value="0" {% if 0 in dep_ids_custom %}class="custom"{% endif %} {% if not department %}selected="selected"{% endif %} data-refresh-url="{{ path('admin_tickets_editor_dep', {'department_id': '0', 'section': section}) }}">{{ phrase('admin.tickets.default_layout') }}</option>
+				{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+					{% if dep.children|length %}
+						<optgroup label="{{ dep.title }}">
+							{% for subdep in dep.children %}
+								<option {% if subdep.id in dep_ids_custom %}class="custom"{% endif %} data-full-title="{{ dep.title }} &gt; {{ subdep.title }}" value="{{subdep.id}}" {% if department.id == subdep.id %}selected="selected"{% endif %} data-refresh-url="{{ path('admin_tickets_editor_dep', {'department_id': subdep.id, 'section': section}) }}">{{subdep.title}}</option>
+							{% endfor %}
+						</optgroup>
+					{% else %}
+						<option {% if dep.id in dep_ids_custom %}class="custom"{% endif %} value="{{dep.id}}" {% if department.id == dep.id %}selected="selected"{% endif %} data-refresh-url="{{ path('admin_tickets_editor_dep', {'department_id': dep.id, 'section': section}) }}">{{dep.title}}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+		</div>
+	{% endif %}
+</div>
+
+<div class="content-tabs">
+	<nav>
+		<span class="saving-text" id="saving_text" style="display: none">{{ phrase('agent.general.saving') }}</span>
+		<ul>
+			<li {% if section == 'create' %}class="on"{% endif %}>
+				<div {% if 'create' in custom_sections %}class="orange-pip"{% endif %}>
+					<a href="{{ path('admin_tickets_editor_dep', {'department_id': department.id|default('0')}) }}">{{ phrase('admin.tickets.new_ticket_form') }}</a>
+				</div>
+			</li>
+			<li {% if section == 'view' %}class="on"{% endif %}>
+				<div {% if 'view' in custom_sections %}class="orange-pip"{% endif %}>
+					<a href="{{ path('admin_tickets_editor_dep', {'department_id': department.id|default('0'), 'section': 'view'}) }}">{{ phrase('admin.tickets.view_ticket_page') }}</a>
+				</div>
+			</li>
+			<li class="{% if section == 'modify' %}on{% endif %}">
+				<div {% if 'modify' in custom_sections %}class="orange-pip"{% endif %}>
+					<a href="{{ path('admin_tickets_editor_dep', {'department_id': department.id|default('0'), 'section': 'modify'}) }}">{{ phrase('admin.tickets.modify_ticket_form') }}</a>
+				</div>
+			</li>
+		</ul>
+		<br />
+	</nav>
+
+	<div class="editor-toggle-alt-view" {% if is_default %}style="border-bottom: none"{% endif %}>
+		{% if is_default %}
+			{% if section == 'view' or section == 'modify' %}
+				{{ phrase('admin.tickets.view_modify_ticket_page_default_explain') }}
+			{% else %}
+				{{ phrase('admin.tickets.new_ticket_form_default_explain') }}
+			{% endif %}
+			<br />
+		{% endif %}
+		<input
+			type="checkbox"
+			class="onoff-slider"
+			id="alternative_view_toggle"
+			data-enable="{{ path('admin_tickets_editor_dep_init', {department_id: department.id|default(0), section: section}) }}"
+			data-disable="{{ path('admin_tickets_editor_dep_revert', {department_id: department.id|default(0), section: section}) }}"
+			{% if not is_default %}checked="checked"{% endif %}
+		/>
+        {% if section == 'view' %}
+        	{% set phrase_part = phrase('admin.tickets.view_ticket_page') %}
+        {% elseif section == 'create' %}
+        	{% set phrase_part = phrase('admin.tickets.new_ticket_form') %}
+        {% else %}
+        	{% set phrase_part = phrase('admin.tickets.modify_ticket_form') %}
+        {% endif %}
+        {{ phrase('admin.tickets.enable_alternative_for_x', {'subphrase':phrase_part}, true) }}
+	</div>
+
+	<section {% if is_default %}style="display: none"{% endif %}>
+		<form
+			action="{{ path('admin_tickets_editor_dep_save', {'department_id': department.id|default(0), 'section': section }) }}"
+			method="post"
+			class="dp-page-box"
+			id="admin_ticket_editor"
+			data-element-handler="DeskPRO.Admin.ElementHandler.TicketEditor"
+			data-section="{{section}}"
+		>
+		<ul id="admin_ticket_editor_items" class="dp-form">
+			<li class="no-items-notice">
+				{{ phrase('admin.tickets.drag_drop_fields') }}
+			</li>
+		</ul>
+		</form>
+	</section>
+</div>
+
+{############################
+ # Main row template
+ ############################}
+<script type="text/x-deskpro-plain" id="editor_row_tpl">
+	<li class="form-item dp-form-row">
+		<div class="dp-block-controls">
+			<ul>
+				<li class="dp-edit-fields"><span></span></li>
+				<li class="dp-edit edit-field-trigger"><span></span></li>
+				<li class="dp-remove remove-field-trigger"><span></span></li>
+				<li class="dp-move"><span></span></li>
+			</ul>
+		</div>
+		<div class="dp-form-label">
+			<label class="field-title"></label>
+			<span class="field-agent-only" style="display:none">Agent Only</span>
+		</div>
+		<article class="dp-form-input"></article>
+
+		<div class="field-options-overlay" style="width: 760px; height: 260px; display: none;">
+			<div class="overlay-title">
+				<span class="close-trigger close-overlay"></span>
+				<h4>{{ phrase('admin.tickets.field_options') }}</h4>
+			</div>
+			<div class="overlay-content">
+				<div class="dp-form">
+					<div class="choices-container"></div>
+					<div class="dp-form-row">
+						<div class="dp-form-label agent_only_opt">
+							<label>
+								<input type="checkbox" class="agent_only" name="agent_only" value="1" />
+								Only show this field for agents
+							</label>
+							<br />
+							<br />
+						</div>
+						<div class="dp-form-label not_agent_only_opt">
+							<label>
+								<input type="checkbox" class="not_agent_only" name="not_agent_only" value="1" />
+								Show this field for both users and agents
+							</label>
+							<br />
+							<br />
+						</div>
+						<div class="dp-form-label">
+							<label>
+                                {% set phrase_part %}
+								<select name="term_match_type">
+                                    <option value="all">{{ phrase('agent.general.all') }}</option>
+                                    <option value="any">{{ phrase('agent.general.any') }}</option>
+                                </select>
+                                {% endset %}
+                                {{ phrase('admin.tickets.show_field_when_choice', {'choice':phrase_part}, true) }}
+                            </label>
+						</div>
+						<div class="dp-form-input">
+							<div class="criteria-form search-form">
+								<div class="search-terms"></div>
+								<div class="term"><span class="add-term">+</span> {{ phrase('agent.general.add_a_new_criteria') }}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</li>
+</script>
+
+{############################
+ # For choice-type fields, allow selection of which options to display
+ ############################}
+<script type="text/x-deskpro-plain" id="field_options_choices_tpl">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				<input type="checkbox" class="custom_options" name="custom_options" value="1" /> {{ phrase('admin.tickets.customize_display_choices') }}
+			</label>
+		</div>
+		<div class="dp-form-input custom-options" style="display:none"></div>
+	</div>
+</script>
+
+{############################
+ # Person Name
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_person_name">
+	<div class="person_name">
+		<input type="text" />
+	</div>
+</script>
+
+{############################
+ # Subject
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_ticket_subject">
+	<div class="subject">
+		<input type="text" />
+	</div>
+</script>
+
+{############################
+ # CC
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_ticket_cc_emails">
+	<div class="ticket_cc_emails">
+		<input type="text" />
+	</div>
+</script>
+
+{############################
+ # Remove CC
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_ticket_remove_ccs">
+	<div class="ticket_remove_ccs">
+		<ul><label><input type="checkbox" /> Name &lt;email@example.com&gt;</label></ul>
+	</div>
+</script>
+
+
+{############################
+ # Department
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_ticket_department">
+	<div class="subject">
+		<select>
+			<option>Choose a department...</option>
+			{% for dep in app.departments.getPersonDepartments(app.user, 'tickets') %}
+				{% if dep.children|length %}
+					<optgroup label="{{ dep.title }}">
+						{% for sub in dep.children %}
+							<option>{{ sub.title }}</option>
+						{% endfor %}
+					</optgroup>
+				{% else %}
+					<option>{{ dep.title }}</option>
+				{% endif %}
+			{% endfor %}
+		</select>
+	</div>
+</script>
+
+{############################
+ # Message field
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_message">
+	<div class="message">
+		<textarea class="message-input" style="height: 80px; resize: none;"></textarea>
+	</div>
+</script>
+
+{############################
+ # Attachments field
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_attachments">
+	<div class="attachments">
+		<input type="file" /> <button class="clean-white small">{{ phrase('agent.general.upload') }}</button>
+	</div>
+</script>
+
+{############################
+ # Category field value
+ ############################}
+
+{% if term_options.ticket_categories_full %}
+	<script type="text/x-deskpro-plain" id="rendered_field_ticket_category">
+		<div class="ticket-category">
+			<select class="ticket-category-input field-value">
+				<option>{{ phrase('admin.tickets.choose_a_category') }}</option>
+				{% for id,label in term_options.ticket_categories_full %}
+					<option value="{{id}}">{{label}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</script>
+{% endif %}
+
+{############################
+ # Workflow field
+ ############################}
+
+{% if app.getDataService('TicketWorkflow').getAll()|length %}
+	<script type="text/x-deskpro-plain" id="rendered_field_ticket_workflow">
+		<div class="ticket-workflow">
+			<select class="ticket-workflow-input field-value">
+				<option>Workflow</option>
+				{% for work in app.getDataService('TicketWorkflow').getAll() %}
+					<option value="{{ work.id }}">{{ work.title }}</option>
+				{% endfor %}
+			</select>
+			<div style="font-size: 10px">Note: This field is only displayed for agents</div>
+		</div>
+	</script>
+{% endif %}
+
+{############################
+ # Product field value
+ ############################}
+
+{% if term_options.products %}
+	<script type="text/x-deskpro-plain" id="rendered_field_ticket_product">
+		<div class="ticket-product">
+			<select class="ticket-product-input field-value">
+				<option>{{ phrase('admin.tickets.choose_a_product') }}</option>
+				{% for id,label in term_options.products %}
+					<option value="{{id}}">{{label}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</script>
+{% endif %}
+
+{############################
+ # Priority field value
+ ############################}
+
+{% if term_options.priorities %}
+	<script type="text/x-deskpro-plain" id="rendered_field_ticket_priority">
+		<div class="ticket-priority">
+			<select class="ticket-priority-input field-value">
+				<option>{{ phrase('admin.tickets.choose_a_priority') }}</option>
+				{% for id,label in term_options.priorities %}
+					<option value="{{id}}">{{label}}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</script>
+{% endif %}
+
+{############################
+ # Custom fields
+ ############################}
+
+{% for field in custom_ticket_fields %}
+	<script type="text/x-deskpro-plain" id="rendered_field_ticket_field_{{field.id}}">
+		<div class="ticket-field field-value">
+			{{ render_custom_field_form(field) }}
+		</div>
+	</script>
+{% endfor %}
+
+{############################
+ # Captcah field rnedered
+ ############################}
+<script type="text/x-deskpro-plain" id="rendered_field_captcha">
+	<div class="captcha">
+		<img src="{{ asset('images/admin/captcha-example.png') }}"
+	</div>
+</script>
+
+
+{############################
+ # Criteria options
+ ############################}
+
+{% if term_options.products or term_options.ticket_categories_full or term_options.priorities or term_options.ticket_workflows %}
+<div id="criteria_tpl" class="search-builder-tpl" style="display:none">
+	<div class="row">
+		<div class="term">
+			<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+				<td style="vertical-align: middle; text-align: center;" width="11"><div class="builder-remove">-</div></td>
+				<td class="builder-controls" style="vertical-align: middle;">
+					<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+						<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+						<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+						<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+					</tr></tbody></table>
+				</td>
+			</tr></tbody></table>
+		</div>
+	</div>
+	{% if app.getSetting('core.use_product') %}
+		<div class="builder-type" title="{{ phrase('agent.general.product') }}" data-rule-type="product">
+			<div class="builder-op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				<select name="product">
+					{% for cat in app.products.getRootNodes() %}
+						{% if cat.children|length %}
+							<optgroup label="{{ cat.title }}">
+								{% for subcat in cat.children %}
+									<option data-full-title="{{ cat.title }} &gt; {{ subcat.title }}" value="{{ subcat.id }}">{{ subcat.title }}</option>
+								{% endfor %}
+							</optgroup>
+						{% else %}
+							<option value="{{ cat.id }}">{{ cat.title }}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+	{% if app.getSetting('core.use_ticket_category') %}
+		<div class="builder-type" title="{{ phrase('agent.general.category') }}" data-rule-type="category">
+			<div class="builder-op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				<select name="category">
+					{% for cat in app.getDataService('TicketCategory').getRootNodes() %}
+						{% if cat.children|length %}
+							<optgroup label="{{ cat.title }}">
+								{% for subcat in cat.children %}
+									<option data-full-title="{{ cat.title }} &gt; {{ subcat.title }}" value="{{ subcat.id }}">{{ subcat.title }}</option>
+								{% endfor %}
+							</optgroup>
+						{% else %}
+							<option value="{{ cat.id }}">{{ cat.title }}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+	{% if app.getSetting('core.use_ticket_priority') %}
+		<div class="builder-type" title="{{ phrase('agent.general.priority') }}" data-rule-type="priority">
+			<div class="builder-op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+					<option value="lt">&lt;</option>
+					<option value="lte">&lt;=</option>
+					<option value="gt">&gt;</option>
+					<option value="gte">&gt;=</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				<select name="priority">
+					{% for id,name in app.getDataService('TicketPriority').getNames() %}
+						<option value="{{ id }}">{{ name }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+	{% if app.getSetting('core.use_ticket_workflow') %}
+		<div class="builder-type" title="{{ phrase('agent.general.workflow') }}" data-rule-type="workflow">
+			<div class="builder-op">
+				<select name="op">
+					<option value="is">{{ phrase('agent.general.is') }}</option>
+					<option value="not">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</div>
+			<div class="builder-options">
+				<select name="workflow">
+					{% for work in app.getDataService('TicketWorkflow').getAll() %}
+						<option value="{{ work.id }}">{{ work.title }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	{% endif %}
+</div>
+{% endif %}
+
+<div id="embed_form_overlay" style="width: 785px; height: 555px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.tickets.embed_in_website') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div class="loading-icon-big" style="padding-top: 20px;"></div>
+	</div>
+</div>
+
+{% endblock %}

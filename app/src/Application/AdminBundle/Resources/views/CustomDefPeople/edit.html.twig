@@ -1,0 +1,35 @@
+{% extends 'AdminBundle:CustomDefAbstract:edit.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+     <ul>
+		<li><a href="{{ path('admin_customdefpeople') }}">{{ phrase('admin.custom_fields.people_fields') }}</a></li>
+		{% if field.id %}
+			<li>{{ phrase('admin.general.edit_field') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.general.new_field') }}</li>
+		{% endif %}
+     </ul>
+
+	{% if field.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_customdefpeople_delete', {'field_id': field.id, 'security_token': security_token('delete_custom_field') }) }}" onclick="return confirm('Are you sure?');">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block form_extra2 %}
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Agent Only</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="checkbox" name="fielddef[is_agent_field]" value="1" {% if field.is_agent_field %}checked="checked"{% endif %} />
+					Only show this field to agents
+				</label>
+			</div>
+		</div>
+	</div>
+{% endblock %}

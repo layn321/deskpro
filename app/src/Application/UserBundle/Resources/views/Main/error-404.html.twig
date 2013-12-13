@@ -1,0 +1,34 @@
+{##
+ # The 404 page displayed when a user attempts to view a page that does not exist.
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> {{ phrase('user.error.not-found-title') }}</li>
+{% endblock %}
+{% block content %}
+
+{% if app.getLastException()._dp_sn %}
+	<!-- [SN{{ app.getLastException()._dp_sn }}] -->
+{% endif %}
+
+<section class="dp-content-post dp-content-page">
+	<header>
+		<h3 style="margin-bottom: 0">
+			{% if error_title %}
+				{{ error_title }}
+			{% else %}
+				{{ phrase('user.error.not-found-title') }}
+			{% endif %}
+		</h3>
+	</header>
+	<article>
+		{% if error_message %}
+			{{ error_message }}
+		{% else %}
+			{{ phrase('user.error.not-found') }}
+		{% endif %}
+	</article>
+</section>
+<!-- DeskPRO -->
+{% endblock %}

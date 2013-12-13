@@ -1,0 +1,99 @@
+{% extends base_edit_tpl %}
+{% block form_extra %}
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>
+			{{ phrase('admin.general.default_value') }}
+			<span class="small-light-icon tipped" title="This value will be disaplyed by default when the user has not input anything. The user can still remove the value to submit an empty field. If you always want input, you should use the validation options below."></span>
+		</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.default_value) }}
+	</div>
+</div>
+
+{% if not no_validation_options %}
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				{{ phrase('admin.custom_fields.user_validation') }}
+				<span class="small-light-icon tipped" title="Validation rules applied when the user submits a new ticket or updates a ticket through the web interface."></span>
+			</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[validation_type]" value="" {% if not editfield.validation_type %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.no_validation') }}
+				</label>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[validation_type]" value="required" {% if editfield.validation_type == 'required' %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.choice_require_user_input') }}
+				</label>
+				<div id="required_group" class="dp-group-options" style="display: none">
+					{{ phrase('admin.custom_fields.min_characters') }}: {{ form_widget(form.min_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+					&nbsp;&nbsp;
+					{{ phrase('admin.custom_fields.max_characters') }}: {{ form_widget(form.max_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+				</div>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[validation_type]" value="regex" {% if editfield.validation_type == 'regex' %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.match_regular_expression') }}
+				</label>
+				<div id="required_group" class="dp-group-options" style="display: none">
+					{{ phrase('admin.general.pattern') }}: {{ form_widget(form.regex, { 'attr': { 'class': 'small', 'size': '20', 'style': 'width:250px' }}) }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				{{ phrase('admin.custom_fields.agent_validation') }}
+				<span class="small-light-icon tipped" title="Validation rules applied when agents create tickets or update tickets through the agent interface."></span>
+			</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[agent_validation_type]" value="" {% if not editfield.agent_validation_type %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.no_validation') }}
+				</label>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[agent_validation_type]" value="required" {% if editfield.agent_validation_type == 'required' %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.choice_require_user_input') }}
+				</label>
+				<div id="agent_required_group" class="dp-group-options" style="display: none">
+					{{ phrase('admin.custom_fields.min_characters') }}: {{ form_widget(form.agent_min_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+					&nbsp;&nbsp;
+					{{ phrase('admin.custom_fields.max_characters') }}: {{ form_widget(form.agent_max_length, { 'attr': { 'class': 'small', 'size': '5', 'style': 'width:60px' }}) }}
+				</div>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="fielddef[agent_validation_type]" value="regex" {% if editfield.agent_validation_type == 'regex' %}checked="checked"{% endif %} />
+					{{ phrase('admin.custom_fields.match_regular_expression') }}
+				</label>
+				<div id="required_group" class="dp-group-options" style="display: none">
+					{{ phrase('admin.general.pattern') }}: {{ form_widget(form.agent_regex, { 'attr': { 'class': 'small', 'size': '20', 'style': 'width:250px' }}) }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

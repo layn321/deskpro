@@ -1,0 +1,913 @@
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flag %}
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.Ticket';
+pageMeta.title         = {{ticket.subject|json_encode|raw}};
+pageMeta.ticket_id     = {{ticket.id}};
+pageMeta.alert_id      = 'ticket-{{ ticket.id }}';
+pageMeta.url_fragment  = '{{ url_fragment('agent_ticket_view', {'ticket_id': ticket.id}) }}';
+
+pageMeta.labelsAutocompleteUrl        = '{{ path('agent_ajax_labels_autocomplete', {'label_type': 'tickets'}) }}';
+pageMeta.labelsSaveUrl                = '{{ path('agent_ticket_ajax_labels_save', {'ticket_id': ticket.id}) }}';
+pageMeta.getMacroUrl                  = '{{ path('agent_ticket_ajax_get_macro', {'ticket_id': ticket.id }) }}?macro_id=$macro_id';
+pageMeta.saveActionsUrl               = '{{ path('agent_ticket_ajax_save_actions', {'ticket_id': ticket.id }) }}';
+pageMeta.deleteTicketUrl              = '{{ path('agent_ticketsearch_ajax_delete_tickets') }}';
+pageMeta.uploadAttachUrl              = '{{ path('agent_accept_upload') }}';
+pageMeta.getMessageQuoteUrl           = '{{ path('agent_ticket_message_ajax_getquote', {'ticket_id': ticket.id, 'message_id': '000'})|replace({'000': '{message_id}'}) }}';
+pageMeta.viewPersonUrl                = '{{ path('agent_people_view', {'person_id': ticket.person.id}) }}';
+pageMeta.lastMessageId = {{ last_message_id|default(0) }};
+pageMeta.lastLogId = {{ last_log_id|default(0) }};
+pageMeta.ticket_reverse_order = {% if app.user.getPref('agent.ticket_reverse_order') %}true{% else %}false{% endif %};
+
+pageMeta.last_activity = {{ ticket.getLastActivityDate().getTimestamp() }};
+
+pageMeta.person_id    = {{ ticket.person.id }};
+pageMeta.person_email = {{ ticket.person.primary_email_address|json_encode|raw }};
+pageMeta.person_name  = {{ ticket.person.display_name|json_encode|raw }};
+
+pageMeta.ticket = {{ ticket_api|json_encode|raw }};
+pageMeta.api_data = {{ ticket.toApiData()|json_encode|raw }};
+
+pageMeta.ticket_perms = {{ ticket_perms|json_encode|raw }};
+{% if ticket.isLocked(app.user) %}
+	pageMeta.isLocked = true;
+{% else %}
+	pageMeta.isLocked = false;
+{% endif %}
+pageMeta.unlockOnClose = {{ app.getSetting('core_tickets.unlock_on_close') ? 'true' : 'false' }};
+
+{% if ticket.person.organization %}
+	pageMeta.viewOrgUrl = '{{ path('agent_org_view', {'organization_id': ticket.person.organization.id}) }}';
+{% endif %}
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+
+pageMeta.isDeleted = {% if ticket.hidden_status == 'deleted' %}true{% else %}false{% endif %};
+pageMeta.isClosed = {% if ticket.status == 'closed' %}true{% else %}false{% endif %};
+pageMeta.isSpam = {% if ticket.hidden_status == 'spam' %}true{% else %}false{% endif %};
+{# pageMeta.isLocked = {% if ticket.is_locked == 'deleted' %}true{% else %}false{% endif %}; #}
+pageMeta.auto_start_bill = {% if app.getSetting('core_tickets.billing_auto_timer') %}true{% else %}false{% endif %};
+
+pageMeta.agentMap = {{ agent_map|json_encode|raw }};
+pageMeta.goNextOnReply = {{ app.user.getPref('agent.ticket_go_next_reply') ? 'true' : 'false' }};
+pageMeta.lang = {{ {
+	'find_ticket': phrase('agent.tickets.find_ticket'),
+	'users_tickets': phrase('agent.tickets.users_tickets'),
+	'open_tickets': phrase('agent.tickets.open_tickets'),
+	'filter_results': phrase('agent.tickets.filter_results'),
+	'search': phrase('agent.general.search'),
+}|json_encode|raw }};
+</script>
+<div class="layout-content with-scrollbar page-ticket {% if ticket.isLocked(app.user) %}locked{% endif %} {{ ticket.status_code|replace({'.': '_'}) }} urgency-{{ ticket.urgency }}">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+
+{% set locked_self = (ticket.locked_by_agent and ticket.locked_by_agent.id == app.user.id) %}
+{% if ticket.is_locked %}<div class="locked-overlay" id="{{baseId}}_locked_overlay"></div>{% endif %}
+
+<form class="value-form" id="{{ baseId }}_value_form" style="display:none">
+	<input type="hidden" name="department_id" class="department_id" value="{{ticket.department.id|default(0)}}" />
+	<input type="hidden" name="agent_id" class="agent_id" value="{{ticket.agent.id|default(0)}}" />
+	<input type="hidden" name="agent_team_id" class="agent_team_id" value="{{ticket.agent_team.id|default(0)}}" />
+	<input type="hidden" name="product_id" class="product_id" value="{{ticket.product.id|default(0)}}" />
+	<input type="hidden" name="category_id" class="category_id" value="{{ticket.category.id|default(0)}}" />
+	<input type="hidden" name="workflow_id" class="workflow_id" value="{{ticket.workflow.id|default(0)}}" />
+	<input type="hidden" name="priority_id" class="priority_id" value="{{ticket.priority.id|default(0)}}" />
+	<input type="hidden" name="language_id" class="language_id" value="{{ticket.language.id|default(app.languages.getDefaultId()) }}" />
+	<input type="hidden" name="is_hold" class="is_hold" value="{{ticket.is_hold|default(0)}}" />
+	<input type="hidden" name="status" class="status" value="{{ticket.status}}" />
+	<input type="hidden" name="hidden_status" class="hidden_status" value="{{ticket.hidden_status}}" />
+</form>
+
+{% if ticket.status == 'hidden' %}
+	{% include 'AgentBundle:Ticket:view-hidden-bar.html.twig' %}
+{% endif %}
+
+<header class="main-header" id="{{ baseId }}_page_header">
+	<div id="{{baseId}}_locked_message" {% if not ticket.locked_by_agent %}style="display: none"{% endif %} {% if locked_self %}data-locked-self="1"{% endif %}>
+		<div class="locked-message">
+			<button class="dp-btn" id="{{baseId}}_unlock_ticket2" style="float:right">{{ phrase('agent.tickets.unlock') }}</button>
+			<div style="margin-right: 100px;">
+				<div id="{{baseId}}_locked_message_self" {% if not locked_self %}style="display: none"{% endif %}>
+					{% if locked_self and app.getSetting('core_tickets.lock_on_view') %}
+						{{ phrase('agent.tickets.you_have_auto_lock') }}
+					{% else %}
+						{{ phrase('agent.tickets.you_have_locked') }}
+					{% endif %}
+					{% if app.getSetting('core_tickets.unlock_on_close') %}<br/>{{ phrase('agent.tickets.lock_auto_release') }}{% endif %}
+				</div>
+				{% if ticket.locked_by_agent and not locked_self %}
+					<div id="{{baseId}}_locked_message_other">
+						{{ phrase('agent.tickets.agent_has_lock', {agent: ticket.locked_by_agent.display_name}) }}
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div id="{{baseId}}_hold_message" {% if not ticket.is_hold %}style="display: none"{% endif %}>
+		<div class="hold-message">
+			<button class="dp-btn set-hold unhold" id="{{baseId}}_unhold_btn" style="float:right">{{ phrase('agent.tickets.unhold_ticket') }}</button>
+			<div style="margin-right: 100px;">
+				{{ phrase('agent.tickets.currently_on_hold') }}
+			</div>
+		</div>
+	</div>
+	<div class="row title first">
+		<table cellspacing="0" cellpadding="0" width="100%"><tr><td width="10" nowrap="nowrap">
+			<div class="id-number" id="{{ baseId }}_idref_switch">
+				<span id="{{ baseId }}_id_num" title="Ticket ID">
+					<span class="copy-btn-outer"><span class="copy-btn" data-clipboard-text="{{ ticket.id }}" title="{{ phrase('agent.general.copy_to_clipboard') }}"><i class="icon-paste"></i></span></span>
+					{{ phrase('agent.general.id') }}: {{ ticket.id }}
+				</span>
+				<span id="{{ baseId }}_ref_num" style="display: none;" title="Ticket Reference">
+					<span class="copy-btn-outer"><span class="copy-btn" data-clipboard-text="{{ ticket.ref }}" title="{{ phrase('agent.general.copy_to_clipboard') }}"><i class="icon-paste"></i></span></span>
+					{{ phrase('agent.general.id') }}: {{ ticket.ref }}
+				</span>
+			</div>
+		</td><td>
+			<h1>
+				<span id="{{baseId}}_showname">{{ ticket.subject }}</span>
+				<span id="{{baseId}}_editname" style="display: none"><input type="text" placeholder="Enter subject" name="name" value="{{ ticket.subject }}" /></span>
+				<a id="{{baseId}}_editname_end" class="edit-name-save clean-white" style="display: none">{{ phrase('agent.general.done') }}</a>
+			</h1>
+		</td></tr></table>
+	</div>
+	<div class="row author last">
+		<div class="dp-btn-group dp-dropdown">
+			<a id="{{ baseId }}_profile_link" class="dp-btn as-popover preload user-btn" data-route="person:{{ path('agent_people_view', {'person_id': ticket.person_id}) }}">
+				<span class="text" style="background-image: url({{ ticket.person.getPictureUrl(25) }});">
+					{{ ticket.person.getNameWithTitle() }}
+					<span class="email" id="{{ baseId }}_user_email_text">({{ ticket.person_email.email|default(ticket.person_email_address) }})</span>
+				</span>
+			</a>
+			{% if ticket.person.emails|length > 1 %}
+				<a class="dp-btn dp-dropdown-toggle" style="padding: 7px;" id="{{ baseId }}_user_email_menu_trigger">
+					<span class="dp-caret dp-caret-down"></span>
+				</a>
+				<div id="{{ baseId }}_user_email_menu" class="dp-menu" style="display: none;">
+					<section>
+						<div class="dp-menu-area">
+							<label>{{ phrase('agent.tickets.change_user_ticket_email') }}</label>
+							<ul>
+								{% for email in ticket.person.emails %}
+									<li data-email-id="{{ email.id }}">{{ email.email }}</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</section>
+				</div>
+			{% endif %}
+		</div>
+
+		{% if ticket.person.organization %}
+			&nbsp;&nbsp;
+			<a id="{{ baseId }}_org_link" class="dp-btn as-popover" data-route="page:{{ path('agent_org_view', {'organization_id': ticket.person.organization.id}) }}"><i class="icon-briefcase"></i>
+				{{ ticket.person.organization }}
+				{% if ticket.person.organization_position %}<span class="email">({{ ticket.person.organization_position }})</span>{% endif %}
+			</a>
+		{% endif %}
+
+		{% if ticket_perms.modify_cc and not user_parts|length %}
+			<a class="cc-btn cc-btn-main" id="{{ baseId }}_cc_list_btn"><i class="icon-envelope"></i> <em>{{ phrase('agent.tickets.add_cc') }}</em></a>
+		{% endif %}
+
+		{% if ticket_perms.modify_cc or user_parts|length %}
+		<div
+			id="{{ baseId }}_cc_list"
+			class="cc-row {% if user_parts|length %}cc-open{% endif %}"
+			data-element-handler="DeskPRO.Agent.ElementHandler.TicketCcManage"
+			data-add-url="{{ path('agent_ticket_addpart', {'ticket_id': ticket.id}) }}"
+			data-delete-url="{{ path('agent_ticket_delpart', {'ticket_id': ticket.id}) }}"
+			data-replybox-container="#{{baseId}}_replybox_wrap"
+			{% if not user_parts|length %}style="display: none;"{% endif %}
+		>
+			<ul class="cc-row-list" id="{{ baseId }}_cc_row_list">
+				{% for part in user_parts %}
+					{% if loop.index0 < 2 %}
+						{% include 'AgentBundle:Ticket:view-user-cc-row.html.twig' with {'person': part.person, 'ticket_perms':ticket_perms, preload: true } %}
+					{% else %}
+						{% include 'AgentBundle:Ticket:view-user-cc-row.html.twig' with {'person': part.person, 'ticket_perms':ticket_perms } %}
+					{% endif %}
+				{% endfor %}
+			</ul>
+			<div class="cc-btn-holder">
+				{% if ticket_perms.modify_cc and user_parts|length %}
+					<a class="cc-btn cc-btn-main" id="{{ baseId }}_cc_list_btn"><i class="icon-envelope"></i> <em>{{ phrase('agent.tickets.add_cc') }}</em></a>
+				{% endif %}
+			</div>
+
+			{% if ticket_perms.modify_cc %}
+				<div class="cc-autocomplete addrow noedit-hide" style="display: none; clear:left;">
+					<input type="text" class="user-part cc-people-search-trigger" placeholder="{{ phrase('agent.general.choose_a_person') }}" />
+					<div class="person-search-box" style="display: none">
+						<section>
+							<ul class="results-list">
+							</ul>
+						</section>
+					</div>
+					<span class="is-not-loading">
+						<button class="clean-white small cc-saverow-trigger">{{ phrase('agent.general.add') }}</button>
+					</span>
+					<span class="is-loading">{{ phrase('agent.general.saving') }}</span>
+				</div>
+			{% endif %}
+			<div style="clear:left;"></div>
+			<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+				<li>
+					<a>
+					<span class="user-name"></span>
+					<address>&lt;<span class="user-email"></span>&gt;</address>
+					<div class="bound-fade"></div>
+				</a></li>
+			</script>
+		</div>
+		{% endif %}
+	</div>
+	<div class="margin"></div>
+</header>
+
+<nav class="header-nav">
+	<ul>
+		<li title="{{ phrase('agent.general.department') }}">
+			{% include 'AgentBundle:Common:select-department.html.twig' with {
+				'name': "department_id",
+				'with_blank': blank_option,
+				'blank_title': phrase('agent.general.none'),
+				'selected': ticket.department.id|default(0),
+				'id': baseId ~ '_department_id',
+				'add_attr': 'data-invisible-trigger="1" style="visibility: hidden" data-dropdown-css-class="ticket-header"',
+				'departments': app.departments.getPersonDepartments(app.user, 'tickets', [ticket.department.id|default(0)], 'assign')
+			} %}
+
+			<span id="{{ baseId }}_department_txt">{{ ticket.department.full_title|default(phrase('agent.general.none')) }}</span>
+
+			<span class="dp-caret"></span>
+		</li>
+		<li title="{{ phrase('agent.general.status') }}">
+			<select name="status_code" class="status_code" id="{{baseId}}_status_code" data-invisible-trigger="1" style="display: none" data-dropdown-css-class="ticket-header" data-dropdown-nosearch="1">
+				{% if ticket.status == 'hidden' %}
+					<option value="" selected="selected">{{ phrase('agent.general.hidden') }}</option>
+				{% endif %}
+				{% if ticket.status_code == 'awaiting_user' or ticket_perms.modify_set_awaiting_agent %}
+					<option value="awaiting_agent" {% if ticket.status_code == 'awaiting_agent' %}selected="selected"{% endif %}>{{ phrase('agent.tickets.status_awaiting_agent') }}</option>
+				{% endif %}
+				{% if ticket.status_code == 'awaiting_user' or ticket_perms.modify_set_awaiting_user %}
+					<option value="awaiting_user" {% if ticket.status_code == 'awaiting_user' %}selected="selected"{% endif %}>{{ phrase('agent.tickets.status_awaiting_user') }}</option>
+				{% endif %}
+				{% if ticket.status_code == 'resolved' or ticket_perms.modify_set_resolved %}
+					<option value="resolved" {% if ticket.status_code == 'resolved' %}selected="selected"{% endif %}>{{ phrase('agent.tickets.status_resolved') }}</option>
+				{% endif %}
+				{%  if ticket.status_code == 'closed' %}
+					<option value="closed" {% if ticket.status_code == 'closed' %}selected="selected"{% endif %}>{{ phrase('agent.tickets.status_closed') }}</option>
+				{% endif %}
+			</select>
+
+			<span id="{{ baseId }}_status_txt" class="urgency-text">
+				{{ phrase('agent.tickets.status_' ~ ticket.status_code|replace({'.': '_'})) }}
+			</span>
+
+			<span class="dp-caret"></span>
+		</li>
+		<li title="{{ phrase('agent.general.urgency') }}" class="urgency-item">
+			<select name="urgency" class="urgency" data-style-type="urgency" id="{{baseId}}_urgency" style="display: none" data-invisible-trigger="1" data-dropdown-css-class="ticket-header" data-dropdown-nosearch="1">
+				{% for i in 1..10 %}
+					<option value="{{ i }}" {% if ticket.urgency == i %}selected="selected"{% endif %}>{{ i }}</option>
+				{% endfor %}
+			</select>
+
+			<span id="{{ baseId }}_urgency_txt" class="urgency-value-{{ ticket.urgency }}">{{ ticket.urgency }}</span>
+
+			<span class="dp-caret"></span>
+		</li>
+		<li>
+			<input type="hidden" id="{{ baseId }}_flag_old" value="{{ ticket_flagged }}" />
+			<select name="flag" class="flag" id="{{baseId}}_flag" class="dpe_select" data-style-type="icons" data-invisible-trigger="1" data-dropdown-css-class="ticket-header" data-dropdown-nosearch="1">
+				<option
+					value=""
+					data-icon="{{ asset('images/agent/icons/flag-gray.png' ) }}"
+				>{{ phrase('agent.general.none') }}</option>
+				{% for color in ['blue', 'green', 'orange', 'pink', 'purple', 'red', 'yellow'] %}
+					<option
+						value="{{color}}"
+						{% if ticket_flagged == color %}selected="selected"{% endif %}
+						data-icon="{{ asset('images/agent/icons/flag-' ~ color ~ '.png' ) }}"
+					>{{ flag.flag_name(color) }}</option>
+				{% endfor %}
+			</select>
+
+			<i id="{{ baseId }}_flagicon" class="icon-flag flag-color-{{ ticket_flagged|default('none') }}" style="margin:0; padding: 0;"></i>
+			<span id="{{ baseId }}_flagtext">{% if ticket_flagged %}{{ flag.flag_name(ticket_flagged) }}{% endif %}</span>
+
+			<span class="dp-caret"></span>
+		</li>
+	</ul>
+</nav>
+
+{{ dp_widgets(baseId, 'ticket', 'header', 'below', ticket_api) }}
+{{ dp_widgets(baseId, 'ticket', 'properties', 'above', ticket_api) }}
+
+<div class="header-profile-box">
+<div class="profile-box-container">
+	<header id="{{baseId}}_properties_header">
+		{% if ticket_perms.modify_fields %}
+			<div class="controls {% if ticket.isLocked(app.user) %}hide-locked{% endif %}" id="{{baseId}}_field_edit_controls">
+				<div class="is-not-loading">
+					<span class="edit-gear" id="{{baseId}}_field_edit_start"></span>
+					<button class="cancel" id="{{baseId}}_field_edit_cancel" style="display: none">{{ phrase('agent.general.cancel') }}</button>
+					<button class="save" id="{{baseId}}_field_edit_save" style="display: none">{{ phrase('agent.general.save') }}</button>
+				</div>
+				<span class="is-loading">{{ phrase('agent.general.saving') }}</span>
+			</div>
+		{% endif %}
+		{% set sla_pips %}
+			{% for ticket_sla in ticket.ticket_slas %}<span class="sla-pip {{ ticket_sla.sla_status }}" data-sla-id="{{ ticket_sla.sla_id }}"></span>{% endfor %}
+		{% endset %}
+		{{ dp_widget_tabs_header(baseId, 'ticket', 'properties', {
+			(baseId ~ '_fields_display_main_wrap'): phrase('agent.general.properties'),
+			(baseId ~ '_linked_wrap'): '<i class="icon-link"></i> ' ~ phrase('agent.tickets.linked_tickets') ~' (<span id="' ~ baseId ~ '_linked_count" data-count="'~linked_tickets.count~'">' ~ linked_tickets.count ~ '</span>)',
+			(baseId ~ '_tasks_wrap'): phrase('agent.general.tasks') ~' (<span id="' ~ baseId ~ '_task_count">' ~ tasks|length ~ '</span>)',
+			(baseId ~ '_sla_wrap'): (((addable_slas is not empty and ticket_perms.modify_slas) or ticket.ticket_slas is not empty) ? phrase('agent.general.slas') ~ ' ' ~ sla_pips|raw : false),
+			(baseId ~ '_billing_wrap'): (app.getSetting('core_tickets.enable_billing') ? phrase('agent.tickets.billing') : false)
+		}) }}
+	</header>
+	<section class="description-area" style="padding:0">
+		<div class="error-list {% if validator_errors %}on{% endif %}" id="{{baseId}}_field_errors" {% if not validator_errors %}style="display:none"{% endif %}>
+			<span class="title">{{ phrase('agent.tickets.save_errors') }}:</span>
+			<ul>
+				{% for i in validator_errors %}
+					<li>{{ i }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<article id="{{baseId}}_fields_display_main_wrap" class="headerbox" style="position: relative;">
+			{% if ticket.isLocked(app.user) %}<div class="lock-overlay"></div>{% endif %}
+			<table cellspacing="0" cellpadding="0" width="100%"><tr><td style="padding-right: 5px;">
+					<label class="field-label-title">{{ phrase('agent.general.agent') }}</label>
+					<select id="{{baseId}}_agent_sel" class="dpe_select" data-style-type="icons" data-select-icon-size="22">
+						{% if ticket_perms.modify_assign_agent or not ticket.agent %}<option {% if not ticket.agent.id %}selected="selected"{% endif %} value="0">{{ phrase('agent.general.unassigned') }}</option>{% endif %}
+						{% if ticket_perms.modify_assign_self or ticket.agent.id == app.user.id %}
+							<option {% if app.user.id == ticket.agent.id %}selected="selected"{% endif %} data-icon="{{ app.user.getPictureUrl(20) }}" value="{{ app.user.id }}">{{ app.user.display_name }}</option>
+						{% endif %}
+						{% for agent in agents %}
+							{% if agent.id != app.user.id and (ticket_perms.modify_assign_agent or ticket.agent.id == agent.id) %}
+								<option {% if agent.id == ticket.agent.id %}selected="selected"{% endif %} data-icon="{{ agent.getPictureUrl(20) }}" value="{{ agent.id }}">{{ agent.display_name }}</option>
+							{% endif %}
+						{% endfor %}
+					</select>
+			</td><td style="padding-right: 5px;">
+				<label class="field-label-title">{{ phrase('agent.general.team') }}</label>
+				<select id="{{baseId}}_agent_team_sel" class="dpe_select" data-select-nogrouptitle="1">
+					{% if ticket_perms.modify_assign_team or not ticket.agent_team %}
+						<option value="0" {% if not ticket.agent_team %}selected="selected"{% endif %}>{{ phrase('agent.general.none') }}</option>
+					{% endif %}
+
+					{% if app.user.getAgent().getTeams()|length and (ticket_perms.modify_assign_self or (ticket.agent_team.id == team.id)) %}
+					<optgroup label="{{ phrase('agent.general.your_teams') }}">
+						{% for team in app.user.getAgent().getTeams() %}
+							<option value="{{ team.id }}" {% if ticket.agent_team.id == team.id %}selected="selected"{% endif %}>{{ team.name }}</option>
+						{% endfor %}
+					</optgroup>
+					{% endif %}
+
+					{% for team in agent_teams %}
+						{% if (ticket_perms.modify_assign_team or ticket.agent_team.id == team.id) and team.id not in app.user.getAgent().getTeamIds() %}
+							<option value="{{ team.id }}" {% if ticket.agent_team.id == team.id %}selected="selected"{% endif %}>{{ team.name }}</option>
+						{% endif %}
+					{% endfor %}
+				</select>
+			</td><td width="100%">
+				<label class="field-label-title">{{ phrase('agent.general.followers') }}</label>
+				<div class="followers-list">
+					<ul id="{{ baseId }}_followers_list">
+						{% for a in agent_parts %}
+							<li class="agent-{{ a.person.id }}" data-agent-id="{{ a.person.id }}"><a class="dp-btn dp-btn-small agent-link" data-agent-id="{{ a.person.id }}"><span class="text" style="background-image: url({{ a.person.getPictureUrl(15) }})">{{ a.person.display_name }}</span><span class="remove-row-trigger"> <i class="icon-remove"></i></span></a></li>
+						{% endfor %}
+					</ul>
+					<div class="new-follower" id="{{ baseId }}_followers_sel_wrap">
+						<select id="{{ baseId }}_followers_sel" class="dpe_select" data-style-type="icons" data-select-icon-size="22">
+							<option value="0">{{ phrase('agent.general.select_agent') }}</option>
+							{% for agent in agents %}
+								<option data-icon="{{ agent.getPictureUrl(20) }}" value="{{ agent.id }}" data-icon-small="{{ agent.getPictureUrl(15) }}">{{ agent.display_name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<a class="new-follower-btn" id="{{ baseId }}_add_follower_btn">
+						<i class="icon-signin"></i>
+						{{ phrase('agent.tickets.add_follower') }}
+					</a>
+				</div>
+			</td></tr></table>
+			<div class="sep">-</div>
+			<div id="{{baseId}}_field_holders">
+				<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table">
+					{% include 'AgentBundle:Ticket:view-page-display-holders.html.twig' %}
+					{% if ticket_perms.modify_labels or ticket.labels|length %}
+						<tbody class="always-bottom">
+							<tr>
+								<th width="80" style="vertical-align: middle; border-bottom: none; padding-top: 0; padding-bottom: 0;">{{ phrase('agent.general.labels') }}:</th>
+								<td style="vertical-align: middle; border-bottom: none; padding-top: 0; padding-bottom: 0; padding-right: 0;">
+									<div style="width: 98%" id="{{ baseId }}_labels_wrap">
+										<input
+											type="hidden"
+											id="{{baseId}}_labels_input"
+											class="dpe_select dpe_select_noborder"
+											data-placeholder="Add a label"
+											value="{% for label in ticket.labels %}{{ label.label }},{% endfor %}"
+										/>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					{% endif %}
+					{% if ticket.linked_chat and app.getSetting('core.apps_chat') and app.user.hasPerm('agent_chat.use') %}
+						<tbody>
+							<tr>
+								<th>
+									{{ phrase('agent.general.linked_chat') }}
+								</th>
+								<td>
+									<a data-route="page:{{ path('agent_userchat_view', { conversation_id: ticket.linked_chat.id }) }}">{{ ticket.linked_chat.getSubjectLine() }}</a>
+								</td>
+							</tr>
+						</tbody>
+					{% endif %}
+				</table>
+			</div>
+		</article>
+		<article id="{{baseId}}_linked_wrap">
+			{% include 'AgentBundle:Ticket:linked-tickets.html.twig' %}
+		</article>
+		<article id="{{baseId}}_tasks_wrap">
+			{% include 'AgentBundle:Ticket:view-tasks.html.twig' %}
+		</article>
+		{% if (addable_slas is not empty and ticket_perms.modify_slas) or ticket.ticket_slas is not empty %}
+			<article id="{{baseId}}_sla_wrap">
+				{% include 'AgentBundle:Ticket:view-slas.html.twig' %}
+			</article>
+		{% endif %}
+		{% if app.getSetting('core_tickets.enable_billing') %}
+			<article id="{{baseId}}_billing_wrap">
+				{% include 'AgentBundle:Ticket:view-billing.html.twig' %}
+			</article>
+		{% endif %}
+		{{ dp_widget_tabs(baseId, 'ticket', 'properties', 'article', ticket_api) }}
+	</section>
+</div>
+</div>
+
+<nav class="header-nav">
+	<ul>
+		<li id="{{ baseId }}_unlock_ticket" {% if not ticket.hasLock() %}style="display: none"{% endif %}>
+			<i class="icon-unlock"></i>
+			{{ phrase('agent.tickets.unlock') }}
+		</li>
+		<li id="{{ baseId }}_lock_ticket" {% if ticket.hasLock() %}style="display: none"{% endif %}>
+			<i class="icon-lock"></i>
+			{{ phrase('agent.tickets.lock') }}
+		</li>
+		{% if ticket_perms.modify_merge %}
+			<li class="merge-menu-trigger noedit-hide">
+				<i class="icon-columns"></i>
+				{{ phrase('agent.general.merge') }}
+				<span class="dp-caret"></span>
+			</li>
+		{% endif %}
+		<li id="{{baseId}}_macros_menu_trigger">
+			<i class="icon-tasks"></i>
+			{{ phrase('agent.general.macros') }}
+			<span class="dp-caret"></span>
+		</li>
+		{% if ticket_perms.delete %}
+			{% if not (ticket.hidden_status in ['deleted', 'spam'] )%}
+				<li id="{{baseId}}_remove_menu_trigger">
+					<i class="icon-trash"></i>
+					{{ phrase('agent.general.remove') }}
+					<span class="dp-caret"></span>
+				</li>
+			{% endif %}
+		{% endif %}
+		<li id="{{ baseId }}_actions_menu_trigger">
+			<i class="icon-edit"></i>
+			{{ phrase('agent.general.actions') }}
+			<span class="dp-caret"></span>
+		</li>
+	</ul>
+</nav>
+
+<ul style="display:none" id="{{baseId}}_remove_menu">
+	<li data-action="spam">{{ phrase('agent.tickets.set_as_spam') }}</li>
+	<li data-action="delete">{{ phrase('agent.tickets.delete_ticket') }}</li>
+	{% if app.user.hasPerm('agent_people.delete') %}
+		{% if person_object_counts.tickets > 1 or person_object_counts.chats > 0 %}
+			{% if person_object_counts.tickets > 1 %}
+				<li data-action="delete.ban">{{ phrase('agent.tickets.perm_del_user_and_other_tickets', {ticket_count: person_object_counts.tickets}) }}</li>
+			{% else %}
+				<li data-action="delete.ban">{{ phrase('agent.tickets.perm_del_user_and_content') }}</li>
+			{% endif %}
+		{% else %}
+			<li data-action="delete.ban">{{ phrase('agent.tickets.perm_del_user_and_ticket') }}</li>
+		{% endif %}
+	{% endif %}
+</ul>
+
+<ul style="display:none" id="{{baseId}}_actions_menu">
+	<li data-action="change-user">{{ phrase('agent.tickets.change_user_btn') }}</li>
+	<li style="{% if ticket.is_hold %}display: none;{% endif %}" id="{{ baseId }}_menu_set_hold" data-action="set-hold">{{ phrase('agent.tickets.hold_btn') }}</li>
+	<li style="{% if not ticket.is_hold %}display: none;{% endif %}" id="{{ baseId }}_menu_unset_hold" data-action="unset-hold">{{ phrase('agent.tickets.unhold_btn') }}</li>
+	{% if ticket_perms.modify_merge %}<li data-action="split">{{ phrase('agent.tickets.split_messages_into_ticket') }}</li>{% endif %}
+	{% if app.user.hasPerm('agent_tickets.create') %}<li data-action="linked_ticket">{{ phrase('agent.tickets.create_linked_ticket') }}</li>{% endif %}
+	<li data-action="kb-pending">{{ phrase('agent.tickets.create_new_pending_article') }}</li>
+	<li><a target="_blank" href="{{ path('agent_ticket_view', {'ticket_id': ticket.id,'view_print': 1, '_rt': security_token('request_token', 10800)}) }}">{{ phrase('agent.general.print') }}</a></li>
+	<li><a target="_blank" href="{{ path('agent_ticket_view', {'ticket_id': ticket.id,'pdf': 1, '_rt': security_token('request_token', 10800)}) }}">{{ phrase('agent.general.download_pdf') }}</a></li>
+</ul>
+
+<div class="pagecontent">
+
+{{ dp_widgets(baseId, 'ticket', 'properties', 'below', ticket_api) }}
+{{ dp_widgets(baseId, 'ticket', 'messages', 'above', ticket_api) }}
+
+{% if app.user.getPref('agent.ticket_reverse_order') %}
+	{% if ticket_perms.reply or ticket_perms.modify_notes %}
+	<div style="position:relative;" class="ticket_reverse_order">
+		{% if ticket.isLocked(app.user) %}<div class="lock-overlay"></div>{% endif %}
+		<div id="{{baseId}}_replybox_wrap" class="replybox-wrap">
+			{% include 'AgentBundle:Ticket:replybox.html.twig' %}
+		</div>
+	</div>
+	{% endif %}
+{% endif %}
+
+<div class="profile-box-container ticket-messages">
+	<header>
+		{% set messageTabs = dp_widgets_raw('ticket', 'messages', 'tab') %}
+		<nav id="{{ baseId }}_messagebox_tabs" data-element-handler="DeskPRO.ElementHandler.SimpleTabs">
+			<ul>
+				<li data-list-type="messages" class="on" data-tab-for="#{{baseId}}_messages_wrap">{{ phrase('agent.tickets.messages') }}</li>
+				<li class="logs" data-list-type="log" data-tab-for="#{{baseId}}_logs_wrap">{{ phrase('agent.tickets.full_log') }}</li>
+				{% if app.getSetting('core.tickets.enable_feedback') and app.getSetting('core.tickets.feedback_agents_read') and ticket.date_feedback_rating %}
+					<li data-list-type="feedback" data-tab-for="#{{baseId}}_messages_wrap">
+						{{ phrase('agent.tickets.ticket_feedback') }} <span class="feedback-rating feedback-{{ ticket.feedback_rating_type }}">{% if ticket.feedback_rating == 1 %}☺{% elseif ticket.feedback_rating == -1 %}☹{% else %}&mdash;{% endif %}</span>
+					</li>
+				{% endif %}
+				<li data-tab-for="#{{ baseId }}_times">{{ phrase('agent.general.dates_and_times') }}</li>
+			{% for widget in messageTabs %}
+				<li data-tab-for="#{{ dp_widget_id(baseId, widget) }}">{{widget.title|raw}}</li>
+			{% endfor %}
+			</ul>
+		</nav>
+	</header>
+	<section class="messages-wrap" id="{{baseId}}_messages_wrap" data-page="{{ message_page }}" data-page-count="{{ message_page_count }}">
+		<div class="message-page-prev" {% if message_page == message_page_count or app.user.getPref('agent.ticket_reverse_order') %}style="display: none"{% endif %} id="{{ baseId }}_message_prev_page">
+			<strong>{% if not app.user.getPref('agent.ticket_reverse_order') %}{{ phrase('agent.tickets.view_older_messages') }}{% else %}{{ phrase('agent.tickets.view_newer_messages') }}{% endif %}</strong>
+		</div>
+		{% if active_drafts and app.user.getPref('agent.ticket_reverse_order') %}
+			{% for active_draft in active_drafts %}
+				{% if active_draft.message_html %}
+					{% include 'AgentBundle:Ticket:ticket-message-draft.html.twig' with {draft: active_draft} %}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+		<div id="{{ baseId }}_message_page_wrap">
+			{{ ticket_messages_block|raw }}
+		</div>
+		{% if active_drafts and not app.user.getPref('agent.ticket_reverse_order') %}
+			{% for active_draft in active_drafts %}
+				{% if active_draft.message_html %}
+					{% include 'AgentBundle:Ticket:ticket-message-draft.html.twig' with {draft: active_draft} %}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+		<div class="message-page-next" {% if message_page == message_page_count or not app.user.getPref('agent.ticket_reverse_order') %}style="display: none"{% endif %} id="{{ baseId }}_message_next_page">
+			<strong>{% if app.user.getPref('agent.ticket_reverse_order') %}{{ phrase('agent.tickets.view_older_messages') }}{% else %}{{ phrase('agent.tickets.view_newer_messages') }}{% endif %}</strong>
+		</div>
+	</section>
+	<section id="{{baseId}}_logs_wrap" style="margin: 0;padding: 0;">
+		{{ logs_block|raw }}
+	</section>
+	<section id="{{ baseId }}_times" style="display: none; padding: 0;">
+		<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table th-ra">
+			<tbody><tr>
+				<th width="200">{{ phrase('agent.general.created') }}:</th>
+				<td>
+					<time class="timeago" datetime="{{ticket.date_created|date('c', 'UTC')}}"></time>
+					({{ ticket.date_created|date('fulltime') }})
+				</td>
+			</tr></tbody>
+			{% set times_work_hours = (ticket.getWorkHoursSet().getActiveTime() != 'all') %}
+			{% if ticket.status == 'awaiting_agent' and ticket.date_user_waiting %}
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.current_user_waiting_time') }}:</th>
+				<td>
+					{% if times_work_hours %}
+						{{ ticket.current_user_waiting_work_time|time_length('hours') }}
+						<span class="tipped small-light-icon" title="Work hours only, real time: {{ ticket.current_user_waiting_time|time_length }}"></span>
+					{% else %}
+						<time class="timeago" data-timeago-no-ago="1" datetime="{{ ticket.date_user_waiting|date('c', 'UTC') }}"></time>
+					{% endif %}
+					({{ phrase('agent.general.since_time', {time: ticket.date_user_waiting|date('fulltime')}) }})
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.real_total_user_waiting and ticket.real_total_user_waiting > 0 %}
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.total_user_waiting_time') }}:</th>
+				<td>
+					{% if times_work_hours %}
+						{{ ticket.total_user_waiting_work_time|time_length('hours') }}
+						<span class="tipped small-light-icon" title="Work hours only, real time: {{ ticket.real_total_user_waiting|time_length }}"></span>
+					{% else %}
+						<time class="timeago" data-timeago-no-ago="1" datetime="{{ ("- " ~ ticket.real_total_user_waiting|default('1') ~ " seconds")|date('c', 'UTC') }}"></time>
+					{% endif %}
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.total_to_first_reply and ticket.total_to_first_reply > 0 %}
+				<tbody><tr>
+					<th>{{ phrase('agent.tickets.waiting_til_first_reply') }}:</th>
+					<td>
+						{% if times_work_hours %}
+							{{ ticket.work_time_to_first_reply|time_length('hours') }}
+							<span class="tipped small-light-icon" title="Work hours only, real time: {{ ticket.total_to_first_reply|time_length }}"></span>
+						{% else %}
+							<time class="timeago" data-timeago-no-ago="1" datetime="{{ ticket.date_first_agent_reply|date('c', 'UTC') }}"></time>
+						{% endif %}
+					</td>
+				</tr></tbody>
+			{% endif %}
+			{% if ticket.status == 'awaiting_user' and ticket.date_agent_waiting %}
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.current_agent_waiting_time') }}:</th>
+				<td>
+					<time class="timeago" data-timeago-no-ago="1" datetime="{{ ticket.date_agent_waiting|date('c', 'UTC') }}"></time>
+					({{ phrase('agent.general.since_time', {time: ticket.date_agent_waiting|date('fulltime')}) }})
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.date_resolved %}
+			<tbody><tr>
+				<th>{{ phrase('agent.general.date_resolved') }}:</th>
+				<td>
+					<time class="timeago" datetime="{{ ticket.date_resolved|date('c', 'UTC') }}"></time>
+					({{ ticket.date_resolved|date }})
+				</td>
+			</tr></tbody>
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.time_til_resolve') }}</th>:</th>
+				<td>
+					{% if times_work_hours %}
+						{{ ticket.work_time_until_resolution|time_length('hours') }}
+						<span class="tipped small-light-icon" title="Work hours only, real time: {{ ticket.time_until_resolution|time_length }}"></span>
+					{% else %}
+						<time class="timeago" data-timeago-no-ago="1" datetime="{{ ("- " ~ ticket.time_until_resolution|default('1') ~ " seconds")|date('c', 'UTC') }}"></time>
+					{% endif %}
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.date_closed %}
+			<tbody><tr>
+				<th>{{ phrase('agent.general.date_archived') }}:</th>
+				<td>
+					<time class="timeago" datetime="{{ ticket.date_closed|date('c', 'UTC') }}"></time>
+					({{ ticket.date_closed|date }})
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.date_first_agent_assign %}
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.first_assignment') }}:</th>
+				<td>
+					<time class="timeago" datetime="{{ ticket.date_first_agent_assign|date('c', 'UTC') }}"></time>
+					({{ ticket.date_first_agent_assign|date('fulltime') }})
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.date_first_agent_reply %}
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.first_agent_reply') }}:</th>
+				<td>
+					<time class="timeago" datetime="{{ ticket.date_first_agent_reply|date('c', 'UTC') }}"></time>
+					({{ ticket.date_first_agent_reply|date('fulltime') }})
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.date_last_agent_reply %}
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.last_agent_reply') }}:</th>
+				<td>
+					<time class="timeago" datetime="{{ ticket.date_last_agent_reply|date('c', 'UTC') }}"></time>
+					({{ ticket.date_last_agent_reply|date('fulltime') }})
+				</td>
+			</tr></tbody>
+			{% endif %}
+			{% if ticket.date_last_user_reply %}
+			<tbody><tr>
+				<th>{{ phrase('agent.tickets.last_user_reply') }}:</th>
+				<td>
+					<time class="timeago" datetime="{{ ticket.date_last_user_reply|date('c', 'UTC') }}"></time>
+					({{ ticket.date_last_user_reply|date('fulltime') }})
+				</td>
+			</tr></tbody>
+			{% endif %}
+		</table>
+	</section>
+	{{ dp_widget_tabs(baseId, 'ticket', 'messages', 'section', 'article', ticket_api) }}
+</div>
+
+{{ dp_widgets(baseId, 'ticket', 'messages', 'below', ticket_api) }}
+{{ dp_widgets(baseId, 'ticket', 'reply', 'above', ticket_api) }}
+
+{% if not app.user.getPref('agent.ticket_reverse_order') %}
+	{% if ticket_perms.reply or ticket_perms.modify_notes %}
+	<div style="position:relative;">
+		{% if ticket.isLocked(app.user) %}<div class="lock-overlay"></div>{% endif %}
+		<div id="{{baseId}}_replybox_wrap" class="replybox-wrap">
+			{% include 'AgentBundle:Ticket:replybox.html.twig' %}
+		</div>
+	</div>
+	{% endif %}
+{% endif %}
+
+{{ dp_widgets(baseId, 'ticket', 'reply', 'below', ticket_api) }}
+{{ dp_widgets(baseId, 'ticket', 'footer', 'above', ticket_api) }}
+
+{# Wrapper around fields in the properties box #}
+<script type="text/x-deskpro-plain" id="{{baseId}}_fields_display_main_wrap_tpl">
+	<table class="prop-table display-item" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<th class="prop-title display-title"></th>
+			<td class="prop-val display-content"></td>
+		</tr>
+	</table>
+</script>
+<script type="text/x-deskpro-plain" id="{{baseId}}_fields_display_main_edit_tpl">
+	<div class="fields-edit-container">
+		<div class="fields-edit-rows"></div>
+		<div class="controls">
+			<div class="is-not-loading">
+				<button class="clean-white save-trigger">{{ phrase('agent.general.save') }}</button>
+				<button class="clean-white close-trigger">{{ phrase('agent.general.cancel') }}</button>
+			</div>
+			<div class="is-loading">
+				{{ phrase('agent.general.saving') }}
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/x-deskpro-plain" id="{{baseId}}_fields_display_main_edit_row_tpl">
+	<table class="prop-table display-item" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<th class="display-title"></th>
+			<td class="display-content"></td>
+		</tr>
+	</table>
+</script>
+
+{# New tab code for bottom tabs (for addition to tabstrip) #}
+<script type="text/x-deskpro-plain" class="tpl-fields-maintabs-tab" id="{{baseId}}_fields_display_tabs_tab_tpl">
+	<li class="tab-trigger {id} field-tab" data-tab-for=".{id}" data-field-tab-id="{id}">
+		<a>{title}</a>
+	</li>
+</script>
+<script type="text/x-deskpro-plain" class="tpl-fields-maintabs-content" id="{{baseId}}_fields_display_tabs_content_tpl">
+	<div class="full-container-tabbed-contents tab-content field-tab-content {id}">
+	</div>
+</script>
+<script type="text/x-deskpro-plain" id="{{baseId}}_fields_display_tabs_wrap_tpl">
+	<dl class="info-list display-item">
+		<dt class="display-title"></dt>
+		<dd class="display-content"></dd>
+	</dl>
+</script>
+
+<ul class="ticket-message-edit-menu" style="display:none">
+	<li data-option-id="window" data-url="{{ path('agent_ticket_message_window', {ticket_id: '00000', message_id: '11111', _rt: security_token('request_token', 10800)}) }}">{{ phrase('agent.tickets.view_message_in_window') }}</li>
+	<li data-option-id="quote">{{ phrase('agent.general.quote') }}</li>
+	<li class="forward-message" data-option-id="fwd">{{ phrase('agent.tickets.forward_message') }}</li>
+	{% if ticket_perms.modify_messages %}<li class="delete-link" data-option-id="delete">{{ phrase('agent.tickets.delete_message') }}</li>{% endif %}
+	{% if ticket_perms.delete %}<li class="delete-attachments-link" data-option-id="delete-attachments">{{ phrase('agent.tickets.delete_attach') }}</li>{% endif %}
+	<li class="set-as-note" data-option-id="setnote.note">{{ phrase('agent.tickets.set_as_note') }}</li>
+	<li class="set-as-message" data-option-id="setnote.message">{{ phrase('agent.tickets.set_as_normal_message') }}</li>
+	{% if ticket_perms.modify_merge %}<li data-option-id="split">{{ phrase('agent.tickets.split_message_btn') }}</li>{% endif %}
+	{% if app.user.hasPerm('agent_tickets.create') %}<li data-option-id="linked_ticket">{{ phrase('agent.tickets.create_linked_ticket') }}</li>{% endif %}
+	{% if ticket_perms.modify_messages %}<li data-option-id="edit">{{ phrase('agent.general.edit') }}</li>{% endif %}
+	{% if app.user.can_admin %}<li data-option-id="debug" data-url="{{ path('agent_ticket_download_debug_report', {ticket_id: '00000', _rt: security_token('request_token', 10800)}) }}">{{ phrase('agent.tickets.debug_file_download') }}</li>{% endif %}
+	{#<li data-option-id="split">{{ phrase('agent.tickets.split_from_here') }}</li>#}
+</ul>
+<ul class="ticket-macros-menu" style="display:none" {% if baseId %}id="{{baseId}}_macros_menu"{% endif %}>
+	{% for macro in macros %}
+		<li class="res-ticketmacro-{{ macro.id }}" data-macro-id="{{macro.id}}"><span class="macro-title">{{macro.title}}</span></li>
+	{% endfor %}
+	<li class="open-settings-trigger" style="background-color: #E4E4E4; border-top: 1px solid #C1C1C1;"><i class="icon-cog"></i> {{ phrase('agent.general.manage_macros') }}</li>
+</ul>
+
+<div class="delete-ticket-overlay overlay" style="display:none">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.general.delete') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+		{{ phrase('agent.general.deleted_reason') }}: <input type="text" value="" class="delete-reason" style="width: 200px;" />
+
+		{% if person_object_counts.tickets > 1 or person_object_counts.chats %}
+		<div id="{{ baseId }}_delete_user_list" style="display: none;">
+			<br/>
+			{{ phrase('agent.people.other_user_content_being_deleted') }}<br />
+			&bull; {{ phrase('agent.general.count_tickets', {count: person_object_counts.tickets}) }}
+			{% if person_object_counts.chats %}&bull; {{ phrase('agent.general.count_chat', {count: person_object_counts.chats}) }}<br/>{% endif %}
+		</div>
+		{% endif %}
+	</div>
+
+	<div class="overlay-footer">
+		<div class="loading-off">
+			<button class="save-trigger clean-white">{{ phrase('agent.general.delete') }}</button>
+		</div>
+		<div class="loading-on" style="display:none">
+			<span>{{ phrase('agent.general.saving') }}... <span class="flat-spinner"></span></span>
+		</div>
+	</div>
+</div>
+
+<div class="delete-message-overlay overlay" style="display:none">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.general.delete') }}</h4>
+	</div>
+
+	<div class="overlay-content">
+		{{ phrase('agent.tickets.delete_message_confirm') }}
+		<div class="ticket-messages"></div>
+		<input type="hidden" class="message-id" value="" />
+	</div>
+
+	<div class="overlay-footer">
+		<div class="loading-off">
+			<button class="save-trigger clean-white">{{ phrase('agent.general.delete') }}</button>
+		</div>
+		<div class="loading-on" style="display:none">
+			<span>{{ phrase('agent.general.saving') }}... <span class="flat-spinner"></span></span>
+		</div>
+	</div>
+</div>
+
+<div class="macro-controls" style="display: none;">
+	<button class="clean-white save" id="macro_apply_btn">{{ phrase('agent.general.apply') }}</button>
+	<button class="clean-white cancel" id="macro_cancel_btn">{{ phrase('agent.general.cancel') }}</button>
+</div>
+
+<div class="confirm-macro-overlay" id="{{baseId}}_confirm_macro_overlay" style="width: 800px; height: 400px; display: none;">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.general.confirm') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<ul class="actions-list"></ul>
+	</div>
+	<div class="overlay-footer">
+		<button class="clean-white" id="{{baseId}}_apply_macro_btn">{{ phrase('agent.general.apply') }}</button>
+	</div>
+</div>
+
+<section id="{{ baseId }}_message_edit_overlay" style="display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay close-trigger"></span>
+		<h4>{{ phrase('agent.general.edit') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<input type="hidden" name="message_id" class="message_id" value="0" />
+		<textarea rows="10" cols="60" style="width: 98%; height: 200px; color: #000; size: 10px; font-family: Monaco, Consolas, monospace;" name="message_text" class="message_text"></textarea>
+	</div>
+	<div class="overlay-footer">
+		<button class="clean-white save-text-trigger">{{ phrase('agent.general.save') }}</button>
+		<span class="flat-spinner save-text-loading" style="display: none"></span>
+	</div>
+</section>
+
+{% include 'AgentBundle:Ticket:custom-view-include.html.twig' %}
+
+{{ dp_widgets(baseId, 'ticket', '', '', ticket_api) }}
+
+</div>
+
+<div id="{{baseId}}_pending_add" style="display:none;" data-save-url="{{ path('agent_kb_newpending') }}">
+	<div class="mass-actions-overlay pending-article" style="width: 550px; height: 400px;">
+		<div class="overlay-title">
+			<h4>{{ phrase('agent.tickets.create_new_pending_article') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<div style="font-size: 12px; padding-bottom: 9px;">{{ phrase('agent.tickets.pending_article_info') }}</div>
+			<input type="hidden" name="ticket_id" value="{{ ticket.id }}" />
+			<textarea name="comment" placeholder="{{ phrase('agent.tickets.pending_article_desc') }}" style="width: 98%; height: 260px;"></textarea>
+		</div>
+		<div class="overlay-footer">
+			<div class="is-not-loading">
+				<button class="save-new-trigger clean-white">{{ phrase('agent.general.add') }}</button>
+			</div>
+			<div class="is-loading">
+				<i class="flat-spinner"></i>
+			</div>
+		</div>
+	</div>
+</div>
+
+</div></div> {# /scroll #}
+</div>{# /layout #}

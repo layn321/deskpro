@@ -1,0 +1,52 @@
+<div class="with-search-builder">
+	<div class="search-form criteria_list add-to-search">
+		<div class="search-terms"></div>
+		<div class="add-term-row"><span class="add-term"><i class="icon-plus-sign"></i></span></div>
+	</div>
+
+	<div class="search-builder-tpl criteria_tpl" style="display:none">
+		<div class="row">
+			<div class="term">
+				<div class="remove-row-btn trigger-remove-row"><i class="icon-minus-sign"></i></div>
+				<div class="sep-row">
+					<div class="line"></div>
+					<strong>{{ phrase('agent.general.and') }}</strong>
+				</div>
+				<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+					<td class="builder-controls" style="vertical-align: middle;">
+						<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+							<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+						</tr></tbody></table>
+					</td>
+				</tr></tbody></table>
+			</div>
+		</div>
+		<div class="builder-type-choice" title="{{ phrase('agent.general.choose_criteria') }}" data-rule-type=""></div>
+
+		{% set op_lang = {'is': phrase('agent.general.is'), 'not': phrase('agent.general.is_not'), 'contains': phrase('agent.general.contains'), 'notcontains': phrase('agent.general.does_not_contain'), 'gt': phrase('agent.general.is_greater_than'), 'lt': phrase('agent.general.is_less_than') } %}
+		{% for field in app.getOrgFieldManager().getDisplayArray() %}
+			{% if field.field_def.getFilterCapabilities(search_context) %}
+			<div class="builder-type" title="{{field.field_def.title}}" data-rule-type="org_field[{{field.field_def.id}}]">
+				<div class="builder-op">
+					<select name="op" class="op">
+						{% if search_context == 'filter' %}
+							{% for op in field.field_def.getFilterCapabilities(search_context) %}
+								<option value="{{op}}">{{op_lang[op]}}</option>
+							{% endfor %}
+						{% else %}
+							{% for op in field.field_def.getSearchCapabilities(search_context) %}
+								<option value="{{op}}">{{op_lang[op]}}</option>
+							{% endfor %}
+						{% endif %}
+					</select>
+				</div>
+				<div class="builder-options">
+					{{ form_widget(field.formView) }}
+				</div>
+			</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>

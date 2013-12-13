@@ -1,0 +1,15 @@
+<header class="list-selection-bar">
+	<input type="checkbox" class="selection-control" />
+    {% set phrase_part %}
+        <span class="selected-count">0</span>
+    {% endset %}
+    {{ phrase('agent.general.display_count_selected', {'display_count':phrase_part}, true) }}
+	<a class="perform-action perform-actions-trigger disabled menu-fitted">
+		<span>{{ phrase('agent.general.perform_actions') }}</span>
+	</a>
+	<i class="ajax-loading flat-spinner" style="display: none;"></i>
+	<ul class="actions-menu" style="display: none">
+		<li data-action="approve">{{ phrase('agent.general.approve') }}</li>
+		<li data-action="disapprove">{{ phrase('agent.general.delete') }}</li>
+	</ul>
+</header>

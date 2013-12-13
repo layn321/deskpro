@@ -1,0 +1,39 @@
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for content_info in content_validating %}
+		{% set info = content_info.info %}
+		{% set content = content_info.obj %}
+		<article
+			class="row-item content {{ info.content_type }}-{{content.id}} {{ get_type(content)|lower }}"
+			data-route="page:{{ object_path_agent(content) }}"
+			data-route-title="@selector(a.row-title)"
+			data-route-openclass="open"
+		>
+			{% if app.user.hasPerm('agent_publish.validate') %}
+				<input class="item-select" type="checkbox" value="{{ info.content_type }}.{{content.id}}" data-content-type="{{ info.content_type }}" data-content-id="{{ content.id }}" />
+			{% endif %}
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="row-title click-through">{{ content.title }}</a>
+					</h3>
+				</div>
+			</div>
+			<hr class="clear-top" />
+			<div class="extra-fields">
+				<ul>
+					<li>{{ get_type(content) }}</li>
+					{% if info.revision_id %}
+						<li>
+                            {{ phrase('agent.publish.revision_by', {'name':content.revisions[info.revision_id].person.display_name}) }}
+						</li>
+					{% else %}
+						<li>
+                            {{ phrase('agent.general.by_name', {'name':content.person.display_name}) }}
+						</li>
+					{% endif %}
+				</ul>
+				<br class="clear" />
+			</div>
+		</article>
+	{% endfor %}
+</section>

@@ -1,0 +1,62 @@
+{% extends 'ReportBundle:ReportBuilder:layout.html.twig' %}
+{% block inner_page %}
+	<h1>
+		{% if report.isEditable() %}
+			<a rel="report-page-body" href="{{ path('report_builder_delete', {'report_builder_id': report.id}) }}"
+			   class="report-action"><img src="{{ asset('images/report/icons/close.png') }}" alt="Delete" /></a>
+			<a rel="report-page-body" href="{{ path('report_builder_edit', {'report_builder_id': report.id}) }}"
+			   class="report-action"><img src="{{ asset('images/report/icons/edit.png') }}" alt="Edit" /></a>
+		{% endif %}
+
+		<a href="{{ path('report_builder_favorite', {
+			'report_builder_id': report.id,
+			'token': security_token('report_builder_favorite'),
+			'params': params
+			}) }}"
+		   class="report-favorite-toggle report-favorite"
+		   data-report-id="{{ report.id }}"
+		   data-report-params="{{ params|join(',') }}"
+		   title="Toggle favorite status"
+		>Toggle favorite status</a>
+
+		<a href="{{ path('report_builder_report', {'report_builder_id': report.id}) }}" rel="report-page-body" class="report-title-with-params" data-params="{{ params|json_encode }}">{{report.getTitle('no_groupable', params)}}</a>
+	</h1>
+	{% if report.description %}<p>{{ report.description|nl2br }}</p>{% endif %}
+	{% if report.parent %}
+		<p>Clone of <a rel="report-page-body" href="{{ path('report_builder_report', {'report_builder_id': report.parent.id})}}"
+			>{{report.parent.getTitle(false)}}</a></p>
+	{% endif %}
+
+	<form action="{{ path('report_builder_report', {'report_builder_id' : report.id}) }}" class="dp-form" method="post">
+		<div id="report-editor-controls" class="{{ ((report.isEditable() and report.isQueryDifferent(query)) or not run) ? '' : 'report-editor-hidden'}}">
+			{% include 'ReportBundle:ReportBuilder:query-editor.html.twig' with {'readOnly': not report.isEditable()} %}
+
+			<div class="report-actions">
+				<button class="btn primary" name="run" value="1">Run Report</button>
+				{% if report.isEditable() and not report.hasPlaceholders() %}
+					<button class="btn" name="save" value="1">Save Changes</button>
+				{% endif %}
+			</div>
+		</div>
+
+		{% if run %}
+			<div class="report-actions">
+				<button class="btn" name="output" value="csv">CSV</button>
+				<button class="btn" name="output" value="pdf">PDF</button>
+				<button class="btn" name="run" value="1" onclick="window.print(); return false;">Print</button>
+				<button class="btn" name="clone" value="1">Clone</button>
+				{% if not (report.isEditable() and report.isQueryDifferent(query)) %}
+					<a class="btn report-action report-editor-controls-show" href="javascript:" data-target="#report-editor-controls" data-hide-text="Hide Query">Show Query</a>
+				{% endif %}
+			</div>
+
+			{% include 'ReportBundle:ReportBuilder:results.html.twig' %}
+		{% endif %}
+
+		{{ form_token() }}
+
+		{% for key, val in params %}
+			<input type="hidden" name="params[{{ key }}]" value="{{ val }}" />
+		{% endfor %}
+	</form>
+{% endblock %}

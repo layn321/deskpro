@@ -1,0 +1,159 @@
+{##
+ # The feedback tab of the website widget overlay
+ ##}
+
+<div id="newfeedback" class="tab" style="display: none;">
+	<form action="{{ path('user_widget_newfeedback') }}" method="POST" id="dp_newfeedback_form" class="with-form-validator">
+		{{ form_token('newfeedback_widget') }}
+
+		{% if app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+		<div class="socials">
+			<div>
+				<span>{{ phrase('user.widget.login-connect') }}</span>
+				<ul>
+					{% for usersource in app.usersourceManager.getWithCapability('tpl_widget_overlay_btn') %}
+					<li>{{ render_usersource(usersource, 'widget_overlay_btn') }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		{% endif %}
+
+		<div class="dp-new-feedback" >
+			<div class="dp-input-prepend">
+				<table cellspacing="0" cellpadding="0" width="100%"><tr>
+					<td width="50" class="dp-msg">
+						<span style="white-space: nowrap;">{{ phrase('user.widget.feedback_form_prefix') }}</span>
+					</td>
+					<td width="10" class="dp-cat dp-cat2">
+						<div class="dp-form-row-category_id">
+							<div class="with-sub-options feedbackCat_id_wrapper" data-field-validators="DeskPRO.Form.TwoLevelSelectValidator">
+								<div style="position: relative;" class="dp-inplace-drop">
+									<em><span class="dp-opt-label">&nbsp;</span> <i></i></em>
+									<select name="feedback[category_id]" class="parent-option category_id no-uniform">
+										{% for cat in feedback_categories %}
+											<option value="{{cat.id}}">{{cat.title}}</option>
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.feedback_form_error_type') }}</span>
+							</span>
+						</div>
+					</td>
+					<td class="dp-title">
+						{{ form_widget(feedbackform.title, {
+							'attr': {
+								'data-field-validators': 'DeskPRO.Form.LengthValidator',
+								'data-min-len': 5,
+								'class': 'search-collect',
+								'placeholder': phrase('user.widget.feedback_form_subject')
+							}
+						}) }}
+					</td>
+				</tr></table>
+			</div>
+			<div class="dp-form-row-title">
+				<span class="tooltip-error">
+					<span>{{ phrase('user.widget.feedback_form_error_subject') }}</span>
+				</span>
+			</div>
+		</div>
+
+		<table class="form-table" cellspacing="0" cellpadding="0" width="100%">
+			<tbody>
+				<tr>
+					<th width="120">
+						{{ phrase('user.widget.name') }}
+					</th>
+					<td>
+						<div class="dp-form-row-person_name">
+							<div class="txt">
+								{{ form_widget(feedbackform.person_name, {
+									'attr': {
+										'data-field-validators': 'DeskPRO.Form.LengthValidator',
+										'data-min-len': 2,
+										'class': 'name-field'
+									}
+								}) }}
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.form_error_name') }}</span>
+							</span>
+						</div>
+					</td>
+				</tr>
+
+				<tr>
+					<th>
+						{{ phrase('user.widget.email') }}
+					</th>
+					<td>
+						<div class="dp-form-row-person_email">
+							<div class="txt">
+								<input type="text" class="email-field" id="dp_newticket_email" name="feedback[person_email]" value="" data-field-validators="DeskPRO.Form.EmailValidator" data-min-len="4" />
+							</div>
+							<span class="tooltip-error">
+								<span>{{ phrase('user.widget.form_error_email') }}</span>
+							</span>
+						</div>
+					</td>
+				</tr>
+
+				{% if newfeedback_cat_field %}
+					<tr>
+						<th>{{ phrase('user.feedback.category') }}</th>
+						<td>
+							<div class="dp-form-row-usercat">
+								<div class="fields-row" style="position: relative;">
+									{{ render_custom_field_form(newfeedback_cat_field, {field_group: 'feedback[custom_fields]'}) }}
+								</div>
+								<span class="tooltip-error">
+									{{ phrase('user.feedback.form_new_error_category') }}
+								</div>
+							</div>
+						</td>
+					</tr>
+				{% endif %}
+
+				<tr>
+					<th>
+						{{ phrase('user.widget.feedback_form_message') }}
+					</th>
+					<td>
+						<div class="fields-row message dp-form-row-content">
+							<table cellspacing="0" cellpadding="0" width="100%"><tr><td><div style="position: relative">
+								<div class="textarea">
+									{{ form_widget(feedbackform.content, {
+										'attr': {
+											'class': 'dp-message',
+											'data-field-validators': 'DeskPRO.Form.LengthValidator',
+											'data-min-len': 10,
+											'class': addclass
+										}
+									}) }}
+								</div>
+								<span class="tooltip-error">
+									<span>{{ phrase('user.widget.feedback_form_error_message') }}</span>
+								</span>
+							</div></td></tr></table>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>&nbsp;</th>
+					<td>
+						<button type="submit" class="btn-activity dp-show-not-loading">{{ phrase('user.widget.feedback_form_submit') }}</button>
+						<i class="spinner-flat dp-show-is-loading"></i>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+
+	<div class="thank-you" id="dp_newfeedback_done" style="display: none">
+		<h2>{{ phrase('user.widget.feedback_form_completed-title') }}</h2>
+		<p>{{ phrase('user.widget.feedback_form_completed') }}</p>
+	</div>
+</div>

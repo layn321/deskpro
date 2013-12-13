@@ -1,0 +1,42 @@
+<div data-page="{{ message_page }}" data-page-count="{{ message_page_count }}">
+	{% if app.user.getPref('agent.ticket_reverse_order') %}
+		{% if ticket_message_logs['after'] %}
+			{% if app.user.getPref('agent.ticket_reverse_order') %}{% set logs = ticket_message_logs['after']|reverse %}{% else %}{% set logs = ticket_message_logs['after'] %}{% endif %}
+			{% for log_id in logs %}
+				{% set log = ticket_logs[log_id] %}
+				{% include 'AgentBundle:Ticket:ticket-log-row.html.twig' %}
+			{% endfor %}
+		{% endif %}
+	{% endif %}
+	{% if app.user.getPref('agent.ticket_reverse_order') %}{% set ticket_messages = ticket_messages|reverse %}{% endif %}
+	{% for message in ticket_messages %}
+		{% if app.user.getPref('agent.ticket_reverse_order') %}
+			{% if ticket_message_logs[message.id] %}
+				{% if app.user.getPref('agent.ticket_reverse_order') %}{% set logs = ticket_message_logs[message.id]|reverse %}{% else %}{% set logs = ticket_message_logs[message.id] %}{% endif %}
+				{% for log_id in logs %}
+					{% set log = ticket_logs[log_id] %}
+					{% include 'AgentBundle:Ticket:ticket-log-row.html.twig' %}
+				{% endfor %}
+			{% endif %}
+		{% endif %}
+		{% include 'AgentBundle:Ticket:ticket-message.html.twig' with {message: message, message_num: ticket_messages_num[message.id] } %}
+		{% if not app.user.getPref('agent.ticket_reverse_order') %}
+			{% if ticket_message_logs[message.id] %}
+				{% if app.user.getPref('agent.ticket_reverse_order') %}{% set logs = ticket_message_logs[message.id]|reverse %}{% else %}{% set logs = ticket_message_logs[message.id] %}{% endif %}
+				{% for log_id in logs %}
+					{% set log = ticket_logs[log_id] %}
+					{% include 'AgentBundle:Ticket:ticket-log-row.html.twig' %}
+				{% endfor %}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+	{% if not app.user.getPref('agent.ticket_reverse_order') %}
+		{% if ticket_message_logs['after'] %}
+			{% if app.user.getPref('agent.ticket_reverse_order') %}{% set logs = ticket_message_logs['after']|reverse %}{% else %}{% set logs = ticket_message_logs['after'] %}{% endif %}
+			{% for log_id in logs %}
+				{% set log = ticket_logs[log_id] %}
+				{% include 'AgentBundle:Ticket:ticket-log-row.html.twig' %}
+			{% endfor %}
+		{% endif %}
+	{% endif %}
+</div>

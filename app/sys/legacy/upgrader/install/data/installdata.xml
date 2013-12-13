@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--  $Id: installdata.xml 6758 2010-03-17 04:41:19Z chroder $ -->
+<!--  This is data that is loaded at install but never gain -->
+<data>
+
+	<query table="data">
+		<name>email_ban</name>
+		<isdefault>1</isdefault>
+		<data>a:0:{}</data>
+	</query>
+	<query table="data">
+		<name>ip_ban</name>
+		<isdefault>1</isdefault>
+		<data>a:0:{}</data>
+	</query>
+	<query table="data">
+		<name>plugin_settings</name>
+		<isdefault>1</isdefault>
+		<data>a:0:{}</data>
+	</query>
+
+	<!-- Default usergroups -->
+	<query table="user_groups">
+		<id>1</id>
+		<name>Guests</name>
+		<description>Guests are users who are not logged in. Every guest will be added to this usergroup for the duration of their stay. Use this usergroup to control access permissions for guests.</description>
+		<is_system>1</is_system>
+		<system_name>guest</system_name>
+		<p_kb>1</p_kb>
+		<p_kb_comment>1</p_kb_comment>
+		<p_kb_rate>1</p_kb_rate>
+		<p_dl>1</p_dl>
+		<p_trouble>1</p_trouble>
+		<p_trouble_rate>1</p_trouble_rate>
+		<p_ticket>1</p_ticket>
+		<p_ticket_new>1</p_ticket_new>
+		<p_ticket_new_email>1</p_ticket_new_email>
+		<p_ideas>1</p_ideas>
+		<p_ideas_vote>0</p_ideas_vote>
+		<p_ideas_new>0</p_ideas_new>
+		<p_ideas_new_visible>0</p_ideas_new_visible>
+		<p_ideas_comment_new>0</p_ideas_comment_new>
+		<p_ideas_comment_view>1</p_ideas_comment_view>
+	</query>
+	<query table="user_groups">
+		<id>2</id>
+		<name>Registered</name>
+		<description>Users who are fully registered all belong to this usergroup. A user can belong to any amount of additional usergroups, but they will always belong to this one. Use this usergroup to control the base permissions applied to all users.</description>
+		<is_system>1</is_system>
+		<system_name>registered</system_name>
+		<p_kb>1</p_kb>
+		<p_kb_new>1</p_kb_new>
+		<p_kb_subscribe>1</p_kb_subscribe>
+		<p_kb_comment>1</p_kb_comment>
+		<p_kb_rate>1</p_kb_rate>
+		<p_dl>1</p_dl>
+		<p_trouble>1</p_trouble>
+		<p_trouble_rate>1</p_trouble_rate>
+		<p_ticket>1</p_ticket>
+		<p_ticket_new>1</p_ticket_new>
+		<p_ticket_new_email>1</p_ticket_new_email>
+		<p_ticket_rate>1</p_ticket_rate>
+		<p_ticket_reopen>1</p_ticket_reopen>
+		<p_ideas>1</p_ideas>
+		<p_ideas_vote>1</p_ideas_vote>
+		<p_ideas_new>1</p_ideas_new>
+		<p_ideas_new_visible>1</p_ideas_new_visible>
+		<p_ideas_comment_new>1</p_ideas_comment_new>
+		<p_ideas_comment_view>1</p_ideas_comment_view>
+	</query>
+
+	<!-- Default usersource -->
+	<query table="user_source">
+		<module>Dp</module>
+		<enabled>1</enabled>
+		<runorder>-1000</runorder>
+		<title>Default</title>
+		<description>The default user source. New users who register through the helpdesk, or are registered automatically, are stored in the local database.</description>
+		<user_title>Helpdesk</user_title>
+		<user_description>This helpdesk.</user_description>
+		<config>a:2:{s:24:"disable_secure_passwords";i:0;s:10:"done_setup";b:1;}</config>
+	</query>
+
+	<!-- Some default ticket categories -->
+	<query table="ticket_cat">
+		<name>General</name>
+		<displayorder>1</displayorder>
+		<name_language></name_language>
+		<custom_all>1</custom_all>
+	</query>
+	<query table="ticket_cat">
+		<name>Support</name>
+		<displayorder>2</displayorder>
+		<name_language></name_language>
+		<custom_all>1</custom_all>
+	</query>
+	<query table="ticket_cat">
+		<name>Sales</name>
+		<displayorder>3</displayorder>
+		<name_language></name_language>
+		<custom_all>1</custom_all>
+	</query>
+	<query table="ticket_cat">
+		<name>Billing</name>
+		<displayorder>4</displayorder>
+		<name_language></name_language>
+		<custom_all>1</custom_all>
+	</query>
+
+	<!-- Some default ticket category permissions -->
+	<query table="ticket_cat_permissions">
+		<usergroup>1</usergroup>
+		<category>1</category>
+	</query>
+	<query table="ticket_cat_permissions">
+		<usergroup>2</usergroup>
+		<category>1</category>
+	</query>
+	<query table="ticket_cat_permissions">
+		<usergroup>1</usergroup>
+		<category>2</category>
+	</query>
+	<query table="ticket_cat_permissions">
+		<usergroup>2</usergroup>
+		<category>2</category>
+	</query>
+	<query table="ticket_cat_permissions">
+		<usergroup>1</usergroup>
+		<category>3</category>
+	</query>
+	<query table="ticket_cat_permissions">
+		<usergroup>2</usergroup>
+		<category>3</category>
+	</query>
+	<query table="ticket_cat_permissions">
+		<usergroup>1</usergroup>
+		<category>4</category>
+	</query>
+	<query table="ticket_cat_permissions">
+		<usergroup>2</usergroup>
+		<category>4</category>
+	</query>
+
+	<!-- Some default ticket priorities -->
+	<query table="ticket_pri">
+		<name>Low</name>
+		<displayorder>1</displayorder>
+		<color></color>
+		<name_language></name_language>
+	</query>
+	<query table="ticket_pri">
+		<name>Normal</name>
+		<displayorder>2</displayorder>
+		<color></color>
+		<name_language></name_language>
+	</query>
+	<query table="ticket_pri">
+		<name>Emergency</name>
+		<displayorder>3</displayorder>
+		<color></color>
+		<name_language></name_language>
+	</query>
+
+	<!-- Some default ticket priorities permissions -->
+	<query table="ticket_pri_permissions">
+		<usergroup>1</usergroup>
+		<priority>1</priority>
+	</query>
+	<query table="ticket_pri_permissions">
+		<usergroup>2</usergroup>
+		<priority>1</priority>
+	</query>
+	<query table="ticket_pri_permissions">
+		<usergroup>1</usergroup>
+		<priority>2</priority>
+	</query>
+	<query table="ticket_pri_permissions">
+		<usergroup>2</usergroup>
+		<priority>2</priority>
+	</query>
+	<query table="ticket_pri_permissions">
+		<usergroup>1</usergroup>
+		<priority>3</priority>
+	</query>
+	<query table="ticket_pri_permissions">
+		<usergroup>2</usergroup>
+		<priority>3</priority>
+	</query>
+
+	<!-- Some default ticket workflows -->
+	<query table="ticket_workflow">
+		<name>In Process</name>
+		<displayorder>1</displayorder>
+	</query>
+	<query table="ticket_workflow">
+		<name>Awaiting Consultation</name>
+		<displayorder>2</displayorder>
+	</query>
+	<query table="ticket_workflow">
+		<name>On Hold</name>
+		<displayorder>3</displayorder>
+	</query>
+
+	<query table="faq_cats">
+		<id>1</id>
+		<name>Test Category</name>
+		<articles>1</articles>
+		<displayorder>1</displayorder>
+		<timestamp_created>###TIMENOW###</timestamp_created>
+	</query>
+	<query table="faq_permissions">
+		<catid>1</catid>
+		<groupid>1</groupid>
+	</query>
+	<query table="faq_permissions">
+		<catid>1</catid>
+		<groupid>2</groupid>
+	</query>
+	<query table="faq_articles">
+		<id>1</id>
+		<title>Test Article - How do I turn off a computer?</title>
+		<question>How should I turn off my computer? A friend told me it was a bad idea to just pull out the power plug. Please help</question>
+		<answer>If you are running Windows XP, click the Start button in the bottom left hand corner. Then move your mouse to the Shut Down icon on the bottom right of the menu that pops up. Select Shut Down from the next menu and click Ok. Your computer will now turn itself off.</answer>
+		<category>1</category>
+		<timestamp_made>###TIMENOW###</timestamp_made>
+		<techid_made>1</techid_made>
+		<displayorder>1</displayorder>
+		<ref>1456-DFRD-2345</ref>
+		<featured>1</featured>
+	</query>
+
+</data>

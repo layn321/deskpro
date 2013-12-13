@@ -1,0 +1,49 @@
+{% import 'ReportBundle:Overview:macros.html.twig' as macros %}
+<section class="report-wrapper {% if initial_display %}initial-display{% endif %}">
+	<header>
+		<h2>
+			There were <span class="label-sum">{{ data.sum }}</span> Knowledgebase Article Views Today
+		</h2>
+	</header>
+	<article>
+		<div class="loading-overlay" {% if not initial_display %}style="display: none"{% endif %}><strong>Loading</strong></div>
+			{% if data.values %}
+			<table class="stat-table stat-table-vert" width="100%">
+				<tr>
+					{% for id, title in data.titles %}
+						<td width="4%" style="height: 100px; vertical-align: bottom; text-align: center;" valign="bottom">
+							{% if data.values[id] %}
+								{{ data.values[id] }}<br />
+								<table width="100%" class="stat-value" style="vertical-align: bottom;" valign="bottom"><tr>
+									{% set perc = (data.values[id] / data.max|default(1)) * 100 %}
+									{% if perc < 1.0 %}
+										<td class="value"><div style="height: 1px;">&nbsp;</div></td>
+									{% else %}
+										<td class="value"><div style="height: {{ perc }}px">&nbsp;</div></td>
+									{% endif %}
+								</tr></table>
+							{% else %}
+								&nbsp;
+							{% endif %}
+						</td>
+					{% endfor %}
+				</tr>
+				<tr>
+					{% for id, title in data.titles %}
+						<td width="4%" style="text-align: center">
+							<span style="font-size:10px">
+								{% if title == 0 %}12am
+								{% elseif title == 12 %}12pm
+								{% elseif title > 12 %}{{ title - 12 }}pm
+								{% else %}{{title}}am
+								{% endif %}
+							</span>
+						</td>
+					{% endfor %}
+				</tr>
+			</table>
+		{% else %}
+			{{ macros.no_data() }}
+		{% endif %}
+	</article>
+</section>

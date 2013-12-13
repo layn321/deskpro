@@ -1,0 +1,113 @@
+{% macro block_sections() %}
+	<div class="block-sections">
+		<ul>
+{% endmacro %}
+{% macro block_sections_end() %}
+		</ul>
+	</div>
+{% endmacro %}
+
+{% macro block_sections_item() %}
+	<li>
+{% endmacro %}
+{% macro block_sections_item_end() %}
+	</li>
+{% endmacro %}
+
+
+
+{% macro structure_table(options) %}
+	<div class="structure-table">
+		<table
+			{% if options.id %}id="{{ options.id }}"{% endif %}
+			cellspacing="0"
+			cellpadding="0"
+			width="100%"
+			border="0"
+			class="{% if options.save_order_url %}with-reorderable{% endif %} structure-list"
+			{% if options.save_order_url %}data-reorder-save-url="{{ options.save_order_url }}"{% endif %}
+		>
+{% endmacro %}
+
+{% macro structure_table_end() %}
+		</table>
+	</div>
+{% endmacro %}
+
+{% macro helpbox() %}
+<div class="dp-pagehelp">
+	<span></span>
+	<section>
+		<article>
+{% endmacro %}
+{% macro helpbox_end() %}
+		</article>
+	</section>
+</div>
+{% endmacro %}
+
+{% macro dpgrid(options) %}
+	<div class="dp-grid {{ options.class }}" {{ options.extra|raw }}>
+{% endmacro %}
+
+	{% macro dpgrid_headerrow(options) %}
+		<header class="dp-grid-headerrow {{ options.class }}" {{ options.extra|raw }}>
+	{% endmacro %}
+
+			{% macro dpgrid_headercol(options) %}
+				<div class="header-col"><div class="inner-wrap {{ options.class }}" style="{{ options.style }}"><div class="inner-wrap2"><table cellpadding="0" cellspacing="0" width="100%" height="100%" border="0"><tr><td valign="top" width="100%" height="100%">
+			{% endmacro %}
+
+			{% macro dpgrid_headercol_end() %}
+				</td></tr></table></div></div></div>
+			{% endmacro %}
+
+	{% macro dpgrid_headerrow_end() %}
+		<br class="clear" />
+		</header>
+	{% endmacro %}
+
+
+	{% macro dpgrid_section(options) %}
+		<div class="dp-grid-sectionrow {{ options.rowclass }}" {{ options.rowextra|raw }}>
+			<div class="section-col"><div class="inner-wrap {{ options.class }}" style="{{ options.style }}"><div class="inner-wrap2"><table cellpadding="0" cellspacing="0" width="100%" height="100%" border="0"><tr><td valign="top" width="100%" height="100%">
+	{% endmacro %}
+
+	{% macro dpgrid_section_end(options) %}
+			</td></tr></table></div></div></div>
+			<br class="clear" />
+		</div>
+	{% endmacro %}
+
+	{% macro dpgrid_content(options) %}
+		<article class="dp-grid-row {{ options.class }}" {{ options.extra|raw }}>
+	{% endmacro %}
+
+			{% macro dpgrid_col(options) %}
+				<div class="col"><div class="inner-wrap {{ options.class }}" style="{{ options.style }}"><div class="inner-wrap2"><table cellpadding="0" cellspacing="0" width="100%" height="100%" border="0"><tr><td valign="top" width="100%" height="100%">
+			{% endmacro %}
+
+			{% macro dpgrid_col_end() %}
+				</td></tr></table></div></div></div>
+			{% endmacro %}
+
+	{% macro dpgrid_content_end() %}
+		<br class="clear" />
+		</article>
+	{% endmacro %}
+
+
+{% macro dpgrid_end() %}
+	<br  class="clear" />
+	</div>
+{% endmacro %}
+
+{% macro lic_expire_days(in_word) %}
+	{% if app.getLicense().getExpireDays() == 0 and app.getLicense().getExpireTime('hours') == 0 %}
+		In {{ app.getLicense().getExpireTime('mins') }} minutes
+	{% elseif app.getLicense().getExpireDays() < 3 %}
+		In {{ app.getLicense().getExpireTime('hours') }} hours
+	{% else %}
+		In {{ app.getLicense().getExpireDays() }} days
+	{% endif %}
+{% endmacro %}

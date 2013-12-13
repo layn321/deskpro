@@ -1,0 +1,64 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>Test Email</li>
+	</ul>
+{% endblock %}
+{% block page %}
+<form action="{{ path('admin_server_testemail') }}" method="post">
+	<div class="check-grid item-list">
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td>Send through:</td>
+					<td>
+						<div style="float:right">
+							<a href="{{ path('admin_emailtrans_list') }}">Manage email transports</a>
+						</div>
+						<select name="email_transport_id">
+							{% for t in all_transports %}
+								<option value="{{ t.id }}">{{ t.title }} (#{{ t.id }})</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>From:</td>
+					<td>
+						<input type="text" name="from" value="{{ app.getSetting('core.default_from_email') }}" style="width: 65%" />
+					</td>
+				</tr>
+				<tr>
+					<td>To:</td>
+					<td>
+						<input type="text" name="to" value="{{ app.user.email_address }}" style="width: 65%" />
+					</td>
+				</tr>
+				<tr>
+					<td>Subject:</td>
+					<td>
+						<input type="text" name="subject" value="DeskPRO Test Email ({{ 'now'|date('fulltime') }})" style="width: 65%" />
+					</td>
+				</tr>
+				<tr>
+					<td>Message:</td>
+					<td>
+						<textarea name="message" cols="30" rows="10" style="width: 98%; height: 140px;">This is a test email from DeskPRO sent on {{ 'now'|date('fulltime') }}</textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>
+						<label><input type="radio" name="send_when" value="now" checked="checked" /> Send right now</label><br/>
+						<label><input type="radio" name="send_when" value="queued" /> Queue for sending during next task run</label>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<footer class="controls" id="save_control">
+		<button class="clean-white">Send Email</button>
+	</footer>
+</form>
+{% endblock %}

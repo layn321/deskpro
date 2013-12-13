@@ -1,0 +1,570 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.SettingsPage.TicketNotifications';
+</script>
+<form action="{{ path('agent_settings_ticketnotif_save') }}" method="post">
+
+	<header class="pageheader">
+		<nav>
+			<ul>
+				<li class="on" data-tab-for="#settingswin_ticket_notifications_email">{{ phrase('agent.settings.email_notifications') }}</li>
+				<li data-tab-for="#settingswin_ticket_notifications_alert">{{ phrase('agent.settings.browser_notifications') }}</li>
+			</ul>
+		</nav>
+	</header>
+
+	<div style="padding: 10px;">
+		<div id="settingswin_ticket_notifications_email">
+
+			{% if app.user.getPref('agent_notif.no_allow_set_email') %}
+				<p>
+					{{ phrase('agent.settings.notif_contact_admin') }}
+				</p>
+			{% else %}
+				<div class="check-grid">
+					<header>{{ phrase('agent.general.inbox') }}</header>
+					<table width="100%">
+						<thead>
+							<tr>
+								<th width="180">&nbsp;</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_new') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_assign') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_user') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_agent') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_note') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_change') }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_my') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][email_created]" value="1" {% if my_subs[1].email_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created and assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][email_new]" value="1" {% if my_subs[1].email_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket is assigned to me"></span>
+									<input type="checkbox" name="filter_sub[1][email_leave]" value="1" {% if my_subs[1].email_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when I am unassigned from a ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][email_user_activity]" value="1" {% if my_subs[1].email_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][email_agent_activity]" value="1" {% if my_subs[1].email_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when another agent replies to a ticket assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][email_agent_note]" value="1" {% if my_subs[1].email_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when another agent adds a note to a ticket assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][email_property_change]" value="1" {% if my_subs[1].email_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticked assigned to me"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_follow') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][email_created]" value="1" {% if my_subs[3].email_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created and I am added as a follower"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][email_new]" value="1" {% if my_subs[3].email_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when I am added as a follower to a ticket"></span>
+									<input type="checkbox" name="filter_sub[3][email_leave]" value="1" {% if my_subs[3].email_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when I am removed as a follower"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][email_user_activity]" value="1" {% if my_subs[3].email_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket I follow"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][email_agent_activity]" value="1" {% if my_subs[3].email_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to a ticket I follow"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][email_agent_note]" value="1" {% if my_subs[3].email_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to a ticket I follow"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][email_property_change]" value="1" {% if my_subs[3].email_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticket I follow"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_team') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][email_created]" value="1" {% if my_subs[2].email_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created that is assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][email_new]" value="1" {% if my_subs[2].email_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket is assigned to one of my teams"></span>
+									<input type="checkbox" name="filter_sub[2][email_leave]" value="1" {% if my_subs[2].email_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket is unassigned from my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][email_user_activity]" value="1" {% if my_subs[2].email_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][email_agent_activity]" value="1" {% if my_subs[2].email_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to a ticket assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][email_agent_note]" value="1" {% if my_subs[2].email_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to a ticket assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][email_property_change]" value="1" {% if my_subs[2].email_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticket assigned to one of my teams"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_unassigned') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][email_created]" value="1" {% if my_subs[4].email_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created that is not assigned to any agent or team"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][email_new]" value="1" {% if my_subs[4].email_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket becomes unassigned"></span>
+									<input type="checkbox" name="filter_sub[4][email_leave]" value="1" {% if my_subs[4].email_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an unassigned ticket becomes assigned"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][email_user_activity]" value="1" {% if my_subs[4].email_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to an unassigned ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][email_agent_activity]" value="1" {% if my_subs[4].email_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to an unassigned ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][email_agent_note]" value="1" {% if my_subs[4].email_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to an unassigned ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][email_property_change]" value="1" {% if my_subs[4].email_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticket not assigned to any agent or team"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_all') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][email_created]" value="1" {% if my_subs[5].email_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when any new ticket is created"></span>
+								</td>
+								<td class="prop">
+									&nbsp;
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][email_user_activity]" value="1" {% if my_subs[5].email_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to any ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][email_agent_activity]" value="1" {% if my_subs[5].email_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to any ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][email_agent_note]" value="1" {% if my_subs[5].email_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to any ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][email_property_change]" value="1" {% if my_subs[5].email_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to any ticket"></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<br />
+
+				{% if custom_filters|length %}
+				<div class="check-grid">
+					<header>{{ phrase('agent.general.filters') }}</header>
+					<table width="100%">
+						<thead>
+							<tr>
+								<th width="180">&nbsp;</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_new') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created that matches this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.filter_match') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a change to a ticket causes it to match this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_user') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket that matches this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_agent') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to a ticket that matches this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_note') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to a ticket that matches this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_change') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when any change is made to a ticket that matches this filter"></span></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for filter in custom_filters %}
+								<tr>
+									<td class="title" style="text-align: right">{{ filter.title }}</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][email_created]" value="1" {% if my_subs[filter.id].email_created %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][email_new]" value="1" {% if my_subs[filter.id].email_new %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][email_user_activity]" value="1" {% if my_subs[filter.id].email_user_activity %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][email_agent_activity]" value="1" {% if my_subs[filter.id].email_agent_activity %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][email_agent_note]" value="1" {% if my_subs[filter.id].email_agent_note %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][email_property_change]" value="1" {% if my_subs[filter.id].email_property_change %}checked="checked"{% endif %} />
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<br />
+				{% endif %}
+
+				<div class="check-grid">
+					<header>{{ phrase('agent.settings.notif_my_events') }}</header>
+					<table width="100%">
+						<thead>
+							<tr>
+								<th width="180">&nbsp;</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_all_actions') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_forwards') }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_my_own_actions') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="agent_notify_override_all_email" value="1" {% if app.user.getPref('agent_notify_override.all.email') %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Send me notifications for all events I trigger"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="agent_notify_override_forward_email" value="1" {% if app.user.getPref('agent_notify_override.forward.email') %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Send me notifications when I forward an email to the helpdesk"></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<br />
+				<div class="check-grid">
+					<header>{{ phrase('agent.settings.notif_notes_with_mentions') }}</header>
+					<table width="100%">
+						<tbody>
+							<tr>
+								<td class="title" style="text-align: left;">
+									{{ phrase('agent.settings.notif_notes_with_mentions_opt') }}<br/>
+									<select name="ticket_mention">
+										<option {% if app.user.getPref('agent_notif.ticket_mention', 'always_send') == 'always_send' %}selected="selected"{% endif %}value="always_send">{{ phrase('agent.settings.notif_notes_with_mentions_always') }}</option>
+										<option {% if app.user.getPref('agent_notif.ticket_mention', 'always_send') == 'smart_send'  %}selected="selected"{% endif %}value="smart_send">{{ phrase('agent.settings.notif_notes_with_mentions_smart') }}</option>
+									</select>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			{% endif %}
+		</div>
+
+		<div id="settingswin_ticket_notifications_alert" style="display: none">
+			{% if app.user.getPref('agent_notif.no_allow_set_browser') %}
+				<p>
+					{{ phrase('agent.settings.notif_contact_admin') }}
+				</p>
+			{% else %}
+				<div class="check-grid">
+					<header>{{ phrase('agent.general.inbox') }}</header>
+					<table width="100%">
+						<thead>
+							<tr>
+								<th width="180">&nbsp;</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_new') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_assign') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_user') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_agent') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_note') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_change') }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_my') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][alert_created]" value="1" {% if my_subs[1].alert_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created and assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][alert_new]" value="1" {% if my_subs[1].alert_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket is assigned to me"></span>
+									<input type="checkbox" name="filter_sub[1][alert_leave]" value="1" {% if my_subs[1].alert_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when I am unassigned from a ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][alert_user_activity]" value="1" {% if my_subs[1].alert_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][alert_agent_activity]" value="1" {% if my_subs[1].alert_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when another agent replies to a ticket assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][alert_agent_note]" value="1" {% if my_subs[1].alert_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when another agent adds a note to a ticket assigned to me"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[1][alert_property_change]" value="1" {% if my_subs[1].alert_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticket assigned to me"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_follow') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][alert_created]" value="1" {% if my_subs[3].alert_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created and I am added as a follower"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][alert_new]" value="1" {% if my_subs[3].alert_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when I am added as a follower to a ticket"></span>
+									<input type="checkbox" name="filter_sub[3][alert_leave]" value="1" {% if my_subs[3].alert_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when I am removed as a follower"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][alert_user_activity]" value="1" {% if my_subs[3].alert_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket I follow"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][alert_agent_activity]" value="1" {% if my_subs[3].alert_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to a ticket I follow"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][alert_agent_note]" value="1" {% if my_subs[3].alert_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to a ticket I follow"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[3][alert_property_change]" value="1" {% if my_subs[3].alert_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticket I follow"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_team') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][alert_created]" value="1" {% if my_subs[2].alert_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created that is assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][alert_new]" value="1" {% if my_subs[2].alert_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket is assigned to one of my teams"></span>
+									<input type="checkbox" name="filter_sub[2][alert_leave]" value="1" {% if my_subs[2].alert_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket is unassigned from my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][alert_user_activity]" value="1" {% if my_subs[2].alert_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][alert_agent_activity]" value="1" {% if my_subs[2].alert_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to a ticket assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][alert_agent_note]" value="1" {% if my_subs[2].alert_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to a ticket assigned to one of my teams"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[2][alert_property_change]" value="1" {% if my_subs[2].alert_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticket assigned to one of my teams"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_unassigned') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][alert_created]" value="1" {% if my_subs[4].alert_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created that is not assigned to any agent or team"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][alert_new]" value="1" {% if my_subs[4].alert_new %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a ticket becomes unassigned"></span>
+									<input type="checkbox" name="filter_sub[4][alert_leave]" value="1" {% if my_subs[4].alert_leave %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an unassigned ticket becomes assigned"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][alert_user_activity]" value="1" {% if my_subs[4].alert_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to an unassigned ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][alert_agent_activity]" value="1" {% if my_subs[4].alert_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to an unassigned ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][alert_agent_note]" value="1" {% if my_subs[4].alert_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent a note to an unassigned ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[4][alert_property_change]" value="1" {% if my_subs[4].alert_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to a ticket not assigned to any agent or team"></span>
+								</td>
+							</tr>
+
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_group_all') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][alert_created]" value="1" {% if my_subs[5].alert_created %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when any new ticket is created"></span>
+								</td>
+								<td class="prop">
+									&nbsp;
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][alert_user_activity]" value="1" {% if my_subs[5].alert_user_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to any ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][alert_agent_activity]" value="1" {% if my_subs[5].alert_agent_activity %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to any ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][alert_agent_note]" value="1" {% if my_subs[5].alert_agent_note %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent adds a note to any ticket"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="filter_sub[5][alert_property_change]" value="1" {% if my_subs[5].alert_property_change %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me of any change to any ticket"></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				{% if custom_filters|length %}
+				<br />
+				<div class="check-grid">
+					<header>{{ phrase('agent.general.filters') }}</header>
+					<table width="100%">
+						<thead>
+							<tr>
+								<th width="180">&nbsp;</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_new') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a new ticket is created that matches this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.general.filter_match') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a change to a ticket causes it to match this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_user') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when a user replies to a ticket that matches this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_agent') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when an agent replies to or adds a note to a ticket that matches this filter"></span></th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_type_change') }} <span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Notify me when any change is made to a ticket that matches this filter"></span></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for filter in custom_filters %}
+								<tr>
+									<td class="title" style="text-align: right">{{ filter.title }}</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][alert_created]" value="1" {% if my_subs[filter.id].alert_created %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][alert_new]" value="1" {% if my_subs[filter.id].alert_new %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][alert_user_activity]" value="1" {% if my_subs[filter.id].alert_user_activity %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][alert_agent_activity]" value="1" {% if my_subs[filter.id].alert_agent_activity %}checked="checked"{% endif %} />
+									</td>
+									<td class="prop">
+										<input type="checkbox" name="filter_sub[{{ filter.id }}][alert_property_change]" value="1" {% if my_subs[filter.id].alert_property_change %}checked="checked"{% endif %} />
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% endif %}
+
+				<br />
+				<div class="check-grid">
+					<header>{{ phrase('agent.settings.notif_my_events') }}</header>
+					<table width="100%">
+						<thead>
+							<tr>
+								<th width="180">&nbsp;</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_all_actions') }}</th>
+								<th nowrap="nowrap">{{ phrase('agent.settings.notif_forwards') }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="title" style="text-align: right;">{{ phrase('agent.settings.notif_my_own_actions') }}</td>
+								<td class="prop">
+									<input type="checkbox" name="agent_notify_override_all_alert" value="1" {% if app.user.getPref('agent_notify_override.all.alert') %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Send me notifications for all events I trigger"></span>
+								</td>
+								<td class="prop">
+									<input type="checkbox" name="agent_notify_override_forward_alert" value="1" {% if app.user.getPref('agent_notify_override.forward.alert') %}checked="checked"{% endif %} />
+									<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Send me notifications when I forward an email to the helpdesk"></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			{% endif %}
+		</div>
+
+		{% if admin_triggers %}
+			<br />
+			<br />
+			<div class="check-grid">
+				<header>{{ phrase('agent.tickets.admin_trigger_notifications_explain') }}</header>
+				<table width="100%">
+					<tbody>
+					{% set types = {
+						'new_ticket': phrase('admin.tickets.new_ticket'),
+						'new_ticket.web_person': phrase('admin.tickets.new_ticket_web'),
+						'new_ticket.gateway_person': phrase('admin.tickets.new_ticket_gateway'),
+						'new_ticket.widget': phrase('admin.tickets.new_ticket_widget'),
+						'new_ticket.agent': phrase('admin.tickets.new_ticket_agent'),
+						'new_reply': phrase('admin.tickets.new_reply'),
+						'new_reply.web_person': phrase('admin.tickets.new_reply_web'),
+						'new_reply.gateway_person': phrase('admin.tickets.new_reply_gateway'),
+						'new_reply.agent': phrase('admin.tickets.new_reply_agent'),
+						'property_change': phrase('admin.tickets.property_change'),
+						'property_change.user': phrase('admin.tickets.property_change_user'),
+						'property_change.agent': phrase('admin.tickets.property_change_agent'),
+						'time_open': phrase('admin.tickets.time_open'),
+						'time_user_waiting': phrase('admin.tickets.time_user_waiting'),
+						'time_total_user_waiting': phrase('admin.tickets.time_total_user_waiting'),
+						'time_agent_waiting': phrase('admin.tickets.time_agent_waiting'),
+						'time_resolved': phrase('admin.tickets.time_resolved'),
+						'other': phrase('agent.general.other'),
+					} %}
+						{% for trigger in admin_triggers %}
+							<tr>
+								<td class="title" style="text-align: right;">
+									{{ types[trigger.event_trigger] }}:
+									{% for desc in trigger.getAllTermDescriptions() %}
+										{{ desc }}
+										{% if not loop.last %}<br /><em class="op">{{ phrase('agent.general.and') }}</em>{% endif %}
+									{% endfor %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% endif %}
+	</div>
+
+
+	<div class="button-container center">
+		<button type="submit" class="clean-white">{{ phrase('agent.general.save') }}</button>
+	</div>
+</form>

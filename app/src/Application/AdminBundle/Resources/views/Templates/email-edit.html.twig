@@ -1,0 +1,154 @@
+{% import 'AdminBundle:Templates:macros.html.twig' as tplmacro %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+{% if is_custom or allow_variation %}
+	<nav>
+		<ul>
+			{% if is_custom %}
+				<li class="delete"><a href="{{ path('admin_templates_deletecustom', {name: name, _dp_security_token: security_token('delete_template') }) }}" onclick="return confirm('Are you sure?');">{{ phrase('agent.general.delete') }}</a></li>
+			{% endif %}
+			{% if allow_variation %}
+				<li class="add" id="add_variation_trigger"><a>Create Variation</a></li>
+			{% endif %}
+		</ul>
+	</nav>
+{% endif %}
+<ul>
+	<li>Emails</li>
+	<li>
+		{% if ':emails_user:' in name %}
+			<a href="{{ path('admin_templates_email', {list_type: 'user'}) }}">User Emails</a>
+		{% elseif ':emails_agent:' in name %}
+			<a href="{{ path('admin_templates_email', {list_type: 'agent'}) }}">Agent Emails</a>
+		{% else %}
+			<a href="{{ path('admin_templates_email', {list_type: 'layout'}) }}">Email Layout</a>
+		{% endif %}
+	</li>
+	{% if template.variant_of == 'DeskPRO:emails_user:blank.html.twig' or template.variant_of == 'DeskPRO:emails_agent:blank.html.twig' %}
+		<li>
+			Custom Template
+		</li>
+		<li>
+			{{ template.getBaseName() }}
+		</li>
+	{% else %}
+		<li>
+			{{ phrase(phrase_key ~ '_title') }}
+		</li>
+		{% if is_custom %}
+			<li>
+				{{ template.getBaseName() }}
+			</li>
+		{% endif %}
+	{% endif %}
+</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditPhrasesPage.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('vendor/codemirror/lib/codemirror.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('vendor/codemirror/lib/codemirror.css') }}" type="text/css" />
+
+<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/css/css.js') }}"></script>
+<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/javascript/javascript.js') }}"></script>
+<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/xml/xml.js') }}"></script>
+<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/htmlembedded/htmlembedded.js') }}"></script>
+<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/htmlmixed/htmlmixed.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/Templates/DpCodeHints.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/Templates/DpEmailEditor.js') }}"></script>
+
+<style type="text/css">
+.lang_overlay_nav {
+	margin-top: 3px;
+}
+
+.lang_overlay_nav .select2-container {
+	margin-right: 6px;
+}
+
+.subject .CodeMirror-scroll {
+	height: {{ max(50, source.subject|count_lines * 24) }}px;
+}
+</style>
+
+<script type="text/javascript">
+var DP_DEFAULT_LANG_ID = {{ app.languages.getDefaultId()|default(1) }};
+$(document).ready(function() {
+	var editor = new DpEmailEditor('{{ name }}');
+});
+</script>
+{% endblock %}
+{% if is_custom %}
+	{% set phrase_key = 'admin.emailtpl_desc.' ~ template.variant_of|lower|replace({'.':'_', ':':'_'}) %}
+{% else %}
+	{% set phrase_key = 'admin.emailtpl_desc.' ~ name|lower|replace({'.':'_', ':':'_'}) %}
+{% endif %}
+{% block page %}
+
+	{% if template.variant_of == 'DeskPRO:emails_user:blank.html.twig' or template.variant_of == 'DeskPRO:emails_agent:blank.html.twig' %}
+		<h3>Custom Template: {{ template.getBaseName() }}</h3>
+		<br/>
+	{% else %}
+		{% if is_custom %}
+			<h3>Custom Variation of {{ phrase(phrase_key ~ '_title') }}: {{ template.getBaseName() }}</h3>
+		{% else %}
+			<h3>{{ phrase(phrase_key ~ '_title') }}</h3>
+		{% endif %}
+		<p>
+			{{ phrase(phrase_key ~ '_desc') }}
+		</p>
+	{% endif %}
+
+	<div class="template-edit-row">
+		<div class="template-editor-label"><strong>Subject:</strong></div>
+		<div class="template-editor-wrap subject">
+			<div class="template-toolbar">
+				<ul>
+					<li class="new-phrase"><span>Add Phrase</span></li>
+					<li class="phrase-editor"><span>Phrase Editor</span></li>
+					{% if default_template %}
+						<li class="view-default" data-part="subject"><span>View Default</span></li>
+						<li class="reset-default" data-part="subject"><span>Reset To Default</span></li>
+					{% endif %}
+				</ul>
+			</div>
+			<textarea name="subject" class="template-editor subject">{{ source.subject }}</textarea>
+			{% if default_template %}<textarea class="subject-default-code" style="display: none;">{{ default_source.subject }}</textarea>{% endif %}
+		</div>
+	</div>
+
+	<div class="template-edit-row">
+		<div class="template-editor-label"><strong>Body:</strong></div>
+		<div class="template-editor-wrap">
+			<div class="template-toolbar">
+				<ul>
+					<li class="new-phrase"><span>Add Phrase</span></li>
+					<li class="phrase-editor"><span>Phrase Editor</span></li>
+					{% if default_template %}
+						<li class="view-default" data-part="body"><span>View Default</span></li>
+						<li class="reset-default" data-part="body"><span>Reset To Default</span></li>
+					{% endif %}
+				</ul>
+			</div>
+			<textarea class="template-editor template" data-template-name="{{ name }}">{{ source.body }}</textarea>
+			{% if default_template %}<textarea class="body-default-code" style="display: none;">{{ default_source.body }}</textarea>{% endif %}
+		</div>
+	</div>
+
+	<footer class="controls" id="save_control">
+		<div class="is-not-loading">
+			<button class="clean-white save-trigger">Save Template</button>
+		</div>
+		<div class="is-loading">
+			<div class="loading-icon-flat">&nbsp;</div>
+		</div>
+	</footer>
+
+	<script type="text/x-deskpro-plain" id="edittpl_overlay_source">
+		{{ tplmacro.render_editor_overlay() }}
+	</script>
+	{{ tplmacro.render_addphrase_overlay() }}
+	{{ tplmacro.render_addvariation_overlay() }}
+	{{ tplmacro.render_lang_overlay() }}
+{% endblock %}

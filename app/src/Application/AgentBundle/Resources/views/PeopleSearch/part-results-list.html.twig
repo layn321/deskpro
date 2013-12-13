@@ -1,0 +1,32 @@
+<tbody class="search-results page-set" data-page="{{page}}">
+{% for p in people %}
+	<tr class="{% if loop.index % 2 == 0 %}white{% endif %} person-{{p.id}} line-1" data-person-id="{{p.id}}">
+		<td rowspan="2" width="20" style="vertical-align: middle; padding: 4px; white-space:nowrap;">
+			<img src="{{p.getPictureUrl(30)}}" width="30" height="30" />
+		</td>
+		<td colspan="{{display_fields|length-1}}" class="subject">
+			<a class="with-route" data-route="person:{{ path('agent_people_view', {'person_id': p.id}) }}">{{p.display_name}}</a>
+		</td>
+	</tr>
+	<tr class="{% if loop.index % 2 == 0 %}white{% endif %} person-{{p.id}} line-2" data-person-id="{{p.id}}">
+		{% for field in display_fields %}
+			<td class="{{field}}" {% if loop.last and display_fields|length > 1 %}style="text-align:right"{% endif %}>
+			{% if field == 'email_address' %}
+				<span class="prop-val email_address">{{p.primary_email_address}}</span>
+			{% elseif field == 'organization' %}
+				<span class="prop-val email_address">{{p.organization.name|default(phrase('agent.general.none'))}}</span>
+			{% elseif field == 'language' %}
+				<span class="prop-val email_address">{{p.language.title|default(phrase('agent.general.default'))}}</span>
+			{% else %}
+				{% for f in person_field_defs %}
+					{% if field == 'person_fields['~f.id~']' and person.hasCustomField(f.id) %}
+					<div class="prop-val person_fields_{{f.id}}">
+						{{ render_custom_field(person.getCustomFieldDisplayArray(f.id)) }}
+					</div>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	</tr>
+{% endfor %}
+</tbody>

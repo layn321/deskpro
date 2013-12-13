@@ -1,0 +1,17 @@
+<?php return array(
+	'user.email_subjects.chat_transcript'                                  => 'Trascrittura della chat',
+	'user.email_subjects.comment-approved'                                 => 'Commento approvato',
+	'user.email_subjects.comment-confirmation'                             => 'Grazie per il commento',
+	'user.email_subjects.comment-deleted'                                  => 'Comento letto da un membro dello staff',
+	'user.email_subjects.email_new-confirm'                                => 'Convalida il tuo indirizzo email',
+	'user.email_subjects.feedback_new'                                     => 'Grazie per il tuo feedback',
+	'user.email_subjects.feedback_new-approved'                            => 'Feedback approvato',
+	'user.email_subjects.feedback_new-confirm'                             => 'Grazie per averci dato il tuo feedback (soggetto a convalida)',
+	'user.email_subjects.feedback_new-disapproved'                         => 'Feedback rifiutato',
+	'user.email_subjects.feedback_updated'                                 => 'Feedback aggiornato: {{title}}',
+	'user.email_subjects.password_agent-reset'                             => 'Un membro dello staff ha resettato la tua password',
+	'user.email_subjects.password_reset'                                   => 'Reset Password',
+	'user.email_subjects.re'                                               => 'Ri: {{subject}}',
+	'user.email_subjects.ticket_new-participant'                           => 'Una nuova persona è stata aggiunta al tuo ticket',
+	'user.email_subjects.validate-email'                                   => 'Convalida il tuo indirizzo email',
+);

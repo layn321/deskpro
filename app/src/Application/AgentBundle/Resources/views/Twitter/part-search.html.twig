@@ -1,0 +1,15 @@
+<section class="twitter-status-list list-listing"
+	{% if page %} data-page="{{ page }}" data-total-count="{{ total_count }}"{% endif %}
+	data-twitter-max-id="{{ max_id }}"
+	data-added="{{ added }}"
+>
+{% for account_status in statuses %}
+	{% include 'AgentBundle:TwitterStatus:list-row.html.twig' %}
+{% endfor %}
+</section>
+
+<section class="list-listing no-results" id="{{baseId}}_no_results" {% if statuses|length %}style="display:none"{% endif %}>
+	<article class="row-item no-results">
+		<p style="padding: 15px;">{{ phrase('agent.general.there_are_no_results') }}</p>
+	</article>
+</section>

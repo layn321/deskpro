@@ -1,0 +1,13 @@
+{% extends 'AdminBundle:CustomDefAbstract:index.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+     <nav>
+          <ul>
+               <li class="add"><a href="{{ path(route_basename~'new_choosetype') }}">{{ phrase('admin.general.add_field') }}</a></li>
+          </ul>
+     </nav>
+     <ul>
+		<li><a href="{{ path('admin_products') }}">{{ phrase('agent.general.products') }}</a></li>
+		<li>{{ phrase('admin.custom_fields.product_fields') }}</li>
+     </ul>
+{% endblock %}

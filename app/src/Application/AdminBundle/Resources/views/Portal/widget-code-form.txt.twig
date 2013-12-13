@@ -1,0 +1,38 @@
+<!-- DeskPRO Ticket Form -->
+<div id="dp_newticket_form" style="display: none;"></div>
+<script type="text/javascript">
+	var DpNewTicket_Options = DpNewTicket_Options || {};
+	DpNewTicket_Options.protocol = ('https:' == document.location.protocol ? 'https' : 'http');
+	DpNewTicket_Options.deskproUrl = DpNewTicket_Options.protocol + '://{{ url('user')|url_trim_scheme }}';
+	DpNewTicket_Options.initialHeight = 700;
+	DpNewTicket_Options.containerId = 'dp_newticket_form';
+	DpNewTicket_Options.departmentId = 0;
+
+	 /**
+     * The Language ID to load for users with no language preference
+     */
+    DpNewTicket_Options.languageId = 0;
+
+	/**
+     * If the user name is already known, you can set it here.
+     * When set, the name field is hidden in the form.
+     */
+    DpNewTicket_Options.formUserName = '';
+
+    /**
+     * If the user email is already known, you can set it here.
+     * When set, the email field is hidden in the form.
+     */
+    DpNewTicket_Options.formUserEmail = '';
+
+	if (document.getElementsByTagName) {
+		(function() {
+			var scr   = document.createElement('script');
+			scr.type  = 'text/javascript';
+			scr.async = true;
+			scr.src   = DpNewTicket_Options.protocol + '://{{ asset_url('javascripts/DeskPRO/User/TicketFormWidget/TicketFormWidget.js')|url_trim_scheme|replace({('/web'~constant('DPC_SITE_BUILD_NUM')~'/'):'/web/'}) }}';
+			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(scr);
+		})();
+	}
+</script>
+<!-- /DeskPRO Ticket Form -->

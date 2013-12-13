@@ -1,0 +1,64 @@
+{##
+ # The ticket listing showing all a users tickets
+ ##}
+{% import 'UserBundle::macros.html.twig' as dp %}
+{% import 'UserBundle:Tickets:list.html.twig' as ticket_macro %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_tickets') }}">{{ phrase('user.tickets.organization_tickets', {organization: organization.name}) }}</a></li>
+{% endblock %}
+{% block page_title %}{{ phrase('user.tickets.organization_tickets', {organization: organization.name}) }}{% endblock %}
+{% block content %}
+
+{% set sort_form %}
+	<form class="dp-ticket-sort" action="{{ path('user_tickets_organization') }}">
+		<select name="sort">
+			<option value="date_created" {% if sort == 'date_created' %}selected="selected"{% endif %}>{{ phrase('user.tickets.date_created') }}</option>
+			<option value="last_reply" {% if sort == 'last_reply' %}selected="selected"{% endif %}>{{ phrase('user.tickets.last_reply') }}</option>
+			<option value="creator" {% if sort == 'creator' %}selected="selected"{% endif %}>{{ phrase('user.tickets.creator') }}</option>
+			<option value="department" {% if sort == 'department' %}selected="selected"{% endif %}>{{ phrase('user.tickets.fields_department') }}</option>
+		</select>
+		<input type="submit" class="dp-btn-primary" value="{{ phrase('user.general.btn_sort') }}" />
+	</form>
+{% endset %}
+
+{% if active_tickets|length %}
+	<section class="dp-ticketlist-section dp-portal-section">
+		<header>
+			{{ sort_form|raw }}
+			<h1>{{ phrase('user.tickets.open_tickets') }}</h1>
+		</header>
+		<div class="dp-content-block">
+			<div class="dp-content-wrapper">
+				<ul class="dp-ticket-list">
+					{% for ticket in active_tickets %}
+						{{ ticket_macro.ticket_row(ticket, last_messages, true) }}
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<br />
+{% endif %}
+
+{% if resolved_tickets|length %}
+	<section class="dp-ticketlist-section dp-portal-section">
+		<header>
+			{% if not active_tickets %}{{ sort_form|raw }}{% endif %}
+			<h1>{{ phrase('user.tickets.list_resolved') }}</h1>
+		</header>
+		<div class="dp-content-block">
+			<div class="dp-content-wrapper">
+				<ul class="dp-ticket-list">
+					{% for ticket in resolved_tickets %}
+						{{ ticket_macro.ticket_row(ticket, last_messages, true) }}
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<br />
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+<script>
+pageMeta.title = 'Recycle Bin'
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.RecycleBin';
+pageMeta.url_fragment  = '{{ url_fragment('agent_recyclebin') }}';
+</script>
+<div class="content">
+	{% if not tickets_html %}
+		<div class="no-more-results" style="display: block;">
+			{{ phrase('agent.general.recycle_bin_none') }}
+		</div>
+	{% endif %}
+
+	{% if tickets_html %}
+		<div class="type-list tickets-list" data-load-name="tickets">
+			<div class="pad">
+				<div class="inner-box-tab-content box-list no-pad">
+					<table class="list" cellspacing="0" width="100%">
+						<thead class="display-options-trigger dbl-click-trigger nosel">
+							<tr>
+								<th>{{ phrase('agent.general.tickets') }}</th>
+							</tr>
+						</thead>
+						{{tickets_html|raw}}
+					</table>
+					<div class="list-load-more" {% if tickets_no_more_results %}style="display:none"{% endif %}>
+						{{ phrase('agent.tickets.load_more') }}
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</div>

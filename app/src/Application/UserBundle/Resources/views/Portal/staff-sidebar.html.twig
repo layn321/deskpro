@@ -1,0 +1,33 @@
+{##
+ # The staff listing sidebar block
+ ##}
+
+{% if staff|length %}
+	<section class="dp-sidebar-block">
+		<header>
+			<h3>
+				{% if title %}
+					{{ title }}
+				{% else %}
+					{% if online %}
+                        {{ phrase('user.portal.online-staff') }}
+					{% else %}
+                        {{ phrase('user.portal.our-staff') }}
+					{% endif %}
+				{% endif %}
+			</h3>
+		</header>
+		<article class="dp-written">
+			<p class="dp-summary">
+				{{ phrase('user.portal.sidebar_staff-description') }}
+			</p>
+			<ul class="dp-clearfix dp-person-list {% if staff|length > 5 %}dp-compact{% endif %}">
+				{% for agent in staff %}
+				<li title="{{ agent.display_name_user }}">
+					<span style="background-image: url('{{ agent.getPictureUrl(24) }}')">{{ agent.display_name_user }}</span>
+				</li>
+				{% endfor %}
+			</ul>
+		</article>
+	</section>
+{% endif %}

@@ -1,0 +1,261 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<style type="text/css">
+{% if type == 'tickets' %}
+.dp-grid article.dp-grid-row .col .r .inner-wrap2 {
+	height: 30px;
+}
+{% endif %}
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+	var selects = $('select.change-linked-gateway');
+	DP.select(selects, {
+		width: 256
+	});
+
+	selects.on('change', function(ev) {
+		var sel = $(this);
+		var departmentId = $(this).data('department-id');
+		var gatewayId = $(this).val();
+		var me = this;
+
+		if (gatewayId == '-1') {
+			window.location = '{{ path('admin_emailgateways_new') }}?linked_department_id=' + departmentId;
+			return;
+		}
+
+		// Change value of existing selects
+		if (gatewayId != '0') {
+			selects.each(function() {
+				if (this != me && $(this).val() == gatewayId) {
+					$(this).select2('val', '0');
+					DeskPRO_Window.util.showSavePuff($(this).prev());
+				}
+			});
+		}
+
+		$.ajax({
+			url: BASE_URL + 'admin/departments/'+departmentId+'/save-gateway-account.json',
+			data: {
+				gateway_account_id: gatewayId
+			},
+			type: 'POST',
+			dataType: 'json',
+			success: function(data) {
+				DeskPRO_Window.util.showSavePuff(sel.prev());
+			}
+		});
+	});
+});
+</script>
+{% endblock %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li class="add"><a id="newdep_open">{{ phrase('admin.departments.add_new_department') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		{% if type == 'tickets' %}
+			<li>Ticket Departments</li>
+		{% else %}
+			<li>Chat Departments</li>
+		{% endif %}
+	</ul>
+{% endblock %}
+{% block content %}
+<div class="dp-page-box">
+<div class="page-content" data-element-handler="DeskPRO.Admin.Departments.AjaxSave" data-reorder-url="{{ path('admin_departments_updateorders') }}">
+	{{ design.helpbox() }}
+	    <p>{{ phrase('admin.departments.notice_dept_default_grouping') }}</p>
+		{% if type == 'tickets' %}
+			<p>
+				You can customize the ticket form layout for each department using the <a href="{{ path('admin_tickets_editor') }}">Ticket Layout Editor &rarr;</a>
+			</p>
+		{% endif %}
+	{{ design.helpbox_end() }}
+
+	{{ design.dpgrid({class: 'dep-list'}) }}
+		{{ design.dpgrid_headerrow() }}
+			{{ design.dpgrid_headercol({ class: 'l r tl tr', style: "width: 480px;"}) }}
+				<h1>{{ phrase('agent.general.department') }}</h1>
+			{{ design.dpgrid_headercol_end() }}
+			{% if type == 'tickets' %}
+				{{ design.dpgrid_headercol({ class: 'l r tl tr l-margin ', style: "width: 275px;"}) }}
+					<h1>Linked Email Account</h1>
+				{{ design.dpgrid_headercol_end() }}
+			{% endif %}
+			{{ design.dpgrid_headercol({ class: 'l r tl tr l-margin', style: "width: 125px"}) }}
+				<h1>Permissions</h1>
+			{{ design.dpgrid_headercol_end() }}
+		{{ design.dpgrid_headerrow_end() }}
+
+		{% for department in all_departments %}
+			{% include 'AdminBundle:Departments:list-row.html.twig' %}
+		{% endfor %}
+	{{ design.dpgrid_end() }}
+
+<div id="editdep_overlay" style="width: 400px; height: 330px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.departments.edit_department_title') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<form class="dp-form" method="POST" action="{{ path('admin_departments_savetitle') }}">
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('agent.general.title') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="hidden" name="department_id" id="editdep_depid" value="" />
+					<input type="text" name="title" id="editdep_title" value="" />
+				</div>
+			</div>
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>
+						{{ phrase('agent.general.user_title') }}
+						<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('admin.general.user_title_explain') }}"></span>
+					</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="user_title" id="editdep_user_title" value="" />
+				</div>
+			</div>
+			<div class="dp-form-row" id="editcat_parent_row">
+				<div class="dp-form-label">
+					<label>Parent</label>
+				</div>
+				<div class="dp-form-input">
+					<select name="parent_id" id="editcat_parent_id">
+						<option value="0">{{ phrase('admin.general.no_parent') }}</option>
+						{% for department in all_departments %}
+							<option value="{{ department.id }}">{{ department.title }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="overlay-footer">
+		<button class="clean-white" id="editdep_savebtn">{{ phrase('agent.general.save') }}</button>
+	</div>
+</div>
+
+<div id="newdep_overlay" style="width: 400px; height: 330px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.departments.new_department') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<form class="dp-form" method="POST" action="{{ path('admin_departments_savenew', {type: type}) }}">
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('agent.general.title') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="title" id="newdep_title" value="" />
+				</div>
+			</div>
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>
+						{{ phrase('agent.general.user_title') }}
+						<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('admin.general.user_title_explain') }}"></span>
+					</label>
+				</div>
+				<div class="dp-form-input">
+					<input type="text" name="user_title" id="newdep_user_title" value="" />
+				</div>
+			</div>
+
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>{{ phrase('admin.general.parent') }}</label>
+				</div>
+				<div class="dp-form-input">
+					<select name="parent_id" id="newdep_parent_id">
+						<option value="0">{{ phrase('admin.general.no_parent') }}</option>
+						{% for department in all_departments %}
+							<option value="{{ department.id }}">{{ department.title }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="overlay-footer">
+		<button class="clean-white" id="newdep_savebtn">{{ phrase('agent.general.add') }}</button>
+	</div>
+</div>
+
+</div>
+
+<div id="dep_not_disabled_overlay" style="width: 518px; height: 180px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>Department was not disabled</h4>
+	</div>
+	<div class="overlay-content">
+		<p>
+			The department was not disabled. DeskPRO always requires at least one department.
+		</p>
+		<br />
+		<p>
+			Note that when there is only a single department, the user will not see the department field.
+		</p>
+	</div>
+	<div class="overlay-footer">
+		<button class="clean-white overlay-close-trigger">Okay</button>
+	</div>
+</div>
+
+{% if type == 'tickets' %}
+<div style="padding: 0 10px 10px 15px;">
+	<form action="{{ path('admin_departments_setdefault', {type: 'tickets'}) }}" method="POST">
+		<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="This is the value selected by default on new tickets. Note that a department is always required. If you leave this selection blank, then in cases whre a default department is required (such as a new ticket via email), the default is simply the first defined department."></span> Default department:
+		<select name="default_value">
+			<option value=""></option>
+			{% for dep in all_departments %}
+				{% if dep.children|length %}
+					<optgroup label="{{ dep.title }}">
+						{% for subdep in dep.children %}
+							<option value="{{ subdep.id }}" {% if app.getSetting('core.default_ticket_dep') == subdep.id %}selected="selected"{% endif %}>{{ subdep.title }}</option>
+						{% endfor %}
+					</optgroup>
+				{% else %}
+					<option value="{{ dep.id }}" {% if app.getSetting('core.default_ticket_dep') == dep.id %}selected="selected"{% endif %}>{{ dep.title }}</option>
+				{% endif %}
+			{% endfor %}
+		</select>
+		<button class="clean-white">Update</button>
+	</form>
+</div>
+{% endif %}
+
+{% if type == 'tickets' %}
+<div style="padding: 0 10px 10px 15px;">
+	<form action="{{ path('admin_departments_setphrase') }}" method="POST">
+		<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Enter a new word for 'Department' that users will see. For example, 'Category' or 'Region' or 'Type.'"></span> Change the name of the department field:<br />
+		<div style="padding-left: 11px;">
+			<table cellspacing="0" cellpadding="3" border="0">
+				<tr>
+					<td style="vertical-align:middle;">Singular:</td><td><input style="padding: 1px 2px;" type="text" name="phrase_singular" value="{{ app.getSetting('core.phrase_department_singular')|default('Department') }}" /></td>
+				</tr>
+				<tr>
+					<td style="vertical-align:middle;">Plural:</td><td><input style="padding: 1px 2px;" type="text" name="phrase_plural" value="{{ app.getSetting('core.phrase_department_plural')|default('Departments') }}" /><br /></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><button class="clean-white">Update</button></td>
+				</tr>
+			</table>
+		</div>
+	</form>
+</div>
+{% endif %}
+
+</div>
+{% endblock %}

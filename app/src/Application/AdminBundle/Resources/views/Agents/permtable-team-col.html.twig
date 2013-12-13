@@ -1,0 +1,25 @@
+{% macro perm_col(title, usergroup_values, permgroup, name, depends_on, class) %}
+	{% set perm_fname_flat = permgroup ~ '_' ~ name %}
+	<tr
+		class="permrow perm-{{ permgroup }}_{{ name }} {{class}}"
+		data-permgroup="{{ permgroup }}"
+		data-permname="{{ name }}"
+		{% if depends_on %}data-depends-on="{{ depends_on }}"{% endif %}
+	>
+		<td width="37" class="prop effective highlight no-border" id="effective_lbl_{{ perm_fname_flat }}">
+			<span class="on">{{ phrase('agent.general.on') }}</span>
+			<span class="off">{{ phrase('admin.general.off') }}</span>
+		</td>
+		<td class="title">{{ title|raw }}</td>
+		<td class="prop">
+			<input
+				class="onoff-slider override-perm"
+				type="checkbox"
+				name="permissions[{{ permgroup }}][{{ name }}]"
+				id="perm_val_override_{{ perm_fname_flat }}"
+				value="1"
+				{% if usergroup_values[permgroup ~ '.' ~ name] %}checked="checked"{% endif %}
+			/>
+		</td>
+	</tr>
+{% endmacro %}

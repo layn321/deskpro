@@ -1,0 +1,13 @@
+<li class="people inside"
+	data-type="people"
+	data-route="page:{{ path('agent_people_view', {'person_id': person.id}) }}"
+	data-route-notabreload="1"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time></time>
+	<big>{{ phrase('agent.people.new_registration', {name: person.getDisplayContact()}) }} </big>
+	<small>
+		{{ phrase('agent.people.new_registration') }}
+		{% if not person.is_agent_confirmed %}{{ phrase('agent.general.requires_validation') }}{% endif %}
+	</small>
+</li>

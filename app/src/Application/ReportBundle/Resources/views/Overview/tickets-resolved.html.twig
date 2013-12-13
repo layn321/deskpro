@@ -1,0 +1,54 @@
+{% import 'ReportBundle:Overview:macros.html.twig' as macros %}
+<section class="report-wrapper {% if initial_display %}initial-display{% endif %}">
+	<header>
+		<h2>
+			<span class="label-sum">{{ data.sum }}</span> Tickets were 'Resolved'
+			<span class="drop-option">
+				<select class="grouping-field" name="date_choice">
+					{% for field,title in {
+						'today': 'Today',
+						'this_week': 'This Week',
+						'this_month': 'This Month',
+						'this_year': 'This Year',
+					} %}
+						<option {% if data.date_choice == field %}selected="selected"{% endif %} value="{{ field }}">{{ title }}</option>
+					{% endfor %}
+				</select>
+				<i></i>
+			</span>
+		</h2>
+		<h3>Showing Grouped by {{ macros.grouping_field_select(data.grouping_field) }}</h3>
+	</header>
+	<article>
+		<div class="loading-overlay" {% if not initial_display %}style="display: none"{% endif %}><strong>Loading</strong></div>
+			{% if data.values %}
+				<table class="stat-table" width="100%">
+				{% for id, title in data.titles %}
+					{% if data.values[id] %}
+						<tr>
+							<td class="title"><span>{{ title }}</span></td>
+							<td width="100%">
+								<table width="100%" class="stat-value"><tr>
+									{% set perc = (data.values[id] / data.max|default(1)) * 100 %}
+									{% if perc < 1.0 %}
+										<td class="value" width="1%"><div>&nbsp;</div></td>
+										<td width="{{ 100 - 1 }}%">{{ data.values[id] }}</td>
+									{% else %}
+										<td class="value" width="{{ perc }}%"><div>&nbsp;</div></td>
+										<td width="{{ 100 - perc }}%">{{ data.values[id] }}</td>
+									{% endif %}
+								</tr></table>
+							</td>
+						</tr>
+					{% endif %}
+				{% endfor %}
+				<tr class="total-row">
+					<td class="title">Total:</td>
+					<td class="val">{{ data.sum }}</td>
+				</tr>
+				</table>
+			{% else %}
+				{{ macros.no_data() }}
+			{% endif %}
+	</article>
+</section>

@@ -1,0 +1,56 @@
+{% extends layout_tpl ? layout_tpl : 'AdminBundle::layout.html.twig' %}
+{% block page %}
+
+<form action="{{ path(route_basename~'edit', {'field_id': field.id|default(0)}) }}" method="post">
+{{ form_widget(form.handler_class) }}
+
+<div class="dp-form">
+	{% if field.id %}
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>
+					ID
+					<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="This is the unique Field ID for use in reports or templates."></span>
+				</label>
+			</div>
+			<div class="dp-form-input">
+				{{ field.id }}
+			</div>
+		</div>
+	{% endif %}
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				{{ phrase('agent.general.title') }}
+				<span class="small-light-icon tipped" title="The title is displayed to both users and agents who see the field. You should usually keep titles short as they are used as labels when showing the field in the interface and emails."></span>
+			</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.title) }}
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>
+				{{ phrase('agent.general.description') }}
+				<span class="small-light-icon tipped" title="The description is displayed to the user when they hover over the '?' icon in the web interface."></span>
+			</label>
+		</div>
+		<div class="dp-form-input">
+			{{ form_widget(form.description, {
+				attr: {'rows': 5, style: 'height:100px'}
+			}) }}
+		</div>
+	</div>
+
+	{% block form_extra_top %}{% endblock %}
+	{% block form_extra %}{% endblock %}
+	{% block form_extra2 %}{% endblock %}
+</div>
+
+<button class="btn primary save-trigger">{{ phrase('agent.general.save') }}</button>
+
+</form>
+
+{% endblock %}

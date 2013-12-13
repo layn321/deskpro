@@ -1,0 +1,8 @@
+<header class="list-control-bar">
+	<ul>
+		<li>{{ phrase('agent.general.sort_by') }} </li>
+		<li><a class="button {% if group_by == 'date' %}on{% endif %}" data-route="listpane:{{ path('agent_task_list',{'search_type': search_type, 'search_categoty': search_categoty, 'group_by': 'date'}) }}">{{ phrase('agent.general.date') }}</a></li>
+		<li><a class="button {% if group_by == 'assigned' %}on{% endif %}" data-route="listpane:{{ path('agent_task_list',{'search_type': search_type, 'search_categoty': search_categoty, 'group_by': 'assigned'}) }}">{{ phrase('agent.general.assigned') }}</a></li>
+		<li><a class="button {% if group_by == 'creator' %}on{% endif %}" data-route="listpane:{{ path('agent_task_list',{'search_type': search_type, 'search_categoty': search_categoty, 'group_by': 'creator'}) }}">{{ phrase('agent.tasks.creator') }}</a></li>
+	</ul>
+</header>

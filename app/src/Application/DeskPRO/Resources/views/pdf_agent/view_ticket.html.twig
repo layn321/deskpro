@@ -1,0 +1,141 @@
+{% if not print %}
+	{% include 'DeskPRO:pdf_agent:header.html.twig' %}
+
+	<sethtmlpageheader name="deskproHeader" page="ALL" value="on" show-this-page="1" />
+
+	{% include 'DeskPRO:pdf_agent:footer.html.twig' %}
+
+	<sethtmlpagefooter name="deskproFooter" page="ALL" value="on" show-this-page="1" />
+{% endif %}
+
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flag %}
+
+<style type="text/css">
+    #ticket_properties th {
+        text-align: left;
+    }
+
+    body {
+        font-family: DejaVuSans;
+    }
+
+    .ticket_list_table {
+        page-break-inside: avoid;
+    }
+
+    .ticket_list_table td {
+        overflow: wrap;
+    }
+</style>
+<h1>{{ ticket.subject }}</h1>
+<table id="ticket_properties">
+    <tr>
+        <th>
+            {{ phrase('agent.general.ticket_id') }}:
+        </th>
+        <td>
+            {{ ticket.id }}
+        </td>
+    </tr>
+    <tr>
+        <th>
+            {{ phrase('agent.general.urgency') }}:
+        </th>
+        <td>
+            {{ ticket.urgency }}
+        </td>
+    </tr>
+    <tr>
+        <th>
+            {{ phrase('agent.general.status') }}:
+        </th>
+        <td>
+            {% set status_strings = {
+                'awaiting_agent': 'Awaiting Agent',
+                'awaiting_user': 'Awaiting User',
+                'closed': 'Closed',
+                'resolved': 'Resolved',
+                'hidden.spam': 'Spam',
+                'hidden.validating': 'Validating',
+                'hidden.deleted': 'Deleted'
+                }
+            %}
+            {{ status_strings[ticket.status_code] }}
+        </td>
+    </tr>
+    {% if ticket_flagged %}
+        <tr>
+            <th>{{ phrase('agent.general.flag') }}:</th>
+            <td>
+                {% for color in ['blue', 'green', 'orange', 'pink', 'purple', 'red', 'yellow'] %}
+                    {% if ticket_flagged == color %}{{ flag.flag_name(color) }}{% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endif %}
+    {% if ticket.linked_chat %}
+    <tr>
+        <th>{{ phrase('agent.general.linked_chat') }}:</th>
+        <td>{{ ticket.linked_chat.getSubjectLine() }}</td>
+    </tr>
+    {% endif %}
+    {% if ticket.labels|length %}
+    <tr>
+        <th class="type-labels">{{ phrase('agent.general.labels') }}:</th>
+        <td class="ticket-tags tags-wrap">
+            <ul>
+                {% for label in ticket.labels %}
+                    <li>{{label.label}}</li>
+                {% endfor %}
+            </ul>
+        </td>
+    </tr>
+    {% endif %}
+
+    <tr>
+        <th>{{ phrase('agent.general.created') }}:</th>
+        <td>
+            {{ ticket.date_created|date('fulltime') }}
+        </td>
+    </tr>
+    <tr>
+        <th>{{ phrase('agent.general.owner') }}:</th>
+        <td>
+            <span>
+                {{ ticket.person.display_name }}
+                {% if ticket.person.organization %},
+                    {% if ticket.person.organization_position %}
+                        {{ ticket.person.organization_position }}
+                    {% endif %}
+                    {{ ticket.person.organization }}
+                {% endif %}
+                <span>&lt;{{ ticket.person_email_address }}&gt;</span>
+            </span>
+            </dl>
+        </td>
+    <tr>
+        <th>{{ phrase('agent.general.assignments') }}:</th>
+        <td>
+            {{ ticket.agent.display_name|default(phrase('agent.general.no_agent_assigned')) }}
+        </td>
+    </tr>
+    {% if ticket.agent_team %}
+        <tr>
+            <th>{{ phrase('agent.general.team') }}:</th>
+            <td>{{ ticket.agent_team.name|default(phrase('agent.general.none')) }}</td>
+        </tr>
+    {% endif %}
+    {% if agent_parts|length %}
+        <tr>
+            <th>{{ phrase('agent.general.followers') }}:</th>
+            <td>
+                {% for part in agent_parts %}
+                    {{ part.person.display_name }}
+                    {% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endif %}
+</table>
+
+{{ ticket_messages_block|raw }}

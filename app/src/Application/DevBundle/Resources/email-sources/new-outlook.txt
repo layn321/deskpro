@@ -1,0 +1,128 @@
+Delivered-To: hello@deskpro.com
+Received: by 10.64.27.38 with SMTP id q6csp9249ieg;
+        Wed, 27 Jun 2012 02:19:29 -0700 (PDT)
+Received: by 10.180.86.194 with SMTP id r2mr3055858wiz.15.1340788768477;
+        Wed, 27 Jun 2012 02:19:28 -0700 (PDT)
+Return-Path: <chris.padfield@deskpro.com>
+Received: from mail-we0-f176.google.com (mail-we0-f176.google.com [74.125.82.176])
+        by mx.google.com with ESMTPS id fx10si9794759wib.29.2012.06.27.02.19.27
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Wed, 27 Jun 2012 02:19:28 -0700 (PDT)
+Received-SPF: pass (google.com: domain of chris.padfield@deskpro.com designates 74.125.82.176 as permitted sender) client-ip=74.125.82.176;
+Authentication-Results: mx.google.com; spf=pass (google.com: domain of chris.padfield@deskpro.com designates 74.125.82.176 as permitted sender) smtp.mail=chris.padfield@deskpro.com
+Received: by weyr3 with SMTP id r3so777332wey.21
+        for <hello@deskpro.com>; Wed, 27 Jun 2012 02:19:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20120113;
+        h=from:to:subject:date:message-id:mime-version:content-type:x-mailer
+         :thread-index:content-language:x-gm-message-state;
+        bh=ubqQhQ7QMwq+fOWe+MrMiq7haIxU6fie6GQaKFjgFJg=;
+        b=Vv53+zP+htVcYOksBPVv7cbSyAgEsGqshwPeaICjPPS8jKADsB2Gx3P67mil8EDPrd
+         rlO/Y2lu6CqtBdjusTHnk3jJn1hDEDUtN+w98KF4f74/T/n3oyTmok7nwTf+LXjouKNE
+         64FfSRVp+a4BmvGIBd9YNz5cQkRAR2V0fVQCtQ3eNaWweLKH65l5y9VSdgvQNV3l5ad4
+         6tlsynBLX8nZ7xa9c9xHSN2cuyCpfjajqibKYZRDiahAT0AfAkZvNBPBp81RNSHdXBzd
+         T0os95CTxC3mzYrdxkGrgi5MBB/FAGhmzj7IbntXh9x1s1bDtBkSpBCEWdTA+prjE0qf
+         u3eQ==
+Received: by 10.216.132.150 with SMTP id o22mr3651236wei.109.1340788767202;
+        Wed, 27 Jun 2012 02:19:27 -0700 (PDT)
+Return-Path: <chris.padfield@deskpro.com>
+Received: from DESKPROCHRIS (iw-01.clients.vorboss.net. [194.8.255.114])
+        by mx.google.com with ESMTPS id m4sm9396965wie.1.2012.06.27.02.19.25
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Wed, 27 Jun 2012 02:19:25 -0700 (PDT)
+From: "Chris Padfield" <chris.padfield@deskpro.com>
+To: <hello@deskpro.com>
+Subject: test 1 2 3
+Date: Wed, 27 Jun 2012 10:19:27 +0100
+Message-ID: <010a01cd5445$f41bc670$dc535350$@deskpro.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_010B_01CD544E.55E0CAB0"
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: Ac1URexjN947Y9oOQFy55Fud3Fzfiw==
+Content-Language: en-gb
+X-Gm-Message-State: ALoCoQlPKfa6PkcC79j0LWmV0nrySrk//YgmKm5G4mkzsXl6oGRtjqgxRSbQhnz6EqaMvDqY+USv
+
+This is a multipart message in MIME format.
+
+------=_NextPart_000_010B_01CD544E.55E0CAB0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Testing agent reply
+
+
+
+Too see if it
+
+
+
+Handles newlines
+
+
+
+Correctly in notifications
+
+
+------=_NextPart_000_010B_01CD544E.55E0CAB0
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
+xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" =
+xmlns=3D"http://www.w3.org/TR/REC-html40"><head><META =
+HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii"><meta name=3DGenerator content=3D"Microsoft Word 14 =
+(filtered medium)"><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";
+	mso-fareast-language:EN-US;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri","sans-serif";
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri","sans-serif";
+	mso-fareast-language:EN-US;}
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 72.0pt 72.0pt 72.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]--></head><body lang=3DEN-GB link=3Dblue =
+vlink=3Dpurple><div class=3DWordSection1><p class=3DMsoNormal>Testing =
+agent reply<o:p></o:p></p><p class=3DMsoNormal><o:p>&nbsp;</o:p></p><p =
+class=3DMsoNormal>Too see if it<o:p></o:p></p><p =
+class=3DMsoNormal><o:p>&nbsp;</o:p></p><p class=3DMsoNormal>Handles =
+newlines<o:p></o:p></p><p class=3DMsoNormal><o:p>&nbsp;</o:p></p><p =
+class=3DMsoNormal>Correctly in =
+notifications<o:p></o:p></p></div></body></html>
+------=_NextPart_000_010B_01CD544E.55E0CAB0--
+
+

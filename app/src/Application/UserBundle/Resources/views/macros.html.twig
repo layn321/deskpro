@@ -1,0 +1,8 @@
+{% macro full_title(obj, sep) %}
+	{% if not sep %}{% set sep = '>' %}{% endif %}
+	{% if obj.parent %}
+		{% if obj.parent['user_title'] is defined %}{{ phrase_object(obj.parent, 'user') }}{% else %}{{ phrase_object(obj.parent) }}{% endif %}
+		{{ sep }}
+	{% endif %}
+	{% if obj['user_title'] is defined %}{{ phrase_object(obj, 'user') }}{% else %}{{ phrase_object(obj) }}{% endif %}
+{% endmacro %}

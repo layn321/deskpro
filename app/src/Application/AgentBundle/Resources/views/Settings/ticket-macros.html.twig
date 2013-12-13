@@ -1,0 +1,38 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.SettingsPage.Macros';
+</script>
+<div style="padding: 10px;">
+	<div style="text-align: right">
+		<a class="clean-white" data-route="poppage:{{ path('agent_settings_ticketmacros_new') }}" data-zindex="32050">{{ phrase('agent.settings.create_macro') }}</a>
+	</div>
+
+	<br />
+
+	<div class="check-grid item-list">
+		<table width="100%">
+			<thead>
+				<tr>
+					<th>{{ phrase('agent.general.macros') }}</th>
+					<th width="50"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for macro in all_macros %}
+					<tr>
+						<td><label class="obj-macro" data-macro-id="{{ macro.id }}">{{ macro.title }}</label></td>
+						<td class="prop" style="text-align: center;">
+							<ul class="controls">
+								<li class="delete delete-macro" data-delete-url="{{ path('agent_settings_ticketmacros_del', { 'macro_id': macro.id }) }}" data-macro-id="{{ macro.id }}"></li>
+								<li class="edit"  data-route="poppage:{{ path('agent_settings_ticketmacros_edit', { 'macro_id': macro.id }) }}" data-zindex="32050"></li>
+							</ul>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="2">{{ phrase('agent.settings.no_macros') }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>

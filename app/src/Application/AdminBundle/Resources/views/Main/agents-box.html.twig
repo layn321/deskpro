@@ -1,0 +1,48 @@
+<div class="dp-page-box">
+	<div class="resource-item-list">
+		<header>
+			<h4>Agents</h4>
+		</header>
+		<article>
+			<ul>
+				{% for agent in online_agents %}
+				<li style="line-height: 40px;">
+					<div style="background: url({{ agent.getPictureUrl(35) }}) no-repeat 0 50%; padding-left: 40px;">{{ agent.display_name }}</div>
+				</li>
+				{% endfor %}
+			</ul>
+			{% if online_agents|length != app.agents.getAgents()|length %}
+				<div class="dp-icon-list" style="padding: 3px; padding-bottom: 0;">
+					<ul>
+						{% for agent in app.agents.getAgents() if not online_agents[agent.id] %}
+							<li><img src="{{ agent.getPictureUrl(16) }}" class="tipped" title="{{ agent.display_name }}" /></li>
+						{% endfor %}
+					</ul>
+					<br class="clear" />
+				</div>
+			{% endif %}
+
+			<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/MassAddAgents.js') }}"></script>
+			<div id="agents_sidebar_add" data-element-handler="DeskPRO.Admin.ElementHandler.MassAddAgents" style="margin-top: 5px;">
+				<strong>Add more agents</strong><br/>
+				<div class="agent-input">
+					<textarea class="address-list" placeholder="Enter email addresses separated by commas" style="width: 261px; font-size: 11px;"></textarea>
+					<button class="btn submit-trigger" data-submit-url="{{ path('admin_mass_add') }}" style="display: none;"><em style="font-style: normal">Create agent accounts &rarr;</em></button>
+				</div>
+				<div class="agents-result agents-loading" style="display: none;">
+					Please wait while we set up new accounts for your collegues. <em class="flat-spinner"></em>
+				</div>
+				<div class="agents-result agents-done" style="display: none;">
+					<p>We created these new accounts:</p>
+					<ul class="small-detail-list"></ul>
+				</div>
+				<div class="agents-result agents-error" style="display: none;">
+					<p class="error-text no_emails">Please enter valid email addresses into the text box</p>
+					<p class="error-text no_new_agents">The email addresses you entered all belong to existing agents</p>
+					<p class="error-text too_many">Please enter a maximum of 20 email addresses at a time.</p>
+					<p class="error-text license">Your license does not allow you to create any more agents. Go to your <a href="{{ app.request.getBaseUrl() }}/billing">Billing Interface</a> to add more.</p>
+				</div>
+			</div>
+		</article>
+	</div>
+</div>

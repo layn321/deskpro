@@ -1,0 +1,27 @@
+<thead>
+	<tr>
+		{#
+		{% if not disable_actions %}
+			<th width="20" class="check-all check" width="5" valign="middle" style="vertical-align: middle;"><input type="checkbox" class="check-all-box selection-control" style="margin: 0; margin-rght: 4px; padding: 0;"/></th>
+		{% endif %}
+		#}
+		{% set perc = (100 / display_fields|length) %}
+		{% for field in display_fields %}
+			{% if field == 'name' %}<th width="{{perc}}%" data-field="email_address">{{ phrase('agent.general.name') }}</th>
+			{% elseif field == 'email' %}<th width="{{perc}}%" data-field="email_address">{{ phrase('agent.general.email_address') }}</th>
+			{% elseif field == 'org' %}<th width="{{perc}}%" data-field="email_address">{{ phrase('agent.general.organization') }}</th>
+			{% elseif field == 'org_pos' %}<th width="{{perc}}%" data-field="email_address">{{ phrase('agent.general.position') }}</th>
+			{% elseif field == 'organization' %}<th width="{{perc}}%" data-field="organization">{{ phrase('agent.general.organization') }}</th>
+			{% elseif field == 'language' %}<th width="{{perc}}%" data-field="language">{{ phrase('agent.general.language') }}</th>
+			{% elseif field == 'labels' %}<th width="{{perc}}%" data-field="labels">{{ phrase('agent.general.labels') }}</th>
+			{% elseif field == 'num_tickets' %}<th width="{{perc}}%" data-field="num_tickets">{{ phrase('agent.general.tickets') }}</th>
+			{% else %}
+				{% for f in person_field_defs %}
+					{% if field == 'person_fields['~f.id~']' %}
+					<th width="{{perc}}%" data-field="person_fields[{{f.id}}]">{{f.title}}</th>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+	</tr>
+</thead>

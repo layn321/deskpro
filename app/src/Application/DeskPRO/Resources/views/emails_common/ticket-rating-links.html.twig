@@ -1,0 +1,6 @@
+<div class="rate-link">
+	{{ phrase('user.emails.ticket_rate-question') }}
+	<a href="{{ url_full('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, setrating: 1}) }}">&nbsp;&nbsp;{{ phrase('user.emails.ticket_rate-positive') }}&nbsp;&nbsp;</a>
+	<a href="{{ url_full('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, setrating: 0}) }}">&nbsp;&nbsp;{{ phrase('user.emails.ticket_rate-neutral') }}&nbsp;&nbsp;</a>
+	<a href="{{ url_full('user_tickets_feedback', {'ticket_ref': ticket.ref, 'auth': ticket.auth, 'message_id': message.id, setrating: -1}) }}">&nbsp;&nbsp;{{ phrase('user.emails.ticket_rate-negative') }}&nbsp;&nbsp;</a>
+</div>

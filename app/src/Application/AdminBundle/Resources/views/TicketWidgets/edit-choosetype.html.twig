@@ -1,0 +1,45 @@
+{% extends 'AdminBundle::layout_popout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/GeneralEdit.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" charset="utf-8">
+function _page_exec() {
+	window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.GeneralEdit('', 0);
+}
+</script>
+{% endblock %}
+{% block header %}
+	<h1>{{ phrase('admin.tickets.choose_widget_type') }}</h1>
+{% endblock %}
+{% block content %}
+
+<form action="{{ path('admin_ticketwidgets_edit', {'widget_id': widget.id|default(0)}) }}" class="form" method="post">
+
+<input type="hidden" name="widget[template_name]" value="DeskPRO:Widgets:deskpro_content.html.twig" />
+
+<strong>{{ phrase('admin.tickets.widget_location') }}</strong>
+<ul class="item-list">
+	<li>
+		<input type="radio" name="widget[section]" value="agent.ticket.display" checked="checked" /> {{ phrase('admin.tickets.display_field_in_agent') }}<br />
+		<input type="radio" name="widget[section]" value="agent.ticket.tabs" /> {{ phrase('admin.tickets.tab_in_agent_interface') }}<br />
+		<input type="radio" name="widget[section]" value="user.ticket.display" /> {{ phrase('admin.tickets.display_field_in_user') }}<br />
+	</li>
+</ul>
+
+<br />
+
+<strong>{{ phrase('admin.tickets.widget_type') }}</strong>
+<ul class="item-list">
+	<li>
+		<input type="radio" name="widget[name_id]" value="deskpro_content" checked="checked" /> {{ phrase('admin.tickets.simple_html_content') }}
+	</li>
+</ul>
+
+</form>
+
+{% endblock %}
+{% block footer %}
+	<button class="dp-button green save-trigger">{{ phrase('agent.general.continue') }}</button>
+
+{% endblock %}

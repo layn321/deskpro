@@ -1,0 +1,9 @@
+<dp:subject>{{ phrase('agent.emails.subject_new_agent') }}</dp:subject>
+{% set phrase_part %}
+	<a href="{{ app.getSetting('core.deskpro_url') }}">{{ app.getSetting('core.deskpro_url') }}</a>
+{% endset %}
+{{ phrase('agent.emails.ticket_created_link', {'link':phrase_part,'name':app.user.getDisplayName()|e,'email':app.user.primary_email_address}, true) }}
+
+<strong>{{ phrase('agent.emails.login_url') }}:</strong> <a href="{{ app.getSetting('core.deskpro_url') }}agent/">{{ app.getSetting('core.deskpro_url') }}agent/</a><br />
+<strong>{{ phrase('agent.general.your_email_address') }}:</strong> {{ agent.primary_email_address }}<br />
+<strong>{{ phrase('agent.emails.your_initial_password') }}:</strong> {{ agent.getPlaintextPassword() }}

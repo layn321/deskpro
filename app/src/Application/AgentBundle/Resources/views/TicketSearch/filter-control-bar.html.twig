@@ -1,0 +1,67 @@
+<header class="list-control-bar">
+	<ul class="btn-controls">
+		<li class="display-options display-options-trigger"><a></a></li>
+		<li class="right"><span class="sep"></span></li>
+		<li class="detail-view detail-view-trigger"><a class="setupIcon"></a></li>
+		<li class="right"><span class="sep"></span></li>
+	</ul>
+	<ul>
+		<li>{{ phrase('agent.general.ordered_by') }} </li>
+		<li class="order-by-menu-trigger menu-fitted" data-menu-button=".button"><a class="button"><span class="label"><label>{{ order_by_summary }}</label> <i class="order-dir asc" {% if order_by[1] != 'asc' %}style="display: none"{% endif %}>{{ phrase('agent.general.sort_asc') }}</i><i class="order-dir desc" {% if order_by[1] != 'desc' %}style="display: none"{% endif %}>{{ phrase('agent.general.sort_desc') }}</i></span><em></em></a></li>
+		<li>{{ phrase('agent.general.and_grouped_by') }} </li>
+		<li class="group-by-menu-trigger menu-fitted" data-menu-button=".button"><a class="button"><span class="label">{{ grouping_summary|default(phrase('agent.general.none')) }}</span><em></em></a></li>
+
+	</ul>
+
+	<ul style="display: none" class="order-by-menu">
+		{% if sla_id %}
+			<li data-order-by="sla_severity_asc"><label class="label">{{ phrase('agent.tickets.sla_severity') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+			<li data-order-by="sla_severity_desc"><label class="label">{{ phrase('agent.tickets.sla_severity') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+		{% endif %}
+        {% if needs_urgency %}
+        <li data-order-by="urgency_asc"><label class="label">{{ phrase('agent.general.urgency') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+        <li data-order-by="urgency_desc"><label class="label">{{ phrase('agent.general.urgency') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+        {% endif %}
+        <li data-order-by="date_created_asc"><label class="label">{{ phrase('agent.general.date_opened') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+        <li data-order-by="date_created_desc"><label class="label">{{ phrase('agent.general.date_opened') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+		<li data-order-by="date_last_agent_reply_asc"><label class="label">{{ phrase('agent.tickets.date_last_agent_reply') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+		<li data-order-by="date_last_agent_reply_desc"><label class="label">{{ phrase('agent.tickets.date_last_agent_reply') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+		<li data-order-by="date_last_user_reply_asc"><label class="label">{{ phrase('agent.tickets.date_last_user_reply') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+		<li data-order-by="date_last_user_reply_desc"><label class="label">{{ phrase('agent.tickets.date_last_user_reply') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+        <li data-order-by="date_last_reply_asc"><label class="label">{{ phrase('agent.tickets.date_last_reply') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+		<li data-order-by="date_last_reply_desc"><label class="label">{{ phrase('agent.tickets.date_last_reply') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+		{% if app.getSetting('core.use_ticket_priority') %}
+        <li data-order-by="priority_asc"><label class="label">{{ phrase('agent.general.priority') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+        <li data-order-by="priority_desc"><label class="label">{{ phrase('agent.general.priority') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+        {% endif %}
+        <li data-order-by="time_waiting_asc"><label class="label">{{ phrase('agent.general.time_waiting') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+        <li data-order-by="time_waiting_desc"><label class="label">{{ phrase('agent.general.time_waiting') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+        <li data-order-by="total_user_waiting_asc"><label class="label">{{ phrase('agent.general.total_time_waiting') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_asc') }}</i></li>
+        <li data-order-by="total_user_waiting_desc"><label class="label">{{ phrase('agent.general.total_time_waiting') }}</label> <i class="order-dir">{{ phrase('agent.general.sort_desc') }}</i></li>
+	</ul>
+	<ul style="display: none" class="group-by-menu">
+		<li data-group-by="">{{ phrase('agent.general.none') }}</li>
+		<li class="sep">-</li>
+		<li data-group-by="department">{{ phrase('agent.general.department') }}</li>
+		{% if app.getSetting('core.use_ticket_category') %}<li data-group-by="category">{{ phrase('agent.general.category') }}</li>{% endif %}
+		{% if app.getSetting('core.use_ticket_priority') %}<li data-group-by="priority">{{ phrase('agent.general.priority') }}</li>{% endif %}
+		{% if app.getSetting('core.use_product') %}<li data-group-by="product">{{ phrase('agent.general.product') }}</li>{% endif %}
+		{% if app.getSetting('core.use_ticket_workflow') %}<li data-group-by="workflow">{{ phrase('agent.general.workflow') }}</li>{% endif %}
+		<li data-group-by="organization">{{ phrase('agent.general.organization') }}</li>
+		<li data-group-by="person">{{ phrase('agent.general.person') }}</li>
+		{% if app.languages.isMultiLang() %}
+			<li data-group-by="language">{{ phrase('agent.general.language') }}</li>
+		{% endif %}
+        {% if needs_urgency %}
+		    <li data-group-by="urgency">{{ phrase('agent.general.urgency') }}</li>
+        {% endif %}
+		<li data-group-by="agent">{{ phrase('agent.general.agent') }}</li>
+		{% if app.getSetting('core.use_agent_team') %}<li data-group-by="agent_team">{{ phrase('agent.general.agent_team') }}</li>{% endif %}
+		<li data-group-by="user_waiting">{{ phrase('agent.general.time_waiting') }}</li>
+		<li data-group-by="total_user_waiting">{{ phrase('agent.general.total_time_waiting') }}</li>
+		<li data-group-by="date_created">{{ phrase('agent.general.date_opened') }}</li>
+		{% for f in app.getTicketFieldManager().getFields() %}
+			<li data-group-by="ticket_field_{{ f.id }}">{{ f.title }}</li>
+		{% endfor %}
+	</ul>
+</header>

@@ -1,0 +1,39 @@
+{% extends 'AgentBundle:Login:layout.html.twig' %}
+{% block content %}
+	<div class="title">
+		{{ phrase('agent.login.browser_requirements') }}
+	</div>
+	<div class="content">
+		<div class="text-info">
+			<p>{{ phrase('agent.login.notice_outdated_browser') }}</p>
+
+			<p>{{ phrase('agent.login.supported_browsers') }}:</p>
+
+			<ul>
+				<li><a href="http://www.getfirefox.com">{{ phrase('agent.login.mozilla_firefox') }}</a> {{ phrase('agent.login.version_x_or_later', {'version':4}) }}</li>
+				<li><a href="http://www.google.com/chrome">{{ phrase('agent.login.google_chrome') }}</a> {{ phrase('agent.login.version_x_or_later', {'version':17}) }}</li>
+				<li><a href="http://www.apple.com/safari/">{{ phrase('agent.login.apple_safari') }}</a> {{ phrase('agent.login.version_x_or_later', {'version':5}) }}</li>
+				<li><a href="http://www.opera.com/">{{ phrase('agent.login.opera') }}</a> {{ phrase('agent.login.version_x_or_later', {'version':11}) }}</li>
+				<li><a href="http://www.microsoft.com/windows/internet-explorer/">{{ phrase('agent.general.internet_explorer') }}</a> {{ phrase('agent.login.version_x_or_later', {'version':8}) }}</li>
+			</ul>
+
+			{% if is_ie %}
+				<p class="note">
+					<span id="compat_info_trigger">{{ phrase('agent.login.ie_compat_mode_title', {url: path('agent_browser_requirements_ie_compat')}) }}</span>.
+					{{ phrase('agent.login.ie_use_chrome_frame') }}
+				</p>
+			{% endif %}
+		</div>
+	</div>
+{% if is_ie %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#compat_info_trigger').on('click', function(ev) {
+			var href = $(this).find('a').get(0).href;
+			window.open(href, 'iecompat', 'width=650,height=500,location=1,menubar=1,scrollbars=1,status=1,toolbar=0,resizable=1');
+			ev.preventDefault();
+		});
+	});
+	</script>
+{% endif %}
+{% endblock %}

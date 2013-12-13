@@ -1,0 +1,291 @@
+{% set this_page = 'website_widgets' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagetitle %}
+	Website Embeds
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript">
+$(document).ready(function() {
+	if ($('#widget_content_select').height() <= 240) {
+		return;
+	}
+
+	$('#widget_content_select_showmore').show().on('click', function() {
+		$(this).hide();
+		$('#widget_content_select').css('max-height', '1000000px');
+	});
+});
+
+$(document).ready(function() {
+	var dep_form_wrap = $('#department_form_wrap');
+	var sel = dep_form_wrap.find('select');
+	DP.select(sel);
+
+	sel.on('change', function() {
+		var depid = parseInt(sel.val());
+
+		if (depid) {
+			window.location = '{{ path('admin_website_embeds') }}?department_id=' + depid + '#contact_form';
+		} else {
+			window.location = '{{ path('admin_website_embeds') }}#contact_form';
+		}
+
+		$('#change_dep_load').show();
+	});
+});
+</script>
+<style type="text/css">
+#widget_content_select {
+	max-height: 250px;
+	overflow: hidden;
+}
+
+#widget_content_select_wrap {
+	position: relative;
+}
+
+#widget_content_select_showmore {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 90px;
+	background: #fff;
+	background: rgba(255, 255, 255, 0.6);
+	background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(100%,rgba(255,255,255,1)));
+	background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
+	background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
+	background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
+	background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );
+	text-align: center;
+}
+#widget_content_select_showmore button {
+	margin-top: 66px;
+}
+</style>
+{% endblock %}
+{% block dp_full_page %}
+
+	{##################################################################################################################}
+	{# Overlay #}
+	{##################################################################################################################}
+
+	<div class="dp_admin_pagebar">
+		<ul>
+			<li>"Feedback and Support" Website Tab</li>
+		</ul>
+	</div>
+	<div class="dp_admin_page">
+		<div class="dp-page-box">
+			<div class="page-content">
+				<p>{{ phrase('admin.portal.website_widgets_overlay_explain') }}</p>
+
+				{% set code %}{% include 'AdminBundle:Portal:widget-code-overlay.txt.twig' %}{% endset %}
+				<textarea class="code" wrap="off">{{ code|replace({"\t":"    "})|e }}</textarea>
+				<p>{{ phrase('admin.portal.website_widget_install') }}</p>
+
+				<div id="widget_content_select_wrap">
+					<div id="widget_content_select">
+						<form action="{{ path('admin_website_embeds') }}" method="post">
+						<input type="hidden" name="save_selections" value="1" />
+						<h1 class="noexpand">Show links to content by default</h1>
+
+						{% macro build_list(name, cats, items, map, selections, depth) %}
+							{% for cat in cats %}
+								<div style="margin-left: {{ 10 * depth }}px; margin-bottom: 6px;">
+									<strong>{{ cat.title }}</strong>
+									{% for item_id in map[cat.id] if items[item_id] %}
+										<div style="margin-left: {{ 10 * (depth+1) }}px">
+											<label>
+												<input type="checkbox" name="selections[{{ name }}][]" value="{{ item_id }}" {% if item_id in selections %}checked="checked"{% endif %} />
+												{{ items[item_id] }}
+											</label>
+										</div>
+									{% endfor %}
+									{% if cat.children %}
+										{{ _self.build_list(name, cat.children, items, map, selections, depth + 1) }}
+									{% endif %}
+								</div>
+							{% endfor %}
+						{% endmacro %}
+						{% if articles %}
+							<div style="width:295px; float: left; overflow: auto;">
+								<h3 style="color: #88826F; border-top: 1px solid #88826F; border-bottom: 1px solid #88826F; padding: 3px 0 3px 0; margin-top: 5px; margin-bottom: 5px;">Articles</h3>
+								{{ _self.build_list('articles', app.getDataService('ArticleCategory').getRootNodes(), articles, article_cat_map, selections.articles, 0) }}
+							</div>
+						{% endif %}
+
+						{% if downloads %}
+							<div style="width:295px; float: left; overflow: auto;">
+								<h3 style="color: #88826F; border-top: 1px solid #88826F; border-bottom: 1px solid #88826F; padding: 3px 0 3px 0; margin-top: 5px;">Downloads</h3>
+								{{ _self.build_list('downloads', app.getDataService('DownloadCategory').getRootNodes(), downloads, download_cat_map, selections.downloads, 0) }}
+							</div>
+						{% endif %}
+
+						{% if news %}
+							<div style="width:295px; float: left; overflow: auto;">
+								<h3 style="color: #88826F; border-top: 1px solid #88826F; border-bottom: 1px solid #88826F; padding: 3px 0 3px 0; margin-top: 5px;">News</h3>
+								{{ _self.build_list('news', app.getDataService('NewsCategory').getRootNodes(), news, news_cat_map, selections.news, 0) }}
+							</div>
+						{% endif %}
+
+						<br style="clear:both" />
+						<br />
+
+						<button class="clean-white">Update Selections</button>
+
+						</form>
+					</div>
+					<div id="widget_content_select_showmore" style="display: none;"><button class="clean-white">Show More</button></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+
+	{##################################################################################################################}
+	{# Chat Widget #}
+	{##################################################################################################################}
+
+	{% if app.getSetting('core.apps_chat') %}
+		<div class="dp_admin_pagebar">
+			<ul>
+				<li>"Chat with us" Tab</li>
+			</ul>
+		</div>
+		<div class="dp_admin_page">
+			<div class="dp_admin_page_inner">
+				<div class="dp-page-box">
+					<div class="page-content">
+
+						<p>{{ phrase('admin.portal.website_widgets_chat_explain') }}</p>
+
+						<p style="background-color: #F8FFC4;">
+							<strong>Important:</strong>
+							The chat widget only appears when there are agents available for chat in the Agent Interface.
+
+							{% if not chat_online %}
+								<br/>At the moment, there no agents signed in to chat so the widget will not appear.
+							{% endif %}
+						</p>
+
+						{% set code %}{% include 'AdminBundle:Portal:widget-code-chat.txt.twig' %}{% endset %}
+						<textarea class="code" wrap="off">{{ code|replace({"\t":"    "})|e }}</textarea>
+						<p>{{ phrase('admin.portal.website_widget_install') }}</p>
+
+						<p>Related articles:</p>
+						<ul class="small-detail-list">
+							<li><a href="https://support.deskpro.com/kb/articles/146" target="_blank">Set language from the chat widget</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+	{% endif %}
+
+	{##################################################################################################################}
+	{# Contact Form #}
+	{##################################################################################################################}
+
+	<div class="dp_admin_pagebar" id="contact_form">
+		<ul>
+			<li>Contact Form</li>
+		</ul>
+	</div>
+	<div class="dp_admin_page">
+		<div class="dp_admin_page_inner">
+			<div class="dp-page-box">
+				<div class="page-content">
+
+					<div id="department_form_wrap" style="margin-bottom: 10px;">
+						<table cellspacing="0" cellpadding="0"><tr>
+							<td valign="middle" style="vertical-align: middle; padding-right: 7px;">
+								Get code for a specific department:
+							</td>
+							<td valign="middle" style="vertical-align: middle; padding-right: 7px;">
+								<select name="department">
+									<option value=""></option>
+									{% for dep in app.departments.getRootNodes() if dep.is_tickets_enabled %}
+										{% if dep.children|length %}
+											<optgroup label="{{ dep.title }}">
+												{% for subdep in dep.children %}
+													<option value="{{subdep.id}}" {% if subdep.id == department.id %}selected="selected"{% endif %}>{{subdep.title}}</option>
+												{% endfor %}
+											</optgroup>
+										{% else %}
+											<option value="{{dep.id}}" {% if dep.id == department.id %}selected="selected"{% endif %}>{{dep.title}}</option>
+										{% endif %}
+									{% endfor %}
+								</select>
+							</td>
+							<td valign="middle" style="vertical-align: middle;">
+								<i id="change_dep_load" style="display: none;" class="flat-spinner"></i>
+							</td>
+						</tr></table>
+					</div>
+
+					<h3>{{ phrase('admin.tickets.direct_link') }}</h3>
+					{{ phrase('admin.tickets.choice_direct_link_ticket_form') }}:
+					<br />
+					<input type="text" value="{{ app.request.getUriForPath('') }}/new-ticket{% if department %}/{{ department.id }}{% endif %}" style="width: 80%;" />
+
+					<br />
+					<br />
+
+					<h3>{{ phrase('admin.tickets.popup_window') }}</h3>
+					{{ phrase('admin.tickets.add_popup_link') }}
+					<br />
+{% set code %}
+<a
+	href="{{ app.request.getUriForPath('') }}/tickets/new-simple/{{ department.id|default('0') }}"
+	onclick="window.open(this.href, null, 'height=600, width=710, toolbar=0, location=0, status=1, scrollbars=1, resizable=1'); return false;"
+	class="dp-newticket-link"
+>{{ phrase('admin.tickets.contact_us') }}</a>
+{% endset %}
+					<textarea class="code" wrap="off">{{ code|replace({"\t":"    "})|e }}</textarea>
+
+					<br />
+					<br />
+
+					<h3>{{ phrase('agent.general.website_widget') }}</h3>
+					{{ phrase('admin.tickets.embed_ticket_form_websites') }}:
+					<br />
+					{% set code %}{% include 'AdminBundle:Portal:widget-code-form.txt.twig' %}{% endset %}
+					<textarea class="code" wrap="off">{{ code|replace({"\t":"    "})|e }}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br />
+
+	{##################################################################################################################}
+	{# Helpdesk #}
+	{##################################################################################################################}
+
+	{% if app.getSetting('user.portal_enabled') %}
+		<div class="dp_admin_pagebar">
+			<ul>
+				<li>Embed the entire helpdesk</li>
+			</ul>
+		</div>
+		<div class="dp_admin_page">
+			<div class="dp_admin_page_inner">
+				<div class="dp-page-box">
+					<div class="page-content">
+
+						<p>This embeds the entire helpdesk portal directly into any page on your site.</p>
+
+						{% set code %}{% include 'AdminBundle:Portal:widget-code-helpdesk.txt.twig' %}{% endset %}
+						<textarea class="code" wrap="off">{{ code|replace({"\t":"    "})|e }}</textarea>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+	{% endif %}
+
+{% endblock %}

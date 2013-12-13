@@ -1,0 +1,82 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.PublishNewCat';
+pageMeta.title = '{{ phrase('agent.general.new_ticket') }}';
+pageMeta.ticket_id = 0;
+
+pageMeta.labelsAutocompleteUrl        = '{{ path('agent_ajax_labels_autocomplete', {'label_type': 'ticket'}) }}';
+pageMeta.uploadAttachUrl              = '{{ path('agent_accept_upload') }}';
+
+pageMeta.auto_start_bill = {% if app.getSetting('core_tickets.billing_auto_timer_new') %}true{% else %}false{% endif %};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<header>
+	<span class="close close-trigger">{{ phrase('agent.general.close_lc') }}</span>
+	<h1>{{ phrase('agent.general.add_category') }}</h1>
+</header>
+<article class="padded" data-width="700" data-height="400">
+
+<form action="{{ path('agent_publish_cats_newform_save', {type: type}) }}" method="POST">
+
+<div class="profile-box-container reply-box-wrap">
+	<header>
+		<h4>{{ phrase('agent.general.properties') }}</h4>
+	</header>
+	<section>
+		<article class="headerbox">
+			<table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table">
+				<tbody>
+					<tr>
+						<th width="120">{{ phrase('agent.general.title') }}</th>
+						<td>
+							<input type="text" name="category[title]" style="width: 200px;" />
+						</td>
+					</tr>
+					<tr>
+						<th width="80">{{ phrase('agent.general.parent_category') }}</th>
+						<td>
+							{% include 'AgentBundle:Common:select-standard.html.twig' with {
+								'name': 'category[parent_id]',
+								'id': baseId ~ '_parent_id',
+								'add_classname': 'parent_id',
+								'add_attr': '',
+								'with_blank': true,
+								'blank_title': phrase('agent.general.none'),
+								'categories': all_categories,
+								'allow_parent_sel': true
+							} %}
+						</td>
+					</tr>
+					<tr>
+						<th width="80">{{ phrase('agent.general.permissions') }}</th>
+						<td>
+							<ul>
+								{% for ug in app.getUsergroups().getUserUsergroups() %}
+									<li>
+										<label>
+											<input class="ug-check ug-{{ ug.id }} {% if ug.sys_name %}ug-{{ ug.sys_name }}{% endif %}" type="checkbox" name="category[usergroups][]" value="{{ ug.id }}" checked="checked" />
+											{{ ug.title }}
+										</label>
+									</li>
+								{% endfor %}
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</article>
+	</section>
+</div>
+
+</form>
+</article>
+<footer>
+	<div class="dp-not-loading">
+		<button class="submit-trigger clean-white">{{ phrase('agent.general.save') }}</button>
+	</div>
+	<div class="dp-is-loading" style="padding-top: 9px;">
+		<img src="{{ asset('images/spinners/loading-small.gif') }}" />
+	</div>
+</footer>

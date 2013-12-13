@@ -1,0 +1,10 @@
+<header class="list-selection-bar">
+	<div class="pull-right" style="position: relative; top: -1px; padding-right: 8px;">
+		<button id="{{ tplvars.baseId }}_perform_actions_btn" class="dp-btn dp-btn-xxsmall" style="display: none;">{{ phrase('agent.general.perform_actions') }}</button>
+	</div>
+
+	<input class="selection-control" type="checkbox" />
+	{{ phrase('agent.general.x_selected', {'num_placeholder': '<span class="selected-count">0</span>'}, true) }}
+
+	{% include 'AgentBundle:TicketSearch:filter-massactions-overlay.html.twig' %}
+</header>

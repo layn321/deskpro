@@ -1,0 +1,93 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/PageHandler/PluginList.js') }}"></script>
+{% endblock %}
+{% block page_js_exec %}
+<script type="text/javascript" >
+	function _page_exec() {
+		window.DeskPRO_Page = new DeskPRO.Admin.PageHandler.PluginList();
+	}
+</script>
+{% endblock %}
+{% block pagebar %}
+<ul>
+	<li>Plugins</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<h2>{{ phrase('admin.plugins.installed_plugins') }}</h2>
+<form action="{{ path('admin_plugins_toggle') }}" method="post" class="check-grid item-list">
+	<table width="100%">
+	<thead>
+	<tr>
+		<th style="text-align: left; width: 10%">&nbsp;</th>
+		<th style="text-align: left; width: 20%">Name</th>
+		<th style="text-align: left; width: 20%">Developer</th>
+		<th style="text-align: left; width: 50%">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for plugin in installed_plugins %}
+		{% set info = installed_plugin_info[plugin.id] %}
+		{% if info %}
+		<tr>
+			<td><input
+				class="onoff-slider plugin-toggle"
+				type="checkbox"
+				name="plugins[{{plugin.id}}]"
+				value="1"
+				{% if plugin.enabled %}checked="checked"{% endif %}
+			/></td>
+			<td><a href="{{ path('admin_plugins_plugin', {'plugin_id': plugin.id}) }}">{{info.title}}</a></td>
+			<td><a href="{{ info.developer_url }}" target="_blank">{{info.developer}}</a></td>
+			<td>{{info.description|raw}}</td>
+		</tr>
+		{% else %}
+		<tr>
+			<td>&nbsp;</td>
+			<td>{{plugin.title}} {{plugin.version}}</td>
+			<td colspan="2">This plugin has been disabled as the associated files could not be found. <a href="{{ path('admin_plugins_uninstall', {plugin_id: plugin.id}) }}">Uninstall now</a>.</td>
+		</tr>
+		{% endif %}
+	{% else %}
+		<tr><td colspan="4">{{ phrase('admin.plugins.no_plugins_installed') }}</td></tr>
+	{% endfor %}
+	</tbody>
+	</table>
+
+	{{ form_token() }}
+</form>
+<div style="font-size: 11px">Disabled plugins can be re-enabled with no loss of data. Uninstalling a plugin will remove all associated data.</div>
+
+<br />
+
+<h2>{{ phrase('admin.plugins.available_plugins') }}</h2>
+<div class="item-list check-grid">
+<table width="100%">
+	<thead>
+	<tr>
+		<th style="text-align: left; width: 10%">&nbsp;</th>
+		<th style="text-align: left; width: 20%">Name</th>
+		<th style="text-align: left; width: 20%">Developer</th>
+		<th style="text-align: left; width: 50%">Description</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for plugin in available_plugins %}
+	<tr>
+		<td>
+			<a href="{{ path('admin_plugins_install', {'plugin_id': plugin.name}) }}" class="btn">{{ phrase('admin.plugins.install') }}</a>
+		</td>
+		<td>{{plugin.title}}</td>
+		<td><a href="{{ plugin.developer_url }}" target="_blank">{{plugin.developer}}</a></td>
+		<td>{{plugin.description|raw}}</td>
+	</tr>
+	{% else %}
+	<tr><td colspan="4">{{ phrase('admin.plugins.no_plugins_available') }}</td></tr>
+	{% endfor %}
+	</tbody>
+</table>
+</div>
+
+{% endblock %}

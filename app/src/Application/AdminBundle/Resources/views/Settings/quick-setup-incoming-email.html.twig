@@ -1,0 +1,19 @@
+<div class="alert-message block-message error errors-box" style="display: none;">
+	<strong>We detected an error with your account details:</strong>
+	<ul>
+		<li class="error-item error-message"></li>
+		<li class="error-item error_gateway_address">Please enter a valid email address for the incoming account</li>
+		<li class="error-item error_pop3_host">Please enter a host for your POP3 server</li>
+		<li class="error-item error_pop3_port">Please enter a valid connection port for your POP3 server</li>
+		<li class="error-item error_pop3_username">Please enter a username for your POP3 server</li>
+		<li class="error-item error_pop3_password">Please enter a password for your POP3 server</li>
+		<li class="error-item error_gapps_username">Please enter your Google Apps email address</li>
+		<li class="error-item error_gapps_password">Please enter your Google Apps password</li>
+	</ul>
+	Fix the errors or click "skip." You will be able to configure incoming email later.
+</div>
+
+{{ incoming_email_form|raw }}
+<div style="position: absolute; bottom: 13px; right: 15px;">
+	<button class="clean-white" id="pop3_skip_trigger">Skip this step</button>
+</div>

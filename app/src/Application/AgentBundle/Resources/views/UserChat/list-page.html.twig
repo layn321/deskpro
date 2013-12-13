@@ -1,0 +1,39 @@
+{% if chats|length %}
+<section class="search-reuslts page-set" data-page="{{ page }}">
+	{% for convo in chats %}
+		<article
+			class="row-item convo-{{ convo.id }} without-selection"
+			data-convo-id="{{ convo.id }}"
+			data-route="page:{{ path('agent_userchat_view', {'conversation_id': convo.id}) }}" data-route-title="@selector(a.subject)" data-route-openclass="open">
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="row-title click-through">
+							{{ convo.subjectLine }}
+						</a>
+					</h3>
+				</div>
+				<div class="top-row-right">
+					<div class="bound-fade"></div>
+				</div>
+			</div>
+			<div class="userinfo general">
+				{% if convo.person %}
+					{%- set phrase_part -%}<a class="click-through name" data-route="person:{{ path('agent_people_view', {'person_id': convo.person.id}) }}" ><span class="with-icon" data-person-id="{{ convo.person.id|default(0) }}" style="background-image: url('{{ convo.person.getPictureUrl(16) }}');">{{ convo.person.display_name }}</span></a> &lt;{{ convo.person.primary_email_address }}&gt;{%- endset -%}
+				{% else %}
+					{% if convo.person_name or convo.person_email %}
+						{% set phrase_part %}{{ convo.person_name }} {% if convo.person_email %} &lt;{{ convo.person_email }}&gt;{% endif %}{% endset %}
+					{% else %}
+						{% set phrase_part %}{{ phrase('agent.general.anonymous') }}{% endset %}
+					{% endif %}
+				{% endif %}
+				{{ phrase('agent.general.by_name', {'name':phrase_part}, true) }} | <time class="timeago" datetime="{{ convo.date_created|date('c', 'UTC') }}">{{ convo.date_created|date('day_short') }}</time>
+			</div>
+		</article>
+	{% endfor %}
+</section>
+{% else %}
+	<section class="list-listing no-results">
+		<p>{{ phrase('agent.general.there_are_no_results') }}</p>
+	</section>
+{% endif %}

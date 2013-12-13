@@ -1,0 +1,24 @@
+<div class="dp-overlay-container display-options">
+	<section class="dp-overlay">
+		<header>
+			<span class="close close-trigger"></span>
+			<h1>{% block title %}{{ phrase('agent.general.display_options') }}{% endblock %}</h1>
+		</header>
+		<article>
+			<ul class="display-fields-list on-list sortable-list">
+				{% block display_elements_list %}{% endblock %}
+			</ul>
+			<ul class="display-fields-list off-list"></ul>
+
+			{% block other_options %}{% endblock %}
+		</article>
+		<footer>
+			<div class="loading-off">
+				<button class="save-trigger clean-white">{{ phrase('agent.general.apply') }}</button>
+			</div>
+			<div class="loading-on" style="display:none">
+				<span>{{ phrase('agent.general.saving') }}</span>
+			</div>
+		</footer>
+	</section>
+</div>

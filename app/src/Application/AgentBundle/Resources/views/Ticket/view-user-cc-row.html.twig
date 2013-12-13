@@ -1,0 +1,9 @@
+<li class="cc-user-row" data-person-id="{{ person.id }}" data-email-address="{{ person.primary_email_address }}">
+	<a class="as-popover {% if preload %}preload{% endif %} dp-btn dp-btn-small" data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}">
+		<span class="text" style="background-image: url({{ person.getPictureUrl(15) }});">
+			{{ person.getNameWithTitle() }}
+			({{ person.primary_email_address }})
+		</span>
+		{% if ticket_perms.modify_cc %}<span class="remove-row-trigger nohide-edit"><i class="icon-remove"></i></span>{% endif %}
+	</a>
+</li>

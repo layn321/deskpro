@@ -1,0 +1,15 @@
+<dl>
+	{% if info.title %}
+		<dt>{{ phrase('agent.general.redirect_page_title') }}:</dt>
+		<dd>{{ info.title }}</dd>
+	{% endif %}
+
+	<dt>{{ phrase('agent.general.page') }}:</dt>
+	<dd>{{ info.size_readable }} {{ phrase('agent.general.redirect_page_makeup', {'num_images': info.num_images, 'num_scripts': info.num_scripts}) }}</dd>
+
+	<dt>{{ phrase('agent.general.redirect_server_ip') }}:</dt>
+	<dd>{{ info.ip }}</dd>
+
+	<dt>{{ phrase('agent.general.host') }}:</dt>
+	<dd>{{ info.hostname }}</dd>
+</dl>

@@ -1,0 +1,37 @@
+{% extends 'AgentBundle:TextSnippets:base-widget-shell.html.twig' %}
+{% block pagemeta %}
+	pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.SnippetViewer';
+	pageMeta.title = '{{ phrase('agent.snippets.ticket_snippets') }}';
+	pageMeta.snippet_typename = 'tickets';
+	pageMeta.baseId = '%baseId%';
+{% endblock %}
+{% block edit_snippet_bottomright %}
+	<select class="variables-select">
+		<optgroup label="Ticket">
+			<option value="ticket.subject">{{ phrase('agent.general.subject') }}</option>
+			<option value="ticket.department.title">{{ phrase('agent.general.department') }}</option>
+			<option value="ticket.product.title">{{ phrase('agent.general.product') }}</option>
+			<option value="ticket.category.title">{{ phrase('agent.general.category') }}</option>
+			<option value="ticket.workflow.title">{{ phrase('agent.general.workflow') }}</option>
+			<option value="ticket.priority.title">{{ phrase('agent.general.priority') }}</option>
+			<option value="ticket.agent.display_name">{{ phrase('agent.general.agent') }}</option>
+			<option value="ticket.agent.primary_email">{{ phrase('agent.general.agent_email_address') }}</option>
+			<option value="ticket.agent_team.name">{{ phrase('agent.general.agent_team') }}</option>
+			{% for field in app.getCustomFieldManager('tickets').getFields() %}
+				<option value="ticket.field{{ field.id }}">{{ field.title }}</option>
+			{% endfor %}
+		</optgroup>
+		<optgroup label="User">
+			<option value="ticket.person.display_name">{{ phrase('agent.general.name') }}</option>
+			<option value="ticket.person.primary_email">{{ phrase('agent.general.email_address') }}</option>
+			<option value="ticket.person.organization.name">{{ phrase('agent.general.organization') }}</option>
+			<option value="ticket.person.organization_position">{{ phrase('agent.general.org_position') }}</option>
+			{% for field in app.getCustomFieldManager('people').getFields() %}
+				<option value="ticket.person.field{{ field.id }}">{{ field.title }}</option>
+			{% endfor %}
+		</optgroup>
+	</select>
+	<button class="variables-insert-btn clean-white" style="vertical-align: top; position:relative; top: 3px;">{{ phrase('agent.snippets.insert_variable') }}</button>
+	<br />
+	<a href="http://support.deskpro.com/kb/articles/133-using-variables-in-snippets" target="_blank">{{ phrase('agent.snippets.learn_more_about_vars') }}</a>
+{% endblock %}

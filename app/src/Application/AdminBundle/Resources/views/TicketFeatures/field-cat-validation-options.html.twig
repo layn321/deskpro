@@ -1,0 +1,92 @@
+<script type="text/javascript">
+$(document).ready(function() {
+	var wrapper = $('#field_validation_settings');
+	var submitSettings = function() {
+		var formData = wrapper.find('input[type="hidden"], :radio:checked').serializeArray();
+
+		wrapper.addClass('loading');
+		$.ajax({
+			url: '{{ path('admin_settings_saveform', {type: 'field_validation', auth: security_token('settings_field_validation') }) }}',
+			type: 'POST',
+			data: formData,
+			complete: function() {
+				wrapper.removeClass('loading');
+			}
+		});
+	};
+
+	wrapper.find('.save-trigger').on('click', function(ev) {
+		submitSettings();
+	});
+
+
+});
+</script>
+{% set user_setting_name = 'core_tickets.field_validation_'~field_id~'_user_required' %}
+{% set agent_setting_name = 'core_tickets.field_validation_'~field_id~'_agent_required' %}
+
+<div id="field_validation_settings" class="dp-form" style="margin: 15px;">
+	<input type="hidden" name="set_settings[]"  value="{{ user_setting_name }}" />
+	<input type="hidden" name="set_settings[]"  value="{{ agent_setting_name }}" />
+
+	{% if not hide_user %}
+		<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+			<div class="dp-form-row">
+				<div class="dp-form-label">
+					<label>
+						{{ phrase('admin.custom_fields.user_validation') }}
+						<span class="small-light-icon tipped" title="Validation rules applied when agents create tickets or update tickets through the agent interface."></span>
+					</label>
+				</div>
+				<div class="dp-form-input">
+					<div class="dp-input-group">
+						<label>
+							<input type="radio" class="option-trigger" name="settings[{{ user_setting_name }}]" value="0" {% if not app.getSetting(user_setting_name) %}checked="checked"{% endif %} />
+							{{ phrase('admin.custom_fields.no_validation') }}
+						</label>
+					</div>
+
+					<div class="dp-input-group">
+						<label>
+							<input type="radio" class="option-trigger require-selection-radio" name="settings[{{ user_setting_name }}]" value="1" {% if app.getSetting(user_setting_name) %}checked="checked"{% endif %} />
+							Require a selection for this field
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>
+					{{ phrase('admin.custom_fields.agent_validation') }}
+					<span class="small-light-icon tipped" title="Validation rules applied when agents create tickets or update tickets through the agent interface."></span>
+				</label>
+			</div>
+			<div class="dp-form-input">
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger" name="settings[{{ agent_setting_name }}]" value="0" {% if not app.getSetting(agent_setting_name) %}checked="checked"{% endif %} />
+						{{ phrase('admin.custom_fields.no_validation') }}
+					</label>
+				</div>
+
+				<div class="dp-input-group">
+					<label>
+						<input type="radio" class="option-trigger require-selection-radio" name="settings[{{ agent_setting_name }}]" value="1" {% if app.getSetting(agent_setting_name) %}checked="checked"{% endif %} />
+						Require a selection for this field
+					</label>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div>
+		<div class="is-loading"><i class="loading-icon-flat" style="display: inline-block;"></i></div>
+		<div class="is-not-loading">
+			<button class="clean-white save-trigger">Save Validation Options</button>
+		</div>
+	</div>
+</div>

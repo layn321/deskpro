@@ -1,0 +1,156 @@
+{% extends 'AgentBundle::source-pane-layout.html.twig' %}
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+{% block pane_main_tab %}
+	<li class="tab active"><i class="icon-dp-chat"></i> {{ phrase('agent.chrome.nav_userchat') }}</li>
+{% endblock %}
+{% block pane_other_tabs %}{% endblock %}
+{% block pane_content %}
+<div class="pane-content pane-content-main">
+
+	{##################################}
+	{# Open Chats #}
+	{##################################}
+
+	{% macro dep_row(dep, dep_counts, depth) %}
+		<li class="is-nav-item {% if depth %} sub-item{% endif %}" {% if not dep_counts[dep.id ~ '_total'] %}style="display: none"{% endif %}>
+			<div class="item" data-route="listpane:{{ path('agent_userchat_list_new', {'department_id':dep.id}) }}">
+				<h3>{% if depth %}&mdash; {% endif %}{{ dep.title }}</h3>
+				<em class="counter list-counter" {% if depth %}data-parentid="{{ dep.getParentId() }}"{% endif %}  id="userchat_deplist_{{ dep.id }}_counter" data-count-key="dep_counts.{{ dep.id }}_total" data-count="{{ dep_counts[dep.id ~ '_total']|default(0) }}">{{ dep_counts[dep.id ~ '_total']|default(0) }}</em>
+			</div>
+		</li>
+		{% if dep.children|length %}
+			{% for subdep in dep.children %}
+				{{ _self.dep_row(subdep, dep_counts, depth+1) }}
+			{% endfor %}
+		{% endif %}
+	{% endmacro %}
+
+	<section class="pane-section">
+		<header>
+			<h1>{{ phrase('agent.chat.title_open') }}</h1>
+		</header>
+		<article>
+			<ul class="nav-list">
+				{# New Chats #}
+				<li id="userchat_deplist_all" class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_userchat_list_new', {'department_id': -1}) }}">
+						<h3>{{ phrase('agent.chat.title_new_chats') }}</h3>
+						<em class="counter list-counter" id="userchat_deplist_0_counter" data-count-key="dep_counts.0_total" data-count="{{ dep_counts['0_total']|default(0) }}">{{ dep_counts['0_total']|default(0) }}</em>
+					</div>
+					{% if not single_dep_mode %}
+						<ul class="nav-list nav-list-small indented {% if dep_counts['0_total'] %}show{% endif %}">
+							{% for dep in departments %}
+								{{ _self.dep_row(dep, dep_counts, 0) }}
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</li>
+
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_userchat_list_active', {'agent_id': app.user.id}) }}">
+						<h3>{{ phrase('agent.chat.my_open_chats') }}</h3>
+						<em class="counter list-counter" id="userchat_list_{{ app.user.id }}_counter" data-count-key="counts.{{ app.user.id }}">{{ counts[app.user.id]|default(0) }}</em>
+					</div>
+				</li>
+
+				{# Active Chats #}
+				<li id="userchat_list_all" class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_userchat_list_active', {'agent_id': -1}) }}">
+						<h3>{{ phrase('agent.chat.title_active_chats') }}</h3>
+						<em class="counter list-counter" id="userchat_list_allagents_counter" data-count-key="counts.active" data-count="{{ counts.active|default(0) }}">{{ counts.active|default(0) }}</em>
+					</div>
+					<ul class="nav-list nav-list-small indented">
+						{% for agent_id,agent_name in agent_names %}
+							{% if agent_id != app.user.id %}
+								<li class="" {% if not counts[agent_id] %}style="display: none"{% endif %} id="userchat_list_{{ agent_id }}">
+									<span class="title" data-route="listpane:{{ path('agent_userchat_list_active', {'agent_id': agent_id}) }}">
+										<span class="list-counter" data-count-key="counts.{{ agent_id }}" id="userchat_list_{{ agent_id }}_counter">{{ counts[agent_id]|default(0) }}</span>
+										{{ agent_name }}
+									</span>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</li>
+			</ul>
+		</article>
+	</section>
+
+	{##################################}
+	{# Ended Chats #}
+	{##################################}
+
+	<section class="pane-section">
+		<header>
+			<h1>{{ phrase('agent.chat.title_ended') }}</h1>
+		</header>
+		<article>
+			<ul class="nav-list">
+				{% for filter in ended_filters %}
+					<li class="is-nav-item filter filter-{{ filter.id }} nav-filter-{{filter.id}} {% if loop.index == 1 %}active{% endif %}"
+						data-filter-id="{{filter.id}}"
+						data-filter-name="{{filter.sys_name}}"
+						data-grouping-ignore="{{ filter.disallowed }}"
+					>
+						<div class="item" data-route="listpane:{{ path('agent_userchat_filterlist', { 'filter_id': filter.id}) }}">
+							<h3>{{ filter.title }}</h3>
+							<em class="counter list-counter" id="userchat_{{filter.id}}_count" data-count="{{ filter.count }}">{{ filter.count }}</em>
+						</div>
+					</li>
+				{% endfor %}
+			</ul>
+		</article>
+	</section>
+
+
+	{##################################}
+	{# labels #}
+	{##################################}
+
+	<section class="pane-section last">
+		<header>
+			<h1>{{ phrase('agent.general.labels') }}</h1>
+		</header>
+		<article>
+			<nav class="pill-two-switcher" {% if not labels_index|length %}style="display: none"{% endif %} data-element-handler="DeskPRO.ElementHandler.SimpleTabs" id="chat_outline_labels_switcher">
+				<ul>
+					<li data-tab-for="#userchat_labels_list" class="list on">{{ phrase('agent.general.labels_list') }}</li>
+					<li data-tab-for="#userchat_labels_cloud" class="cloud">{{ phrase('agent.general.labels_cloud') }}</li>
+				</ul>
+			</nav>
+
+			<section class="labels-list" id="userchat_labels_list">
+				{% if labels_index|length %}
+					<table>
+						{% for letter,labels in labels_index %}
+							<tr>
+								<td class="letter">{{ letter }}</td>
+								<td class="labels">
+									<ul>
+										{% for label in labels %}
+											<li class="{{css_class}} nav-label-{{label|slugify}} is-nav-item" data-route="listpane:{{ path('agent_userchat_filterlist', {filter_id: 'label', filter_param: label}) }}"><span>{{label}}</span></li>
+										{% endfor %}
+									</ul>
+								</td>
+							</tr>
+						{% endfor %}
+					</table>
+				{% else %}
+				<aside class="source-info-explain">{{ phrase('agent.general.no_ticket_labels') }}</aside>
+				{% endif %}
+			</section>
+			<section class="labels-cloud" id="userchat_labels_cloud" style="display: none; border-top:none;">
+				{% if labels_cloud|length %}
+					<ul>
+						{% for label,css_class in labels_cloud %}
+							<li class="{{css_class}} nav-label-{{label|slugify}} is-nav-item" data-route="listpane:{{ path('agent_userchat_filterlist', {filter_id: 'label', filter_param: label}) }}"><span>{{label}}</span></li>
+						{% endfor %}
+					</ul>
+				{% else %}
+				<aside class="source-info-explain">{{ phrase('agent.general.no_ticket_labels') }}</aside>
+				{% endif %}
+			</section>
+		</article>
+	</section>
+</div>
+{% endblock %}

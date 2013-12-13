@@ -1,0 +1,363 @@
+/**********************************************************************
+* Overlay
+***********************************************************************/
+
+.overlay-main input[type=text] {
+	width: 95%;
+	margin-top: 5px;
+}
+
+/* The modal background, dims out the screen */
+.deskpro-overlay-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 10001;
+}
+
+.deskpro-overlay-overlay.error {
+	background-color: rgba(255, 0, 0, 0.08);
+}
+
+/* Main overlay wrapper */
+.deskpro-overlay-outer {
+	position: absolute;
+	z-index: 10002;
+
+	background-color: #FAFAFA;
+	border: 2px solid #0B374D;
+	border-radius: 6px;
+	-mox-border-radius: 6px;
+
+	-webkit-box-shadow: 2px 1px 6px 0px rgba(100, 100, 100, 0.7);
+	-moz-box-shadow: 2px 1px 6px 0px rgba(100, 100, 100, 0.7);
+	box-shadow: 2px 1px 6px 0px rgba(100, 100, 100, 0.7);
+	margin: 10px;
+}
+
+.deskpro-overlay-outer.error {
+	background-color: #F00;
+	border: 1px solid #633737;
+}
+
+.deskpro-overlay-outer.normal-size {
+
+}
+.deskpro-overlay.normal-size {
+	width: 400px;
+	height: 300px;
+}
+
+/* The inner wrapper */
+.deskpro-overlay {
+	position: relative;
+	background: #fff;
+
+	-webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.overlay-title {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 35px;
+  background: #edeeef;
+  background: -moz-linear-gradient(top, #edeeef 0%, #dbdcdd 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #edeeef), color-stop(100%, #dbdcdd));
+  background: -webkit-linear-gradient(top, #edeeef 0%, #dbdcdd 100%);
+  background: -o-linear-gradient(top, #edeeef 0%, #dbdcdd 100%);
+  background: -ms-linear-gradient(top, #edeeef 0%, #dbdcdd 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#edeeef', endColorstr='#dbdcdd',GradientType=0 );
+  background: linear-gradient(top, #edeeef 0%, #dbdcdd 100%);
+  border-bottom: 1px solid #ACB2B9;
+  -moz-border-radius-topleft: 9px;
+  -moz-border-radius-topright: 9px;
+  -moz-border-radius-bottomright: 0px;
+  -moz-border-radius-bottomleft: 0px;
+  -webkit-border-radius: 9px 9px 0px 0px;
+  border-radius: 9px 9px 0px 0px;
+  padding-left: 12px;
+}
+
+.overlay-title h4{
+	color: #595959;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding-top: 8px;
+}
+
+.overlay-content {
+	padding: 10px;
+	min-width: 300px;
+	-webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+
+	  position: absolute;
+	  top: 36px;
+	  right: 0;
+	  bottom: 35px;
+	  left: 0;
+
+	overflow: auto;
+}
+
+.overlay-content.no-footer {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+	bottom: 0;
+}
+
+.overlay-footer {
+	position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 30px;
+  border-top: 1px solid #A1AAB3;
+  background: #e4e7e9;
+	padding-top: 7px;
+
+  background: -moz-linear-gradient(top, #e4e7e9 0%, #babfc4 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #e4e7e9), color-stop(100%, #babfc4));
+  background: -webkit-linear-gradient(top, #e4e7e9 0%, #babfc4 100%);
+  background: -o-linear-gradient(top, #e4e7e9 0%, #babfc4 100%);
+  background: -ms-linear-gradient(top, #e4e7e9 0%, #babfc4 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e4e7e9', endColorstr='#babfc4',GradientType=0 );
+  background: linear-gradient(top, #e4e7e9 0%, #babfc4 100%);
+
+  border-radius: 0px 0px 5px 5px;
+  text-align: center;
+}
+
+.deskpro-overlay.iframe {
+
+}
+
+.deskpro-overlay.iframe .overlay-content {
+	padding: 0;
+	margin: 0;
+}
+
+.deskpro-overlay.iframe iframe {
+	background-color: #fff;
+	margin: 0;
+	padding: 0;
+	display: block;
+	border-radius: 5px;
+}
+
+.deskpro-overlay.no-padding .overlay-content {
+	padding: 0;
+}
+
+/**********************************************************************
+* Menu
+***********************************************************************/
+
+.deskpro-menu-outer {
+    background-color: #F0F0F0;
+	border: 1px solid #ABAFB3;
+
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+
+	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.deskpro-menu-outer.with-point:after {
+	border-color: transparent transparent #ABAFB3;
+    border-style: solid;
+    border-width: 5px;
+    content: "";
+    display: block;
+    height: 0;
+    left: 4px;
+    position: absolute;
+    top: -10px;
+    width: 0;
+    z-index: 100;
+}
+
+.deskpro-menu-inner {
+    color: #787F84;
+	text-shadow: 0 1px 0 #fff;
+
+	box-shadow: 0 1px 0 #FFFFFF inset, 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 11px;
+}
+
+.with-point .deskpro-menu-inner:after {
+    border-color: transparent transparent #F0F0F0;
+    border-style: solid;
+    border-width: 5px;
+    content: "";
+    display: block;
+    height: 0;
+    left: 4px;
+    position: absolute;
+    top: -9px;
+    width: 0;
+    z-index: 101;
+}
+
+.deskpro-menu {
+
+}
+
+.deskpro-menu > ul {
+	min-width: 160px;
+}
+
+.deskpro-menu > ul > li {
+	padding: 3px 4px 3px 10px;
+	line-height: 17px;
+	border: 1px solid transparent;
+	border-top:  1px solid #E3E4E6;
+
+    position: relative;
+
+	font-family: Helvetica,Arial,sans-serif;
+    font-size: 11px;
+}
+
+.deskpro-menu > ul > li:first-child {
+	border-top-color: transparent;
+}
+
+.deskpro-menu > ul > li.highlight {
+	-webkit-box-shadow: inset 0px 0px 4px 5px #ffffff;
+	-moz-box-shadow: inset 0px 0px 4px 5px #ffffff;
+	box-shadow: inset 0px 0px 4px 5px #ffffff;
+}
+
+.deskpro-menu > ul.alert-highlight > li.is-alerting {
+	background-color: #5687C0;
+}
+
+.deskpro-menu > ul.alert-highlight > li.is-alerting a,
+.deskpro-menu > ul.alert-highlight > li.is-alerting span {
+	color: #fff;
+	text-shadow: none;
+}
+
+.deskpro-menu > ul > li a, .deskpro-menu > ul > li span{
+	line-height: 17px;
+	display: block;
+}
+
+.deskpro-menu > ul > li:last-child {
+	border-bottom: 1px solid transparent;
+}
+
+.deskpro-menu > ul > li > a {
+    color: #787F84;
+    text-decoration: none;
+}
+
+.deskpro-menu > ul > li:not(.sep):not(.elm):not(.section-title):hover,
+.deskpro-menu > ul > li.hover, .deskpro-menu > ul > li.hover > a {
+    background: #FCFEFE;
+
+	cursor: pointer;
+
+    -webkit-transition: color 0.2s ease-out;
+    -moz-transition: color 0.2s ease-out;
+    transition: color 0.2s ease-out;
+}
+
+.deskpro-menu > ul > li.on {
+    background: #323437;
+
+    color: #CCC;
+	cursor: pointer;
+
+    -webkit-transition: color 0.2s ease-out;
+    -moz-transition: color 0.2s ease-out;
+    transition: color 0.2s ease-out;
+}
+
+.deskpro-menu > ul > li + .deskpro-menu > ul > li.sep {
+	border-top-color: transparent;
+}
+
+.deskpro-menu > ul > li.sep {
+	border: none;
+	border-top: 1px solid #C1C1C5;
+	height: 0;
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+}
+
+.deskpro-menu > ul > li > span.icon {
+	padding-left: 20px;
+	background-repeat: no-repeat;
+	background-position: 0 50%;
+}
+
+.deskpro-menu > ul > li > span.arrow {
+	float: right;
+}
+
+.deskpro-menu > ul > li.section-title {
+	color: #6E7073;
+	padding-left: 3px;
+	padding-top: 2px;
+	padding-bottom: 3px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.deskpro-menu li .count {
+	background: #a4a8ab;
+    background: -moz-linear-gradient(top, #a4a8ab 0%, #707477 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a4a8ab), color-stop(100%,#707477));
+    background: -webkit-linear-gradient(top, #a4a8ab 0%,#707477 100%);
+    background: -o-linear-gradient(top, #a4a8ab 0%,#707477 100%);
+    background: -ms-linear-gradient(top, #a4a8ab 0%,#707477 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#A4A8AB', endColorstr='#707477',GradientType=0 );
+    background: linear-gradient(top, #a4a8ab 0%,#707477 100%);
+
+    text-shadow: 1px 1px 0px #545454;
+    filter: dropshadow(color=#545454, offx=1, offy=0);
+
+	padding: 0px 4px;
+	color: #fff;
+	font-size: 10px;
+	line-height: 14px;
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    margin-right: 5px;
+    margin-top: 1px;
+
+	-webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+
+	-webkit-box-shadow:  inset 0 1px 0 #c8ced3, 0 1px 0 #fff;
+    -moz-box-shadow: inset 0 1px 0 #c8ced3, 0 1px 0 #fff;
+    box-shadow:  inset 0 1px 0 #c8ced3, 0 1px 0 #fff;
+}
+/**********************************************************************
+* Simple Tabs
+***********************************************************************/
+
+.deskpro-tab { display: none; }
+.deskpro-tab.on { display: block; }

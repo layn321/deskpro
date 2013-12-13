@@ -1,0 +1,43 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailGatewayPage.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailTransportPage.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_kb_gateways') }}">Article Email Gateways</a></li>
+		{% if gateway.id %}
+			<li>{{ phrase('admin.gateway.edit_gateway') }}</li>
+		{% else %}
+			<li>{{ phrase('admin.gateway.new_gateway') }}</li>
+		{% endif %}
+	</ul>
+
+	{% if gateway.id %}
+		<nav>
+			<ul>
+				<li class="delete"><a href="{{ path('admin_kb_gateways_del', {id: gateway.id, security_token: security_token('delete_gateway') }) }}" onclick="return confirm('{{ phrase('admin.gateway.ask_delete_gateway') }}');">{{ phrase('agent.general.delete') }}</a></li>
+			</ul>
+		</nav>
+	{% endif %}
+{% endblock %}
+{% block page %}
+
+<div class="alert-message block-message error errors-box" id="page_error_box" style="display: none;">
+	<strong>We detected an error with your account details:</strong>
+	<ul>
+		<li class="error-item error-message"></li>
+		<li class="error-item error_gateway_address">Please enter a valid email address for the incoming account</li>
+		<li class="error-item error_pop3_host">Please enter a host for your POP3 server</li>
+		<li class="error-item error_pop3_port">Please enter a valid connection port for your POP3 server</li>
+		<li class="error-item error_pop3_username">Please enter a username for your POP3 server</li>
+		<li class="error-item error_pop3_password">Please enter a password for your POP3 server</li>
+		<li class="error-item error_gapps_username">Please enter your Gmail / Google Apps email address</li>
+		<li class="error-item error_gapps_password">Please enter your Gmail / Google Apps password</li>
+	</ul>
+</div>
+
+{% include 'AdminBundle:Kb:edit-gateway-form.html.twig' %}
+
+{% endblock %}

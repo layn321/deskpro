@@ -1,0 +1,78 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<nav>
+		<ul>
+			<li><a href="{{ path('admin_server_cron_logs') }}">{{ phrase('admin.logs.view_logs') }}</a></li>
+		</ul>
+	</nav>
+	<ul>
+		<li>{{ phrase('admin.general.scheduled_tasks') }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+		<tr>
+			<th style="text-align:left">&nbsp; Last Run Time</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>
+				{% if not last_start %}
+					Tasks have never been run.
+				{% else %}
+					&bull; The last time tasks were executed was
+					{{ relative_time(time_since_start) }} ago
+					({{ last_start|date('fulltime') }}).
+
+					<br />
+
+					{% if not last_run %}
+						&bull; Tasks have never completed successfully.
+					{% else %}
+						&bull; The last time tasks completed successfully was
+						{{ relative_time(time_since_run) }} ago
+						({{ last_run|date('fulltime') }}).
+					{% endif %}
+				{% endif %}
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<br />
+
+<div class="check-grid item-list">
+	<table width="100%">
+		<thead>
+			<tr>
+				<th style="text-align:left">&nbsp; {{ phrase('admin.logs.task') }}</th>
+				<th style="text-align:center" width="80">{{ phrase('admin.logs.interval') }}</th>
+				<th style="text-align:center" width="185">Last Run</th>
+				<th style="text-align:center" width="185">Last Complete</th>
+				<th style="text-align:center" width="185">{{ phrase('admin.logs.next_run') }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for job in jobs %}
+				<tr>
+					<td style="{% if job.getIsCrashed() %}background-color:#FFE2E2{% endif %}">{{ job.title }}</td>
+					<td style="text-align:center; {% if job.getIsCrashed() %}background-color:#FFE2E2{% endif %}">{{ job.interval_readable }}</td>
+					<td style="text-align:center; {% if job.getIsCrashed() %}background-color:#FFE2E2{% endif %}">
+						{% if job.last_start_date %}{{ job.last_start_date|date('fulltime') }}{% else %}{{ phrase('agent.general.never') }}{% endif %}
+					</td>
+					<td style="text-align:center; {% if job.getIsCrashed() %}background-color:#FFE2E2{% endif %}">
+						{% if job.last_run_date %}{{ job.last_run_date|date('fulltime') }}{% else %}{{ phrase('agent.general.never') }}{% endif %}
+					</td>
+					<td style="text-align:center; {% if job.getIsCrashed() %}background-color:#FFE2E2{% endif %}">
+						{{ job.getNextRunRelativeTime() }}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+<div class="change-picture-overlay {% if person.hasPicture() %}with-existing{% endif %} mass-actions-overlay">
+	<div class="overlay-title">
+		<span class="close close-trigger">{{ phrase('agent.general.close_lc') }}</span>
+		<h4>{{ phrase('agent.general.change_pic_for', {'name': person.display_name}) }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div class="drop-file-zone"><h1>{{ phrase('agent.general.drop_here_to_upload') }}</h1></div>
+		{% if person.hasPicture() %}
+		<div class="existing-picture">
+			<header><h3>{{ phrase('agent.general.existing_picture') }}</h3></header>
+			<section>
+				<img src="{{ person.getPictureUrl(60) }}" />
+			</section>
+		</div>
+		{% endif %}
+		<form class="new-picture">
+			<header><h3>Update Picture</h3></header>
+			<div class="upload-control">
+				<input type="file" name="file-upload" />
+				<button class="clean-white small">{{ phrase('agent.general.upload') }}</button>
+			</div>
+			<div class="files" style="margin-top: 3px">
+			</div>
+
+			<div class="save-row">
+				<button class="clean-white save-trigger small">{{ phrase('agent.general.save') }}</button>
+			</div>
+
+			<script class="template-upload" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				<p>{{ '{%=file.name%}' }} ({{ phrase('agent.general.saving') }})</p>
+				{{ '{% } %}' }}
+			</script>
+			<script class="template-download" type="text/x-tmpl">
+				{{ '{% for (var i=0, file; file=o.files[i]; i++) { %}' }}
+				{{ '{% if (file.error) { %}'}}
+				<div class="error">
+					{{ '{%=file.error%}' }}
+				</div>
+				{{ '{% } else { %}'}}
+				<div>
+					<input type="hidden" name="new_blob_id" class="new_blob_id" value="{{ '{%=file.blob_id%}' }}" />
+					<img src="{{ '{%=file.download_url%}' }}?s=150" class="pic-new" data-setted-size="{{ '{%=file.download_url%}' }}?s=50&amp;size-fit=1" />
+				</div>
+				{{ '{% } %}' }}
+				{{ '{% } %}' }}
+			</script>
+		</form>
+		<br class="clear" />
+	</div>
+</div>

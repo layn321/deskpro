@@ -1,0 +1,18 @@
+<?php return array(
+	'user.email_subjects.chat_transcript'                                  => 'Chat Abschrift',
+	'user.email_subjects.comment-approved'                                 => 'Ihr Kommentar wurde genehmigt',
+	'user.email_subjects.comment-confirmation'                             => 'Vielen Dank für Ihren Kommentar',
+	'user.email_subjects.comment-deleted'                                  => 'Ihr Kommentar wurde von unseren Agenten gelesen',
+	'user.email_subjects.email_new-confirm'                                => 'Bestätigen Sie Ihre Email Adresse',
+	'user.email_subjects.feedback_new'                                     => 'Vielen Dank für Ihr Feedback',
+	'user.email_subjects.feedback_new-approved'                            => 'Ihr Feedback wurde genehmigt',
+	'user.email_subjects.feedback_new-comment'                             => 'Es gibt einen neuen Kommentar zu "{{title}}"',
+	'user.email_subjects.feedback_new-confirm'                             => 'Vielen Dank für Ihr Feedback (Validierung erforderlich)',
+	'user.email_subjects.feedback_new-disapproved'                         => 'Ihr Feedback wurde abgelehnt',
+	'user.email_subjects.feedback_updated'                                 => 'Ihr Feedback wurde aktualisiert: {{title}}',
+	'user.email_subjects.password_agent-reset'                             => 'Ein Agent hat Ihr Kennwort zurückgesetzt',
+	'user.email_subjects.password_reset'                                   => 'Kennwort zurücksetzen',
+	'user.email_subjects.re'                                               => 'AW: {{subject}}',
+	'user.email_subjects.ticket_new-participant'                           => 'Ihrem Ticket wurde eine neue Person hinzugefügt',
+	'user.email_subjects.validate-email'                                   => 'Bestätigen Sie Ihre Email Adresse',
+);

@@ -1,0 +1,58 @@
+<div class="alert-message block-message info">
+	Magento single sign on can only be used if the <a href="{{ path('admin_plugins_plugin', {'plugin_id': 'Magento'}) }}">Magento API information</a> has been entered.
+</div>
+
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Local Server Single Sign On</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="usersource[sso_cookie]" value="0" {% if not usersource.getOption('sso_cookie') %}checked="checked"{% endif %} />
+					Disable
+				</label>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="usersource[sso_cookie]" value="1" {% if usersource.getOption('sso_cookie') %}checked="checked"{% endif %} />
+					Enable
+				</label>
+				<div class="dp-group-options" style="display: none">
+					File Path to Magento: {{ form_widget(form.magento_path, {'attr': {'placeholder': 'Example: /var/www/html/magento'}}) }}
+					<br />(Note: Magento's cookies must be available to DeskPRO. This can be configured in Magento.)
+				</div>
+			</div>
+		</div>
+		<div>Local server single sign on ensures that any users logged into Magento will be logged into DeskPRO automatically when they visit. This requires Magento to be on the same server and domain as DeskPRO.</div>
+	</div>
+</div>
+
+<div class="dp-form-row-group" data-element-handler="DeskPRO.Admin.ElementHandler.RadioExpander" data-group-class="dp-input-group" data-expand-class="dp-group-options">
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>Cross Domain Single Sign On</label>
+		</div>
+		<div class="dp-form-input">
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="usersource[sso_js]" value="0" {% if not usersource.getOption('sso_js') %}checked="checked"{% endif %} />
+					Disable
+				</label>
+			</div>
+
+			<div class="dp-input-group">
+				<label>
+					<input type="radio" class="option-trigger" name="usersource[sso_js]" value="1" {% if usersource.getOption('sso_js') %}checked="checked"{% endif %} />
+					Enable
+				</label>
+				<div class="dp-group-options" style="display: none">
+					You must have the <a href="http://www.magentocommerce.com/magento-connect/deskpro-integration-3130.html" target="_blank">DeskPRO Integration</a> extension installed in Magento.
+				</div>
+			</div>
+		</div>
+		<div>Cross domain single sign on allows logins to be shared between DeskPRO and Magento across multiple servers and even multiple domains. Any time a guest visits DeskPRO while logged into Magento, they will automatically be logged into DeskPRO.</div>
+	</div>
+</div>

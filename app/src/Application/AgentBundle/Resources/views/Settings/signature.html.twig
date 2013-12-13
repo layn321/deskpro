@@ -1,0 +1,40 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.SettingsPage.Signature';
+</script>
+<form action="{{ path('agent_settings_signature_save') }}" method="post">
+
+	<div class="dp-form">
+
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.settings.ticket_signature') }}</label></div>
+			<div class="dp-form-input" style="width: 590px;">
+				<div style="padding-bottom: 10px;" class="unreset">
+					<textarea name="ticket_signature" id="agent_settings_signature" data-rte="{% if can_signature_html %}1{% else %}0{% endif %}"></textarea>
+					<div class="drop-file-zone drop-file-zone-rte"><h1>{{ phrase('agent.settings.drop_here_insert_signature') }}</h1></div>
+				</div>
+				<em class="desc" style="display: block; float: none; width: 80%;">{{ phrase('agent.settings.ticket_signature_desc') }}</em>
+				<input type="hidden" id="agent_settings_is_html_signature" name="is_html_signature" value="0" />
+				<input type="hidden" value="{{ signature }}" id="agent_settings_signature_text" />
+				<input type="hidden" value="{{ signature_html }}" id="agent_settings_signature_html" />
+			</div>
+		</div>
+
+		<br class="clear"/>
+
+		{% if app.user.getTwitterAccountIds()|length %}
+			<div class="dp-form-row">
+				<div class="dp-form-label"><label>{{ phrase('agent.settings.twitter_signature') }}</label></div>
+				<div class="dp-form-input">
+					<input type="text" name="tweet_signature" value="{{ tweet_signature }}" />
+					<em class="desc">{{ phrase('agent.settings.twitter_signature_desc') }}</em>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	<br class="clear" />
+
+	<div class="button-container">
+		<button type="submit" class="clean-white submit-trigger">{{ phrase('agent.general.save') }}</button>
+	</div>
+</form>

@@ -1,0 +1,74 @@
+{% include 'AgentBundle:PeopleSearch:list-list-thead.html.twig' %}
+<tbody class="search-results page-set" data-page="{{page}}">
+{% for person in people %}
+	<tr
+		class="row-item person-{{person.id}}"
+		data-ticket-id="{{person.id}}"
+		data-route="person:{{ path('agent_people_view', {'person_id': person.id|default('0')}) }}" data-route-title="@selector(a.name)"
+		data-route-title="@selector(.subject-link span)"
+		data-route-openclass="open"
+	>
+		{#
+		<td class="check-all" style="vertical-align: middle;">
+			<input type="checkbox" value="{{person.id}}" class="person item-select" style="margin: 0; margin-rght: 4px; padding: 0;"/>
+		</td>
+		#}
+		{% for field in display_fields %}
+			{% if field == 'name' %}
+				<td class="subject">
+					<a class="subject-link">
+						<a class="name click-through"><span class="person-name-picture" style="background-image: url({{ person.getPictureUrl(15) }})">{{ person.getNameWithTitle() }}</span></a>
+					</a>
+				</td>
+			{% elseif field == 'email' %}
+				<td class="{{field}}">
+					{% if person.email_address %}&lt;{{ person.email_address }}&gt;{% endif %}
+				</td>
+			{% elseif field == 'org' %}
+				<td class="{{field}}">
+					{{ person.organization.name }}
+				</td>
+			{% elseif field == 'person_username' %}
+				{% if result_display.getPersonUsernames(person) %}
+					<td class="{{field}}">
+						{% for u in result_display.getPersonUsernames(person) %}
+							{{ u }}
+						{% endfor %}
+					</td>
+				{% endif %}
+			{% elseif field == 'org_pos' %}
+				<td class="{{field}}">
+					{{ person.organization_position }}
+				</td>
+			{% elseif field == 'language' %}
+				<td class="{{field}}">
+					{{ticket.language.title}}
+				</td>
+			{% elseif field == 'num_tickets' %}
+				<td class="{{field}}">
+					{{ result_display.getPersonTicketCount(person) }}
+				</td>
+			{% elseif field == 'labels' %}
+				<td class="{{field}}">
+					<span class="prop-val labels">
+						{% for label in result_display.getPersonLabels(person) %}
+							<span class="listing-tag">{{ label }}</span>
+						{% endfor %}
+					</span>
+				</td>
+			{% else %}
+				<td class="person-field">
+					{% set custom_fields = result_display.getCustomFields(person) %}
+					{% for f in custom_fields %}
+						{% if field == 'person_fields['~f.id~']' and person.hasCustomField(f.id) %}
+						<div class="prop-val person_fields_{{f.id}}">
+							{{ render_custom_field(f) }}
+						</div>
+						{% endif %}
+					{% endfor %}
+				</td>
+			{% endif %}
+		{% endfor %}
+	</tr>
+{% endfor %}
+</tbody>

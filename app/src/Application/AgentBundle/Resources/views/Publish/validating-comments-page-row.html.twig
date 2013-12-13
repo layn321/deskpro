@@ -1,0 +1,50 @@
+<article class="row-item comment {{ info.content_type }}-{{comment.id}} {{ get_type(comment.object)|lower }}">
+	{% if app.user.hasPerm('agent_publish.validate') %}
+	<input
+		class="item-select"
+		type="checkbox"
+		value="{{ info.content_type }}.{{info.content_id}}"
+		data-content-type="{{ info.content_type }}"
+		data-comment-id="{{ comment.id }}"
+	/>
+	{% endif %}
+	<div class="top-row">
+		<div class="top-row-left">
+			<div class="by-line">
+				{% if comment.person %}<a data-person-id="{{ comment.person.id }}" data-route="page:{{ object_path_agent(comment.person) }}">{% endif %}
+				{{ comment.user_name }} {% if comment.user_email %}&lt;{{ comment.user_email }}&gt;{% endif %}
+				{% if comment.person %}</a>{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="comment-text">
+		<div class="rendered">
+			{{ comment.content_html|raw }}
+		</div>
+	</div>
+	<div class="extra-fields">
+		<ul>
+			<li>
+				{{ get_type(comment.object) }}: <a class="with-route" data-route="page:{{ object_path_agent(comment.object) }}">{{ comment.object.title }}</a>
+			</li>
+		</ul>
+		<br class="clear" />
+	</div>
+	<div class="controls-row">
+		<div class="bound-faded"></div>
+		<button class="clean-white small validate-approve">{{ phrase('agent.general.approve') }}</button>
+		<button class="clean-white small validate-delete">{{ phrase('agent.general.delete') }}</button>
+		<button class="clean-white small validate-create-ticket">{{ phrase('agent.general.create_ticket') }}</button>
+		<button class="clean-white small validate-edit">{{ phrase('agent.general.ucfirst_edit') }}</button>
+	</div>
+</article>
+<div
+	class="row-item edit-comment edit-{{ info.content_type }}-{{comment.id}} {{ get_type(comment.object)|lower }}"
+	style="display: none"
+	data-content-type="{{ info.content_type }}"
+	data-comment-id="{{ comment.id }}"
+>
+	<textarea>{{ comment.content }}</textarea><br />
+	<button class="clean-white small comment-editsave-trigger">{{ phrase('agent.general.save') }}</button>
+	<button class="clean-white small comment-editcancel-trigger">{{ phrase('agent.general.cancel') }}</button>
+</div>

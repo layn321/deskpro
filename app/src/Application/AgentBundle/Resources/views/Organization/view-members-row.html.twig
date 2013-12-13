@@ -1,0 +1,45 @@
+<tr class="line-1 member-row member-{{ person.id }} {% if person.is_disabled %}disabled{% endif %} {% if person.organization_manager %}is-manager{% endif %}" data-person-id="{{ person.id }}">
+	<td width="100%">
+		<div class="fade-container">
+			<div class="line {% if person.organization_manager %}is-manager{% endif %}">
+				<a
+					class="as-popover {% if person.primary_email_address %}tipped{% endif %}"
+					data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}"
+					{% if person.primary_email_address %}title="{{ person.primary_email_address }}"{% endif %}
+					style="background: url('{{ person.getPictureUrl(16) }}') no-repeat 0 50%; padding-left: 20px;"
+				>{{ person.getNameWithTitle() }}</a>
+			</div>
+			<div class="bound-fade"></div>
+		</div>
+	</td>
+	<td class="position-edit-trigger" style="text-align: right; white-space: nowrap" nowrap="nowrap">
+		<span class="position-label single-click-activate">
+			{% if person.organization_position %}
+				{{ person.organization_position }}
+			{% else %}
+				<span style="font-size: 11px; color: #959595;">{{ phrase('agent.people.no_position_set') }}</span>
+			{% endif %}
+		</span>
+		<div class="position-edit" style="display: none">
+			<input
+				type="text"
+				class="integrated inner"
+				value="{{ person.organization_position }}"
+				data-save-url="{{ path('agent_org_save_member_pos', {'organization_id': org.id, 'person_id': person.id }) }}"
+				style="text-align: right;"
+			/>
+		</div>
+	</td>
+	<td width="11" style="text-align: center; width: 11px;">
+		<span
+			class="organization-manager-icon"
+			data-is-manager="{{ phrase('agent.organizations.org_manager_click_to_remove') }}"
+			data-not-manager="{{ phrase('agent.organizations.click_set_manager') }}"
+			data-save-url="{{ path('agent_org_save_member_manager', {'organization_id': org.id, 'person_id': person.id }) }}"
+			style="position:relative;top:-1px;"
+		></span>
+	</td>
+	<td width="5" style="width: 5px;">
+		<span class="remove remove-icon">x</span>
+	</td>
+</tr>

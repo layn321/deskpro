@@ -1,0 +1,116 @@
+{% import 'AdminBundle:Templates:macros.html.twig' as tplmacro %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagetabs %}
+<ul>
+	<li class="on"><a href="{{ path('admin_templates_email', {list_type: 'layout'}) }}">Email Layout</a></li>
+	<li><a href="{{ path('admin_templates_email', {list_type: 'user'}) }}">User Emails</a></li>
+	<li><a href="{{ path('admin_templates_email', {list_type: 'agent'}) }}">Agent Emails</a></li>
+</ul>
+{% endblock %}
+{% block html_head %}
+	<style type="text/css">
+		.template-editor-wrap {
+			width: 913px;
+		}
+
+		.lang_overlay_nav {
+			margin-top: 3px;
+		}
+
+		.lang_overlay_nav .select2-container {
+			margin-right: 6px;
+		}
+	</style>
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/Templates/DpTplSearch.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditPhrasesPage.js') }}"></script>
+
+	<script type="text/javascript" src="{{ asset('vendor/codemirror/lib/codemirror.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('vendor/codemirror/lib/codemirror.css') }}" type="text/css" />
+
+	<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/css/css.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/javascript/javascript.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/xml/xml.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/htmlembedded/htmlembedded.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('vendor/codemirror/mode/htmlmixed/htmlmixed.js') }}"></script>
+
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/Templates/DpCodeHints.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/Templates/DpEmailEditor.js') }}"></script>
+	<script type="text/javascript">
+	var DP_DEFAULT_LANG_ID = {{ app.languages.getDefaultId()|default(1) }};
+	$(document).ready(function() {
+		$('.template-editor-row').each(function() {
+			var row       = $(this);
+			var toggle    = row.find('.toggle-section');
+			var tbody     = row.find('tbody');
+			var tfoot     = row.find('tfoot');
+			var textarea  = tbody.find('textarea.template');
+			var template  = textarea.data('template-name');
+			var templateEl = textarea.get(0);
+			var hasLoaded = false;
+
+			var codeCm = null;
+			var editor = null;
+
+			var load = function() {
+				if (toggle.hasClass('expanded')) {
+					toggle.removeClass('expanded');
+					tbody.hide();
+					tfoot.hide();
+					return;
+				}
+
+				if (hasLoaded) {
+					toggle.addClass('expanded');
+					tbody.show();
+					tfoot.show();
+					return;
+				}
+
+				$.ajax({
+					url: BASE_URL + 'admin/templates/get-template-code',
+					data: {
+						name: template,
+						info: 1
+					},
+					dataType: 'json',
+					complete: function() {
+						toggle.find('i').hide();
+					},
+					success: function(data) {
+						hasLoaded = true;
+						toggle.addClass('expanded');
+						tbody.show();
+						tfoot.show();
+
+						textarea.val(data.code);
+
+						row.find('textarea.body-default-code').val(data.default_code || '');
+
+						if (data.code != data.default_code) {
+							$('.view-default, .reset-default', row).show();
+						}
+
+						editor = new DpEmailEditor(template, row);
+					}
+				});
+			}
+
+			load();
+		});
+	});
+	</script>
+{% endblock %}
+{% block dp_full_page %}
+
+<div class="dp_admin_page with-pagetabs">
+	<div class="dp-page-box">
+		<div class="page-content">
+			{{ tplmacro.email_template_row('Email Header', 'DeskPRO:emails_common:email-header.html.twig') }}
+			{{ tplmacro.email_template_row('Email Footer', 'DeskPRO:emails_common:email-footer.html.twig') }}
+			{{ tplmacro.email_template_row('Custom CSS', 'DeskPRO:emails_common:email-custom-css.css.twig') }}
+			{{ tplmacro.email_template_row('Main CSS', 'DeskPRO:emails_common:email-css.css.twig') }}
+		</div>
+	</div>
+</div>
+
+{% endblock %}

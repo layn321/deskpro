@@ -1,0 +1,89 @@
+<section class="search-reuslts page-set" data-page="{{page}}">
+	{% for person in people %}
+
+		{% set person_email = result_display.getEmail(person) %}
+
+		<article class="row-item person person-{{person.id}}" data-route="person:{{ path('agent_people_view', {'person_id': person.id|default('0')}) }}" data-route-title="@selector(a.name)" data-route-openclass="open">
+			<span class="top-row-spacer"></span>
+			<div class="top-row">
+				<div class="top-row-left">
+					<h3>
+						<a class="name click-through"><span class="person-name-picture" style="background-image: url({{ person.getPictureUrl(15) }})">{{ person.getNameWithTitle() }}</span></a>
+						{% if person_email.email %}<span class="person-email">&lt;{{ person_email.email }}&gt;</span>{% endif %}
+						{% if person.organization %}<span class="person-org" data-route="org:{{ path('agent_org_view', {organization_id: person.organization.id})}}">{% if person.organization_position %}{{ person.organization_position }}, {% endif %}{{ person.organization.name }}{% endif %}</span>
+					</h3>
+				</div>
+			</div>
+			{% if display_fields|length %}
+				{% set extra_info_row %}
+				{% set has_set = false %}
+				<div class="extra-fields">
+					<ul>
+						{% for field in display_fields %}
+							{% if field == 'organization' and person.organization %}
+								{% set has_set = true %}
+								<li>
+									<span class="prop-val org">{{ person.organization.name }}</span>
+									{% if person.organization_position %}
+										({{ person.organization_position }})
+									{% endif %}
+								</li>
+							{% elseif field == 'person_username' %}
+								{% if result_display.getPersonUsernames(person) %}
+									<li>
+										<span class="prop-val org">{{ phrase('agent.general.username') }}: </span>
+										{% for u in result_display.getPersonUsernames(person) %}
+											{{ u }}
+										{% endfor %}
+									</li>
+								{% endif %}
+							{% elseif field == 'language' %}
+								{% set has_set = true %}
+								<li><span class="prop-val email_address">{{person.language.title}}</span></li>
+							{% elseif field == 'labels' and result_display.hasPersonLabels(person) %}
+								<li>
+									<span class="prop-title">{{ phrase('agent.general.labels') }}:</span>
+									<span class="prop-val labels">
+										{% for label in result_display.getPersonLabels(person) %}
+											<span class="listing-tag">{{ label }}</span>
+										{% endfor %}
+									</span>
+								</li>
+							{% elseif field == 'num_tickets' %}
+								{% set has_set = true %}
+								<li><span class="prop-val num_tickets">{{ phrase('agent.general.tickets') }}: {{ result_display.getPersonTicketCount(person) }}</span></li>
+							{% else %}
+								{% set custom_fields = result_display.getCustomFields(person) %}
+								{% for f in custom_fields %}
+									{% if field == 'person_fields['~f.id~']' and person.hasCustomField(f.id) %}
+									{% set has_set = true %}
+									<li>
+										<span class="prop-title">{{ f.title }}:</span>
+										<span class="prop-val">{{ render_custom_field(f) }}</span>
+									</li>
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						{% endfor %}
+					</ul>
+					<br class="clear" />
+				</div>
+				{% endset %}
+				{% if has_set %}{{ extra_info_row }}{% endif %}
+				{% if not person.is_confirmed or not person.is_agent_confirmed %}
+					<div class="validation-row">
+						{% if not person.is_confirmed and not person.is_agent_confirmed %}
+							{{ phrase('agent.people.user_awaiting_email_and_agent_validation') }}
+						{% elseif not person.is_confirmed %}
+							{{ phrase('agent.people.user_awaiting_email_validation') }}
+						{% elseif not person.is_agent_confirmed %}
+							{{ phrase('agent.people.user_awaiting_agent_validation') }}
+						{% endif %}
+						<button class="agent-confirm-approve" data-person-id="{{ person.id }}">{{ phrase('agent.general.approve') }}</button>
+						{%  if app.user.hasPerm('agent_people.delete') %}<button class="agent-confirm-delete" data-person-id="{{ person.id }}">{{ phrase('agent.general.delete') }}</button>{% endif %}
+					</div>
+				{% endif %}
+			{% endif %}
+		</article>
+	{% endfor %}
+</section>

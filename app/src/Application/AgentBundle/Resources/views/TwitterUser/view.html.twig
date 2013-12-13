@@ -1,0 +1,228 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.Page.TwitterUser';
+
+pageMeta.title = {{ user.name|json_encode|raw }};
+pageMeta.userId = '{{ user.id|escape }}';
+pageMeta.accountId = {{ account ? account.id|json_encode|raw : 'null' }};
+pageMeta.accountScreenName = {{ account ? account.user.screen_name|json_encode|raw : 'null' }};
+pageMeta.url_fragment  = '{{ url_fragment('agent_twitter_user', {'user_id': user.id}) }}';
+
+{% include 'AgentBundle:Twitter:list-urls.js.twig' %}
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+
+{# Page Containers #}
+<div class="profile layout-content with-scrollbar">
+<div class="scrollbar disable"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+<div class="scroll-viewport"><div class="scroll-content">
+{# /Page Containers #}
+
+<header class="page-header twitter-user-page">
+	<table cellspacing="0" cellpadding="0" width="100%"><tr><td width="60">
+		<div class="person-picture-box" >
+			<a href="{{ user.getProfileImageUrl('') }}" target="_blank"><img src="{{ user.getProfileImageUrl('reasonably_small') }}" width="60" height="60" /></a>
+		</div>
+	</td><td>
+		<div class="titlewrap">
+			<h1 style="float: none; margin-left: 0">
+				<span>{{ user.name }}</span>
+				<span class="screen-name">@{{ user.screen_name }}</span>
+			</h1>
+			<div class="description">{{ user.description }}</div>
+			{% if user.location or user.url %}
+				<ul class="extra">
+					{% if user.location %}<li>{{ user.location }}</li>{% endif %}
+					{% if user.url %}<li><a href="{{ user.url }}" target="_blank">{{ user.url }}</a></li>{% endif %}
+				</ul>
+			{% endif %}
+		</div>
+	</td></tr></table>
+
+	<div style="margin-top: 10px;" style="clear: both">
+		{{ phrase('agent.twitter.associated_people') }}:
+		{% for person in user.getVerifiedPeople() %}
+			<a class="as-popover tipped person-name-picture person-verified" data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}" style="background-image: url('{{ person.getPictureUrl(16) }}');" title="Verified">{{ person.display_name }}<em></em></a>
+		{% endfor %}
+		{% for person in user.getPossiblePeople() %}
+			{% include 'AgentBundle:TwitterUser:part-possible-person.html.twig' %}
+			<!--<a class="as-popover tipped person-name-picture person-unverified" data-route="person:{{ path('agent_people_view', {'person_id': person.id}) }}" style="background-image: url('{{ person.getPictureUrl(16) }}');" title="Unverified">{{ person.display_name }}</a>-->
+		{% endfor %}
+
+		<div id="{{baseId}}_choose_user" style="display:inline;" class="choose-user" >
+			<div
+				id="{{baseId}}_user_searchbox"
+				data-element-handler="DeskPRO.Agent.ElementHandler.PersonSearchBox"
+				data-search-url="{{ path('agent_peoplesearch_performquick', {'format': 'json', 'limit': 10, 'start_with': 'a'}) }}"
+				data-highlight-term="1"
+				data-touch-focus="1"
+				data-search-param="term"
+				data-position-bound="#{{baseId}}_userselect"
+				style="display: inline"
+			>
+				<input type="text" id="{{baseId}}_userselect" class="select-user term add-person-org-input" placeholder="Add Person..." style="width: 150px" />
+				<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+					<li>
+						<a>
+							<span class="user-name"></span>
+							<address>&lt;<span class="user-email"></span>&gt;</address>
+							<div class="bound-fade"></div>
+						</a>
+					</li>
+				</script>
+				<div class="person-search-box" style="display: none">
+					<section>
+						<ul class="results-list">
+
+						</ul>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div style="margin-top: 10px;" style="clear: both">
+		{{ phrase('agent.twitter.associated_orgs') }}:
+		{% for org in user.getPossibleOrganizations() %}
+			{% include 'AgentBundle:TwitterUser:part-possible-organization.html.twig' %}
+		{% endfor %}
+		 <div class="choose-org" style="display: inline" id="{{baseId}}_org_edit_wrap">
+			<div
+				class="org-input"
+				id="{{baseId}}_org_searchbox"
+				data-element-handler="DeskPRO.Agent.ElementHandler.OrgSearchBox"
+				data-search-url="{{ path('agent_orgsearch_quicknamesearch', {'format': 'json', 'limit': 10, 'start_with': 'a'}) }}"
+				data-highlight-term="1"
+				data-touch-focus="1"
+				data-search-param="term"
+				data-position-bound="@parent(.org-input)"
+				style="display: inline"
+			>
+				<input type="text" class="org-name add-person-org-input" id="{{baseId}}_orgselect" placeholder="Add Organization..." style="width: 150px" />
+				<script type="text/x-deskpro-tmpl" class="user-row-tpl">
+					<li>
+							<a>
+							<span class="org-name"></span>
+							<div class="bound-fade"></div>
+					</a></li>
+				</script>
+				<div class="person-search-box org" style="display: none">
+					<section>
+						<ul class="results-list">
+
+						</ul>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="meta-line" style="clear: both">
+		<nav class="actions" id="{{baseId}}_action_buttons">
+			<ul>
+				{% if account and accounts|length > 1 %}
+					<li id="{{ baseId }}_switch_account_trigger"><a class="clean-white large">
+						<img src="{{ account.user.profile_image_url }}" width="14" height="14" alt="" style="vertical-align: middle" />
+						@{{ account.user.screen_name }}
+					</a></li>
+				{% endif %}
+				{% if account %}
+					{% if user.id != account.user.id %}
+						{% if user.id in account.friend_ids %}
+							<li class="unfollow-button"><a class="clean-white large">{{ phrase('agent.general.unfollow') }}</a></li>
+						{% else %}
+							<li class="follow-button"><a class="clean-white large">{{ phrase('agent.general.follow') }}</a></li>
+						{% endif %}
+					{% endif %}
+					<li class="send-message-button"><a class="clean-white large">{{ phrase('agent.general.message') }}</a></li>
+				{% endif %}
+				<li><a href="https://twitter.com/{{ user.screen_name }}" target="_blank" class="clean-white large">{{ phrase('agent.twitter.view_twitter_profile') }}</a></li>
+			</ul>
+		</nav>
+	</div>
+	<br class="clear" />
+</header>
+
+<ul style="display:none" id="{{baseId}}_switch_account_menu">
+	{% for possible_account in accounts %}
+		<li data-load-route="{{ path('agent_twitter_user', {'user_id': user.id, 'account_id': possible_account.id}) }}">
+			<img src="{{ possible_account.user.profile_image_url }}" width="14" height="14" alt="" style="vertical-align: middle" />
+			@{{ possible_account.user.screen_name }}
+		</li>
+	{% endfor %}
+</ul>
+
+<div class="profile-box-container twitter-user-page">
+	<header id="{{baseId}}_twitter_header">
+		<nav data-element-handler="DeskPRO.ElementHandler.SimpleTabs">
+			<ul>
+				<li data-tab-for="#{{baseId}}_statuses_tab" class="on">{{ phrase('agent.twitter.tweets') }} ({{ user.statuses_count }})</li>
+				<li data-tab-for="#{{baseId}}_messages_tab">{{ phrase('agent.general.messages') }}</li>
+				<li data-tab-for="#{{baseId}}_mentions_tab">{{ phrase('agent.general.mentions') }}</li>
+				<li data-tab-for="#{{baseId}}_following_tab">{{ phrase('agent.twitter.following') }} ({{ user.friends_count }})</li>
+				<li data-tab-for="#{{baseId}}_followers_tab">{{ phrase('agent.twitter.followers') }} ({{ user.followers_count }})</li>
+			</ul>
+		</nav>
+	</header>
+	<section>
+		<article id="{{baseId}}_statuses_tab" class="on">
+			{% for status in statuses %}
+				{% include 'AgentBundle:TwitterUser:part-status.html.twig' %}
+			{% else %}
+				<div style="padding: 10px">{{ phrase('agent.twitter.no_statuses') }}</div>
+			{% endfor %}
+			{% if user.statuses_count > 25 %}
+				<div class="more-box"><button class="clean-white more-button" data-load-url="{{ path('agent_twitter_user_statuses', {'user_id': user.id, 'page': 2}) }}">{{ phrase('agent.general.view_more') }} <span class="flat-spinner" style="display: none"></span></button></div>
+			{% endif %}
+		</article>
+
+		<article id="{{baseId}}_messages_tab">
+			{% for status in messages %}
+				{% include 'AgentBundle:TwitterUser:part-status.html.twig' with {'hide_replies': true} %}
+			{% else %}
+				<div style="padding: 10px">{{ phrase('agent.twitter.no_messages') }}</div>
+			{% endfor %}
+		</article>
+
+		<article id="{{baseId}}_mentions_tab">
+			{% for status in mentions %}
+				{% include 'AgentBundle:TwitterUser:part-status.html.twig' with {'hide_replies': true} %}
+			{% else %}
+				<div style="padding: 10px">{{ phrase('agent.twitter.no_mentions') }}</div>
+			{% endfor %}
+		</article>
+
+		{% if user.friends_count %}
+			<article id="{{baseId}}_following_tab" data-load-url="{{ path('agent_twitter_user_following', {'user_id': user.id}) }}">
+				<div style="padding: 10px; text-align: center"><span class="flat-spinner"></span></div>
+			</article>
+		{% else %}
+			<article id="{{baseId}}_following_tab">
+				<div style="padding: 10px">{{ phrase('agent.twitter.no_followed') }}</div>
+			</article>
+		{% endif %}
+
+		{% if user.followers_count %}
+			<article id="{{baseId}}_followers_tab" data-load-url="{{ path('agent_twitter_user_followers', {'user_id': user.id}) }}">
+				<div style="padding: 10px; text-align: center"><span class="flat-spinner"></span></div>
+			</article>
+		{% else %}
+			<article id="{{baseId}}_followers_tab">
+				<div style="padding: 10px">{{ phrase('agent.twitter.no_followers') }}</div>
+			</article>
+		{% endif %}
+	</section>
+</div>
+
+<style type="text/css">
+	.table-content td { padding: 10px; }
+	.table-content .title-col { font-weight: bold; }
+	.tabbed article { padding: 10px; }
+</style>
+
+{# Page Containers #}
+</div>
+</div>
+</div>
+{# /Page Containers #}

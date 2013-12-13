@@ -1,0 +1,50 @@
+{##
+ # The main search results listing
+ ##}
+
+{% extends 'UserBundle::layout.html.twig' %}
+{% block breadcrumb %}
+	{% if query %}
+		<li><span class="dp-divider">{{ language_arrow('right') }}</span> Search for: <a href="{{ path('user_search', {'q': query }) }}">{{ query }}</a></li>
+	{% endif %}
+{% endblock %}
+{% block content %}
+
+<section class="dp-portal-section">
+	<header>
+		<h1>{{ phrase('user.portal.search_result-count', {count: num_results}) }}</h1>
+	</header>
+	<div class="dp-content-block dp-search-block">
+		<div class="dp-content-wrapper">
+			{% if not results and not sticky_results %}
+				<p>{{ phrase('user.portal.no_results_help') }}</p>
+			{% else %}
+				<ul class="dp-content-list">
+					{% if sticky_results %}
+						{% for res in sticky_results %}
+							{% include 'UserBundle:Search:search-result-item.html.twig' with {'is_sticky': true}%}
+						{% endfor %}
+					{% endif %}
+					{% for res in results %}
+						{% include 'UserBundle:Search:search-result-item.html.twig' %}
+					{% endfor %}
+				</ul>
+			{% endif %}
+		</div>
+	</div>
+</section>
+
+{% if pageinfo.last != 1 %}
+	{% set page_url = path('user_search', {'q': query}) ~ '&p=' %}
+	<div class="dp-pagination">
+		<ul>
+			{% if pageinfo.prev %}<li><a href="{{ page_url|raw ~ pageinfo.prev }}">{{ language_arrow('left') }} {{ phrase('user.general.page_prev') }}</a></li>{% endif %}
+			{% for p in pageinfo.pages %}
+				<li class="{% if pageinfo.cursor == p %}dp-active{% endif %}"><a href="{{ page_url|raw ~ p }}">{{ p }}</a>
+			{% endfor %}
+			{% if pageinfo.next %}<li><a href="{{ page_url|raw ~ pageinfo.next }}">{{ phrase('user.general.next') }} {{ language_arrow('right') }}</a></li>{% endif %}
+		</ul>
+	</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{{ set_tplvar('agent_notification_footer', 'notify') }}
+<dp:subject>
+	{{ phrase('agent.publish.new_comment_on', {name: comment.getObject().title}) }}
+	{% if comment.status == 'validating' %}({{ phrase('agent.general.requires_validation') }}){% endif %}
+</dp:subject>
+{{ phrase('agent.publish.new_comment_submitted_by', {name: comment.getUserDisplayContact() }) }}
+
+<br />
+<br />
+
+{{ comment.getContentHtml() }}
+
+<br />
+<br />
+
+<table class="dp-props-table" border="0" cellspacing="0" cellpadding="0">
+	{% if comment.status == 'validating' %}
+		<td colspan="2">
+			{{ phrase('agent.publish.comment_requires_validation') }}<br />
+			{% if get_type(comment.getObject()) == 'Article' %}
+				<a href="{{ url_full('agent') }}#app.publish,validating_comments,a.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#app.publish,validating_comments,a.o={{ comment.getObject().getId() }}</a>
+			{% elseif get_type(comment.getObject()) == 'Download' %}
+				<a href="{{ url_full('agent') }}#app.publish,validating_comments,d.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#app.publish,validating_comments,d.o={{ comment.getObject().getId() }}</a>
+			{% elseif get_type(comment.getObject()) == 'News' %}
+				<a href="{{ url_full('agent') }}#app.publish,validating_comments,n.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#app.publish,validating_comments,n.o={{ comment.getObject().getId() }}</a>
+			{% elseif get_type(comment.getObject()) == 'Feedback' %}
+				<a href="{{ url_full('agent') }}#app.publish,fb_comments,i.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#app.publish,fb_comments,i.o={{ comment.getObject().getId() }}</a>
+			{% else %}
+				<a href="{{ url_full('agent') }}#app.publish,validating_comments">{{ url_full('agent') }}#app.publish,validating_comments</a>
+			{% endif %}
+		</td>
+	{% endif %}
+	<tr>
+		<td class="dp-td-heading">Title:</td>
+		<td>{{ comment.getObject().title }}</td>
+	</tr>
+	<tr>
+		<td class="dp-td-heading">{{ phrase('agent.general.category') }}:</td>
+		<td>
+			{% if get_type(comment.getObject()) == 'Article' %}
+				{{ comment.getObject().getCategoryNames() }}
+			{% else %}
+				{{ comment.getObject().category.getFullTitle() }}
+			{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			{% if get_type(comment.getObject()) == 'Article' %}
+				{{ phrase('agent.emails.view_online_at') }} <a href="{{ url_full('agent') }}#a.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#a.o={{ comment.getObject().getId() }}</a>
+			{% elseif get_type(comment.getObject()) == 'Download' %}
+				{{ phrase('agent.emails.view_online_at') }} <a href="{{ url_full('agent') }}#d.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#d.o={{ comment.getObject().getId() }}</a>
+			{% elseif get_type(comment.getObject()) == 'News' %}
+				{{ phrase('agent.emails.view_online_at') }} <a href="{{ url_full('agent') }}#n.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#n.o={{ comment.getObject().getId() }}</a>
+			{% elseif get_type(comment.getObject()) == 'Feedback' %}
+				{{ phrase('agent.emails.view_online_at') }} <a href="{{ url_full('agent') }}#i.o={{ comment.getObject().getId() }}">{{ url_full('agent') }}#i.o={{ comment.getObject().getId() }}</a>
+			{% endif %}
+		</td>
+	</tr>
+</table>

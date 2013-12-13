@@ -1,0 +1,9 @@
+<dp:subject>{{ phrase('user.email_subjects.ticket_new-participant') }}</dp:subject>
+{% if is_first %}
+	{{ phrase('user.emails.ticket_cc-new', {'name':ticket.person.display_name_user}) }}
+	<br /><br />
+{% endif %}
+
+{% for message in messages %}
+	{{ message.message_html|raw }}
+{% endfor %}

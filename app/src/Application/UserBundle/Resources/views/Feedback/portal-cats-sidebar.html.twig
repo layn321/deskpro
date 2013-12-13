@@ -1,0 +1,34 @@
+{##
+ # The portal sidebar block that draws the feedback category list.
+ ##}
+
+<section class="dp-sidebar-block">
+	<header>
+		<h3>
+			<a href="{{ path('user_feedback_home') }}">{% if title %}{{ title }}{% else %}{{ phrase('user.feedback.feedback') }}{% endif %}</a>
+		</h3>
+	</header>
+	<article class="dp-written">
+		<p class="dp-summary">
+			{% if not counts[0]['new'] and not counts[0]['active'] and not counts[0]['closed'] %}
+				{{ phrase('user.feedback.sidebar_description-none', { link: path('user_feedback_new') }) }}
+			{% else %}
+				{% set phrase1 %}{{ phrase('user.feedback.title-status', {count: (counts[0]['new'] + counts[0]['active'])|default(0)} )}}{% endset %}
+				{% set phrase2 %}{{ phrase('user.feedback.title-feedback-closed', {count: counts[0]['closed']|default(0)} )}}{% endset %}
+				{{ phrase('user.feedback.sidebar_description', { phrase1: phrase1, phrase2: phrase2 }) }}
+			{% endif  %}
+		</p>
+		<ul class="dp-cat-list">
+			{% for cat in categories %}
+				<li>
+					<div class="dp-fadeaway-container">
+						<i class="dp-icon-folder-close"></i>
+						<a class="dp-fadetitle" href="{{ path('user_feedback', {slug: cat.url_slug}) }}">{{ phrase_object(cat) }}</a>
+						<div class="dp-fadeaway"></div>
+						<a href="{{ path('user_feedback', {slug: cat.url_slug}) }}" class="dp-badge dp-small">{{ (counts[cat.id]['new'] + counts[cat.id]['active'])|default(0) }}</a>
+					</div>
+				</li>
+			{% endfor %}
+		</ul>
+	</article>
+</section>

@@ -1,0 +1,21 @@
+{##
+ # The light-weight view page used when viewing feedback from the website widget
+ ##}
+
+{% set content_link = feedback.getLink() %}
+{% extends 'UserBundle:Widget:layout-content-overlay.html.twig' %}
+{% block content %}
+<section class="dp-content-post dp-content-page">
+	<header>
+		<table class="dp-layout" width="100%"><tr>
+			<td style="padding-{% if is_rtl() %}left{% else %}right{% endif %}: 16px;">{% include 'UserBundle:Feedback:voting-widget.html.twig' %}</td>
+			<td class="dp-row-contain" width="100%">
+				<h3 class="title"><a href="{{ feedback.getLink() }}" class="full-page">{{ feedback.title }}</a></h3>
+			</td>
+		</tr></table>
+	</header>
+	<article>
+		<div class="dp-post">{{ feedback.content_html|raw }}</div>
+	</article>
+</section>
+{% endblock %}

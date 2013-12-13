@@ -1,0 +1,13 @@
+<li class="feedback"
+	data-type="feedback"
+	data-route="page:{{ path('agent_feedback_view', {'feedback_id': feedback.id}) }}"
+	data-route-notabreload="1"
+>
+	<div class="dismiss"><i class="icon-ban-circle"></i></div>
+	<time></time>
+	<big>{{ feedback.title }}</big>
+	<small>
+		{{ phrase('agent.publish.new_feedback_by', {name: feedback.person.getDisplayContact()}) }}
+		{% if feedback.getStatusCode() == 'hidden.user_validating' %}({{ phrase('agent.publish.requires_validation') }}){% endif %}
+	</small>
+</li>

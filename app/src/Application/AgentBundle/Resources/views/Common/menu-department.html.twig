@@ -1,0 +1,17 @@
+<ul class="menu department_id {{add_classname}}" data-option-name="department_id" style="display:none">
+	{% for dep in departments %}
+		{% if last_with_child %}
+			<li class="sep">-</li>
+		{% endif %}
+		{% if dep.children %}
+			<li data-option-value="{{dep.id}}" class="section-title">{{dep.title}}</li>
+			{% for subdep in dep.children %}
+				<li data-option-value="{{subdep.id}}">{{subdep.title}}</li>
+			{% endfor %}
+			{% set last_with_child = true %}
+		{% else %}
+			<li data-option-value="{{dep.id}}">{{dep.title}}</li>
+			{% set last_with_child = false %}
+		{% endif %}
+	{% endfor %}
+</ul>

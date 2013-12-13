@@ -1,0 +1,26 @@
+#!/bin/bash
+
+sudo touch /var/log/log.io-harvester
+sudo chmod 0777 /var/log/log.io-harvester
+
+sudo touch /var/log/log.io-server
+sudo chmod 0777 /var/log/log.io-server
+
+pkill -f log.io-server
+pkill -f log.io-harvester
+
+echo "Starting server"
+/usr/lib/node_modules/log.io/bin/log.io-server > /var/log/log.io-server 2&>1 &
+echo "."
+sleep 1
+echo "--> Done"
+
+echo "Starting harvester"
+/usr/lib/node_modules/log.io/bin/log.io-harvester > /var/log/log.io-harvester 2&>1 &
+echo "."
+sleep 1
+echo "--> Done"
+
+echo ""
+echo "View at http://localhost:28778"
+echo ""

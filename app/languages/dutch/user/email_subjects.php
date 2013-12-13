@@ -1,0 +1,18 @@
+<?php return array(
+	'user.email_subjects.chat_transcript'                                  => 'Kopie van chatgeschiedenis',
+	'user.email_subjects.comment-approved'                                 => 'Uw opmerking is goedgekeurd',
+	'user.email_subjects.comment-confirmation'                             => 'Bedankt voor uw opmerking',
+	'user.email_subjects.comment-deleted'                                  => 'Uw opmerking is gelezen door een medewerken',
+	'user.email_subjects.email_new-confirm'                                => 'Valideer uw e-mailadres',
+	'user.email_subjects.feedback_new'                                     => 'Bedankt voor het sturen van uw feedback',
+	'user.email_subjects.feedback_new-approved'                            => 'Uw feedback is goedgekeurd',
+	'user.email_subjects.feedback_new-comment'                             => 'Er is een nieuwe opmerking op "{{title}}"',
+	'user.email_subjects.feedback_new-confirm'                             => 'Bedankt voor het sturen van uw feedback(Validatie vereist)',
+	'user.email_subjects.feedback_new-disapproved'                         => 'Uw feedback is afgewezen',
+	'user.email_subjects.feedback_updated'                                 => 'Uw feedback is bijgewerkt: {{title}}',
+	'user.email_subjects.password_agent-reset'                             => 'Een medewerker heeft uw wachtwoord gereset',
+	'user.email_subjects.password_reset'                                   => 'Reset uw wachtwoord',
+	'user.email_subjects.re'                                               => 'RE: {{subject}}',
+	'user.email_subjects.ticket_new-participant'                           => 'Er is een nieuw persoon toegevoegd aan uw ticket',
+	'user.email_subjects.validate-email'                                   => 'Valideer uw e-mailadres',
+);

@@ -1,0 +1,53 @@
+{% set is_quick_setup = true %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.QuickSetup' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript">
+var MA_SERVER = '{{ ma_server }}';
+var INSTALL_TOKEN = '{{ install_token }}';
+</script>
+<script type="text/javascript" src="{{ asset('vendor/detect_timezone.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/QuickSetup.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailTransportPage.js') }}"></script>
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/EditEmailGatewayPage.js') }}"></script>
+{% endblock %}
+{% block dp_full_page %}
+	<div class="dp_admin_pagebar">
+		<ul>
+			<li>Correct Server Problem</li>
+		</ul>
+	</div>
+	<div class="dp_admin_page" id="section_install_software">
+		<div class="dp_admin_page_inner">
+			<div class="dp-page-box">
+				<div class="page-content">
+					{% if errors.data_write %}
+						Before you can continue you must ensure the data/ directory and all of it's sub-directories are
+						writable by the web server.
+						<br /><br />
+
+						<div style="padding: 6px; background-color: #eee;">
+							The full path to the data directory is:<br />
+							<code>{{ data_dir }}</code>
+						</div>
+
+						<br /><br />
+						<div style="text-align: center;">
+							<a class="clean-white" href="{{ path('admin_welcome') }}">Click here when are you ready to continue</a>
+						</div>
+					{% else %}
+						We detected the following server errors you need to correct before you can continue:
+						<ul>
+							{% for err in errors %}
+								{% if err.level == 'fatal' %}
+									<li>{{ err.message }}</li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

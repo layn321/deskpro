@@ -1,0 +1,88 @@
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.SettingsPage.MacroEdit';
+
+{% if macro %}
+pageMeta.actions = {{macro.actions|json_encode|raw}};
+{% endif %}
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<header>
+	<span class="close close-trigger">{{ phrase('agent.general.close_lc') }}</span>
+	<h1>{% if macro.id %}{{ phrase('agent.settings.edit_macro') }}{% else %}{{ phrase('agent.settings.new_macro') }}{% endif %}</h1>
+</header>
+<article class="padded" data-width="800" data-height="400">
+	<form id="{{baseId}}_form" action="{{ path('agent_settings_ticketmacros_edit_save', { 'macro_id': macro.id|default(0) }) }}" method="post" accept-charset="utf-8">
+
+	<div class="dp-form">
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.general.title') }}</label></div>
+			<div class="dp-form-input">
+				<input type="text" name="macro[title]" class="input-title" value="{{macro.title}}" />
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.settings.macro_who_can_use') }}?</label></div>
+			<div class="dp-form-input">
+				<select name="macro[is_global]">
+					<option value="0" {% if not macro.is_global %}selected="selected"{% endif %}>{{ phrase('agent.general.just_me') }}</option>
+					<option value="1" {% if macro.is_global %}selected="selected"{% endif %}>{{ phrase('agent.general.everyone') }}</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="dp-form-row">
+			<div class="dp-form-label"><label>{{ phrase('agent.general.actions') }}</label></div>
+			<div class="dp-form-input">
+				<div class="search-form" id="{{baseId}}_actions_list">
+					<div class="search-terms"></div>
+					<div class="term"><span class="add-term">+</span> {{ phrase('agent.general.add_action_term') }}</div>
+				</div>
+				{% include 'DeskPRO:Common:ticket-trigger-actions.html.twig' with { 'classname': 'search-builder-tpl', 'id': baseId ~ '_actions_tpl', 'term_options': ticket_options, 'event_group': 'macro' } %}
+			</div>
+		</div>
+	</div>
+
+	</form>
+</article>
+<footer>
+	<button class="clean-white" id="{{baseId}}_save_btn">{{ phrase('agent.general.save') }}</button>
+</footer>
+{% block nullblock %}
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() {
+	// Set up search builder
+	var editor = new DeskPRO.Form.RuleBuilder($('.actions-tpl'));
+	editor.addEvent('newRow', function(new_row) {
+		$('.remove', new_row).click(function() {
+			new_row.remove();
+		});
+	});
+
+	var to_el = $('.search-form .action-terms');
+
+	$('.search-form .add-term').data('add-count', 0).click(function() {
+		var count = parseInt($(this).data('add-count'));
+		var basename = 'actions['+count+']';
+
+		$(this).data('add-count', count+1);
+
+		editor.addNewRow(to_el, basename);
+	});
+
+	var count = 0;
+	var actions = {{macro.actions|json_encode|raw}};
+	if (actions) {
+		Array.each(actions, function(info, x) {
+			var basename = 'actions[initial_' + x + ']';
+			editor.addNewRow($('.search-form .action-terms'), basename, {
+				type: info.type,
+				options: info.options
+			});
+		});
+	}
+});
+</script>
+{% endblock %}

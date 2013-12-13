@@ -1,0 +1,58 @@
+{% macro render_options(k, cat, selected, depth, parent_title, title_prop, child_prop, allow_parent_sel) %}
+	{% set id = cat.id|default(k) %}
+	{% if title_prop %}
+		{% set title = phrase_object(cat, 'title') %}
+		{% if not title %}
+			{% set title = cat[title_prop] %}
+		{% endif %}
+	{% else %}
+		{% if cat.title is defined %}
+			{% set title = cat.title %}
+		{% endif %}
+		{% if not title and cat.name is defined %}
+			{% set title = cat.name %}
+		{% endif %}
+		{% if not title and get_type(cat) == 'string' %}
+			{% set title = cat %}
+		{% endif %}
+		{% if not title %}
+			{% set title = '(Untitled)' %}
+		{% endif %}
+	{% endif %}
+	{% if parent_title %}
+		{% set full_title = parent_title ~ ' > ' ~ title %}
+	{% else %}
+		{% set full_title = title %}
+	{% endif %}
+	{% if not child_prop %}{% set child_prop = 'children' %}{% endif %}
+	{% if allow_parent_sel %}
+		<option data-full-title="{{ full_title }}" value="{{ id }}" {% if id == selected %}selected="selected"{% endif %}>{% if depth > 0 %}{{ '--'|repeat(depth) }} {% endif %}{{ title }}</option>
+		{% for subk,subcat in cat[child_prop] %}
+			{{ _self.render_options(subk, subcat, selected, depth+1, full_title, title_prop, child_prop) }}
+		{% endfor %}
+	{% else %}
+		{% if depth == 0 and cat[child_prop] %}
+			<optgroup label="{{ title }}">
+				{% for subk,subcat in cat[child_prop] %}
+					{{ _self.render_options(subk, subcat, selected, depth+1, full_title, title_prop, child_prop) }}
+				{% endfor %}
+			</optgroup>
+		{% else %}
+			<option data-full-title="{{ full_title }}" value="{{ id }}" {% if id == selected %}selected="selected"{% endif %}>{% if depth > min_depth_indent %}{{ '--'|repeat(depth) }} {% endif %}{{ title }}</option>
+
+			{% if child_prop != 'NONE' %}
+				{% if cat[child_prop] %}
+					{% for subk,subcat in cat[child_prop] %}
+						{{ _self.render_options(subk, subcat, selected, depth+1, full_title, title_prop, child_prop) }}
+					{% endfor %}
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+{% endmacro %}
+<select {% if name %}name="{{ name }}"{% endif %} {% if id %}id="{{ id }}"{% endif %} class="{{add_classname}}" {{ add_attr|raw }}>
+	{% if with_blank %}<option value="{{ with_blank_value|default('0') }}">{{ blank_title|default('') }}</option>{% endif %}
+	{% for k,cat in categories %}
+		{{ _self.render_options(k, cat, selected, 0, '', title_prop, child_prop, allow_parent_sel) }}
+	{% endfor %}
+</select>

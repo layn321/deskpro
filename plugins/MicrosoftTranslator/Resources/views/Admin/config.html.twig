@@ -1,0 +1,30 @@
+{% extends 'AdminBundle:Plugins:config.html.twig' %}
+{% block inner_form %}
+
+<div class="setting_field_row">
+	<h4>API Configuration</h4>
+
+	<br/><br/>
+	Refer to Microsoft's online guide to learn how to obtain a Client ID and Client Secret:<br/>
+	<div style="font-size:120%;">
+		&nbsp; &rarr; <a href="http://blogs.msdn.com/b/translation/p/gettingstarted1.aspx">Walkthrough: Signing up for Microsoft Translator and getting your credentials</a>
+	</div>
+	<br/><br/>
+
+	<div class="setting_fields">
+		<div class="field_row">
+			<label>Client ID</label>
+			<input type="text" name="settings[client_id]" value="{{ app.getSetting(plugin.id ~ '.client_id') }}" style="width: 50%; padding: 5px" />
+			<p>Enter your Client ID. This is a human-readable name that you signed up under.</p>
+		</div>
+
+		<div class="field_row">
+			<label>Client Secret</label>
+			<input type="password" name="settings[client_secret]" value="{{ app.getSetting(plugin.id ~ '.client_secret') }}" style="width: 50%; padding: 5px" />
+			<p>Enter your Client Secret. This is a long randomly generated secret provided by Microsoft.</p>
+		</div>
+
+	</div>
+</div>
+
+{% endblock %}

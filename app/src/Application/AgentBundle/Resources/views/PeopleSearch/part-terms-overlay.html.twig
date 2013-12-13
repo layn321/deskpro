@@ -1,0 +1,188 @@
+<div class="display-terms overlay">
+	<div class="overlay-title">
+		<h4>{{ phrase('agent.general.search') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<div style="margin-right: 250px;">
+			<div class="search-form">
+				<form action="{{ path('agent_peoplesearch_customfilter') }}" method="post" class="people_search_form">
+					<input type="hidden" name="copy_display_options" value="{{cache_id}}" />
+					<div class="search-form">
+						<div class="search-terms"></div>
+						<div class="term"><span class="add-term">+</span> {{ phrase('agent.general.add_search_term') }}</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="search-builder-tpl" style="display:none">
+				<div class="row">
+					<div class="term">
+						<div class="type"></div>
+						<div class="op"></div>
+						<div class="options"></div>
+						<div class="remove">-</div>
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.organization') }}" data-rule-type="organization">
+					<div class="op">
+						<select name="op">
+							<option value="is">{{ phrase('agent.general.is') }}</option>
+							<option value="not">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<select name="organization">
+							{% for id,title in titles.organizations %}
+								<option value="{{id}}">{{title}}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.usergroup') }}" data-rule-type="usergroup">
+					<div class="op">
+						<select name="op">
+							<option value="is">{{ phrase('agent.general.is') }}</option>
+							<option value="not">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<select name="usergroup">
+							{% for id,title in titles.usergroups %}
+								<option value="{{id}}">{{title}}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.search.person_id') }}" data-rule-type="id">
+					<div class="op">
+						<select name="op">
+							<option value="gte">{{ phrase('agent.general.is_greater_than') }}</option>
+							<option value="lte">{{ phrase('agent.general.is_less_than') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="id" value="" />
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.language') }}" data-rule-type="language">
+					<div class="op">
+						<select name="op">
+							<option value="is">{{ phrase('agent.general.is') }}</option>
+							<option value="not">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<select name="language">
+							{% for id,title in titles.languages %}
+								<option value="{{id}}">{{title}}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+
+				<div class="type" title="{{ phrase('agent.general.email_domain') }}" data-rule-type="email_domain">
+					<div class="op">
+						<select name="op">
+							<option value="is">{{ phrase('agent.general.is') }}</option>
+							<option value="not">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="email_domain" value="" />
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.email_domain') }}" data-rule-type="email_domain">
+					<div class="op">
+						<select name="op">
+							<option value="is">{{ phrase('agent.general.is') }}</option>
+							<option value="not">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="email_domain" value="" />
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.labels') }}" data-rule-type="label">
+					<div class="op">
+						<select name="op">
+							<option value="is">{{ phrase('agent.general.includes_label') }}</option>
+							<option value="not">{{ phrase('agent.general.does_not_include_label') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="label" value="" />
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.name') }}" data-rule-type="name">
+					<div class="op">
+						<select name="op">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="name" value="" />
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.contact_phone') }}" data-rule-type="contact_phone">
+					<div class="op">
+						<select name="op">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="phone" value="" />
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.contact_address') }}" data-rule-type="contact_address">
+					<div class="op">
+						<select name="op">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="address" value="" />
+					</div>
+				</div>
+				<div class="type" title="{{ phrase('agent.general.contact_instant_messaging') }}" data-rule-type="contact_im">
+					<div class="op">
+						<select name="op">
+							<option value="contains">{{ phrase('agent.general.is') }}</option>
+							<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+						</select>
+					</div>
+					<div class="options">
+						<input type="text" name="im" value="" />
+					</div>
+				</div>
+				{% if people_fields %}
+					{% set op_lang = {'is': phrase('agent.general.is'), 'not':phrase('agent.general.search'), 'contains': 'has', 'notcontains': 'does not have', 'gt': phrase('agent.general.search'), 'lt': phrase('agent.general.search')} %}
+					{% for field in people_fields %}
+						<div class="type" title="Field: {{field.field_def.title}}" data-rule-type="person_field[{{field.field_def.id}}]">
+							<div class="op">
+								<select name="op">
+									{% for op in field.field_def.search_capabilities %}
+										<option value="{{op}}">{{op_lang[op]}}</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div class="options">
+								{{ form_widget(field.formView) }}
+							</div>
+						</div>
+					{% endfor %}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="overlay-actions">
+		<div class="loading-off">
+			<button class="save-trigger dp-button small">{{ phrase('agent.general.search') }}</button>
+		</div>
+		<div class="loading-on" style="display:none">
+			<span>{{ phrase('agent.general.saving') }}</span>
+		</div>
+	</div>
+</div>

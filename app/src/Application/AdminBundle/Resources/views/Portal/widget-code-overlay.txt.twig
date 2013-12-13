@@ -1,0 +1,27 @@
+<!-- DeskPRO Widget -->
+<script type="text/javascript">
+	var DpOverlayWidget_Options = DpOverlayWidget_Options || {};
+	DpOverlayWidget_Options.protocol = ('https:' == document.location.protocol ? 'https' : 'http');
+	DpOverlayWidget_Options.deskproUrl = DpOverlayWidget_Options.protocol + '://{{ url('user')|url_trim_scheme }}';
+	DpOverlayWidget_Options.phrase = 'Feedback & Support';
+	DpOverlayWidget_Options.tabLocation = 'left';
+	DpOverlayWidget_Options.topPosition = '200px';
+	DpOverlayWidget_Options.btnStyle = {
+		bgColor: '#3F3F3F',
+		border: '2px solid #727272',
+		textColor: '#FFFFFF',
+		textShadow: '0px 0px 2px #000000',
+		font: 'bold 13px Arial, sans-serif'
+	};
+
+	if (document.getElementsByTagName) {
+		(function() {
+			var scr   = document.createElement('script');
+			scr.type  = 'text/javascript';
+			scr.async = true;
+			scr.src   = DpOverlayWidget_Options.protocol + '://{{ asset_url('javascripts/DeskPRO/User/WebsiteWidget/Overlay.js')|url_trim_scheme|replace({('/web'~constant('DPC_SITE_BUILD_NUM')~'/'):'/web/'}) }}';
+			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(scr);
+		})();
+	}
+</script>
+<!-- /DeskPRO Widget -->

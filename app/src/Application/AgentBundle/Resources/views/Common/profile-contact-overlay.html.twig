@@ -1,0 +1,379 @@
+<div class="profile-contact-editor-wrapper mass-actions-overlay" style="display: none">
+	<div class="overlay-title">
+		<span class="close close-trigger"></span>
+		<h4>{{ phrase('agent.people.contact_info_for_x', {'name': person.display_name}) }}</h4>
+	</div>
+	<div class="overlay-content">
+		{% block list_extra %}{% endblock %}
+
+		{############################################
+		 # Phone
+		 ############################################}
+
+		<div class="row-type phone {% if contact_data.phone|length %}with-values{% endif %}">
+			<h4>{{ phrase('agent.general.phone') }}</h4>
+			<div class="contact-info">
+				<ul>
+					{% for contact in contact_data.phone %}
+						<li data-remove-name="remove_contact_data[]" data-remove-value="{{ contact.id }}">
+							<div class="controls">
+								<span class="remove">x</span>
+							</div>
+							<div class="input">
+								<select class="type" name="contact_data[{{ contact.id }}][type]">
+									{% for type,label in {'phone': 'Phone', 'mobile': 'Mobile', 'fax': 'Fax'} %}
+										<option value="{{ type }}" {% if contact.rec.field_3 == type %}selected="selected"{% endif %}>{{ label }}</option>
+									{% endfor %}
+								</select>
+								+<span data-element-handler="DeskPRO.Agent.ElementHandler.PhoneCountryCode" data-options-list="#phone_countrycode_menu">
+									<span class="icon-flag" style="display: none"></span>
+									<input type="text" size="4" class="country-code" name="contact_data[{{ contact.id }}][country_calling_code]" value="{{ contact.rec.field_1 }}" placeholder="{{ phrase('agent.people.phone_country_placeholder') }}" />
+								</span>
+								<input type="text" size="4" class="phone-number" name="contact_data[{{ contact.id }}][number]" value="{{ contact.rec.field_2 }}" placeholder="{{ phrase('agent.people.phone_number_placeholder') }}" />
+							</div>
+							<div class="label">
+								<input type="text" size="10" name="contact_data[{{ contact.id }}][comment]" value="{{ contact.rec.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+							</div>
+						<br class="clear" /></li>
+					{% endfor %}
+				</ul>
+				<a class="add-trigger">
+					<em class="with-none">{{ phrase('agent.people.add_phone') }}</em>
+					<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+				</a>
+			</div>
+			<script type="text/x-deskpro-plain" class="tpl-new-row">
+				<li>
+					<div class="controls">
+						<span class="remove">x</span>
+					</div>
+					<div class="input">
+						<select class="type" name="new_contact_data[phone][%id%][type]">
+							{% for type,label in {'phone': 'Phone', 'mobile': 'Mobile', 'fax': 'Fax'} %}
+								<option value="{{ type }}" {% if contaxt.rec.field_3 == type %}selected="selected"{% endif %}>{{ label }}</option>
+							{% endfor %}
+						</select>
+						+<span data-element-handler="DeskPRO.Agent.ElementHandler.PhoneCountryCode" data-options-list="#phone_countrycode_menu">
+							<span class="icon-flag" style="display: none"></span>
+							<input type="text" size="4" class="country-code" name="new_contact_data[phone][%id%][country_calling_code]" value="" placeholder="{{ phrase('agent.people.phone_country_placeholder') }}" />
+						</span>
+						<input type="text" size="4" class="phone-number" name="new_contact_data[phone][%id%][number]" placeholder="{{ phrase('agent.people.phone_number_placeholder') }}" />
+					</div>
+					<div class="label">
+						<input type="text" size="8" name="new_contact_data[phone][%id%][comment]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+					</div>
+				<br class="clear" /></li>
+			</script>
+		</div>
+
+		{############################################
+		 # Website
+		 ############################################}
+
+		 <div class="row-type website {% if contact_data.website|length %}with-values{% endif %}">
+			<h4>{{ phrase('agent.people.website') }}</h4>
+			<div class="contact-info">
+				<ul>
+					{% for contact in contact_data.website %}
+						<li data-remove-name="remove_contact_data[]" data-remove-value="{{ contact.id }}">
+							<div class="controls">
+								<span class="remove">x</span>
+							</div>
+							<div class="input">
+								<input type="text" size="15" class="single-input" name="contact_data[{{ contact.id }}][url]" value="{{ contact.url }}" placeholder="{{ phrase('agent.people.website_url_placeholder') }}" />
+							</div>
+							<div class="label">
+								<input type="text" size="10" name="contact_data[{{ contact.id }}][comment]" value="{{ contact.rec.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+							</div>
+						<br class="clear" /></li>
+					{% endfor %}
+				</ul>
+				<a class="add-trigger">
+					<em class="with-none">{{ phrase('agent.people.add_website') }}</em>
+					<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+				</a>
+			</div>
+			<script type="text/x-deskpro-plain" class="tpl-new-row">
+				<li>
+					<div class="controls">
+						<span class="remove">x</span>
+					</div>
+					<div class="input">
+						<input type="text" size="4" class="single-input" name="new_contact_data[website][%id%][url]" placeholder="{{ phrase('agent.people.website_url_placeholder') }}" />
+					</div>
+					<div class="label">
+						<input type="text" size="8" name="new_contact_data[website][%id%][comment]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+					</div>
+				<br class="clear" /></li>
+			</script>
+		</div>
+
+		{############################################
+		 # IM
+		 ############################################}
+
+		 <div class="row-type im {% if contact_data.instant_message|length %}with-values{% endif %}">
+			<h4>{{ phrase('agent.people.im') }}</h4>
+			<div class="contact-info">
+				<ul>
+					{% for contact in contact_data.instant_message %}
+						<li data-remove-name="remove_contact_data[]" data-remove-value="{{ contact.id }}">
+							<div class="controls">
+								<span class="remove">x</span>
+							</div>
+							<div class="input">
+								<select name="contact_data[{{ contact.id }}][service]">
+									<option {% if contact.service == 'aim' %}selected="selected"{% endif %} value="aim">{{ phrase('agent.general.aim') }}</option>
+									<option {% if contact.service == 'msn' %}selected="selected"{% endif %} value="msn">{{ phrase('agent.general.msn') }}</option>
+									<option {% if contact.service == 'yim' %}selected="selected"{% endif %} value="yim">{{ phrase('agent.general.yim') }}</option>
+									<option {% if contact.service == 'icq' %}selected="selected"{% endif %} value="icq">{{ phrase('agent.general.icq') }}</option>
+									<option {% if contact.service == 'skype' %}selected="selected"{% endif %} value="skype">{{ phrase('agent.general.skype') }}</option>
+									<option {% if contact.service == 'gtalk' %}selected="selected"{% endif %} value="gtalk">{{ phrase('agent.general.gtalk') }}</option>
+									<option {% if contact.service == 'other' %}selected="selected"{% endif %} value="other">{{ phrase('agent.general.other') }}</option>
+								</select>
+								<input type="text" size="15" class="single-input" name="contact_data[{{ contact.id }}][username]" value="{{ contact.username }}" placeholder="{{ phrase('agent.people.im_account_placeholder') }}" />
+							</div>
+							<div class="label">
+								<input type="text" size="10" name="contact_data[{{ contact.id }}][comment]" value="{{ contact.rec.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+							</div>
+						<br class="clear" /></li>
+					{% endfor %}
+				</ul>
+				<a class="add-trigger">
+					<em class="with-none">{{ phrase('agent.people.add_im') }}</em>
+					<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+				</a>
+			</div>
+			<script type="text/x-deskpro-plain" class="tpl-new-row">
+				<li>
+					<div class="controls">
+						<span class="remove">x</span>
+					</div>
+					<div class="input">
+						<select name="new_contact_data[instant_message][%id%][service]">
+							<option {% if contact.service == 'aim' %} {% endif %} value="aim">{{ phrase('agent.general.aim') }}</option>
+							<option {% if contact.service == 'msn' %} {% endif %} value="msn">{{ phrase('agent.general.msn') }}</option>
+							<option {% if contact.service == 'yim' %} {% endif %} value="yim">{{ phrase('agent.general.yim') }}</option>
+							<option {% if contact.service == 'icq' %} {% endif %} value="icq">{{ phrase('agent.general.icq') }}</option>
+							<option {% if contact.service == 'skype' %} {% endif %} value="skype">{{ phrase('agent.general.skype') }}</option>
+							<option {% if contact.service == 'gtalk' %} {% endif %} value="gtalk">{{ phrase('agent.general.gtalk') }}</option>
+							<option {% if contact.service == 'other' %} {% endif %} value="other">{{ phrase('agent.general.other') }}</option>
+						</select>
+						<input type="text" size="15" class="single-input" name="new_contact_data[instant_message][%id%][username]" value="" placeholder="{{ phrase('agent.people.im_account_placeholder') }}" />
+					</div>
+					<div class="label">
+						<input type="text" size="8" name="new_contact_data[instant_message][%id%][instant_message]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+					</div>
+				<br class="clear" /></li>
+			</script>
+		</div>
+
+		{############################################
+		 # Twitter
+		 ############################################}
+
+		 <div class="row-type twitter {% if contact_data.twitter|length %}with-values{% endif %}">
+			<h4>{{ phrase('agent.general.twitter') }}</h4>
+			<div class="contact-info">
+				<ul>
+					{% for contact in contact_data.twitter %}
+						<li data-remove-name="remove_contact_data[]" data-remove-value="{{ contact.id }}">
+							<div class="controls">
+								<span class="remove">x</span>
+							</div>
+							<div class="input">
+								<input type="text" size="15" class="single-input" name="contact_data[{{ contact.id }}][username]" value="{{ contact.username }}" placeholder="{{ phrase('agent.general.twitter_username') }}" />
+								<input type="hidden" name="contact_data[{{ contact.id }}][display_feed]" value="1" />
+							</div>
+							<div class="label">
+								<input type="text" size="10" name="contact_data[{{ contact.id }}][comment]" value="{{ contact.rec.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+							</div>
+						<br class="clear" /></li>
+					{% endfor %}
+				</ul>
+				<a class="add-trigger">
+					<em class="with-none">{{ phrase('agent.people.add_twitter_profile') }}</em>
+					<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+				</a>
+			</div>
+			<script type="text/x-deskpro-plain" class="tpl-new-row">
+				<li>
+					<div class="controls">
+						<span class="remove">x</span>
+					</div>
+					<div class="input">
+						<input type="text" size="15" class="single-input" name="new_contact_data[twitter][%id%][username]" value="{{ contact.url }}" placeholder="{{ phrase('agent.general.twitter_username') }}" />
+						<input type="hidden" name="new_contact_data[twitter][%id%][display_feed]" />
+					</div>
+					<div class="label">
+						<input type="text" size="8" name="new_contact_data[twitter][%id%][twitter]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+					</div>
+				<br class="clear" /></li>
+			</script>
+		</div>
+
+		{############################################
+		 # LinkedIn
+		 ############################################}
+
+		 <div class="row-type linkedin {% if contact_data.linked_in|length %}with-values{% endif %}">
+			<h4>{{ phrase('agent.general.linkedin') }}</h4>
+			<div class="contact-info">
+				<ul>
+					{% for contact in contact_data.linked_in %}
+						<li data-remove-name="remove_contact_data[]" data-remove-value="{{ contact.id }}">
+							<div class="controls">
+								<span class="remove">x</span>
+							</div>
+							<div class="input">
+								<input type="text" size="15" name="contact_data[{{ contact.id }}][profile_url]" value="{{ contact.profile_url }}" placeholder="{{ phrase('agent.general.linkedin_url') }}" />
+							</div>
+							<div class="label">
+								<input type="text" size="10" name="contact_data[{{ contact.id }}][comment]" value="{{ contact.rec.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+							</div>
+						<br class="clear" /></li>
+					{% endfor %}
+				</ul>
+				<a class="add-trigger">
+					<em class="with-none">{{ phrase('agent.people.add_linkedin_profile') }}</em>
+					<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+				</a>
+			</div>
+			<script type="text/x-deskpro-plain" class="tpl-new-row">
+				<li>
+					<div class="controls">
+						<span class="remove">x</span>
+					</div>
+					<div class="input">
+						<input type="text" size="15" class="single-input" name="new_contact_data[linked_in][%id%][profile_url]" value="{{ contact.url }}" placeholder="{{ phrase('agent.general.linkedin_url') }}" />
+					</div>
+					<div class="label">
+						<input type="text" size="8" name="new_contact_data[linked_in][%id%][comment]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+					</div>
+				<br class="clear" /></li>
+			</script>
+		</div>
+
+		{############################################
+		 # Facebook
+		 ############################################}
+
+		 <div class="row-type facebook {% if contact_data.facebook|length %}with-values{% endif %}">
+			<h4>{{ phrase('agent.general.facebook') }}</h4>
+			<div class="contact-info">
+				<ul>
+					{% for contact in contact_data.facebook %}
+						<li data-remove-name="remove_contact_data[]" data-remove-value="{{ contact.id }}">
+							<div class="controls">
+								<span class="remove">x</span>
+							</div>
+							<div class="input">
+								<input type="text" size="15" class="single-input" name="contact_data[{{ contact.id }}][profile_url]" value="{{ contact.profile_url }}" placeholder="{{ phrase('agent.general.facebook') }} URL" />
+							</div>
+							<div class="label">
+								<input type="text" size="10" name="contact_data[{{ contact.id }}][comment]" value="{{ contact.rec.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+							</div>
+						<br class="clear" /></li>
+					{% endfor %}
+				</ul>
+				<a class="add-trigger">
+					<em class="with-none">{{ phrase('agent.people.add_facebook_profile') }}</em>
+					<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+				</a>
+			</div>
+			<script type="text/x-deskpro-plain" class="tpl-new-row">
+				<li>
+					<div class="controls">
+						<span class="remove">x</span>
+					</div>
+					<div class="input">
+						<input type="text" size="15" class="single-input" name="new_contact_data[facebook][%id%][profile_url]" value="{{ contact.url }}" placeholder="{{ phrase('agent.general.facebook') }} URL" />
+					</div>
+					<div class="label">
+						<input type="text" size="8" name="new_contact_data[facebook][%id%][comment]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+					</div>
+				<br class="clear" /></li>
+			</script>
+		</div>
+
+		{############################################
+		 # Address
+		 ############################################}
+
+		 <div class="row-type address {% if contact_data.address|length %}with-values{% endif %}">
+			<h4>{{ phrase('agent.general.address') }}</h4>
+			<div class="contact-info">
+				<ul>
+					{% for contact in contact_data.address %}
+						<li data-remove-name="remove_contact_data[]" data-remove-value="{{ contact.id }}">
+							<div class="controls">
+								<span class="remove">x</span>
+							</div>
+							<div class="input">
+								<div class="line-1">
+									<textarea class="address" name="contact_data[{{ contact.id }}][address]" placeholder="{{ phrase('agent.general.address') }}">{{ contact.address }}</textarea>
+								</div>
+								<div class="line-2">
+									<input type="text" size="10" name="contact_data[{{ contact.id }}][city]" value="{{ contact.city }}" placeholder="{{ phrase('agent.people.address_city') }}" />
+									<input type="text" size="10" name="contact_data[{{ contact.id }}][state]" value="{{ contact.state }}" placeholder="{{ phrase('agent.people.address_state') }}" />
+									<input type="text" size="10" name="contact_data[{{ contact.id }}][zip]" value="{{ contact.zip }}" placeholder="{{ phrase('agent.people.address_postal') }}" />
+								</div>
+								<div class="line-3">
+									<select name="contact_data[{{ contact.id }}][country]">
+										{% for c in get_data('country_names') %}
+											<option value="{{ c }}" {% if contact.country == c %}selected="selected"{% endif %}>{{ c }}</option>
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+							<div class="label">
+								<input type="text" size="10" name="contact_data[{{ contact.id }}][comment]" value="{{ contact.rec.comment }}" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+							</div>
+						<br class="clear" /></li>
+					{% endfor %}
+				</ul>
+				<a class="add-trigger">
+					<em class="with-none">{{ phrase('agent.people.add_address') }}</em>
+					<em class="with-some">{{ phrase('agent.people.add_another') }}</em>
+				</a>
+			</div>
+			<script type="text/x-deskpro-plain" class="tpl-new-row">
+				<li>
+					<div class="controls">
+						<span class="remove">x</span>
+					</div>
+					<div class="input">
+						<div class="line-1">
+							<textarea class="address" name="new_contact_data[address][%id%][address]" placeholder="{{ phrase('agent.general.address') }}">{{ contact.address }}</textarea>
+						</div>
+						<div class="line-2">
+							<input type="text" size="10" name="new_contact_data[address][%id%][city]" value="{{ contact.city }}" placeholder="{{ phrase('agent.people.address_city') }}" />
+							<input type="text" size="10" name="new_contact_data[address][%id%][state]" value="{{ contact.state }}" placeholder="{{ phrase('agent.people.address_state') }}" />
+							<input type="text" size="10" name="new_contact_data[address][%id%][zip]" value="{{ contact.zip }}" placeholder="{{ phrase('agent.people.address_postal') }}" />
+						</div>
+						<div class="line-3">
+							<select name="new_contact_data[address][%id%][country]">
+								<option value=""></option>
+								{% for c in get_data('country_names') %}
+									<option value="{{ c }}" {% if contact.country == c %}selected="selected"{% endif %}>{{ c }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="label">
+						<input type="text" size="8" name="new_contact_data[address][%id%][comment]" value="" placeholder="{{ phrase('agent.general.add_a_label') }}" />
+					</div>
+				<br class="clear" /></li>
+			</script>
+		</div>
+
+	</div>
+	<div class="overlay-footer">
+		<div class="is-not-loading">
+			<button class="save-trigger clean-white">{{ phrase('agent.general.save') }}</button>
+		</div>
+		<div class="is-loading">
+			<div class="loading-icon"></div>
+		</div>
+	</div>
+</div>

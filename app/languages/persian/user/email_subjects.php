@@ -1,0 +1,18 @@
+<?php return array(
+	'user.email_subjects.chat_transcript'                                  => 'رونوشت چت',
+	'user.email_subjects.comment-approved'                                 => 'نظر شما مورد تایید قرار گرفت',
+	'user.email_subjects.comment-confirmation'                             => 'با تشکر از شما برای نظر شما',
+	'user.email_subjects.comment-deleted'                                  => 'نظر شما توسط ماموران ما خوانده شده',
+	'user.email_subjects.email_new-confirm'                                => 'اعتبار سنجی آدرس ایمیل شما',
+	'user.email_subjects.feedback_new'                                     => 'با تشکر از شما برای ارسال نظرات خود',
+	'user.email_subjects.feedback_new-approved'                            => 'نظرات شما مورد تایید قرار گرفته است',
+	'user.email_subjects.feedback_new-comment'                             => 'یک نظر جدید وجود دارد "{{title}}"',
+	'user.email_subjects.feedback_new-confirm'                             => 'با تشکر از شما برای ارسال نظرات خود ( اعتبار مورد نیاز )',
+	'user.email_subjects.feedback_new-disapproved'                         => 'نظرات شما رد شده است',
+	'user.email_subjects.feedback_updated'                                 => 'نظرات شما به روز رسانی: {{title}}',
+	'user.email_subjects.password_agent-reset'                             => 'عامل تنظیم مجدد رمز عبور خود',
+	'user.email_subjects.password_reset'                                   => 'تنظیم مجدد رمز عبور',
+	'user.email_subjects.re'                                               => 'پاسخ: {{subject}}',
+	'user.email_subjects.ticket_new-participant'                           => 'یک شخص جدید است اضافه شده به تیک خود',
+	'user.email_subjects.validate-email'                                   => 'اعتبار سنجی آدرس ایمیل شما',
+);

@@ -1,0 +1,41 @@
+{% extends 'AgentBundle::list-pane-layout.html.twig' %}
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+{% block top %}
+	<script>
+		{% block pagemeta %}{% endblock %}
+	</script>
+{% endblock %}
+{% block pane_content %}
+	{% block content_top %}{% endblock %}
+
+	{% set tmp %}{% block control_bar %}{% endblock %}{% endset %}
+	{% if tmp|trim|length %}
+		<header class="list-control-bar">{{ block('control_bar') }}</header>
+	{% endif %}
+
+	{% set tmp %}{% block grouping_bar %}{% endblock %}{% endset %}
+	{% if tmp|trim|length %}
+		<header class="list-grouping-bar">{{ block('grouping_bar') }}</header>
+	{% endif %}
+
+	{% set tmp %}{% block selection_bar %}{% endblock %}{% endset %}
+	{% if tmp|trim|length %}
+		<header class="list-selection-bar">{{ block('selection_bar') }}</header>
+	{% endif %}
+
+	{% block prelist %}{% endblock %}
+
+	{% set tmp %}{% block listing %}{% endblock %}{% endset %}
+	{% if tmp|trim|length %}
+		<section class="list-listing">{{ block('listing') }}</section>
+	{% endif %}
+
+	{% set tmp %}{% block result_nav %}{% endblock %}{% endset %}
+	{% if tmp|trim|length %}
+		<footer class="results-nav">{{ block('result_nav') }}</footer>
+	{% endif %}
+
+	{% block postlist %}{% endblock %}
+
+	{% block bottom %}{% endblock %}
+{% endblock %}

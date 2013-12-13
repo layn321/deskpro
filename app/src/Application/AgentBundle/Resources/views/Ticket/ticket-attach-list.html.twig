@@ -1,0 +1,49 @@
+<div>
+	<nav class="section-subnav logs-type-nav" data-filter="attach" data-page="1" data-num-pages="1">
+		<div class="dp-is-loading" style="float:right; margin: 3px 9px 0 0;">
+			<i class="spinner-flat"></i>
+		</div>
+		<ul>
+			<li class="trigger-update-filter {% if not filter or filter == 'all' %}on{% endif %}" data-typename="all"><em>{{ phrase('agent.general.all') }} ({{ counts.all|default('0') }})</em></li>
+			{% if counts.message %}<li class="trigger-update-filter {% if filter == 'message' %}on{% endif %}" data-typename="message"><em>{{ phrase('agent.tickets.messages') }} ({{ counts.message|default('0') }})</em></li>{% endif %}
+			{% if counts.note %}<li class="trigger-update-filter {% if filter == 'note' %}on{% endif %}" data-typename="note"><em>{{ phrase('agent.tickets.notes') }} ({{ counts.note|default('0') }})</em></li>{% endif %}
+			{% if counts.attach %}<li class="trigger-update-filter {% if filter == 'attach' %}on{% endif %}" data-typename="attach"><em>{{ phrase('agent.tickets.attachments') }} ({{ counts.attach|default('0') }})</em></li>{% endif %}
+			{% if counts.notif %}<li class="trigger-update-filter {% if filter == 'notif' %}on{% endif %}" data-typename="notif"><em>{{ phrase('agent.tickets.notifications') }} ({{ counts.notif|default('0') }})</em></li>{% endif %}
+			{% if counts.assign %}<li class="trigger-update-filter {% if filter == 'assign' %}on{% endif %}" data-typename="assign"><em>{{ phrase('agent.tickets.assignments') }} ({{ counts.assign|default('0') }})</em></li>{% endif %}
+			{% if counts.slas %}<li class="trigger-update-filter {% if filter == 'slas' %}on{% endif %}" data-typename="slas"><em>{{ phrase('agent.general.slas') }} ({{ counts.slas|default('0') }})</em></li>{% endif %}
+			{% if counts.triggers %}<li class="trigger-update-filter {% if filter == 'triggers' %}on{% endif %}" data-typename="triggers"><em>{{ phrase('agent.tickets.triggers') }} ({{ counts.triggers|default('0') }})</em></li>{% endif %}
+			{% if counts.status %}<li class="trigger-update-filter {% if filter == 'status' %}on{% endif %}" data-typename="status"><em>{{ phrase('agent.general.status') }} ({{ counts.status|default('0') }})</em></li>{% endif %}
+			{% if counts.other %}<li class="trigger-update-filter {% if filter == 'other' %}on{% endif %}" data-typename="other"><em>{{ phrase('agent.general.other') }} ({{ counts.other|default('0') }})</em></li>{% endif %}
+		</ul>
+	</nav>
+	<div class="logs-page" style="padding: 6px;">
+		{% for attach in attachments %}
+			<div class="log-batch log-batch-id-0" data-log-batch-id="0">
+				<div class="log-row" data-log-id="0">
+					<div class="info">
+						{% if attach.person %}
+							<a class="as-popover" data-route="person:{{ path('agent_people_view', {'person_id': attach.person.id}) }}">{{ attach.person.display_name }}</a>,
+						{% endif %}
+						<time class="timeago" title="{{ attach.blob.date_created|date('c', 'UTC') }}">{{ attach.blob.date_created|date('day') }}</time>
+					</div>
+
+					<div class="attach">
+						<table>
+							<tr>
+								{% if attach.blob.isImage() %}
+									<td width="10" style="vertical-align: middle; padding-right: 5px;"><a href="{{ attach.blob.download_url }}" data-deskpro-url="{{ attach.blob.getDownloadUrl(false, false) }}" target="_blank" style="padding:0;margin: 0;"><img src="{{ path('serve_blob', {'blob_auth_id': attach.blob.auth_id, 'filename': attach.blob.filename_safe, 's': 50, 'size-fit': '0'}) }}" alt="" class="preview" style="padding:0; margin: 0;" /></a></td>
+								{% else %}
+									<td width="10" style="vertical-align: middle; padding-right: 5px;"><i class="dp-icon-filetype dp-icon-filetype-{{attach.blob.extension|default('none')}}"></i></td>
+								{% endif %}
+								<td style="vertical-align: middle">
+									<a href="{{ attach.blob.download_url }}" target="_blank">{{attach.blob.filename}}</a>
+									<span class="size">({{ attach.blob.readable_filesize }})</span>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+</div>

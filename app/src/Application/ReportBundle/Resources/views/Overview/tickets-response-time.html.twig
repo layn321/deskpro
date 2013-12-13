@@ -1,0 +1,30 @@
+{% import 'ReportBundle:Overview:macros.html.twig' as macros %}
+<section class="report-wrapper {% if initial_display %}initial-display{% endif %}">
+	<header>
+		<h2>
+			Average First Response Time
+			<span class="drop-option">
+				<select class="grouping-field" name="date_choice">
+					{% for field,title in {
+						'today': 'Today',
+						'this_week': 'This Week',
+						'this_month': 'This Month',
+						'this_year': 'This Year',
+					} %}
+						<option {% if data.date_choice == field %}selected="selected"{% endif %} value="{{ field }}">{{ title }}</option>
+					{% endfor %}
+				</select>
+				<i></i>
+			</span>
+		</h2>
+		<h3>Showing Grouped by {{ macros.grouping_field_select(data.grouping_field, {none: true}) }}</h3>
+	</header>
+	<article>
+		<div class="loading-overlay" {% if not initial_display %}style="display: none"{% endif %}><strong>Loading</strong></div>
+		{% if data.values %}
+			{{ macros.stat_table(data) }}
+		{% else %}
+			{{ macros.no_data() }}
+		{% endif %}
+	</article>
+</section>

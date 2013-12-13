@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="robots" content="NOINDEX" />
+	<meta http-equiv="X-UA-Compatible" content="IE=100" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>{{ phrase('agent.general.log_in') }}</title>
+	<script type="text/javascript">
+	if (typeof pageMeta !== 'undefined') pageMeta.goToLogin = true;
+	</script>
+	<script type="text/javascript" charset="utf-8" src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+
+	<style type="text/css">
+	body {
+		background: #fff !important;
+	}
+
+	{% include 'DeskPRO:Common:admin-login.css.twig' %}
+	</style>
+</head>
+<body>
+
+<form action="{{ path('report_login_authenticate_local') }}" method="post">
+	<input type="hidden" name="agent_login" value="1" />
+	{% if return %}<input type="hidden" name="return" value="{{return}}" />{% endif %}
+
+	<div id="dp_login">
+		<div class="msg-outer">
+			<div class="msg">
+				<h1>{{ phrase('agent.general.log_in') }}</h1>
+				{% if failed_login_name %}<p class="error">{{ phrase('agent.login.login_failed') }}</p>{% endif %}
+				{% if has_logged_out %}<p class="okay">{{ phrase('agent.login.has_logged_out') }}</p>{% endif %}
+				<dl>
+					<dt>{{ phrase('agent.general.email') }}</dt>
+					<dd><input type="text" class="text" value="{{ failed_login_name }}" name="email" id="email" size="40" tabindex="1" /></dd>
+
+					<dt>{{ phrase('agent.general.password') }}</dt>
+					<dd class="password">
+						<input type="password" class="text" value="" name="password" id="password" size="40"  tabindex="2" />
+					</dd>
+
+					<dt></dt>
+					<dd class="btn"><button>{{ phrase('agent.general.log_in') }}</button></dd>
+				</dl>
+
+				<br class="clear" />
+			</div>
+		</div>
+		<a href="http://www.deskpro.com/" id="dp_logo">{{ phrase('agent.general.deskpro') }}</a>
+	</div>
+</form>
+
+<script type="text/javascript">
+document.getElementById('email').focus();
+</script>
+</body>
+</html>

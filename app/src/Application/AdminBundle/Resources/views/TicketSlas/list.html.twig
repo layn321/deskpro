@@ -1,0 +1,108 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('vendor/amcharts/javascript/amcharts27.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li class="add"><a href="{{ path('admin_tickets_slas_new') }}">Add SLA</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>SLAs</li>
+</ul>
+{% endblock %}
+{% block prepage %}
+<div style="padding: 10px 10px 0 10px;">
+	{{ design.helpbox() }}
+	<p>SLAs (service level agreements) allow you to trigger actions and highlight tickets if certain time-based conditions occur.</p>
+	{{ design.helpbox_end() }}
+</div>
+{% endblock %}
+{% block page %}
+{% if slas %}
+<div class="check-grid item-list" >
+	<table width="100%">
+	<thead>
+		<tr>
+			<th style="text-align: left">SLA</th>
+			<th style="text-align: left">Type</th>
+			<th style="text-align: left">Warning Time</th>
+			<th style="text-align: left">Failure Time</th>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for sla in slas %}
+		<tr>
+			<td><a href="{{ path('admin_tickets_sla_edit', {'sla_id': sla.id} )}}">{{sla.title}}</a></td>
+			<td>
+				{% if sla.sla_type == 'first_response' %}Time until first response
+				{% elseif sla.sla_type == 'resolution' %}Time until ticket resolution
+				{% elseif sla.sla_type == 'waiting_time' %}User waiting time until ticket resolution{% endif %}
+				{% if sla.active_time == 'default' %}(default working hours)
+				{% elseif sla.active_time == 'all' %}(24x7)
+				{% elseif sla.active_time == 'work_hours' %}(working hours){% endif %}
+			</td>
+			<td>{{ sla.getWarningTimeText() }}</td>
+			<td>{{ sla.getFailTimeText() }}</td>
+			<td style="text-align: right; padding-right: 5px;"><a href="{{ path('admin_tickets_sla_delete', {'sla_id': sla.id, _dp_security_token: security_token('delete_sla')} )}}" class="delete-icon click-confirm" data-confirm="Are you sure you want to delete this SLA?">Delete</a></td>
+		</tr>
+	{% endfor %}
+	</tbody>
+	</table>
+</div>
+{% else %}
+	<div class="note-box new-arrow">You have not created any SLAs yet. Click the "Add SLA" button to create one now.</div>
+{% endif %}
+
+{% if slas and graph_data %}
+	<div class="content-table" style="margin-top: 10px">
+	<table width="100%" class="simple">
+	<thead>
+	<tr>
+		<th class="single-title">
+			<h1>SLA statistics for tickets created recently</h1>
+		</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td style="overflow: hidden">
+		{% for title,data in graph_data %}
+			<div style="float: left; width: 180px">
+				<h2 style="text-align: center">
+					{% if title == 'today' %}Today
+					{% elseif title == 'yesterday' %}Yesterday
+					{% elseif title == 'this_week' %}This Week
+					{% elseif title == 'this_month' %}This Month
+					{% elseif title == 'this_year' %}This Year{% endif %}
+				</h2>
+
+				<div id="sla_stat_{{ title }}"" class="report-chart" style="height: 180px; width: 180px"></div>
+				<script type="text/javascript">
+				$(function() {
+					var chart = new AmCharts.AmPieChart();
+					chart.dataProvider = {{ data|json_encode|raw }};
+					chart.titleField = "title";
+					chart.valueField = "count";
+					chart.colorField = "color";
+					chart.labelsEnabled = false;
+					chart.marginTop = 0;
+					chart.marginRight = 0;
+					chart.marginBottom = 0;
+					chart.marginLeft = 0;
+					chart.startDuration = 0;
+
+					chart.write("sla_stat_{{ title }}");
+				});
+				</script>
+			</div>
+		{% endfor %}
+		</td>
+	</tr>
+	</table>
+	</div>
+{% endif %}
+{% endblock %}

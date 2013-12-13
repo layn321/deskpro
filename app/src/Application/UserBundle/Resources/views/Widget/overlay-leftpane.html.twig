@@ -1,0 +1,37 @@
+{##
+ # The left sidebar of the website widget overlay
+ ##}
+
+<div id="left_pane" class="aside">
+	<div class="head">
+		<div class="is-showing-related">
+			{{ phrase('user.widget.search_related_title') }}<br />
+			<a href="#" id="cancel_related">{{ phrase('user.widget.search_back') }}</a>.
+		</div>
+		<div class="not-showing-related">
+			<form action="#">
+				<div class="search-form clearfix">
+					<div class="txt">
+						<i class="icon-search"></i>
+						<input type="text" id="search_box" />
+					</div>
+					<button class="btn" id="search_box_go">{{ phrase('user.widget.search_button') }}</button>
+				</div>
+			</form>
+
+			<div class="helpdesk-link">
+				<a href="{{ app.getSetting('core.deskpro_url') }}" target="_blank">{{ phrase('user.widget.website_link', {url:app.getSetting('core.deskpro_url')}) }} ▸</a>
+			</div>
+		</div>
+	</div>
+	<div class="area clearfix">
+		<ul id="new_content_list" class="files-list">
+			{% for content in newest_content %}
+				{% include 'UserBundle:Common:searchlist-simplerow.html.twig' with { type: content.type, item: content.item, with_icon: true } %}
+			{% endfor %}
+		</ul>
+		<div id="search_loading" style="display: none;"></div>
+		<ul class="files-list" id="no_results" style="display: none"><li>{{ phrase('user.widget.search_no-results') }}</li></ul>
+		<ul id="search_content_list" class="files-list" style="display: none"></ul>
+	</div>
+</div>

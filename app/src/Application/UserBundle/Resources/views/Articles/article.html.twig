@@ -1,0 +1,136 @@
+{##
+ # The full article view page
+ ##}
+{% import 'UserBundle:Common:macros-social.html.twig' as social %}
+{% set this_section = 'articles' %}
+{% extends 'UserBundle::layout.html.twig' %}
+{% block head %}
+	<meta property="og:url" content="{{ path('user_articles_article', {'slug': article.url_slug}) }}" />
+	<meta property="og:title" content="{{article.title}}" />
+	<meta property="og:type" content="article" />
+	<link rel="canonical" href="{{ url('user_articles_article', {'slug': article.url_slug}) }}" />
+{% endblock %}
+{% block breadcrumb %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_articles') }}">{{ phrase('user.knowledgebase.knowledgebase') }}</a></li>
+	{% for categories in all_categories %}
+		{% if loop.index0 == 0 %}
+			{% for c in categories %}
+				<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_articles', {'slug': c.url_slug}) }}">{{ phrase_object(c) }}</a></li>
+			{% endfor %}
+		{% endif %}
+	{% endfor %}
+	<li><span class="dp-divider">{{ language_arrow('right') }}</span> <a href="{{ path('user_articles_article', {'slug': article.url_slug}) }}">{{article.title}}</a></li>
+{% endblock %}
+{% block page_title %}
+	{{ article.title }}
+	-
+	{{ phrase('user.knowledgebase.knowledgebase') }}
+	{% for categories in all_categories %}
+		{% if loop.index0 == 0 %}
+			{% for c in categories %}
+				/ {{ phrase_object(c) }}
+			{% endfor %}
+		{% endif %}
+	{% endfor %}
+{% endblock %}
+{% block content %}
+
+<section class="dp-article-post dp-content-post dp-content-page">
+	<header>
+		<h3 style="margin-bottom: 0">{{ article.title }}</h3>
+		<ul class="dp-post-info">
+			<li class="dp-author"><i class="dp-icon-user"></i> {{ article.person.display_name_user }}</li>
+			<li class="dp-date"><i class="dp-icon-calendar"></i> {{ article.date_created|date('full') }}</li>
+			{% if app.getSetting('user.publish_comments') %}<li class="dp-comments"><i class="dp-icon-comment"></i> <a href="#comments">{{ phrase('user.general.count_comments', {'count': comment_counts[article.id]|default(0)}) }}</a></li>{% endif %}
+		</ul>
+		{% if article.status != 'published' and article.status != 'archived' and app.user.is_agent %}
+			<div class="sub-note">{{ phrase('user.general.can-view-because-agent') }}</div>
+		{% endif %}
+	</header>
+	<article id="dp_article_content">
+		{{ article.content_html|raw }}
+
+		{% if article.attachments|length %}
+		<ul class="attachment-list">
+			{% for attach in article.attachments %}
+				<li class="{% if attach.blob.isImage() %}is-image{% else %}dp-fileicon dp-fileicon-{{attach.blob.extension|default('none')}}{% endif %}" rel="message-{{message.id}}">
+					{% if attach.blob.isImage() %}
+						<a href="{{ attach.blob.download_url }}" target="_blank"><img src="{{ path('serve_blob', {'blob_auth_id': attach.blob.auth_id, 'filename': attach.blob.filename, 's': 50, 'size-fit': '1'}) }}" alt="" class="preview" /></a>
+					{% endif %}
+					<a href="{{ attach.blob.download_url }}" target="_blank">{{attach.blob.filename}}</a>
+					<span class="size">({{ attach.blob.readable_filesize }})</span>
+				</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+	</article>
+	<footer>
+		{% include 'UserBundle:Common:labels-box.html.twig' with {'labels': article.labels} %}
+		{% include 'UserBundle:Common:related-box.html.twig' with { object: article, type: 'article', related_content: related_content } %}
+
+		{% if app.user.hasPerm('articles.rate') %}
+			{% include 'UserBundle:Common:rating-bar.html.twig' with {'content_object': article} %}
+			{# VIEW_COUNTER
+			{% if article.view_count %}
+				<div class="dp-view-wrap">
+					{{ phrase('user.knowledgebase.article-viewed', {count: article.view_count}) }}
+				</div>
+			{% endif %}
+			#}
+		{% endif %}
+
+		{% if app.getSetting('user.kb_subscriptions') %}
+			<div class="dp-subscribe dp-subscribe-article {% if is_subscribed %}dp-subscribe-on{% endif %}" id="dp_sb">
+				{% if is_subscribed %}
+					{{ phrase('user.knowledgebase.unsubscribe-article', {link: path('user_articles_article_togglesub', {article_id: article.id, auth: security_token('subscribe_article')})}) }}
+				{% else %}
+					{{ phrase('user.knowledgebase.subscribe-article', {link: path('user_articles_article_togglesub', {article_id: article.id, auth: security_token('subscribe_article')})}) }}
+				{% endif %}
+			</div>
+		{% endif %}
+
+		{% if app.getSetting('core.show_share_widget') %}
+			{{ social.social_block(url('user_articles_article', {'slug': article.url_slug}), article.title) }}
+		{% endif %}
+	</footer>
+</section>
+
+{% include 'UserBundle:Common:comments-box.html.twig' with {
+	'type': 'article',
+	'comments': comments,
+	'form_action': path('user_articles_newcomment', {'article_id': article.id}),
+	'check_perm': 'articles.comment'
+} %}
+
+{% if glossary_words|length %}
+<script src="{{ asset('javascripts/DeskPRO/WordHighlighter.js') }}"></script>
+<script type="text/javascript">
+	var dp_glossary_words = {
+		{% for w in glossary_words %}
+			{{ w|json_encode|raw }}: {{ word_defs[w]|json_encode|raw }},
+		{% endfor %}
+		'': null
+	};
+	$(document).ready(function() {
+		DeskPRO.WordHighlighter.highlight(
+			document.getElementById('dp_article_content'),
+			{{ glossary_words|json_encode|raw }},
+			false,
+			true
+		);
+
+		$('.dp-highlight-word').on('mouseover.dp_init_hl', function() {
+			$(this).off('mouseover.dp_init_hl');
+
+			$(this).popover({
+				placement: 'top',
+				title: $(this).data('word'),
+				content: dp_glossary_words[$(this).data('word')] || '',
+				delay: {show: 250, hide: 250}
+			}).popover('show');
+		});
+	});
+</script>
+{% endif %}
+
+{% endblock %}

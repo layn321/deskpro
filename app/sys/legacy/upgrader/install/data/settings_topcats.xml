@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--  $Id: settings_topcats.xml 1662 2005-12-14 18:20:59Z chris $i -->
+<topcats>
+	<category key="set_hidden">Hidden Settings</category>
+	<category key="set_general">General Settings</category>
+	<category key="set_ticket">Ticket Settings</category>
+	<category key="set_email">Email Settings</category>
+	<category key="set_knowledgebase">Knowledgebase</category>
+	<category key="set_gateway">Email Gateway Settings</category>
+	<category key="set_advanced">Advanced Settings</category>
+</topcats>

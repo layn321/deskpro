@@ -1,0 +1,40 @@
+{% extends base_edit_tpl %}
+{% block form_extra %}
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>
+			Set value from cookie variable
+			<span class="small-light-icon tipped" title="Enter the name of the cookie variable to get a value from. If no cookie is set with this value, the query parameter is tried and then finally the default value."></span>
+		</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.cookie_name) }}
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>
+			Set value from query string parameter
+			<span class="small-light-icon tipped" title="Enter the name of the query parameter to get a value from. If no variable exists, then the default value is used."></span>
+		</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.param_name) }}
+	</div>
+</div>
+
+<div class="dp-form-row">
+	<div class="dp-form-label">
+		<label>
+			{{ phrase('admin.general.default_value') }}
+			<span class="small-light-icon tipped" title="The default value stored if no other value is set."></span>
+		</label>
+	</div>
+	<div class="dp-form-input">
+		{{ form_widget(form.default_value) }}
+	</div>
+</div>
+
+{% endblock %}

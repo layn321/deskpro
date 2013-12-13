@@ -1,0 +1,59 @@
+<div class="full-tab-content">
+	<div class="article-content-wrap content-post-wrap">
+		<span class="article-loading"><i class="spinner-flat"></i></span>
+		<iframe src="{{ path('user_articles_article_agent_iframe', {article_id: article.id, '_' : 'now'|date('U'), agent_session_id: app.getSession().getId(), 'real': 1 }) }}" style="width: 100%" class="article-iframe" frameborder="0"></iframe>
+		{% if article.attachments|length %}
+		<ul class="attachment-list">
+			{% for attach in article.attachments %}
+				<li class="{% if attach.blob.isImage() %}is-image{% else %}icon icon-attachment icon-filetype-{{attach.blob.extension|default('none')}}{% endif %}" rel="message-{{message.id}}">
+					{% if attach.blob.isImage() %}
+						<a href="{{ attach.blob.download_url }}" target="_blank"><img src="{{ path('serve_blob', {'blob_auth_id': attach.blob.auth_id, 'filename': attach.blob.filename_safe, 's': 50, 'size-fit': '1'}) }}" alt="" class="preview" /></a>
+					{% endif %}
+					<a href="{{ attach.blob.download_url }}" target="_blank">{{attach.blob.filename}}</a>
+					<span class="size">({{ attach.blob.readable_filesize }})</span>
+				</li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+	</div>
+	<div class="article-editor-wrap" style="display: none">
+		<div class="article-editor">
+			{% if state.article.real_content %}
+				<div class="revert-message-notice">
+					{{ phrase('agent.general.unsaved_changes_were_restored') }}
+					<button class="revert-default">{{ phrase('agent.publish.discard_unsaved_changes') }}</button>
+					<br />
+				</div>
+			{% endif %}
+			<textarea class="edit-content-field" name="article[content]" rows="5" cols="50">{{ state.article.content|default(article.real_content) }}</textarea>
+			{% if app.languages.isMultiLang() %}
+				<div style="float: right; padding-right: 18px; padding-top: 4px;">
+					<span class="small-light-icon tipped" title="{{ phrase('agent.publish.primary_lang_explain') }}"></span>
+					{{ phrase('agent.general.language') }}: <select name="article[language_id]" class="language_id">
+						{% for lang in app.languages.getAll() %}
+							<option value="{{ lang.id }}" {% if lang.id == article.language.id %}selected="selected"{% endif %}>{{ lang.title }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			{% endif %}
+			<div style="float: left;">
+				{% include 'AgentBundle:Common:attach-row-tmpl.html.twig' with {formname: 'newarticle[attach][]'} %}
+				<h6>{{ phrase('agent.general.attachments') }}</h6>
+				<div class="file-input">
+					<input type="file" name="file-upload" multiple="multiple" /> <button class="clean-gray xxx-small">{{ phrase('agent.general.upload') }}</button>
+				</div>
+				<ul class="dp-hide-empty attachment-list files file-list" {% if not article.attachments|length %}style="display: none;"{% endif %}>
+					{% for attach in article.attachments %}
+						<li class="{% if attach.blob.isImage() %}is-image{% else %}icon icon-attachment icon-filetype-{{attach.blob.extension|default('none')}}{% endif %}" rel="message-{{message.id}}">
+							<em class="remove-attach-trigger delete" data-blob-id="{{ attach.blob.id }}"></em>
+							<a href="{{ attach.blob.download_url }}" target="_blank">{{attach.blob.filename}}</a>
+							<span class="size">({{ attach.blob.readable_filesize }})</span>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+			<br class="clear" />
+			<textarea class="edit-content-field-default" style="display: none;">{{article.content}}</textarea>
+		</div>
+	</div>
+</div>

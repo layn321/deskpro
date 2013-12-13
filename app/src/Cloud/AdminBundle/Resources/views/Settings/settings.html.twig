@@ -1,0 +1,48 @@
+{% extends 'AdminBundle:Settings:settings.html.twig' %}
+{% block post_basics %}
+	<input type="hidden" name="set_settings[]" value="core.cloud_custom_domain" />
+	<div class="setting_field_row">
+		<h4>Helpdesk URL</h4>
+		<div class="setting_fields">
+			<div class="field_row">
+				<label>
+					<input type="radio" name="cloud_domain" value="default" onclick="$('#cloud_domain_default').show(); $('#cloud_domain_custom').hide();" {% if not app.getSetting('core.cloud_custom_domain') %}checked="checked" {% endif %} /> Use the default account URL
+				</label>
+				<div id="cloud_domain_default" style="padding-bottom: 15px; {% if app.getSetting('core.cloud_custom_domain') %}display: none{% endif %}">
+					<select name="cloud_domain_ssl">
+						<option value="https" {% if match(app.getSetting('core.deskpro_url'), '/^https:/') %}selected="selected"{% endif %}>(Secure) https://{{ constant('DPC_SITE_DOMAIN') }}/</option>
+						<option value="http" {% if not match(app.getSetting('core.deskpro_url'), '/^https:/') %}selected="selected"{% endif %}>http://{{ constant('DPC_SITE_DOMAIN') }}/</option>
+					</select>
+				</div>
+				<label>
+					<input type="radio" name="cloud_domain" value="custom" onclick="$('#cloud_domain_default').hide(); $('#cloud_domain_custom').show();" {% if app.getSetting('core.cloud_custom_domain') %}checked="checked"{% endif %} /> Use your own custom domain name:
+				</label>
+				<div id="cloud_domain_custom" style="{% if not app.getSetting('core.cloud_custom_domain') %}display: none{% endif %}">
+					{% if not app.getSetting('core.cloud_custom_domain') %}
+						<p>
+							To use a custom domain or sub-domain, create a <var style="background-color: #D7DEE6; font-family: Consolas, Monaco, monospace; font-style: normal;">CNAME</var> record that points to <var style="background-color: #D7DEE6; font-family: Consolas, Monaco, monospace; font-style: normal;">{{ constant('DPC_SITE_DOMAIN') }}.</var>
+						</p>
+						<p>
+							After you have done that you can set your custom domain here: <input type="text" name="settings[core.cloud_custom_domain]" value="{{ app.getSetting('core.cloud_custom_domain') }}" style="width: 200px;" placeholder="Enter your custom domain name" />
+						</p>
+					{% else %}
+						Your custom domain:<br/>
+						<input type="text" name="settings[core.cloud_custom_domain]" value="{{ app.getSetting('core.cloud_custom_domain') }}" style="width: 200px;" placeholder="Enter your custom domain name" />
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block attach_user_filesize_row %}
+	Maximum allowed upload size: 25 MB<br />
+	Maximum allowed email: 25 MB
+	<br />
+	<br />
+{% endblock %}
+{% block attach_agent_filesize_row %}
+	Maximum allowed upload size: 25 MB<br />
+	Maximum allowed email: 25 MB
+	<br />
+	<br />
+{% endblock %}

@@ -1,0 +1,84 @@
+{% set this_page = 'feedback_statuses' %}
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.FeedbackStatusListPage' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block html_head %}
+	<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/FeedbackStatusListPage.js') }}"></script>
+{% endblock %}
+{% block pagebar %}
+<nav>
+	<ul>
+		<li><a id="create_status_btn">{{ phrase('admin.feedback.create_new_status') }}</a></li>
+	</ul>
+</nav>
+<ul>
+	<li>{{ phrase('admin.feedback.feedback_statuses') }}</li>
+</ul>
+{% endblock %}
+{% block page %}
+	{{ design.structure_table({ 'id': 'active_statuses_table', 'save_order_url': path('admin_feedback_status_updateorders') }) }}
+		<thead>
+			<th colspan="10" class="only">
+				{{ phrase('admin.feedback.active_statuses') }}
+				<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('admin.feedback.explain_active_status') }}"></span>
+			</th>
+		</thead>
+		{% for cat in active_cats %}
+			{% include 'AdminBundle:Feedback:statuses-row.html.twig' with {'cat': cat} %}
+		{% endfor %}
+	{{ design.structure_table_end() }}
+
+	<br />
+
+	{{ design.structure_table({ 'id': 'closed_statuses_table', 'save_order_url': path('admin_feedback_status_updateorders') }) }}
+		<thead>
+			<th colspan="10" class="only">
+				{{ phrase('admin.feedback.closed_statuses') }}
+				<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="{{ phrase('admin.feedback.explain_closed_status') }}"></span>
+			</th>
+		</thead>
+		{% for cat in closed_cats %}
+			{% include 'AdminBundle:Feedback:statuses-row.html.twig' with {'cat': cat} %}
+		{% endfor %}
+	{{ design.structure_table_end() }}
+
+
+	<div id="create_status_overlay" style="width: 400px; height: 250px; display: none;">
+		<div class="overlay-title">
+			<span class="close-overlay close-trigger"></span>
+			<h4>{{ phrase('agent.general.create_status') }}</h4>
+		</div>
+		<div class="overlay-content">
+			<div class="dp-form">
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.type') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<select name="cat[status_type]">
+							<option value="active">{{ phrase('admin.feedback.active_status') }}</option>
+							<option value="closed">{{ phrase('admin.feedback.closed_status') }}</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="dp-form-row">
+					<div class="dp-form-label">
+						<label>{{ phrase('agent.general.title') }}</label>
+					</div>
+					<div class="dp-form-input">
+						<input type="text" name="cat[title]" value="" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="overlay-footer">
+			<button
+				id="create_status_save_btn"
+				class="clean-white"
+				data-save-url="{{ path('admin_feedback_statuses_ajaxadd') }}"
+			>{{ phrase('agent.general.create_status') }}</button>
+		</div>
+	</div>
+{% endblock %}

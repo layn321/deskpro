@@ -1,0 +1,54 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+     <ul>
+         <li><a href="{{ path('admin_userreg_options') }}">{{ phrase('admin.user_registration.registration_settings') }}</a></li>
+		 <li>{{ phrase('admin.user_registration.twitter_setup') }}</li>
+     </ul>
+{% endblock %}
+{% block prepage %}
+	<div style="padding: 10px 10px 0 10px;">
+		{{ design.helpbox() }}
+			<p>
+				{{ phrase('admin.user_registration.notice_enable_twitter') }}
+				<a href="https://dev.twitter.com/apps/new">{{ phrase('admin.user_registration.click_here_to_sign_up') }}</a>.
+			</p>
+		{{ design.helpbox_end() }}
+	</div>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_userreg_twitter_edit') }}" method="post" class="dp-form">
+	{{ form_token('twitter_setup') }}
+	<input type="hidden" name="process" value="1" />
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.consumer_key') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="twitter[consumer_key]" value="{{ options.consumer_key }}" placeholder="{{ phrase('admin.user_registration.enter_twitter_key') }}" />
+		</div>
+	</div>
+
+	<div class="dp-form-row">
+		<div class="dp-form-label">
+			<label>{{ phrase('admin.user_registration.consumer_secret') }}</label>
+		</div>
+		<div class="dp-form-input">
+			<input type="text" name="twitter[consumer_secret]" value="{{ options.consumer_secret }}" placeholder="{{ phrase('admin.user_registration.enter_twitter_secret') }}" />
+		</div>
+	</div>
+
+	<footer class="controls">
+	<div class="is-not-loading">
+		<button class="clean-white">{{ phrase('agent.general.save') }}</button>
+	</div>
+	<div class="is-loading">
+		<div class="loading-icon-flat">&nbsp;</div>
+	</div>
+</footer>
+
+<br class="clear" />
+</form>
+{% endblock %}

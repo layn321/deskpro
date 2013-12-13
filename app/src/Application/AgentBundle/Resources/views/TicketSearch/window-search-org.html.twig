@@ -1,0 +1,51 @@
+<div class="pane-row add-to-search">
+	<table class="layout-table v-middle" width="100%">
+		<tr>
+			<td nowrap="nowrap" width="100" style="width: 100px;"><span class="row-label">{{ phrase('agent.general.organization') }}</span></td>
+			<td style="padding: 0 5px;" width="10">
+				<select name="terms_expanded[organization][op]" class="with-select2">
+					<option value="contains">{{ phrase('agent.general.is') }}</option>
+					<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+				</select>
+			</td>
+			<td>
+				<select name="terms_expanded[organization][options][organization_ids][]" multiple="multiple" class="with-select2 ensure-value dp-org-select">
+					{% for id,name in app.getDataService('Organization').getOrganizationNames() %}
+						<option value="{{ id }}">{{ name }}</option>
+					{% endfor %}
+				</select>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<div class="with-search-builder">
+	<div class="search-form criteria_list add-to-search">
+		<div class="search-terms"></div>
+		<div class="add-term-row"><span class="add-term"><i class="icon-plus-sign"></i></span></div>
+	</div>
+
+	<div class="search-builder-tpl criteria_tpl" style="display:none">
+		<div class="row">
+			<div class="term">
+				<div class="remove-row-btn trigger-remove-row"><i class="icon-minus-sign"></i></div>
+				<div class="sep-row">
+					<div class="line"></div>
+					<strong>{{ phrase('agent.general.and') }}</strong>
+				</div>
+				<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+					<td class="builder-controls" style="vertical-align: middle;">
+						<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+							<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+							<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+						</tr></tbody></table>
+					</td>
+				</tr></tbody></table>
+			</div>
+		</div>
+		<div class="builder-type-choice" title="{{ phrase('agent.general.choose_criteria') }}" data-rule-type=""></div>
+
+		{% include 'DeskPRO:Common:org-search-criteria.html.twig' with {'term_options': term_options, 'id': false, 'classname': false} %}
+	</div>
+</div>

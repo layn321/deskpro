@@ -1,0 +1,74 @@
+{% if grouped_info.counts[0].total > 0 and not grouped_info.group1_structure[0] %}
+	<li data-grouping-option="0" class="grouping-0">
+		<div class="item is-nav-item">
+			<h3>{{ phrase('agent.general.none') }}</h3>
+			<div class="float-side"><em class="counter list-counter">{{ grouped_info.counts[0].total }}</em></div>
+		</div>
+	</li>
+{% endif %}
+{% for cat in grouped_info.group1_structure %}
+	{% set count = grouped_info.counts[cat.id].total %}
+	{% set count_all = count %}
+	{% if cat.children %}
+		{% for subcat in cat.children %}
+			{% set count_all = count_all + grouped_info.counts[subcat.id].total %}
+		{% endfor %}
+	{% endif %}
+	{% if count_all > 0 %}
+		<li data-grouping-option="{{ cat.id }}" class="grouping-{{ cat.id }}">
+			<div class="item is-nav-item">
+				<h3>
+					{% if grouping_var == 'urgency' %}
+						<span class="status-pill urgency-{{ cat.title }} awaiting_agent">
+							<label>{{ phrase('agent.tickets.status_awaiting_agent') }}</label>
+							<i>{{ cat.title }}</i>
+						</span>
+					{% elseif grouping_var == 'agent' %}
+						{% set agent = app.agents.get(cat.id) %}
+						{% if agent %}
+							<span
+								style="background: url('{{ agent.getPictureUrl(16) }}') no-repeat 0 50%; height: 16px; padding-left: 19px; display: block;"
+							>{{ cat.title }}</span>
+						{% else %}
+							{{ cat.title }}
+						{% endif %}
+					{% elseif grouping_var == 'language' %}
+						{% set language = app.languages.get(cat.id) %}
+						{% if language and language.flag_image %}
+							<span
+								style="background: url('{{ asset('images/flags/' ~ language.flag_image) }}') no-repeat 0 50%; height: 16px; padding-left: 19px; display: block;"
+							>{{ cat.title }}</span>
+						{% else %}
+							{{ cat.title }}
+						{% endif %}
+					{% else %}
+						{{ cat.title }}
+					{% endif %}
+				</h3>
+				<div class="float-side">
+					<em class="counter list-counter">
+						{% if cat.children %}
+							{% if count %}{{ count }}{% endif %}{% if count and count_all %}/{% endif %}{% if count_all %}{{ count_all }}{% endif %}
+							{% if not count and not count_all %}0{% endif %}
+						{% elseif count %}
+							{{ count|default('0') }}
+						{% endif %}
+					</em>
+				</div>
+			</div>
+		</li>
+		{% if cat.children %}
+			{% for subcat in cat.children %}
+				{% set subcount = grouped_info.counts[subcat.id].total %}
+				{% if subcount > 0 %}
+					<li data-grouping-option="{{ subcat.id }}" class="sub-item grouping-{{ subcat.id }}">
+						<div class="item">
+							<h3>&mdash; {{ subcat.title }}</h3>
+							<div class="float-side"><em class="counter list-counter">{{ subcount }}</em></div>
+						</div>
+					</li>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endif %}
+{% endfor %}

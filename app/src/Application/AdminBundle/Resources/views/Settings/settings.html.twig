@@ -1,0 +1,402 @@
+{% set page_handler = 'DeskPRO.Admin.ElementHandler.SettingsPage' %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+	<ul>
+		<li>{{ phrase('agent.general.settings') }}</li>
+	</ul>
+{% endblock %}
+{% block html_head %}
+<script type="text/javascript" src="{{ asset('javascripts/DeskPRO/Admin/ElementHandler/SettingsPage.js') }}"></script>
+{% endblock %}
+{% block page %}
+
+<form action="{{ path('admin_settings') }}" method="POST" id="settings_form">
+<input type="hidden" name="process" value="1" />
+
+<div class="setting_field_row">
+	<h4>{{ phrase('admin.settings.basics') }}</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>{{ phrase('admin.settings.your_helpdesk_name') }}</label>
+					<input type="text" name="settings[core.deskpro_name]" value="{{app.getSetting('core.deskpro_name')}}" size="40" />
+				</td>
+				{% if not app.isCloud() %}
+					<td>
+						<label>{{ phrase('admin.settings.your_helpdesk_url') }}</label>
+						<input type="text" id="helpdesk_url" name="settings[core.deskpro_url]" value="{{app.getSetting('core.deskpro_url')}}" data-original-value="{{app.getSetting('core.deskpro_url')}}" size="40" />
+						<div id="helpdesk_url_invalid" style="color: red; display: none;">
+							The URL you entered appears to be invalid or the server is not responding.<br/>You should check the URL and try again.
+						</div>
+					</td>
+				{% endif %}
+			</tr></table>
+		</div>
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>{{ phrase('admin.settings.your_website_name') }}</label>
+					<input type="text" name="settings[core.site_name]" value="{{app.getSetting('core.site_name')}}" size="40" />
+				</td>
+				<td>
+					<label>{{ phrase('admin.settings.your_website_url') }}</label>
+					<input type="text" name="settings[core.site_url]" value="{{app.getSetting('core.site_url')}}" size="40" />
+				</td>
+			</tr></table>
+		</div>
+	</div>
+</div>
+{% block post_basics %}{% endblock %}
+<div class="setting_field_row">
+	<h4>{{ phrase('admin.general.helpdesk') }}</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label style="display: inline-block"><input type="checkbox" name="settings[core.helpdesk_disabled]" {% if app.helpdesk_is_offline %}checked="checked"{% endif %} />
+				Make the helpdesk disabled</label>
+			&nbsp;&nbsp;
+			<button class="clean-white" onclick="$(this).hide(); $('#offline_message_edit').show(); return false;">Edit offline message</button>
+		</div>
+		<div id="offline_message_edit" style="display: none;">
+			This message will be displayed when the helpdesk is offline or when you are installing updates. HTML is allowed.<br/>
+			<textarea name="offline_message" style="width: 80%; height: 190px; font-family: Monaco, Consolas, monospace; font-size: 11px;">{{ offline_message }}</textarea>
+			<br/><br/>
+		</div>
+		{% if app.isCloud() %}
+			<input type="hidden" name="settings[core.redirect_correct_url]" value="1" />
+			<input type="hidden" name="settings[core.rewrite_urls]" value="1" />
+		{% else %}
+			<div class="field_row">
+				<label><input type="checkbox" name="settings[core.rewrite_urls]" {% if app.getSetting('core.rewrite_urls') %}checked="checked"{% endif %} />
+					{{ phrase('admin.settings.rewrite_urls_desc') }}</label>
+			</div>
+			<div class="field_row">
+				<label><input type="checkbox" id="redirect_correct_url" name="settings[core.redirect_correct_url]" {% if app.getSetting('core.redirect_correct_url') %}checked="checked"{% endif %} onclick="if (this.checked) $(this).addClass('do-check'); else $(this).removeClass('do-check'); " />
+					{{ phrase('admin.settings.notice_always_redirect_users') }}
+			</div>
+		{% endif %}
+	</div>
+</div>
+
+{% if not app.isCloud() %}
+	<div class="setting_field_row">
+		<h4>Email</h4>
+		<div class="setting_fields">
+			<div class="field_row">
+				Default mail sent from {{ app.getSetting('core.default_from_email') }} (via {{ outgoing_email.title }}).
+				<br />
+				<a class="clean-white" href="{{ path('admin_emailtrans_setup') }}">Edit outgoing mail account &rarr;</a>
+			</div>
+			<div class="field_row">
+				<label>Max incoming email size for emails sent to a <a href="{{ path('admin_emailgateways') }}">ticket account</a>:</label>
+				<input type="text" name="settings[core.gateway_max_email]" value="{% if not app.getSetting('core.gateway_max_email') %}20{% else %}{{ app.getSetting('core.gateway_max_email') / 1024 / 1024 }}{% endif %}" size="10" /> megabytes
+			</div>
+		</div>
+	</div>
+{% endif %}
+
+<div class="setting_field_row">
+	<h4>Languages</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			{% if app.languages.isMultiLang() %}
+				There are {{ app.languages.getTitles()|length }} languages installed:
+				<ul class="small-detail-list">
+					{% for id,title in app.languages.getTitles() %}
+						<li>
+							<a class="editable-link" href="{{ path('admin_langs_editlang', {language_id: id}) }}"><span>
+								{{ title }}
+							</span></a>
+						</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				Only English is installed.
+			{% endif %}
+			<a class="clean-white" href="{{ path('admin_langs') }}">Manage langauges &rarr;</a>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row">
+	<h4>{{ phrase('agent.general.attachments') }}</h4>
+	<div class="setting_fields">
+		<table cellspacing="0" cellpadding="0" width="100%"><tr><td valign="top" style="padding-right: 15px" width="50%">
+			<h6>{{ phrase('agent.general.users') }}</h6>
+
+			{% block attach_user_filesize_row %}
+				<div class="field_row">
+					<input type="hidden" id="user_attach_maxsize" name="settings[core.attach_user_maxsize]" value="{{ app.getSetting('core.attach_user_maxsize') }}" />
+					{{ phrase('admin.settings.max_upload_size') }}: <span id="user_attach_maxsize_label"></span> {{ phrase('admin.settings.mb') }}
+					<div id="user_attach_maxsize_slider"></div>
+					<div id="user_attach_maxsize_notice" data-maxsize="{{ max_uploadsize }}" style="display: none">
+						{{phrase('admin.settings.max_filesize_server', {'filesize':max_uploadsize_readable}) }} <a href="{{ path('admin_server_attach') }}">{{ phrase('admin.settings.link_learn_about_limit') }}</a>
+					</div>
+				</div>
+			{% endblock %}
+
+			<div class="field_row">
+				<label style="display: inline;"><input type="radio" id="user_attach_limit_type_b" name="user_attach_limit_type" value="blacklist" {% if app.getSetting('core.attach_user_not_exts') %}checked="checked"{% endif %}> {{ phrase('admin.settings.disallow_file_types') }}</label>
+				<label style="display: inline;"><input type="radio" id="user_attach_limit_type_w" name="user_attach_limit_type" value="whitelist" {% if app.getSetting('core.attach_user_must_exts') %}checked="checked"{% endif %}> {{ phrase('admin.settings.restrict_file_types') }}</label>
+				<input style="width: 90%;" type="text" id="user_attach_limit_list_whitelist" name="settings[core.attach_user_must_exts]" value="{{ app.getSetting('core.attach_user_must_exts') }}" />
+				<input style="width: 90%;" type="text" id="user_attach_limit_list_blacklist" name="settings[core.attach_user_not_exts]" value="{{ app.getSetting('core.attach_user_not_exts') }}" />
+			</div>
+		</td><td valign="top" style="padding-left: 15px" width="50%">
+			<h6>{{ phrase('agent.general.agents') }}</h6>
+
+			{% block attach_agent_filesize_row %}
+				<div class="field_row">
+					<input type="hidden" id="agent_attach_maxsize" name="settings[core.attach_agent_maxsize]" value="{{ app.getSetting('core.attach_agent_maxsize') }}" />
+					{{ phrase('admin.settings.max_upload_size') }}: <span id="agent_attach_maxsize_label"></span> {{ phrase('admin.settings.mb') }}
+					<div id="agent_attach_maxsize_slider"></div>
+					<div id="agent_attach_maxsize_notice" data-maxsize="{{ max_uploadsize }}" style="display: none">
+						{{phrase('admin.settings.max_filesize_server', {'filesize':max_uploadsize_readable}) }} <a href="{{ path('admin_server_attach') }}">{{ phrase('admin.settings.link_learn_about_limit') }}</a>
+					</div>
+				</div>
+			{% endblock %}
+
+			<div class="field_row">
+				<label style="display:inline"><input type="radio" id="agent_attach_limit_type_b" name="agent_attach_limit_type" value="blacklist" {% if app.getSetting('core.attach_agent_not_exts') %}checked="checked"{% endif %}> {{ phrase('admin.settings.disallow_file_types') }}</label>
+				<label style="display:inline"><input type="radio" id="agent_attach_limit_type_w" name="agent_attach_limit_type" value="whitelist" {% if app.getSetting('core.attach_agent_must_exts') %}checked="checked"{% endif %}> {{ phrase('admin.settings.restrict_file_types') }}</label>
+				<input style="width: 90%;" type="text" id="agent_attach_limit_list_whitelist" name="settings[core.attach_agent_must_exts]" value="{{ app.getSetting('core.attach_agent_must_exts') }}" />
+				<input style="width: 90%;" type="text" id="agent_attach_limit_list_blacklist" name="settings[core.attach_agent_not_exts]" value="{{ app.getSetting('core.attach_agent_not_exts') }}" />
+			</div>
+		</tr></table></table>
+		<table cellspacing="0" cellpadding="0" width="50%"><tr><td valign="top" style="padding-right: 15px">
+			<h6>Send attachments in email notifications up to this size</h6>
+
+			<div class="field_row">
+				<input type="hidden" id="sendemail_attach_maxsize" name="settings[core.sendemail_attach_maxsize]" value="{{ app.getSetting('core.sendemail_attach_maxsize') }}" />
+				{{ phrase('admin.settings.max_upload_size') }}: <span id="sendemail_attach_maxsize_label"></span> {{ phrase('admin.settings.mb') }}
+				<div id="sendemail_attach_maxsize_slider"></div>
+			</div>
+		</tr></table>
+	</div>
+</div>
+<div class="setting_field_row">
+	<h4>{{ phrase('admin.settings.gravatar') }}</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>
+						<input type="checkbox" name="settings[core.use_gravatar]" {% if app.getSetting('core.use_gravatar') %}checked="checked"{% endif %} />
+						{{ phrase('admin.settings.choice_gravatar_default') }}
+					</label>
+				</td>
+			</tr></table>
+		</div>
+	</div>
+</div>
+<div class="setting_field_row">
+	<h4>
+		Dates and Times
+		<br /><span style="font-size: 11px"><a href="http://php.net/date">See PHP date formatting</a>
+	</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>Default Timezone</label>
+					<select name="settings[core.default_timezone]">
+						{% for tz in timezone_options %}
+							<option value="{{ tz }}" {% if app.getSetting('core.default_timezone') == tz %}selected="selected"{% endif %}>{{ tz }}</option>
+						{% endfor %}
+					</select>
+				</td>
+			</tr></table>
+		</div>
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>Full date and time format</label>
+					<input type="text" name="settings[core.date_fulltime]" value="{{app.getSetting('core.date_fulltime')}}" size="15" />
+				</td>
+				<td>
+					<label>Full date</label>
+					<input type="text" name="settings[core.date_full]" value="{{app.getSetting('core.date_full')}}" size="15" />
+				</td>
+				<td style="padding-left: 10px;">
+					<label>Date</label>
+					<input type="text" name="settings[core.date_day]" value="{{app.getSetting('core.date_day')}}" size="15" />
+				</td>
+			</tr></table>
+		</div>
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>Short Date</label>
+					<input type="text" name="settings[core.date_day_short]" value="{{app.getSetting('core.date_day_short')}}" size="15" />
+				</td>
+				<td>
+					<label>Time</label>
+					<input type="text" name="settings[core.date_time]" value="{{app.getSetting('core.date_time')}}" size="15" />
+				</td>
+			</tr></table>
+		</div>
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>When to send agent task reminders:</label>
+					<select name="settings[core.task_reminder_time]">
+						{% for i in range(1,23) %}
+							{% if i < 10 %}{% set i = '0' ~ i %}{% endif %}
+							{% set time1 = i ~ ':00' %}
+							{% set time2 = i ~ ':30' %}
+							<option {% if app.getSetting('core.task_reminder_time') == time1 %}selected="selected"{% endif %} value="{{ time1 }}">{{ time1 }}</option>
+							<option {% if app.getSetting('core.task_reminder_time') == time2 %}selected="selected"{% endif %} value="{{ time2 }}">{{ time2 }}</option>
+						{% endfor %}
+					</select>
+				</td>
+			</tr></table>
+		</div>
+	</div>
+</div>
+<div class="setting_field_row">
+	<h4>Keyboard Shortcuts</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<input type="hidden" name="set_settings_falseable[]" value="core.agent_enable_kb_shortcuts" />
+			<label>
+				<input type="checkbox" name="settings[core.agent_enable_kb_shortcuts]" {% if app.getSetting('core.agent_enable_kb_shortcuts') %}checked="checked"{% endif %} />
+				Enable keyboard shortcuts in the agent interface.
+				<span class="small-light-icon tipped" data-tipped-options="maxWidth: 250" title="Keyboard shortcuts make it faster to access often used features of the interface. For example, press 't' to open the New Ticket form. A complete list is displayed in the Help menu in the agent interface. Depending on your computer input preferences, these keyboard shortcuts may conflict with special language input so you may want to disable them."></span>
+			</label>
+		</div>
+	</div>
+</div>
+<div class="setting_field_row">
+	<h4>{{ phrase('agent.general.misc') }}</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<label>{{ phrase('admin.portal.show_ratings_explain') }}</label>
+			<input type="text" name="settings[user.show_ratings]" value="{{app.getSetting('user.show_ratings')|default('0')}}" size="20" style="width: 50px" />
+		</div>
+		<div class="field_row">
+			<input type="hidden" name="set_settings_falseable[]" value="user.publish_comments" />
+			<label><input type="checkbox" name="settings[user.publish_comments]" {% if app.getSetting('user.publish_comments') %}checked="checked"{% endif %} /> Enable comments on articles, news and downloads</label>
+		</div>
+		<div class="field_row">
+			<input type="hidden" name="set_settings_falseable[]" value="user.register_captcha" />
+			<label><input type="checkbox" name="settings[user.register_captcha]" {% if app.getSetting('user.register_captcha') %}checked="checked"{% endif %} /> Enable captcha on registration form</label>
+		</div>
+		<div class="field_row">
+			<input type="hidden" name="set_settings_falseable[]" value="user.publish_captcha" />
+			<label><input type="checkbox" name="settings[user.publish_captcha]" {% if app.getSetting('user.publish_captcha') %}checked="checked"{% endif %} /> Enable captcha on new feedback and new comment forms</label>
+		</div>
+		<div class="field_row">
+			<input type="hidden" name="set_settings_falseable[]" value="user.always_show_captcha" />
+			<label><input type="checkbox" name="settings[user.always_show_captcha]" {% if app.getSetting('user.always_show_captcha') %}checked="checked"{% endif %} /> Always show captcha even when user is logged in</label>
+		</div>
+		<div class="field_row">
+			<input type="hidden" name="set_settings_falseable[]" value="user.feedback_notify_comments" />
+			<label><input type="checkbox" name="settings[user.feedback_notify_comments]" {% if app.getSetting('user.feedback_notify_comments') %}checked="checked"{% endif %} /> Notify users participating in Feedback posts when a new comment is added</label>
+		</div>
+		<div class="field_row">
+			<input type="hidden" name="set_settings_falseable[]" value="user.kb_subscriptions" />
+			<label><input type="checkbox" name="settings[user.kb_subscriptions]" {% if app.getSetting('user.kb_subscriptions') %}checked="checked"{% endif %} /> Allow users to subscribe to articles and categories. When articles are updated or new articles are created in a category, subscribed users will be notified by email.</label>
+		</div>
+
+		<div class="field_row">
+			<label>Google Analytics Tracking ID</label>
+			<input type="text" name="settings[core.ga_property_id]" value="{{app.getSetting('core.ga_property_id')}}" size="25" />
+			<div>If you enter your Google Analytics tracking ID here, Google Analytics tracking code will be added on all user interface pages.</div>
+		</div>
+	</div>
+</div>
+<div class="setting_field_row">
+	<h4>{{ phrase('admin.portal.share_widgets') }}</h4>
+	<input type="hidden" name="set_settings_falseable[]" value="core.show_share_widget" />
+	<input type="hidden" name="set_settings_falseable[]" value="core.show_share_facebook" />
+	<input type="hidden" name="set_settings_falseable[]" value="core.show_share_twitter" />
+	<input type="hidden" name="set_settings_falseable[]" value="core.show_share_gplus" />
+	<input type="hidden" name="set_settings_falseable[]" value="core.show_share_linkedin" />
+	<div class="setting_fields" id="share_options">
+		<div class="field_row">
+			<label><input type="checkbox" id="share_master" name="settings[core.show_share_widget]" {% if app.getSetting('core.show_share_widget') %}checked="checked"{% endif %} /> {{ phrase('admin.portal.show_share_widget') }}</label>
+			<div id="share_group">
+				<label>&nbsp;&nbsp;&nbsp; <input class="share-child" type="checkbox" name="settings[core.show_share_facebook]" {% if app.getSetting('core.show_share_facebook') %}checked="checked"{% endif %} /> {{ phrase('admin.portal.show_share_widget_facebook') }}</label>
+				<label>&nbsp;&nbsp;&nbsp; <input class="share-child" type="checkbox" name="settings[core.show_share_twitter]" {% if app.getSetting('core.show_share_twitter') %}checked="checked"{% endif %} /> {{ phrase('admin.portal.show_share_widget_twitter') }}</label>
+				<label>&nbsp;&nbsp;&nbsp; <input class="share-child" type="checkbox" name="settings[core.show_share_gplus]" {% if app.getSetting('core.show_share_gplus') %}checked="checked"{% endif %} /> {{ phrase('admin.portal.show_share_widget_gplus') }}</label>
+				<label>&nbsp;&nbsp;&nbsp; <input class="share-child" type="checkbox" name="settings[core.show_share_linkedin]" {% if app.getSetting('core.show_share_gplus') %}checked="checked"{% endif %} /> {{ phrase('admin.portal.show_share_widget_linkedin') }}</label>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="setting_field_row">
+	<h4>Cookies</h4>
+	<div class="setting_fields">
+		<div class="field_row">
+			<table cellspacing="0" cellpadding="0"><tr>
+				<td style="padding-right: 10px;">
+					<label>{{ phrase('admin.settings.cookie_path') }}</label>
+					<input type="text" name="settings[core.cookie_path]" value="{{app.getSetting('core.cookie_path')}}" size="40" />
+				</td>
+				<td>
+					<label>{{ phrase('admin.settings.cookie_domain') }}</label>
+					<input type="text" name="settings[core.cookie_domain]" value="{{app.getSetting('core.cookie_domain')}}" size="40" />
+				</td>
+			</tr></table>
+		</div>
+	</div>
+</div>
+
+<div class="setting_field_row" style="text-align: center">
+	<button class="clean-white" id="save_btn">{{ phrase('admin.general.save_settings') }}</button>
+	<span class="flat-spinner" id="save_loading" style="display: none;"></span>
+</div>
+
+</form>
+
+<div id="adv_settings_warn" style="width: 400px; height: 200px; display: none;">
+	<div class="overlay-title">
+		<span class="close-overlay"></span>
+		<h4>{{ phrase('admin.settings.advanced_settings') }}</h4>
+	</div>
+	<div class="overlay-content">
+		<p>{{ phrase('admin.settings.warning_advanced_settings_undocumented') }}</p>
+		<br />
+		<p>{{ phrase('admin.settings.notice_take_care') }}</p>
+	</div>
+	<div class="overlay-footer">
+		<a href="{{ path('admin_settings_adv') }}" class="clean-white">{{ phrase('admin.settings.continue_to_advanced_settings') }}</a>
+	</div>
+</div>
+
+<div style="position:absolute; bottom: 5px; right: 8px; font-size: 10px;">
+	<a href="#" id="adv_settings_btn">Advanced &rarr;</a>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	function update() {
+		if (!$(':checkbox.share-child').is(':checked')) {
+			$('#share_master').prop('checked', false);
+		}
+
+		if (!$('#share_master').prop('checked')) {
+			$('#share_group').fadeTo('fast', 0.5);
+		} else {
+			$('#share_group').fadeTo('fast', 1);
+		}
+	}
+
+	update();
+	$('#share_options :checkbox').on('change', function() {
+		if ($(this).attr('id') == 'share_master') {
+			if ($(this).prop('checked')) {
+				$('.share-child').prop('checked', true);
+			} else {
+				$('.share-child').prop('checked', false);
+			}
+		} else {
+			if ($(this).prop('checked')) {
+				$('#share_master').prop('checked', true);
+			}
+		}
+		update();
+	});
+});
+</script>
+
+{% endblock %}

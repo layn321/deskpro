@@ -1,0 +1,13 @@
+<select {% if name %}name="{{ name }}"{% endif %} {% if id %}id="{{ id }}"{% endif %} class="language_id {{add_classname}}"
+	data-style-type="icons"
+	{{ add_attr|raw }}
+>
+	{% if with_blank %}<option value="{{ with_blank_value|default('') }}">{{ blank_title|default('') }}</option>{% endif %}
+	{% for language in languages %}
+		{% set title = phrase_object(language, 'title') %}
+		{% if not title %}
+			{% set title = language.title %}
+		{% endif %}
+		<option value="{{ language.id }}" data-icon="{{ asset('images/flags/' ~ language.flag_image) }}" {% if language.id == selected %}selected="selected"{% endif %}>{{ phrase_object(language) }}</option>
+	{% endfor %}
+</select>

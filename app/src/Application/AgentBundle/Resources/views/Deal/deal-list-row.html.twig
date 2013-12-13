@@ -1,0 +1,88 @@
+<article
+    class="row-item item-list deal deal-{{deal.id}} deals-{{deal.id}} related-is-linkable"
+    data-content-type="deals"
+    data-content-id="{{ deal.id }}"
+    data-route="page:{{ path('agent_deal_view', {'deal_id': deal.id|default('0')}) }}"
+    data-route-title="@selector(a.row-title)"
+    >
+
+
+
+    <div class="top-row">
+        <div class="top-row-left">
+            <h3>
+                <a class="name click-through">{{deal.title}}</a>
+            </h3>
+
+        </div>
+        <div class="top-row-right">
+            <span>{{deal.deal_stage.name}}</span><span> {{deal.deal_currency.symbol|default('$')}}{{deal.deal_value}}</span>
+        </div>
+        <div class="top-row-right visible-related-content-controls">
+            <span>{{deal.deal_stage.name}}</span><span> {{deal.deal_currency.symbol|default('$')}}{{deal.deal_value}}</span>
+                <div class="bound-faded"></div>
+                <button class="clean-gray xxx-small related-link clean-white small">{{ phrase('agent.general.add_as_related') }}</button>
+                <button class="clean-gray xxx-small related-unlink clean-white small">{{ phrase('agent.general.remove_as_related') }}</button>
+        </div>
+
+
+    </div>
+    <hr class="clear-top">
+    <div style="margin-left: 22px;">
+        <ul class="controls">
+            <li>{{ phrase('agent.general.user') }}:
+            {% for person in deal.peoples%}
+                <a class="name click-through" data-route="person:{{ path('agent_people_view', {'person_id': person.id|default('0')}) }}">
+                    {{ person.display_name }}
+                </a>
+                {% if loop.index >= 1 and loop.index != loop.last%}
+                    {{ phrase('agent.general.and') }}
+                {%endif%}
+
+             {% endfor%}
+            </li>
+            <li>|</li>
+            <li>{{ phrase('agent.general.organization') }}:
+            {% for organization in deal.organizations%}
+                <a class="with-route" data-route="person:{{ path('agent_org_view', {'organization_id': organization.id}) }}">{{organization.name}}</a>
+                {% if loop.index >= 1 and loop.index != loop.last%}
+                    {{ phrase('agent.general.and') }}
+                {%endif%}
+            {% endfor%}
+            </li>
+        </ul>
+    </div>
+    <div class="clear"></div>
+    <div class="extra-fields">
+        <ul >
+            {% if deal.person.id%}
+            <li>
+                <span class="prop-title">{{ phrase('agent.deal.created_by') }}:</span>
+                <span class="prop-val">{{deal.person.name}}</span>
+            </li>
+            {% endif %}
+
+            {% if deal.assigned_agent.id and 'assigned_agent' in display_fields%}
+            <li>
+                <span class="prop-title">{{ phrase('agent.general.agent') }}:</span>
+                <span class="prop-val">{{deal.assigned_agent.name}}</span>
+            </li>
+            {% endif %}
+
+            {% if 'date_created' in display_fields %}
+            <li>
+                <span class="prop-title">{{ phrase('agent.general.date_created') }}:</span>
+                <span class="prop-val">{{deal.date_created|date('day')}}</span>
+            </li>
+            {% endif %}
+            {% if 'visibility' in display_fields %}
+            <li>
+                <span class="prop-title">{{ phrase('agent.deal.visibility') }}:</span>
+                <span class="prop-val">{% if deal.visibility == 0%} {{ phrase('agent.general.private') }} {% else%} {{ phrase('agent.general.public') }}{% endif %}</span>
+            </li>
+            {% endif %}
+
+        </ul>
+        <br class="clear">
+    </div>
+</article>

@@ -1,0 +1,63 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% block pagebar %}
+	<ul>
+		<li><a href="{{ path('admin_agents') }}">{{ phrase('agent.general.agents') }}</a></li>
+		<li>Add agent from {{ usersource.title }}</li>
+	</ul>
+{% endblock %}
+{% block page %}
+
+<form
+	id="add_form"
+	action="{{ path('admin_agents_new_fromusersource', {'usersource_id': usersource.id}) }}"
+	method="POST"
+	data-search-url="{{ path('admin_agents_new_fromusersource_search', {'usersource_id': usersource.id}) }}"
+>
+	<div class="dp-form">
+		<div class="dp-form-row">
+			<div class="dp-form-label">
+				<label>Find the agent you want to create:</label>
+			</div>
+			<div class="dp-form-input">
+				<input type="text" name="search_term" id="search_term" value="" placeholder="Account name" />
+				<span id="search_loading" style="display: none;"><span class="flat-spinner" style="display: inline-block;"></span></span>
+				<button class="clean-white" id="search_trigger">Find Account</button>
+			</div>
+		</div>
+	</div>
+</form>
+
+<div id="found_account" style="display: none">
+	<div id="found_account_info"></div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var search_url = $('#add_form').data('search-url');
+	$('#search_trigger').on('click', function(ev) {
+		ev.preventDefault();
+
+		$('#search_loading').show();
+		$('#search_trigger').hide();
+		$('#found_account_info').empty();
+		$('#found_account').hide();
+
+		$.ajax({
+			url: search_url,
+			data: {search_term: $('#search_term').val() },
+			type: 'POST',
+			dataType: 'html',
+			complete: function() {
+				$('#search_loading').hide();
+				$('#search_trigger').show();
+			},
+			success: function(block) {
+				$('#found_account_info').html(block);
+				$('#found_account').show();
+			}
+		});
+	});
+});
+</script>
+{% endblock %}

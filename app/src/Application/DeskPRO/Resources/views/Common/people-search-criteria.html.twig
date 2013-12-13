@@ -1,0 +1,234 @@
+{% if id or classname %}
+	{# if given an id or classname then we want a wrapper #}
+	<div {% if id %}id="{{ id }}"{% endif %} class="{{ classname }}" style="display:none">
+	<div class="row">
+		<div class="term">
+			<table cellpadding="0" cellspacing="0" width="100%" border="0" class="term-table"><tbody><tr>
+				<td style="vertical-align: middle; text-align: center;" width="11"><div class="builder-remove">-</div></td>
+				<td class="builder-controls" style="vertical-align: middle;">
+					<table cellpadding="0" cellspacing="0" width="100%" border="0"><tbody><tr>
+						<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-type-choice"></div></td>
+						<td style="vertical-align: middle;" width="10" nowrap="nowrap"><div class="builder-op"></div></td>
+						<td style="vertical-align: middle;"><div class="builder-options"></div></td>
+					</tr></tbody></table>
+				</td>
+			</tr></tbody></table>
+		</div>
+	</div>
+	<div class="builder-type-choice" title="{{ phrase('agent.general.choose_criteria') }}" data-rule-type="">
+	</div>
+{% endif %}
+
+{% if 'person_name' not in no_show_fields %}
+<div class="builder-type" title="{{ phrase('agent.general.name') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_name" data-term-type="GenericInputTerm" data-term-triggers="name">
+	<div class="builder-op">
+		<select name="op">
+			<option value="is">{{ phrase('agent.general.is') }}</option>
+			<option value="contains">{{ phrase('agent.general.contains') }}</option>
+			<option value="notcontains">{{ phrase('agent.general.does_not_contain') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="name" value="" />
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_field' not in no_show_fields and app.getPersonFieldManager.getFields() %}
+	{% set op_lang = {'is': phrase('agent.general.is'), 'not': phrase('agent.general.field_name'), 'contains': phrase('agent.general.field_name'), 'notcontains': phrase('agent.general.field_name'), 'gt': 'is greater than', 'lt': 'is less than'} %}
+	{% for field in app.getPersonFieldManager().getDisplayArray() %}
+	{% if field.field_def.getFilterCapabilities(search_context) %}
+	<div class="builder-type" title="{{ phrase('agent.general.field_name', {'field':field.field_def.title}) }}" {% if with_rule_group %}data-rule-group="Person Fields"{% endif %} data-rule-type="person_field[{{field.field_def.id}}]">
+		<div class="builder-op">
+			<select name="op">
+				{% if search_context == 'filter' %}
+					{% for op in field.field_def.getFilterCapabilities(search_context) %}
+						<option value="{{op}}">{{op_lang[op]}}</option>
+					{% endfor %}
+				{% else %}
+					{% for op in field.field_def.getSearchCapabilities(search_context) %}
+						<option value="{{op}}">{{op_lang[op]}}</option>
+					{% endfor %}
+				{% endif %}
+			</select>
+		</div>
+		<div class="builder-options">
+			{{ form_widget(field.formView) }}
+		</div>
+	</div>
+	{% endif %}
+	{% endfor %}
+{% endif %}
+
+{% if 'person_email' not in no_show_fields %}
+<div class="builder-type" title="{{ phrase('agent.general.email_address') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_email" data-term-type="GenericInputTerm" data-term-triggers="email,emailaddress">
+	<div class="builder-op">
+		<select name="op">
+			<option value="contains">{{ phrase('agent.general.contains') }}</option>
+			<option value="notcontains">{{ phrase('agent.general.does_not_contain') }}</option>
+			<option value="is">{{ phrase('agent.general.is_exactly') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="email" value="" />
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_email_domain' not in no_show_fields %}
+<div class="builder-type" title="{{ phrase('agent.general.email_domain') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_email_domain" data-term-type="GenericInputTerm" data-term-triggers="emaildomain">
+	<div class="builder-op">
+		<select name="op">
+			<option value="is">{{ phrase('agent.general.is') }}</option>
+			<option value="not">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="email_domain" value="" />
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_organization' not in no_show_fields and term_options.organizations %}
+<div class="builder-type" title="{{ phrase('agent.general.organization') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-term-type="GenericMenuTerm" data-term-triggers="org,organization,company" data-rule-type="person_organization">
+	<div class="builder-op">
+		<select name="op">
+			<option value="is">{{ phrase('agent.general.is') }}</option>
+			<option value="not">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<select name="organization">
+			{% for id,title in term_options.organizations %}
+			<option value="{{id}}">{{title}}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_usergroup' not in no_show_fields and term_options.usergroups %}
+<div class="builder-type" title="{{ phrase('agent.general.usergroup') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-term-type="GenericMenuTerm" data-rule-type="person_usergroup" data-term-triggers="usergroup,group">
+	<div class="builder-op">
+		<select name="op">
+			<option value="is">{{ phrase('agent.general.is') }}</option>
+			<option value="not">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<select name="usergroup">
+			{% for id,title in term_options.usergroups %}
+			<option value="{{id}}">{{title}}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_username' not in no_show_fields and app.getUsersourceManager().getUsersources() %}
+<div class="builder-type" title="Username" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_username" data-term-type="GenericInputTerm" data-term-triggers="username">
+	<div class="builder-op">
+		<select name="op">
+			<option value="contains">{{ phrase('agent.general.contains') }}</option>
+			<option value="notcontains">{{ phrase('agent.general.does_not_contain') }}</option>
+			<option value="is">{{ phrase('agent.general.is_exactly') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="username" value="" />
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_language' not in no_show_fields and term_options.languages %}
+<div class="builder-type" title="{{ phrase('agent.general.language') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-term-type="GenericMenuTerm" data-rule-type="person_language" data-term-triggers="lang,language">
+	<div class="builder-op">
+		<select name="op">
+			<option value="is">{{ phrase('agent.general.is') }}</option>
+			<option value="not">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<select name="language">
+			{% for id,title in term_options.languages %}
+			<option value="{{id}}">{{title}}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_date_created' not in no_show_fields %}
+<div class="builder-type" title="Date of profile creation" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_date_created" data-rule-handler="DeskPRO.Agent.RuleBuilder.DateTerm" data-term-triggers="created">
+	<div class="builder-op">
+		<select name="op" class="builder-op">
+			<option value="lte">{{ phrase('agent.general.before') }}</option>
+			<option value="gte">{{ phrase('agent.general.after') }}</option>
+			<option value="between">{{ phrase('agent.general.between') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		{% include 'DeskPRO:Common:rulebuilder-date-options.html.twig' %}
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_label' not in no_show_fields %}
+<div class="builder-type" title="{{ phrase('agent.general.labels') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_label" data-rule-handler="DeskPRO.Agent.RuleBuilder.LabelsTerm" data-term-triggers="label,labelled,labels">
+	<div class="builder-op">
+		<select name="op" class="op">
+			<option value="is">{{ phrase('agent.general.is') }}</option>
+			<option value="not">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		{% include 'DeskPRO:Common:rulebuilder-labels-options.html.twig' %}
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_contact_phone' not in no_show_fields %}
+<div class="builder-type" title="{{ phrase('agent.general.contact_phone') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_contact_phone" data-term-type="GenericInputTerm" data-term-triggers="phone">
+	<div class="builder-op">
+		<select name="op">
+			<option value="contains">{{ phrase('agent.general.is') }}</option>
+			<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="phone" value="" />
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_contact_address' not in no_show_fields %}
+<div class="builder-type" title="{{ phrase('agent.general.contact_address') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_contact_address" data-term-type="GenericInputTerm" data-term-triggers="address">
+	<div class="builder-op">
+		<select name="op">
+			<option value="contains">{{ phrase('agent.general.is') }}</option>
+			<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="address" value="" />
+	</div>
+</div>
+{% endif %}
+
+{% if 'person_contact_im' not in no_show_fields %}
+<div class="builder-type" title="{{ phrase('agent.general.contact_instant_messaging') }}" {% if with_rule_group %}data-rule-group="Person"{% endif %} data-rule-type="person_contact_im" data-term-type="GenericInputTerm" data-term-triggers="messenger">
+	<div class="builder-op">
+		<select name="op">
+			<option value="contains">{{ phrase('agent.general.is') }}</option>
+			<option value="notcontains">{{ phrase('agent.general.is_not') }}</option>
+		</select>
+	</div>
+	<div class="builder-options">
+		<input type="text" name="im" value="" />
+	</div>
+</div>
+{% endif %}
+
+{% if id or classname %}
+	</div>
+{% endif %}

@@ -1,0 +1,28 @@
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li>Server Checks</li>
+</ul>
+{% endblock %}
+{% block page %}
+
+<nav class="check-grid-tabs">
+	<ul data-element-handler="DeskPRO.ElementHandler.SimpleTabs" data-trigger-elements="> li">
+		<li class="on" data-tab-for="#web_checks"><span>Web Checks</span></li>
+		<li data-tab-for="#cli_checks"><span>Command-line Checks</span></li>
+	</ul>
+</nav>
+
+<div id="web_checks">
+	<div class="check-grid" style="padding: 25px;">
+		{{ web_table|raw }}
+	</div>
+</div>
+
+<div id="cli_checks" style="display: none">
+	<div class="check-grid" style="padding: 25px;">
+		{{ cli_table|raw }}
+	</div>
+</div>
+
+{% endblock %}

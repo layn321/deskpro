@@ -1,0 +1,57 @@
+<section class="source-pane-search">
+
+	<div class="add-to-search" style="display: none;">
+		<input type="hidden" name="content_type" value="feedback" />
+	</div>
+
+	{##################################################################################################################}
+	{# Text #}
+	{##################################################################################################################}
+
+	<div class="input-row">
+		<div class="input-row-title">
+			<strong>{{ phrase('agent.general.search_terms') }}</strong>
+		</div>
+		<div class="input-row-body add-to-search">
+			<input class="full" type="text" name="query" value="" placeholder="Enter search terms" />
+		</div>
+	</div>
+
+	{##################################################################################################################}
+	{# Category #}
+	{##################################################################################################################}
+
+	{% macro render_cat_option(cat, prev, depth) %}
+		{% if depth %}{% set title = prev ~ ' / ' ~ cat.title %}{% else %}{% set title = cat.title %}{% endif %}
+		{% if cat.children|length %}
+			{% for subcat in cat.children %}
+				{{ _self.render_cat_option(subcat, title, depth+1) }}
+			{% endfor %}
+		{% else %}
+			<option value="{{ cat.id }}">{{ title }}</option>
+		{% endif %}
+	{% endmacro %}
+
+	<div class="input-row">
+		<div class="input-row-title">
+			<strong>{{ phrase('agent.general.categories') }}</strong>
+		</div>
+		<div class="input-row-body add-to-search">
+			<div class="cat-select-type cat-select-articles">
+				<select class="dp-select-widget-simple" name="feedback_categories[]" multiple="multiple" data-target-menu="auto">
+					{% for cat in feedback_cats %}
+						{{ _self.render_cat_option(cat, '', 0) }}
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		<button class="dp-btn trigger-submit-search" data-search-url="{{ path('agent_publish_search') }}">{{ phrase('agent.general.search') }}</button>
+		<div style="padding-top: 4px; text-align: center; font-size: 11px;">
+			<a href="#" class="reset-form-trigger">{{ phrase('agent.general.reset') }}</a>
+		</div>
+	</footer>
+
+</section>

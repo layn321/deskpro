@@ -1,0 +1,206 @@
+{% if account_status.status.isRetweet() %}
+	{% set retweet = account_status.status %}
+	{% set status = account_status.status.retweet %}
+{% else %}
+	{% set retweet = null %}
+	{% set status = account_status.status %}
+{% endif %}
+
+<article
+	class="row-item twitter-status twitter-status-{{ account_status.id }} {% if account_status.is_archived and (not hide_archive_tools or account_status.status_type) %}archived{% endif %} {% if retweet %}retweet{% endif %} {%if status.in_reply_to_status %}reply{% endif %} {% if status.recipient %}dm{% endif %}"
+	data-status-id="{{ account_status.id }}"
+	data-twitter-status-id="{{ status.id }}"
+	data-user-id="{{ status.user.id }}"
+>
+	<div class="status-body">
+		<div class="photo" data-route="page:{{ path('agent_twitter_user', {'user_id': status.user.id}) }}">
+			<img src="{{ status.user.profile_image_url }}" width="48" height="48" border="0" />
+		</div>
+		<div class="main-status-body">
+			{% if (not retweet and status.user.id == account_status.account.user.id) or (retweet and retweet.user.id == account_status.account.user.id) %}
+				{% if not status.recipient %}
+					<i class="status-delete status-action tipped" title="{{ phrase('agent.general.delete') }}"></i>
+				{% endif %}
+			{% elseif not hide_archive_tools or account_status.status_type %}
+				<i class="status-archived status-action tipped" title="{{ phrase('agent.general.read') }}" {% if not account_status.is_archived %}style="display:none"{% endif %}></i>
+				<i class="status-archive status-action tipped" title="{{ phrase('agent.general.unread') }}" {% if account_status.is_archived %}style="display:none"{% endif %}></i>
+			{% endif %}
+			{% if status.long %}
+				<i class="status-edit status-action tipped" title="{{ phrase('agent.general.edit') }}"></i>
+			{% endif %}
+			<h4>
+				<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': status.user.id}) }}">
+					<span class="name">{{ status.user.name }}</span>
+					<span class="screen-name">@{{ status.user.screen_name }}</span>
+				</span>
+				{% if status.user.id != account_status.account.user.id %}
+					{% if status.user.id in account_status.account.friend_ids %}
+						<span class="follow-unfollow-button unfollow">{{ phrase('agent.twitter.unfollow') }}</span>
+					{% else %}
+						<span class="follow-unfollow-button follow">{{ phrase('agent.twitter.follow') }}</span>
+					{% endif %}
+				{% endif %}
+				{% if status.isMessage() %}
+					<span class="dm-notice">{{ phrase('agent.twitter.dm') }}</span>
+				{% endif %}
+				{% if status.long %}
+					<span class="long-notice">{% if status.long.is_public %}{{ phrase('agent.twitter.long') }}{% else %}{{ phrase('agent.twitter.long_private') }}{% endif %}</span>
+				{% endif %}
+			</h4>
+
+			<div class="status-text">{{ status.long ? status.long.parsed_text|raw : status.parsed_text|raw }}</div>
+
+			{% if link_to_twitter %}
+				{% if status.isMessage() %}
+					<time class="timeago status-time" title="{{status.date_created|date('c', 'UTC')}}" data-relative-cutoff="86400">{{status.date_created|date('day')}}</time>
+				{% else %}
+					<a href="https://twitter.com/{{ retweet ? retweet.user.screen_name : status.user.screen_name }}/status/{{ retweet ? retweet.id : status.id }}" target="_blank" class="timeago status-time" title="{{retweet ? retweet.date_created|date('c', 'UTC') : status.date_created|date('c', 'UTC')}}" data-relative-cutoff="86400">{{retweet ? retweet.date_created|date('day') : status.date_created|date('day')}}</a>
+				{% endif %}
+			{% else %}
+				<a data-route="poppage:{{ path('agent_twitter_status_tweet_overlay', {'account_status_id': account_status.id}) }}" class="timeago status-time" title="{{retweet ? retweet.date_created|date('c', 'UTC') : status.date_created|date('c', 'UTC')}}" data-relative-cutoff="86400">{{retweet ? retweet.date_created|date('day') : status.date_created|date('day')}}</a>
+			{% endif %}
+
+			{% if status.in_reply_to_status or retweet or account_status.action_agent or (status.long and status.long.date_read) %}
+				<div class="extra-container">
+					{% if status.in_reply_to_status %}
+						{% set reply = status.in_reply_to_status %}
+						<div class="extra-row in-reply-to">
+							<a data-route="poppage:{{ path('agent_twitter_status_tweet_overlay', {'account_status_id': 'status:' ~reply.id}) }}" style="color: inherit">{{ phrase('agent.twitter.in_reply_to') }} @{{ reply.user.screen_name }} "{{ reply.getClippedText(70) }}"</a>
+						</div>
+					{% endif %}
+					{% if retweet %}
+						<div class="extra-row retweet">
+							{% set phrase_part %}<span class="user" data-route="page:{{ path('agent_twitter_user', {'user_id': retweet.user.id}) }}"><strong>@{{ retweet.user.screen_name }}</strong></span>{% endset %}
+							{{ phrase('agent.twitter.retweeted_by', {name: phrase_part}, true) }}
+						</div>
+					{% endif %}
+					{% if status.long and status.long.date_read %}
+						<div class="extra-row long-read">
+							{{ phrase('agent.twitter.long_tweet_read') }} <time class="timeago" title="{{status.long.date_read|date('c', 'UTC')}}">{{status.long.date_read|date('day')}}</time>
+						</div>
+					{% endif %}
+					{% if account_status.action_agent %}
+						<div class="extra-row action-agent">
+							{{ phrase('agent.twitter.added_by_agent', {name: account_status.action_agent.display_name}) }}
+						</div>
+					{% endif %}
+				</div>
+			{% endif %}
+		</div>
+	</div>
+	<div class="reply-list" {% if not account_status.replies|length or account_status.isFromSelf() %}style="display:none"{% endif %}>
+		<ul class="twitter-replies">
+		{% if not account_status.isFromSelf() %}
+			{% for reply in account_status.replies %}
+				{% include 'AgentBundle:TwitterStatus:reply-li.html.twig' %}
+			{% endfor %}
+		{% endif %}
+		</ul>
+	</div>
+	{% if not account_status.isFromSelf() %}
+		<div class="new-message" style="display: none">
+			{%  include 'AgentBundle:TwitterStatus:message-block.html.twig' with {
+				'account': account_status.account,
+				'default_type': status.recipient ? 'private' : 'public',
+				'send_text': phrase('agent.general.reply'),
+				'reply_form_extra': '<input type="hidden" name="account_status_id" value="' ~ account_status.id ~ '" />'
+			} %}
+		</div>
+	{% endif %}
+	<div class="new-retweet" style="display: none">
+		<form class="message-block">
+			<ul class="retweet-type">
+				<li><label><input type="radio" name="retweet" value="1" checked="checked" /> {{ phrase('agent.twitter.retweet_as_is') }}</label></li>
+				<li><label><input type="radio" name="retweet" value="0" /> {{ phrase('agent.twitter.retweet_with_edit') }}</label>
+					<div class="edit-only" style="margin-left: 16px; display: none">
+						<textarea name="text" style="display: block; width: 100%; height: 50px; box-sizing: border-box; -moz-box-sizing: border-box">RT @{{ status.user.screen_name }}: {{ status.text }}</textarea>
+					</div>
+				</li>
+			</ul>
+			<div style="margin-top: 3px; margin-left: 16px">
+				<div class="is-not-loading">
+					<div class="edit-only" style="display: none; float: right">
+						<span class="character-count">{{ phrase('agent.twitter.char_remaining', {num_chars: '<em>140</em>'}, true) }}</span>
+						<span class="over-options" style="display: none">{{ phrase('agent.twitter.split_to_multiple') }}</span>
+					</div>
+					<button class="clean-white small save-retweet-trigger">{{ phrase('agent.twitter.retweet') }}</button>
+					<span class="cancel-retweet-trigger">{{ phrase('agent.general.cancel') }}</span>
+				</div>
+				<div class="is-loading">
+					{{ phrase('agent.general.saving') }}
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="status-info">
+		<ul>
+			<li class="noval">
+				<input class="item-select" type="checkbox" value="{{account_status.id}}" />
+			</li>
+			<li class="noval opt-trigger {% if account_status.is_favorited %}favorited{% else %}add-favorite{% endif %}"></li>
+			{% if not account_status.isFromSelf() %}
+				<li class="noval opt-trigger message">
+					<label>{{ phrase('agent.general.reply') }}</label><span class="drop-icon"></span>
+				</li>
+			{% endif %}
+			{% if account_status.canRetweet() %}
+				{% if account_status.retweeted %}
+					<li class="noval opt-trigger retweeted">
+						<label>{{ phrase('agent.twitter.retweeted') }}</label><span class="drop-icon"></span>
+					</li>
+				{% else %}
+					<li class="noval opt-trigger retweet">
+						<label>{{ phrase('agent.twitter.retweet') }}</label><span class="drop-icon"></span>
+					</li>
+				{% endif %}
+			{% endif %}
+			<li class="note-btn" style="float:right;">
+				<label>{{ phrase('agent.general.add_note') }}</label><span class="drop-icon"></span>
+			</li>
+			<li class="noval opt-trigger agent" style="overflow:hidden; height: 18px; position: relative; float: right;">
+				<label>
+					{% if account_status.agent and account_status.agent.id != app.user.id %}<img src="{{ account_status.agent.getPictureUrl(16) }}" alt="" class="agent-assign-icon" /> {{ account_status.agent.display_name }}
+					{% elseif account_status.agent and account_status.agent.id == app.user.id %}<img src="{{ app.user.getPictureUrl(16) }}" alt="" class="agent-assign-icon" /> {{ phrase('agent.general.me') }}
+					{% elseif account_status.agent_team %}<img src="{{ path('serve_default_picture', {'s': 16, 'size-fit': 1}, true) }}" alt="" class="agent-assign-icon" /> {{ account_status.agent_team.name }}
+					{% else %}<img src="{{ path('serve_default_picture', {'s': 16, 'size-fit': 1}, true) }}" alt="" class="agent-assign-icon" /> {{ phrase('agent.general.none') }}{% endif %}
+				</label><span class="drop-icon"></span>
+				<select class="agents_sel dpe_select"  style="min-width: 170px; display: none" data-invisible-trigger="1" data-style-type="icons">
+					<option {% if not account_status.agent and not account_status.agent_team %}selected="selected"{% endif %} value="" data-icon="{{ path('serve_default_picture', {'s': 16, 'size-fit': 1}, true) }}">{{ phrase('agent.general.none') }}</option>
+					<optgroup label="{{ phrase('agent.general.agents') }}">
+						{% for agent in app.agents.getAgents() %}
+							{% if account_status.account.hasPerson(agent) %}
+								<option {% if account_status.agent and agent.id == account_status.agent.id %}selected="selected"{% endif %} data-icon="{{ agent.getPictureUrl(16) }}" value="agent:{{ agent.id }}">{{ agent.display_name }}</option>
+							{% endif %}
+						{% endfor %}
+					</optgroup>
+					{% if app.agent_teams.getTeams()|length %}
+						<optgroup label="{{ phrase('agent.general.teams') }}">
+							{% for team in app.agent_teams.getTeams() %}
+								<option value="agent_team:{{ team.id }}" {% if account_status.agent_team and account_status.agent_team.id == team.id %}selected="selected"{% endif %} data-icon="{{ path('serve_default_picture', {'s': 16, 'size-fit': 1}, true) }}">{{ team.name }}</option>
+							{% endfor %}
+						</optgroup>
+					{% endif %}
+				</select>
+			</li>
+		</ul>
+	</div>
+	<div class="status-notes" {% if not account_status.notes|length %}style="display: none"{% endif %}>
+		<ul class="note-list">
+			{% for note in account_status.notes %}
+				{% include 'AgentBundle:TwitterStatus:note-li.html.twig' with {'note': note} %}
+			{% endfor %}
+		</ul>
+	</div>
+	<div class="new-note" style="display: none">
+		<div class="note-input">
+			<textarea class="note-textarea"></textarea>
+			<div class="is-not-loading">
+				<button class="clean-white small save-note-trigger">{{ phrase('agent.general.add_note') }}</button>
+				<span class="cancel-note-trigger">{{ phrase('agent.general.cancel') }}</span>
+			</div>
+			<div class="is-loading">
+				{{ phrase('agent.general.saving') }}
+			</div>
+		</div>
+	</div>
+</article>

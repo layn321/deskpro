@@ -1,0 +1,91 @@
+{##
+ # The website widget overlay. This is the general overlay layout, and includes the left sidebar and ticket, feedback and chat tabs.
+ ##}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html class="{% if is_rtl() %}rtl{% endif %}" {{ language_html_attr() }}>
+<head>
+	<script type="text/javascript">
+		var BASE_URL = '{{ path('user') }}';
+		var BASE_PATH = '{{ app.request.getBaseUrl()|replace({'/index.php':''}) }}/';
+		var ASSETS_BASE_URL = '{{ asset('') }}';
+		var DESKPRO_PERSON_ID = {{ app.user.id|default(0) }};
+
+		{% if constant('DP_DEBUG') %}
+		DP_DEBUG = true;
+		{% else %}
+		DP_DEBUG = false;
+		{% endif %}
+		DP_DEBUG = true;
+	</script>
+
+	{% if app.isDebug() %}
+		{{ dp_asset_html('user_vendors') }}
+		{{ dp_asset_html('user_common') }}
+		<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.request.getBasePath() }}/file.php/res-user/main.css?{{ app.style.css_updated|date('U') }}&amp;reload=1{% if is_rtl() %}&amp;rtl=1{% endif %}" media="screen,print" />
+	{% else %}
+		{{ dp_asset_html('user') }}
+		{% if (is_rtl() and not app.style.css_blob_rtl) or (not is_rtl() and not app.style.css_blob) or app.admin_portal_controls %}
+			<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.request.getBasePath() }}/file.php/res-user/main.css?{{ app.style.css_updated|date('U') }}&amp;reload=1{% if is_rtl() %}&amp;rtl=1{% endif %}" media="screen,print" />
+		{% else %}
+			{% if is_rtl() %}
+				<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.style.css_blob_rtl.getDownloadUrl() }}?{{ app.style.css_blob_rtl.id }}" media="screen,print" />
+			{% else %}
+				<link id="dp_stylesheet" rel="stylesheet" type="text/css" href="{{ app.style.css_blob.getDownloadUrl() }}?{{ app.style.css_blob.id }}" media="screen,print" />
+			{% endif %}
+		{% endif %}
+	{% endif %}
+
+	<link rel="stylesheet" type="text/css" href="{{ asset('stylesheets/user/main-print.css') }}" media="print" />
+	<!--[if IE ]><link href="{{ asset('stylesheets/user/main-ie.css') }}" rel="stylesheet" type="text/css"><![endif]-->
+
+	<script src="{{ asset('javascripts/DeskPRO/TouchCaller.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('javascripts/DeskPRO/WordHighlighter.js') }}" type="text/javascript"></script>
+	<script src="{{ asset('javascripts/DeskPRO/User/WebsiteWidget/OverlayWin.js') }}" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		window.DeskPRO_Window = new DeskPRO.User.Window();
+		var OverlayWin = new DeskPRO.User.WebsiteWidget.OverlayWin({
+			parentUrl: {{ parent_url|json_encode|raw }}
+		});
+		$(document).ready(function() {
+			window.DeskPRO_Window.initPage();
+			if (!Orb.Compat.WebForms.isPlaceholderSupported()) {
+				Orb.Compat.WebForms.placeholder($('[placeholder]'));
+			}
+			OverlayWin.initPage();
+		});
+	</script>
+
+	<style>
+		html, body { background: transparent;}
+	</style>
+</head>
+<body id="dp_widget_win">
+
+<div id="dp">
+<div class="widget-deskpro" id="widget_deskpro">
+<div class="widget-login-container">
+
+	{% if app.getSetting('core.user_mode') != 'closed' %}
+		<section class="dp-well">
+			<header>
+				<label>
+					<h3>{{ phrase('user.error.permission-denied-title') }}</h3>
+				</label>
+			</header>
+			<article>
+				{{ phrase('user.error.permission-denied') }}
+			</article>
+		</section>
+		<br/>
+	{% endif %}
+</div>
+<div class="widget-logo">
+	<a href="http://www.deskpro.com/" target="_blank">{{ phrase('user.general.helpdesk_by', {'deskpro': phrase('user.general.deskpro')}) }}</a>
+</div>
+</div>
+</div>
+
+</body>
+</html>

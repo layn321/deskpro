@@ -1,0 +1,37 @@
+{% set this_page = 'feedback_cats' %}
+{% import 'AdminBundle:Common:design-macros.html.twig' as design %}
+{% import 'AdminBundle:Common:admin-macros.html.twig' as admin %}
+{% extends 'AdminBundle::layout.html.twig' %}
+{% block pagebar %}
+<ul>
+	<li>Feedback Categories</li>
+</ul>
+{% endblock %}
+{% block page %}
+<div class="dp-page-box">
+
+<form action="{{ path('admin_customdeffeedback_edit', {'field_id': field.id}) }}" method="post">
+
+<div class="choices-list-wrap" data-element-handler="DeskPRO.Admin.ElementHandler.SimpleHierarchyBuilder" data-inline="1">
+	<input type="hidden" name="choices_structure" class="choices_structure" value="{{ choices_structure|json_encode }}" />
+	<input type="hidden" name="choices_counts" class="choices_counts" value="{{ cat_counts|json_encode }}" />
+	<input type="hidden" name="choices_removed_structure" class="choices_removed" value="" />
+</div>
+
+<div id="define_choices_overlay" class="choice-builder-overlay" style="width: 600px;">
+	<header>
+		<input type="text" class="new-option-title" placeholder="Add a new category" />
+		<select class="new-option-parent" style="display: none"></select>
+		<button class="clean-white new-option-trigger">Add</button>
+	</header>
+	<article>
+		<ul class="options-list">
+
+		</ul>
+	</article>
+</div>
+
+<button class="clean-white" type="submit">Save Categories</button>
+
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% import 'AgentBundle:Common:agent-macros.html.twig' as agentui %}
+<script>
+pageMeta.fragmentClass = 'DeskPRO.Agent.PageFragment.ListPane.PeopleList';
+pageMeta.viewTypeUrl = '{{ path('agent_peoplesearch_customfilter') }}?cache_id={{cache_id}}&view_type=$view_type&view_name={{ view_name }}';
+pageMeta.pageUrl = '{{ path('agent_peoplesearch_customfilter') }}?partial=1&cache_id={{cache_id}}&page=$page&view_name={{ view_name }}';
+pageMeta.refreshUrl = '{{ path('agent_peoplesearch_customfilter') }}?cache_id={{cache_id}}&view_name={{ view_name }}';
+pageMeta.saveListPrefsUrl = '{{ path('agent_ajax_save_prefs', {view_name: view_name}) }}';
+pageMeta.fetchResultsUrl = '{{ path('agent_peoplesearch_getpage', {view_name: view_name}) }}';
+pageMeta.resultId = {{cache_id}};
+pageMeta.cache_id = {{cache_id}};
+{% if not people %}
+	pageMeta.noResults = true;
+{% endif %}
+
+{% if view_name_data and view_name_type == 'usergroup' %}
+	pageMeta.url_fragment = '{{ url_fragment('agent_peoplesearch_usergroup', {'id': view_name_data}) }}';
+{% else %}
+	pageMeta.url_fragment = '{{ url_fragment('agent_peoplesearch_customfilter', {'letter': selected_letter}) }}';
+{% endif %}
+pageMeta.saveListPrefsUrl = '{{ path('agent_ajax_save_prefs') }}';
+pageMeta.fetchResultsUrl = '{{ path('agent_peoplesearch_getpage', {'view_type': 'list'}) }}';
+pageMeta.viewType = 'list';
+
+pageMeta.perPage = 50;
+pageMeta.peopleResultIds = {{ person_ids|json_encode|raw }};
+
+{% set baseId = el_uid() %}
+pageMeta.baseId = '{{ baseId }}';
+</script>
+<section class="dp-overlay">
+	<header>
+		<div class="controls">
+			<button class="order-by-menu-trigger clean-white arrow menu-fitted">{{ phrase('agent.general.ordered_by') }}: <span class="label">{% if 'name' in cache.criteria.order_by %}
+						{{ phrase('agent.general.name') }}
+					{% elseif 'date_last_login' in cache.criteria.order_by %}
+						{{ phrase('agent.general.last_login_time') }}
+					{% elseif 'organization' in cache.criteria.order_by %}
+						{{ phrase('agent.general.last_login_time') }}
+					{% elseif 'num_tickets' in cache.criteria.order_by %}
+						{{ phrase('agent.search.number_of_tickets') }}
+					{% else %}
+						{{ phrase('agent.general.date_created') }}
+					{% endif %}
+				</span><em></em>
+			</button>
+			<button class="display-options-trigger clean-white menu-fitted">{{ phrase('agent.general.display_options') }}</button>
+		</div>
+
+		<ul style="display: none" class="order-by-menu">
+			<li data-order-by="people_name">{{ phrase('agent.general.name') }}</li>
+			<li data-order-by="date_created">{{ phrase('agent.general.date_created') }}</li>
+			<li data-order-by="last_login">{{ phrase('agent.general.last_login_time') }}</li>
+			<li data-order-by="org">{{ phrase('agent.general.organization') }}</li>
+			<li data-order-by="num_tickets">{{ phrase('agent.search.number_of_tickets') }}</li>
+		</ul>
+
+		<span class="close close-trigger"></span>
+		<h1>{{ phrase('agent.general.people') }}</h1>
+	</header>
+	<article>
+		{% include 'AgentBundle:PeopleSearch:list-display-options-overlay.html.twig' with {show_all: 1 } %}
+		<div class="table-result-list">
+			<table cellspacing="0" width="100%">
+				{% include 'AgentBundle:PeopleSearch:list-list-page.html.twig' %}
+			</table>
+		</div>
+	</article>
+	<div class="full-loading" style="display: none">
+		<em>{{ phrase('agent.general.loading') }}</em>
+	</div>
+	<footer class="is-ticket-list bottom-action-bar">
+			{#
+			<div class="check-count selection-bar">
+				{{ phrase('agent.general.x_selected', {'num_placeholder': '<span class="selected-count">0</span>'}, true) }}
+
+				<button class="clean-white perform-actions-trigger">
+					<span>{{ phrase('agent.general.perform_actions') }}</span>
+				</button>
+			</div>
+			#}
+			<div class="pagecontrols results-nav">
+				<div class="cursor">
+					{% set phrase_part1 %}
+					<span class="results-showing-count" id="{{baseId}}_showing_count"></span>
+					{% endset %}
+					{% set phrase_part2 %}
+					<span class="results-total-count" id="{{baseId}}_total_count">{{ person_ids|length }}</span>
+					{% endset %}
+					{{ phrase('agent.general.showing_results_x_of_y', {'display_count':phrase_part1,'size':phrase_part2}, true) }}
+				</div>
+				{% if person_ids|length > 50 %}
+					<ul class="pagenav no-prev">
+						<li class="prev"></li>
+						<li class="next"></li>
+					</ul>
+				{% endif %}
+			</div>
+	</footer>
+</section>

@@ -1,0 +1,128 @@
+{% extends 'AgentBundle::source-pane-layout.html.twig' %}
+{% import 'AgentBundle:Common:macro-flagname.html.twig' as flagnamer %}
+{% block pane_main_tab %}
+	<li class="tab active"><i class="icon-dp-task"></i> {{ phrase('agent.chrome.nav_tasks') }}</li>
+{% endblock %}
+{% block pane_other_tabs %}{% endblock %}
+{% block pane_content %}
+<div class="pane-content pane-content-main">
+	<section class="pane-section last">
+		<header>
+			<h1>{{ phrase('agent.chrome.nav_tasks') }}</h1>
+		</header>
+		<article>
+			<ul class="nav-list">
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'own', 'search_categoty': 'total'}) }}">
+						<h3>{{ phrase('agent.tasks.my_tasks') }}</h3>
+						<em class="counter list-counter" id="tasks_counter_own_total">{{ counts.person.total|default(0) }}</em>
+					</div>
+					<ul class="nav-list nav-list-small indented">
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'own', 'search_categoty': 'overdue'}) }}">
+								<h3>{{ phrase('agent.tasks.overdue') }}</h3>
+								<em class="counter list-counter count-in-badge" id="tasks_counter_own_overdue">{{ counts.person.overdue }}</em>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'own', 'search_categoty': 'today'}) }}">
+								<em class="counter list-counter count-in-badge" id="tasks_counter_own_today">{{ counts.person.due_today }}</em>
+								<h3>{{ phrase('agent.tasks.due_today') }}</h3>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'own', 'search_categoty': 'future'}) }}">
+								<em class="counter list-counter" id="tasks_counter_own_future">{{ counts.person.due_future }}</em>
+								<h3>{{ phrase('agent.tasks.due_in_future') }}</h3>
+							</div>
+						</li>
+					</ul>
+				</li>
+
+				{% if app.getSetting('core.use_agent_team') %}
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'team', 'search_categoty': 'total'}) }}">
+						<em class="counter list-counter" id="tasks_counter_team_total">{{ counts.teams.total|default(0) }}</em>
+						<h3>{{ phrase('agent.tasks.my_teamstasks') }}</h3>
+					</div>
+					<ul class="nav-list nav-list-small indented">
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'team', 'search_categoty': 'overdue'}) }}">
+								<em class="counter list-counter" id="tasks_counter_team_overdue">{{ counts.teams.overdue }}</em>
+								<h3>{{ phrase('agent.tasks.overdue') }}</h3>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'team', 'search_categoty': 'today'}) }}">
+								<em class="counter list-counter" id="tasks_counter_team_today">{{ counts.teams.due_today }}</em>
+								<h3>{{ phrase('agent.tasks.due_today') }}</h3>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'team', 'search_categoty': 'future'}) }}">
+								<em class="counter list-counter" id="tasks_counter_team_future">{{ counts.teams.due_future }}</em>
+								<h3>{{ phrase('agent.tasks.due_in_future') }}</h3>
+							</div>
+						</li>
+					</ul>
+				</li>
+				{% endif %}
+
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'delegate', 'search_categoty': 'total'}) }}">
+						<em class="counter list-counter" id="tasks_counter_delegated_total">{{ counts.delegated.total|default(0) }}</em>
+						<h3>{{ phrase('agent.tasks.tasks_i_delegated') }}</h3>
+					</div>
+					<ul class="nav-list nav-list-small indented">
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'delegate', 'search_categoty': 'overdue'}) }}">
+								<em class="counter list-counter" id="tasks_counter_delegated_overdue">{{ counts.delegated.overdue }}</em>
+								<h3>{{ phrase('agent.tasks.overdue') }}</h3>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'delegate', 'search_categoty': 'today'}) }}">
+								<em class="counter list-counter" id="tasks_counter_delegated_today">{{ counts.delegated.due_today }}</em>
+								<h3>{{ phrase('agent.tasks.due_today') }}</h3>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'delegate', 'search_categoty': 'future'}) }}">
+								<em class="counter list-counter" id="tasks_counter_delegated_future">{{ counts.delegated.due_future }}</em>
+								<h3>{{ phrase('agent.tasks.due_in_future') }}</h3>
+							</div>
+						</li>
+					</ul>
+				</li>
+
+				<li class="is-nav-item">
+					<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'all', 'search_categoty': 'total'}) }}">
+						<em class="counter list-counter" id="tasks_counter_all_total">{{ counts.all.total|default(0) }}</em>
+						<h3>{{ phrase('agent.tasks.all_tasks') }}</h3>
+					</div>
+					<ul class="nav-list nav-list-small indented">
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'all', 'search_categoty': 'overdue'}) }}">
+								<em class="counter list-counter" id="tasks_counter_all_overdue">{{ counts.all.overdue }}</em>
+								<h3>{{ phrase('agent.tasks.overdue') }}</h3>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'all', 'search_categoty': 'today'}) }}">
+								<em class="counter list-counter" id="tasks_counter_all_today">{{ counts.all.due_today }}</em>
+								<h3>{{ phrase('agent.tasks.due_today') }}</h3>
+							</div>
+						</li>
+						<li class="is-nav-item">
+							<div class="item" data-route="listpane:{{ path('agent_task_list',{'search_type': 'all', 'search_categoty': 'future'}) }}">
+								<em class="counter list-counter" id="tasks_counter_all_future">{{ counts.all.due_future }}</em>
+								<h3>{{ phrase('agent.tasks.due_in_future') }}</h3>
+							</div>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</article>
+	</section>
+</div>
+{% endblock %}
