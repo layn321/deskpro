@@ -74,6 +74,12 @@ class Department extends \Application\DeskPRO\Domain\DomainObject implements Has
 	protected $user_title = '';
 
 	/**
+	 * The Other Guys
+	 * @var float
+	 */
+	protected $rate = 0.00;
+
+	/**
 	 * @var bool
 	 */
 	protected $is_tickets_enabled = true;
@@ -132,6 +138,25 @@ class Department extends \Application\DeskPRO\Domain\DomainObject implements Has
 		}
 
 		return $this->title;
+	}
+	
+	/**
+	 * The Other Guys
+	 */
+	public function getRate()
+	{
+		/**
+		 * This Other Guys
+		 * #20140118 @ Frankie -- This was backdoor solution to saving parent department rate, which was deemed unnecessary
+		 * if (!$this->rate) 
+		{
+			$con = mysqli_connect("172.24.62.182","root","P@s5w0rd","deskpro");
+			$row = mysqli_query($con,"SELECT rate FROM departments WHERE id = $this->id")->fetch_array(MYSQLI_NUM);
+			$this->rate = $row[0];
+		}
+		*/
+		
+		return $this->rate;
 	}
 
 	public function getParentId()
@@ -288,6 +313,16 @@ class Department extends \Application\DeskPRO\Domain\DomainObject implements Has
 		$metadata->setChangeTrackingPolicy(ClassMetadataInfo::CHANGETRACKING_NOTIFY);
 		$metadata->customRepositoryClassName = 'Application\DeskPRO\EntityRepository\Department';
 		$metadata->setPrimaryTable(array( 'name' => 'departments', ));
+
+
+		/**
+		* The Other Guys
+		* Mapping to rate variable
+		* #201401181400 @Frankie -- Added rate to Doctrine metadata mapping in order to use DeskPro's inherent database writing functionality
+		* #201401191521 #Layne -- Changed type from integer => decimal; scale from 0 => 11  
+		*/
+		$metadata->mapField(array( 'fieldName' => 'rate', 'type' => 'decimal', 'precision' => 10, 'scale' => 2, 'nullable' => false, 'columnName' => 'rate', ));
+
 
 		$metadata->mapField(array( 'fieldName' => 'id', 'type' => 'integer', 'precision' => 0, 'scale' => 0, 'nullable' => false, 'columnName' => 'id', 'id' => true, ));
 		$metadata->mapField(array( 'fieldName' => 'title', 'type' => 'string', 'length' => 255, 'precision' => 0, 'scale' => 0, 'nullable' => false, 'columnName' => 'title', ));

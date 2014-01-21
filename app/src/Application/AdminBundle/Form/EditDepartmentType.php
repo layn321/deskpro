@@ -78,6 +78,12 @@ class EditDepartmentType extends AbstractType
 		}
 	}
 
+	/**
+	 * The Other Guys
+	 * 
+	 * We can add rate to the builder here
+	 */
+
 	public function getName()
 	{
 		return 'department';

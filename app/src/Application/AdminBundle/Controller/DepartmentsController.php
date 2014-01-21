@@ -34,6 +34,12 @@
 
 namespace Application\AdminBundle\Controller;
 
+/**
+ * The Other Guys
+ *
+ * include 'TheOtherGuys.php';
+ */
+
 use Application\DeskPRO\App;
 use Application\DeskPRO\Entity;
 
@@ -180,6 +186,15 @@ class DepartmentsController extends AbstractController
 
 		$department->user_title = $this->in->getString('user_title');
 
+		/**
+		 * The Other Guys
+		 * #201401181200 @Frankie -- Fill rate Doctrine metadata for insert to database (edit department)
+		 * #201401191551 @Layne -- Changed getUint() to getString()
+		 */
+		 //add_rate($department_id, $d_rate); //backdoor work-around prior to metadata mapping of rate field
+		$department->rate = $this->in->getString('rate'); 
+		
+
 		$parent_id = $this->in->getUint('parent_id');
 		if (!count($department->getChildren())) {
 			if (!$parent_id || $parent_id == $department->getId()) {
@@ -216,6 +231,12 @@ class DepartmentsController extends AbstractController
 		$department = new \Application\DeskPRO\Entity\Department();
 		$department->title = $this->in->getString('title');
 		$department->user_title = $this->in->getString('user_title');
+
+		/**
+		 * The Other Guys
+		 * #201401201153 @Frankie -- Fill department rate for insert to database (new department)
+		 */
+		$department->rate = $this->in->getString('rate');
 
 		if ($type == 'tickets') {
 			$department->is_tickets_enabled = true;
