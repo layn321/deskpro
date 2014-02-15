@@ -52,18 +52,10 @@
 
 	{{ design.dpgrid_col({ class: 'l r', style: "width: 480px; cursor: move;"}) }}
 		<span class="field-id" style="float:right">ID: {{ department.id }}</span>
-                {# The Other Guys | 201401201231 @ Frankie -- Added rate to department list so that user does not have to click to view #}
-                {% if not department.children|length %}<span class="field-id" style="float:right">Rate: ${{ department.rate }}</span>{% endif %}
 		<h2>
 			<a
 				class="edit-trigger"
 				data-user-title="{{ department.getRealUserTitle() }}"
-
-				[# The Other Guys | 20140119 @ Frankie -- Added number_format to display trailing zeros but doesn't work; leaving it to show our work #]
-				[# data-rate="{{ department.getRate()|number_format(2,'.',',') }}" #}
-				data-rate="{{ department.rate }}"
-
-	
 				data-linked-gateway-id="{{ department.email_gateway.id|default(0) }}"
 				data-linked-gateway-title="{{ department.email_gateway.title|default(0) }}"
 			>{{department.getRealTitle()}} {% if department.getRealUserTitle() %}<span style="color: #666; font-size: 11px; font-weight: normal; padding-left: 10px;">User title: {{ department.getRealUserTitle() }}</span>{% endif %}</a>
