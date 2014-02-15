@@ -2402,12 +2402,5 @@ class Person extends \Application\DeskPRO\Domain\DomainObject
 		$metadata->mapOneToMany(array( 'fieldName' => 'twitter_users', 'targetEntity' => 'Application\\DeskPRO\\Entity\\PersonTwitterUser', 'mappedBy' => 'person',  ));
 		$metadata->mapManyToMany(array( 'fieldName' => 'slas', 'targetEntity' => 'Application\\DeskPRO\\Entity\\Sla', 'cascade' => array('persist','merge'), 'mappedBy' => 'people', 'dpApi' => true));
 		$metadata->mapManyToMany(array( 'fieldName' => 'twitter_accounts', 'targetEntity' => 'Application\\DeskPRO\\Entity\\TwitterAccount', 'mappedBy' => 'persons' ));
-
-		/**
-		 * The Other Guys
-		 * #201401221859 @ Frankie -- DPQL Field mapping people table to department.title (many to one)
-		 */
-		$metadata->mapManyToOne(array( 'fieldName' => 'department', 'targetEntity' => 'Application\\DeskPRO\\Entity\\Department', 'mappedBy' => NULL, 'inversedBy' => NULL, 'joinColumns' => array( 0 => array( 'title' => 'department_id', 'referencedColumnName' => 'id', 'nullable' => true, 'onDelete' => 'cascade', 'columnDefinition' => NULL, ) ), 'dpApi' => true ));
-
 	}
 }
