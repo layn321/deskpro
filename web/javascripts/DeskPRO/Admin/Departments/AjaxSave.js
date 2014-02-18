@@ -152,11 +152,19 @@ DeskPRO.Admin.Departments.AjaxSave = new Orb.Class({
 		var currentUserTitle = row.find('a.edit-trigger').data('user-title');
 		var currentGatewayId = parseInt(row.find('a.edit-trigger').data('linked-gateway-id'));
 		var currentGatewayTitle = row.find('a.edit-trigger').data('linked-gateway-title');
+		var currentRate = row.find('a.edit-trigger').data('rate'); // The Other Guys
 
 		this.currentEditDep = depId;
 		$('#editdep_title').val(currentTitle);
 		$('#editdep_user_title').val(currentUserTitle);
 		$('#editdep_depid').val(depId);
+
+		/**
+		 * The Other Guys
+		 * Fill in the department rate textbox
+		 * #201401200001 @ Frankie -- Added parseFloat function to render trailing zeros
+		 */
+		$('#editdep_rate').val(parseFloat(currentRate).toFixed(2));
 
 		if (!this.editDepParentOpt) {
 			this.editDepParentOpt = $('#editcat_parent_id').find('option').clone();
@@ -171,13 +179,31 @@ DeskPRO.Admin.Departments.AjaxSave = new Orb.Class({
 		if (parentId != depId) {
 			$('#editcat_parent_row').show();
 			$('#editcat_parent_id').find('option[value="'+parentId+'"]').prop('selected', true);
+			/**
+			 * The Other Guys
+			 * #20140119 @Frankie -- Show the rate textbox when the department has no child departments
+			 */
+			$('#editcat_rate_row').show();
+
 		} else {
 			if (group.find('> article.child')[0]) {
 				$('#editcat_parent_row').hide();
 				$('#editcat_parent_id').find('option[value="0"]').prop('selected', true);
+				/**
+				 * The Other Guys
+				 * #20140119 @Frankie -- Hide the rate textbox when the department is a parent department
+				 */
+			    $('#editcat_rate_row').hide();
+
 			} else {
 				$('#editcat_parent_row').show();
 				$('#editcat_parent_id').find('option[value="0"]').prop('selected', true);
+				/**
+				 * The Other Guys
+				 * #20140119 @Frankie -- Show the rate textbox when the department is a child department
+				 */
+			    $('#editcat_rate_row').show();
+
 			}
 		}
 
