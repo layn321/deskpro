@@ -1042,6 +1042,23 @@ class AgentsController extends AbstractController
 			$dep_matrix = $this->in->getCleanValueArray('agent.departments', 'raw', 'uint');
 			$dep_assign_matrix = $this->in->getCleanValueArray('agent.departments_assign', 'raw', 'uint');
 
+			 /**
+			 * The Other Guys | 201401261008 @Frankie -- Get default department radio button values, strip empties, save to db
+			 */
+			$dep_default_matrix = $this->in->getCleanValueArray('dep_default', 'raw', 'uint');
+			$dep_default_matrix = Arrays::removeFalsey($dep_default_matrix);
+			
+			
+			 $agent->setDepartmentID($dep_default_matrix[0]);
+			 /*
+			$this->db->executeUpdate("
+					UPDATE people
+					SET department_id = ?
+					WHERE id = ?
+				", array($dep_default_matrix[0], $agent->id));
+			 */
+			/* end #201401261008 */
+
 			$this->db->delete('department_permissions', array(
 				'person_id' => $agent->id,
 				'name' => 'full',

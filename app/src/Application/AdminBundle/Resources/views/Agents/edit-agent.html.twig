@@ -273,6 +273,11 @@
 										<th width="80">
 											<a href="#" id="ticketdep_toggle_all_assign" class="tipped" title="If full access is not provided, this controls whether agents can create or assign tickets to this department. Click to toggle all.">Assignment</a>
 										</th>
+                                        {# The Other Guys | 201401250207 -- Add column header entitled Default #}
+                                        <th width="80">
+                                            <span class="tipped" title="Determines the default billing department">Default</span>
+                                        </th>
+                                        {# end #201401250207 #}
 									</tr>
 								</thead>
 								<tbody>
@@ -282,6 +287,9 @@
 												<td class="title title-group">{{ dep.title }}</td>
 												<td class="prop">&nbsp;</td>
 												<td class="prop">&nbsp;</td>
+												{# The Other Guys | 201401250207 -- Add non-breaking space to Default column #}
+                                                <td class="prop">&nbsp;</td>
+                                                {# end #201401250207 #}
 											{% else %}
 												<td class="title">{{ dep.title }}</td>
 												<td class="prop ticket-choice">
@@ -290,6 +298,11 @@
 												<td class="prop ticket-assign-choice">
 													<input class="onoff-slider departments_assign" type="checkbox" {% if agent_deps[dep.id].tickets or agent_deps_assign[dep.id].tickets or not agent.id %}checked="checked"{% endif %} name="agent[departments_assign][{{ dep.id }}][tickets]" value="1" />
 												</td>
+												{# The Other Guys | 201401250207 -- Add radio button to Default column #}
+                                                <td class="prop ticket-assign-choice">
+													<input type="radio" {% if dep.id == agent.getDepartmentId() %}checked="checked"{% endif %} name="dep_default" value="{{ dep.id }}" />
+												</td>
+												{# end #201401250207 #}
 											{% endif %}
 										</tr>
 										{% if dep.children %}
@@ -302,6 +315,11 @@
 													<td class="prop ticket-assign-choice">
 														<input class="onoff-slide departments_assignr" type="checkbox" {% if agent_deps[subdep.id].tickets or agent_deps_assign[subdep.id].tickets or not agent.id %}checked="checked"{% endif %} name="agent[departments_assign][{{ subdep.id }}][tickets]" value="1" />
 													</td>
+												    {# The Other Guys | 201401250207 -- Add radio button to Default column #}
+                                                    <td class="prop ticket-assign-choice">
+													    <input type="radio" {% if subdep.id == agent.getDepartmentId() %}checked="checked"{% endif %} name="dep_default" value="{{ subdep.id }}" />
+												    </td>
+												    {# end #201401250207 #}											
 												</tr>
 											{% endfor %}
 										{% endif %}

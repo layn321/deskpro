@@ -247,6 +247,14 @@ class Person extends \Application\DeskPRO\Domain\DomainObject
 	protected $language = null;
 
 	/**
+	 * The Other Guys
+	 * The user's billing department
+	 * 
+	 * @var \Application\DeskPRO\Entity\Department
+	 */
+	 protected $department = null;
+
+	/**
 	 * The users organization
 	 *
 	 * @var \Application\DeskPRO\Entity\Organization
@@ -521,6 +529,59 @@ class Person extends \Application\DeskPRO\Domain\DomainObject
 	{
 		return false;
 	}
+
+
+	/*
+	 * The Other Guys
+	 * #201402061205 @Layne added deppartment id getter/setter
+	 */
+	 
+	public function getDepartmentId()
+	{
+		if ($this->department) {
+			return $this->department['id'];
+		} else {
+			return 0;
+		}
+	}
+
+/*	public function getDepartment()
+	{
+		if ($this->department) {
+			return $this->department->getUserTitle();
+		} else {
+			return 0;
+		}
+	}
+*/
+	public function setDepartmentId($dep_id)
+	{
+		if ($dep_id) {
+			$dep = App::getEntityRepository('DeskPRO:Department')->find($dep_id);
+			$this->setModelField('department', $dep);
+		} else {
+			$this->setModelField('department', null);
+		}
+	}
+
+	
+	/**
+	 * THE OTHER GUYS - Return Agents Rate - Andy
+     */
+	public function getRate()
+	{ 
+	/**
+	 * 
+	 * The Other Guys | 201401261049 @Frankie -- getDB() is DeskPRO object, much easier
+	 * #201401271140 @Layne -- change function call to reflect Doctrine pattern
+	 */
+		if ($this->department) {
+			return $this->department['rate'];
+		} else {
+			return 0;
+		}
+	}
+	// end #201401271140
 
 	public function _initPersonLogger()
 	{
@@ -2388,6 +2449,12 @@ class Person extends \Application\DeskPRO\Domain\DomainObject
 		$metadata->mapField(array( 'fieldName' => 'date_last_login', 'type' => 'datetime', 'precision' => 0, 'scale' => 0, 'nullable' => true, 'columnName' => 'date_last_login', ));
 		$metadata->mapField(array( 'fieldName' => 'date_picture_check', 'type' => 'datetime', 'precision' => 0, 'scale' => 0, 'nullable' => true, 'columnName' => 'date_picture_check', ));
 		$metadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_IDENTITY);
+		/**
+		 * The Other Guys
+		 * #201401221859 @ Frankie -- DPQL Field mapping people table to department.title (many to one)
+		 */
+		$metadata->mapManyToOne(array( 'fieldName' => 'department', 'targetEntity' => 'Application\\DeskPRO\\Entity\\Department', 'mappedBy' => NULL, 'inversedBy' => NULL, 'joinColumns' => array( 0 => array( 'name' => 'department_id', 'referencedColumnName' => 'id', 'nullable' => true, 'onDelete' => 'set null', 'columnDefinition' => NULL, ) ), 'dpApi' => true ));
+
 		$metadata->mapManyToOne(array( 'fieldName' => 'picture_blob', 'targetEntity' => 'Application\\DeskPRO\\Entity\\Blob', 'mappedBy' => NULL, 'inversedBy' => NULL, 'joinColumns' => array( 0 => array( 'name' => 'picture_blob_id', 'referencedColumnName' => 'id', 'nullable' => true, 'onDelete' => 'set null', 'columnDefinition' => NULL, ), ),  ));
 		$metadata->mapManyToOne(array( 'fieldName' => 'language', 'targetEntity' => 'Application\\DeskPRO\\Entity\\Language', 'mappedBy' => NULL, 'inversedBy' => NULL, 'joinColumns' => array( 0 => array( 'name' => 'language_id', 'referencedColumnName' => 'id', 'nullable' => true, 'onDelete' => 'set null', 'columnDefinition' => NULL, ), )  ));
 		$metadata->mapManyToOne(array( 'fieldName' => 'organization', 'targetEntity' => 'Application\\DeskPRO\\Entity\\Organization', 'mappedBy' => NULL, 'inversedBy' => NULL, 'joinColumns' => array( 0 => array( 'name' => 'organization_id', 'referencedColumnName' => 'id', 'nullable' => true, 'onDelete' => 'set null', 'columnDefinition' => NULL, ), ), 'dpApi' => true  ));
