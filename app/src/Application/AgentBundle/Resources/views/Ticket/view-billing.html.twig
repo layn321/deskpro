@@ -1,6 +1,12 @@
 <table cellspacing="0" cellpadding="0" width="100%" class="field-holders-table th-la billing-table" {% if ticket.charges is empty %}style="display:none"{% endif %}>
 <thead>
-	<th>{{ phrase('agent.tickets.billing_chargetime') }}</th>
+    {# The Other Guys | 201401290154 @Frankie -- Custom Table Headers #}
+	<th>Time</th>
+    <th>Rate</th>
+    <th>Charge</th>
+
+	{#<th>{{ phrase('agent.tickets.billing_chargetime') }}</th>#}
+	{# end #201401290154 #}	
 	<th>{{ phrase('agent.general.agent') }}</th>
 	<th>{{ phrase('agent.general.date') }}</th>
 	<th>{{ phrase('agent.general.comment') }}</th>

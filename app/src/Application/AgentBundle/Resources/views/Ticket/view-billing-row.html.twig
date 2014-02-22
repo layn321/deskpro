@@ -3,6 +3,11 @@
 		{% if charge.charge_time %}
 			{{ charge.charge_time|time_length }}
 		{% endif %}
+	</td> 	{# The Other Guys #}
+	{# The Other Guys #}
+	<td> ${{ charge.billing_rate|number_format(2) }}</td>
+	{# end The Other Guys #}
+	<td> 	{# The Other Guys #}
 		{% if charge.amount %}
 			{{ charge.amount|number_format(2) }} {{ app.getSetting('core_tickets.billing_currency') }}
 		{% endif %}
