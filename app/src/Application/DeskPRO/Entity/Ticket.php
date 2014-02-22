@@ -1143,6 +1143,7 @@ class Ticket extends \Application\DeskPRO\Domain\DomainObject
 		}
 	}
 
+	// The Other Guys | #201402112258 @Layne Modify method definition adding billing_rate and billing_dept
 	public function addCharge(Person $agent, $time, $amount = null, $comment = '')
 	{
 		if ($time !== null) {
@@ -1163,14 +1164,26 @@ class Ticket extends \Application\DeskPRO\Domain\DomainObject
 		}
 
 		$charge = new TicketCharge();
-		$charge->charge_time = $time;
-		$charge->amount = $amount;
+		//$charge->charge_time = $time; 	// The Other Guys -- original code
+		//$charge->amount = $amount; 		// The Other Guys -- original code
 		$charge->comment = strval($comment);
 		$charge->ticket = $this;
 		$charge->person = $this->person;
 		$charge->organization = $this->organization;
 		$charge->agent = $agent;
-
+		// The Other Guys | #201402112258 @Layne add assignments for billing_rate and billing_dept
+		$charge->billing_rate = $agent->getRate();
+		$charge->billing_dept = $agent->getDepartmentId();
+		if ($time !== null) {
+			$charge->amount = floatval( ($charge->billing_rate * ($time/3600)) );
+			$charge->charge_time = $time;
+		} else {
+			$charge->charge_time = ($amount/$charge->billing_rate) * 3600;
+			$charge->amount = $amount;
+		}
+		// end #201402112258
+		
+		
 		$this->charges->add($charge);
 
 		return $charge;
@@ -1191,6 +1204,7 @@ class Ticket extends \Application\DeskPRO\Domain\DomainObject
 		$this->ticket_slas->add($ticket_sla);
 
 		return $ticket_sla;
+		
 	}
 
 	public function removeSla(Sla $sla)

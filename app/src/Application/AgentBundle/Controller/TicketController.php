@@ -2232,7 +2232,17 @@ class TicketController extends AbstractController
 
 		$comment = $this->in->getString('billing_comment');
 
+		/**
+		 * THE OTHER GUYS - Add Hours * rate -- 15 min minimum -- Andy
+		 */
+		if ($time != null && $time < 900)
+		{
+			$time = 900;
+		} 
+		// end The Other Guys
+
 		$charge = $ticket->addCharge($this->person, $time, $amount, $comment);
+
 		if ($charge) {
 			$this->em->persist($ticket);
 			$this->em->flush();

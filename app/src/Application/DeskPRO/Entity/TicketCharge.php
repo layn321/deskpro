@@ -62,6 +62,22 @@ class TicketCharge extends \Application\DeskPRO\Domain\DomainObject
 	protected $amount;
 
 	/**
+	 * The Other Guys
+	 * #201402112108 @Layne -- add billing_rate and billing_dept
+	 */
+
+	 /**
+	 * @var float
+	 */
+	protected $billing_rate;
+
+	/**
+	 * @var integer
+	 */
+	protected $billing_dept;
+	// end #201402112108
+	
+	/**
 	 * @var string
 	 */
 	protected $comment = '';
@@ -111,6 +127,15 @@ class TicketCharge extends \Application\DeskPRO\Domain\DomainObject
 		$metadata->mapField(array( 'fieldName' => 'id', 'type' => 'integer', 'precision' => 0, 'scale' => 0, 'nullable' => false, 'columnName' => 'id', 'id' => true, ));
 		$metadata->mapField(array( 'fieldName' => 'charge_time', 'type' => 'integer', 'precision' => 0, 'scale' => 0, 'nullable' => true, 'columnName' => 'charge_time', ));
 		$metadata->mapField(array( 'fieldName' => 'amount', 'type' => 'decimal', 'precision' => 10, 'scale' => 2, 'nullable' => true, 'columnName' => 'amount', ));
+		/**
+		 * The Other Guys
+		 * #201402112109 @Layne -- add billing_rate and billing_dept Doctrine mappings
+		 */
+
+		$metadata->mapField(array( 'fieldName' => 'billing_rate', 'type' => 'decimal', 'precision' => 11, 'scale' => 2, 'nullable' => true, 'columnName' => 'billing_rate', ));
+		$metadata->mapField(array( 'fieldName' => 'billing_dept', 'type' => 'integer', 'precision' => 0, 'scale' => 0, 'nullable' => true, 'columnName' => 'billing_dept', ));
+		// end #201402112109
+
 		$metadata->mapField(array( 'fieldName' => 'comment', 'type' => 'string', 'length' => 255, 'precision' => 0, 'scale' => 0, 'nullable' => false, 'columnName' => 'comment', ));
 		$metadata->mapField(array( 'fieldName' => 'date_created', 'type' => 'datetime', 'precision' => 0, 'scale' => 0, 'nullable' => false, 'columnName' => 'date_created', ));
 		$metadata->mapManyToOne(array( 'fieldName' => 'ticket', 'targetEntity' => 'Application\\DeskPRO\\Entity\\Ticket', 'mappedBy' => NULL, 'inversedBy' => NULL, 'joinColumns' => array( 0 => array( 'name' => 'ticket_id', 'referencedColumnName' => 'id', 'nullable' => true, 'onDelete' => 'cascade', 'columnDefinition' => NULL, ), ) ));
