@@ -326,6 +326,37 @@ class BillingController extends AbstractController
 					ORDER BY ticket_charges.date_created
 				"
 			),
+			/** The Other Guys
+			* #201401291616 @Frankie -- Custom Billing Report by Department
+			* @Layne -- updated for billing_rate field within ticket_charges table
+			*/
+			'list-charges-dept-date' => array(
+			'title' => '***List of [charges] per agent <1:date group, default: this_month>***',
+			'query' => "
+			DISPLAY TABLE
+			SELECT TOTAL(TIME_LENGTH(ticket_charges.charge_time)) AS 'Time', FORMAT(ticket_charges.billing_rate, 'number', 2) AS 'Rate', TOTAL(FORMAT(ticket_charges.amount, 'number', 2)) AS 'Amount ($currency)', ticket_charges.date_created, ticket_charges.comment, ticket_charges.ticket
+			FROM ticket_charges
+			WHERE ticket_charges.date_created = %1:DATE_GROUP%
+			SPLIT BY ticket_charges.agent
+			ORDER BY ticket_charges.date_created
+			"
+			),
+			/**
+			* The Other Guys
+			* #201401222200 -- Custom Billing Report by Agent
+			* @Layne -- updated for billing_rate field within ticket_charges table
+			*/
+			'list-charges-agent-rate-date' => array(
+			'title' => '***Total [charges] per agent with rate <1:date group, default: this_month>***',
+			'query' => "
+			DISPLAY TABLE
+			SELECT TOTAL(COUNT()) AS 'Number of Charges', TOTAL(TIME_LENGTH(SUM(ticket_charges.charge_time))) AS 'Total Time', FORMAT(ticket_charges.billing_rate, 'number', 2) AS 'Rate ($currency)', ticket_charges.billing_dept AS 'Billing Dept ID', TOTAL(FORMAT(TIME_LENGTH(SUM(ticket_charges.amount)), 'number', 2)) AS 'Total Amount ($currency)'
+			FROM ticket_charges
+			WHERE ticket_charges.date_created = %1:DATE_GROUP%
+			SPLIT BY ticket_charges.agent
+			GROUP BY ticket_charges.billing_rate
+			"
+			),		
 		);
 
 		$tempReport = new ReportBuilder();
